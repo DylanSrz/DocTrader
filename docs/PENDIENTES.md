@@ -20,15 +20,27 @@
       (Binance Pay Merchant requiere aprobación). Si no, se usa solo depósito directo + aprobación manual.
 - [ ] **Direcciones de depósito** de Binance para: USDT-TRC20, USDT-BEP20, BTC (y ETH/USDC si se incluyen).
 - [ ] Decidir si se incluyen **ETH y USDC** (y en qué red).
-- [ ] ¿Precio en cripto fijo en USD (500 USDT) y BTC calculado al cambio del momento? (propuesto: sí).
+- [ ] ¿Precio en cripto fijo en USD (USDT) y BTC calculado al cambio del momento? (propuesto: sí).
 - [ ] ¿Cuánto tiempo es válida una orden de pago antes de expirar? (propuesto: 60 minutos para cripto).
-- [ ] **Política de reembolsos:** ¿hay reembolso? ¿En qué casos y plazos?
-- [ ] ¿Habrá periodo de prueba o descuento de lanzamiento?
+- [x] **Reembolsos:** no hay devoluciones.
+- [x] **Prueba:** USD 50 por 1 mes, solo si el cliente la solicita. Completar: USD 450 por 5 meses más.
+
+### Precios — por confirmar con Argemiro
+- [ ] **Licencia normal:** ¿son 5 meses por USD 499 + 1 mes de obsequio con cupón (= 6 meses)?
+      ¿O "USD 499 el mes" significa otra cosa?
+- [ ] **Cupón del mes de obsequio:** ¿se aplica automáticamente a todos, o el cliente debe escribir
+      un código? ¿Tiene fecha de vencimiento (promoción de lanzamiento)?
+- [ ] ¿La renovación (después de los 6 meses) cuesta lo mismo y también lleva el mes de obsequio?
+- [ ] **Precios en COP** de la licencia normal, la prueba y el pago para completar.
+- [ ] **Prueba:** ¿hasta cuándo puede pagar los USD 450? (propuesto: hasta el último día de la prueba).
+      ¿Los 5 meses se cuentan desde el fin de la prueba (total 6 meses desde el inicio)? (propuesto: sí).
+- [ ] **Prueba:** ¿cómo la solicita el cliente? (propuesto: botón "Solicitar prueba" en su panel →
+      Argemiro la aprueba → el cliente paga los USD 50).
 
 ## 🟡 Operación y cuentas de clientes
 
-- [ ] **Datos exactos que Argemiro necesita** de cada cliente para conectar la cuenta
-      (broker, servidor, plataforma MT4/MT5/cTrader, número de cuenta, contraseña, capital, otros).
+- [x] **Datos para conectar la cuenta:** nombre completo, número de cuenta, broker, servidor,
+      contraseña operativa y contraseña de inversor.
 - [ ] ¿Qué servicio de copy trading usa? (para evaluar más adelante si tiene API).
 - [ ] Al vencer la suscripción: ¿días de gracia antes de desconectar? (propuesto: 0–3 días).
 - [ ] ¿El cliente puede tener **más de una cuenta** de trading por suscripción?
