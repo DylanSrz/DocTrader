@@ -31,8 +31,7 @@
 - [x] **Renovación:** cuesta lo mismo (incluye el mes de obsequio).
 - [x] **Prueba:** se completa hasta el último día de la prueba; los 5 meses se suman al final.
 - [x] **Prueba:** el cliente la solicita con un botón, Argemiro la aprueba y el cliente paga USD 50.
-- [ ] **Precios en COP de la prueba y del pago para completar.**
-      Propuesta proporcional: prueba **COP 200.000** y completar **COP 1.800.000** (suma COP 2.000.000).
+- [x] **Precios en COP:** prueba **COP 200.000** y completar **COP 1.800.000** (suma COP 2.000.000).
 
 ## 🟡 Operación y cuentas de clientes
 

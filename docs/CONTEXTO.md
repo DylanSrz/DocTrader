@@ -29,12 +29,12 @@ deben reflejar esto (nunca prometer rentabilidad).
   - El mes de obsequio es un cupón que **se aplica automáticamente** a toda compra (el cliente no
     escribe ningún código). El admin puede cambiarlo o desactivarlo.
   - La **renovación cuesta lo mismo** y también incluye el mes de obsequio.
-- **Licencia de prueba: 1 mes por USD 50.**
+- **Licencia de prueba: 1 mes por USD 50 o COP 200.000.**
   - **No se ofrece públicamente:** solo si el cliente la solicita (el admin la habilita).
   - Una sola prueba por cliente.
   - Cómo se pide: botón **"Solicitar prueba"** en el panel del cliente → Argemiro la aprueba →
     el cliente paga los USD 50.
-  - Si al cliente le gustó, **completa con USD 450** y recibe **5 meses más**, que se suman al final
+  - Si al cliente le gustó, **completa con USD 450 o COP 1.800.000** y recibe **5 meses más**, que se suman al final
     de la prueba (total: 6 meses por USD 500 desde el inicio de la prueba).
   - Plazo para completar: **hasta el último día de la prueba**.
   - Si no completa a tiempo, para continuar paga una **licencia normal de 6 meses (USD 499)**.
