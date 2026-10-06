@@ -25,17 +25,14 @@
 - [x] **Reembolsos:** no hay devoluciones.
 - [x] **Prueba:** USD 50 por 1 mes, solo si el cliente la solicita. Completar: USD 450 por 5 meses más.
 
-### Precios — por confirmar con Argemiro
-- [ ] **Licencia normal:** ¿son 5 meses por USD 499 + 1 mes de obsequio con cupón (= 6 meses)?
-      ¿O "USD 499 el mes" significa otra cosa?
-- [ ] **Cupón del mes de obsequio:** ¿se aplica automáticamente a todos, o el cliente debe escribir
-      un código? ¿Tiene fecha de vencimiento (promoción de lanzamiento)?
-- [ ] ¿La renovación (después de los 6 meses) cuesta lo mismo y también lleva el mes de obsequio?
-- [ ] **Precios en COP** de la licencia normal, la prueba y el pago para completar.
-- [ ] **Prueba:** ¿hasta cuándo puede pagar los USD 450? (propuesto: hasta el último día de la prueba).
-      ¿Los 5 meses se cuentan desde el fin de la prueba (total 6 meses desde el inicio)? (propuesto: sí).
-- [ ] **Prueba:** ¿cómo la solicita el cliente? (propuesto: botón "Solicitar prueba" en su panel →
-      Argemiro la aprueba → el cliente paga los USD 50).
+### Precios
+- [x] **Licencia normal:** 5 meses + 1 de obsequio = 6 meses por USD 499 o COP 2.000.000.
+- [x] **Cupón del mes de obsequio:** se aplica automáticamente.
+- [x] **Renovación:** cuesta lo mismo (incluye el mes de obsequio).
+- [x] **Prueba:** se completa hasta el último día de la prueba; los 5 meses se suman al final.
+- [x] **Prueba:** el cliente la solicita con un botón, Argemiro la aprueba y el cliente paga USD 50.
+- [ ] **Precios en COP de la prueba y del pago para completar.**
+      Propuesta proporcional: prueba **COP 200.000** y completar **COP 1.800.000** (suma COP 2.000.000).
 
 ## 🟡 Operación y cuentas de clientes
 

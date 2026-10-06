@@ -1,6 +1,6 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-06 (precios, prueba y datos de cuenta)
+> Última actualización: 2026-10-06 (precios confirmados)
 > Estado: **Planeación** (aún no hay código)
 
 ## 1. Resumen
@@ -25,14 +25,18 @@ deben reflejar esto (nunca prometer rentabilidad).
 
 ### Negocio
 - Solo se cobra la **licencia/suscripción al software**. No hay cobro por desempeño ni % de ganancias.
-- **Licencia normal: 6 meses por USD 499** = 5 meses pagados + **1 mes de obsequio aplicado como cupón**.
-  - *Interpretación a confirmar:* el precio base son 5 meses y el cupón suma el 6.º mes (ver PENDIENTES.md).
-  - Precio en COP de esta licencia: **por definir** (el anterior era COP 2.000.000 por 3 meses).
+- **Licencia normal: USD 499 o COP 2.000.000** = 5 meses pagados + **1 mes de obsequio** = **6 meses**.
+  - El mes de obsequio es un cupón que **se aplica automáticamente** a toda compra (el cliente no
+    escribe ningún código). El admin puede cambiarlo o desactivarlo.
+  - La **renovación cuesta lo mismo** y también incluye el mes de obsequio.
 - **Licencia de prueba: 1 mes por USD 50.**
   - **No se ofrece públicamente:** solo si el cliente la solicita (el admin la habilita).
   - Una sola prueba por cliente.
-  - Si al cliente le gustó, **completa con USD 450** y recibe los **5 meses restantes**
-    (total: 6 meses por USD 500, contados desde el inicio de la prueba).
+  - Cómo se pide: botón **"Solicitar prueba"** en el panel del cliente → Argemiro la aprueba →
+    el cliente paga los USD 50.
+  - Si al cliente le gustó, **completa con USD 450** y recibe **5 meses más**, que se suman al final
+    de la prueba (total: 6 meses por USD 500 desde el inicio de la prueba).
+  - Plazo para completar: **hasta el último día de la prueba**.
   - Si no completa a tiempo, para continuar paga una **licencia normal de 6 meses (USD 499)**.
 - **No hay devoluciones** ni periodo de prueba gratis.
 - Planes, precios, duración y cupones **editables desde el panel de administrador**.
