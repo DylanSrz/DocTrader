@@ -60,7 +60,7 @@ deben reflejar esto (nunca prometer rentabilidad).
 
 ### Tecnología
 - **Backend: NestJS** (el desarrollador lo está aprendiendo) + TypeScript.
-- **Frontend: Next.js (React)** + Tailwind — *pendiente de confirmar* (ver PENDIENTES.md).
+- **Frontend: Next.js (React)** + Tailwind — confirmado.
 - Base de datos: **PostgreSQL** con **Prisma** como ORM.
 - Correos: Resend (o similar). Tareas programadas (recordatorios): `@nestjs/schedule`.
 - Hosting propuesto: frontend en Vercel; API NestJS + Postgres en Railway / Render / Supabase (DB).

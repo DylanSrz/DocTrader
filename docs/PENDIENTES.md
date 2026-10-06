@@ -4,9 +4,7 @@
 
 ## 🔴 Bloquean el inicio del desarrollo
 
-- [ ] **Confirmar tecnología del frontend.** NestJS es un framework de *backend* (API). Para la parte
-      visual se propone **Next.js** (React). ¿Se confirma NestJS (API) + Next.js (web)?
-      ¿O la intención era Next.js? (los nombres se parecen).
+- [x] **Tecnología confirmada:** NestJS (API) + Next.js (web).
 - [ ] **% de comisión del socio desarrollador:**
   - [ ] Porcentaje acordado.
   - [ ] ¿Sobre el valor bruto o neto (después de comisiones de pasarela/Binance)?
