@@ -4,6 +4,7 @@ Plataforma web para vender licencias del software de copy trading **Doc Trader P
 
 - Contexto completo y decisiones: `docs/CONTEXTO.md`
 - Información pendiente por recibir: `docs/PENDIENTES.md`
+- Documento de requerimientos formal (RN, RF, RNF, HU, alcance): https://claude.ai/code/artifact/12e017f5-308d-45a5-bf40-89b2d4b6f121
 
 Reglas clave:
 - Se vende una **licencia de uso de software**, nunca "servicio de trading" ni rentabilidad garantizada.
