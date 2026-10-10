@@ -9,7 +9,8 @@ Plataforma web para vender licencias del software de copy trading **Doc Trader P
 Reglas clave:
 - Se vende una **licencia de uso de software**, nunca "servicio de trading" ni rentabilidad garantizada.
 - Pagos **manuales y no recurrentes** (periodos prepagados + recordatorios). Precios editables desde el admin.
-- Sin devoluciones. Precios en USD; en pesos se cobra el equivalente a la **TRM del día** del pago (todas las licencias).
+- Sin devoluciones. Precios en USD; en pesos se cobra el equivalente a la **TRM oficial del día** (Superintendencia Financiera)
+  del pago, redondeado a los 1.000 pesos (todas las licencias).
   Licencia normal y renovación: 6 meses (5 + 1 de obsequio, cupón automático) por USD 499.
   Licencia trimestral: 3 meses por USD 319, sin obsequio. Un trimestral puede pasarse a la normal antes de vencer (días se suman).
   Prueba de 1 mes (USD 50) solo bajo solicitud aprobada por el admin; se completa con USD 450 hasta el último día

@@ -36,8 +36,7 @@
 - [x] **Licencia trimestral:** USD 319 por 3 meses. Semestral de USD 599 descartado.
 - [x] Un cliente trimestral puede pasarse a la licencia de 6 meses antes de vencer; los días se suman.
 - [x] Completar la prueba **no** lleva mes de obsequio.
-- [ ] Fuente de la TRM (propuesto: la TRM oficial publicada por la Superintendencia Financiera / datos.gov.co)
-      y si se redondea el precio en pesos (propuesto: a los 1.000 pesos más cercanos).
+- [x] **TRM:** la oficial de la Superintendencia Financiera; el valor en pesos se redondea a los 1.000 pesos más cercanos.
 - [ ] ¿La prueba puede completarse también con la trimestral? (propuesto: no, solo con los 5 meses de USD 450).
 
 ## 🟡 Operación y cuentas de clientes

@@ -26,6 +26,7 @@ deben reflejar esto (nunca prometer rentabilidad).
 ### Negocio
 - Solo se cobra la **licencia/suscripción al software**. No hay cobro por desempeño ni % de ganancias.
 - **Precios en USD.** En pesos se cobra el **equivalente a la TRM del día** en que se paga, para todas las licencias.
+  - TRM oficial de la **Superintendencia Financiera**; el valor en pesos se **redondea a los 1.000 pesos** más cercanos.
 - **Licencia normal: USD 499** = 5 meses pagados + **1 mes de obsequio** = **6 meses**.
   - El mes de obsequio es un cupón que **se aplica automáticamente** a toda compra (el cliente no
     escribe ningún código). El admin puede cambiarlo o desactivarlo.
