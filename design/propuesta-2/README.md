@@ -8,7 +8,7 @@ Es el material que guía esta propuesta. Lo entrega el usuario por partes.
 
 | Archivo | Qué es | Estado |
 |---|---|---|
-| `referencia-1.png` | Captura completa de Xapo Bank — https://www.xapobank.com/en | Recibida (248×2000 px, baja resolución) |
+| `referencia-1.png` | Captura completa de Xapo Bank — https://www.xapobank.com/en | Recibida: captura propia del 2026-10-10, 1440×10130 px, sin avisos de cookies ni aviso legal |
 | `referencia-2.png` | Captura completa de la segunda página de referencia | Pendiente |
 | `cta-1.png` | Captura de un llamado a la acción de referencia (si aplica) | Pendiente |
 | `DESIGN.md` | Sistema de diseño exportado de Refero (si se tiene) | Pendiente |
