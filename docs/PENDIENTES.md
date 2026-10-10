@@ -43,4 +43,4 @@ TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase
 direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
 una prueba por cliente ·
-soporte por Telegram · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.
+verificación automática de pagos en blockchain · soporte por Telegram · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.

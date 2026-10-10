@@ -1,6 +1,6 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-10 (Binance Merchant en trámite, servicio de copy: Social Trader Tools)
+> Última actualización: 2026-10-10 (verificación automática de pagos en blockchain)
 > Estado: **Planeación** (aún no hay código)
 
 ## 1. Resumen
@@ -55,6 +55,17 @@ deben reflejar esto (nunca prometer rentabilidad).
   **USDT en Tron (TRC20)**, **USDC en BNB Smart Chain (BEP20)** y **BTC en la red Bitcoin**.
   - **Depósito directo (método principal al lanzar):** el admin **agrega desde el panel todas las direcciones de depósito** que
     quiera (moneda + red + dirección, activables). El cliente envía, reporta el hash y el admin aprueba.
+  - **Verificación automática en blockchain:** cuando el cliente reporta el hash, la plataforma consulta
+    la blockchain pública (Tron para USDT TRC20, BNB Smart Chain para USDC BEP20, Bitcoin para BTC) y revisa:
+    1. que el hash no se haya usado antes en otra orden;
+    2. que el destino sea la dirección de depósito de la orden y la moneda/contrato sea el correcto;
+    3. que el monto sea **igual o mayor** al de la orden (si es menor, se marca "monto incompleto");
+    4. que la transacción sea posterior a la creación de la orden;
+    5. que tenga las confirmaciones mínimas (propuesto: Tron 20, BNB Smart Chain 15, Bitcoin 2; editables).
+    El resultado (Verificado / No coincide / Esperando confirmaciones) se muestra al admin junto a la orden,
+    que la aprueba con un clic. Opción en el panel, **apagada por defecto**: aprobar sola las órdenes verificadas.
+    Si el cliente no reporta el hash, el sistema puede detectar el depósito buscando el monto exacto en la dirección.
+  - **BTC:** el monto en BTC se calcula al crear la orden con el precio del momento y queda fijo durante la hora.
   - **Binance Pay Merchant: en trámite.** Argemiro ya solicitó la cuenta de comerciante y espera la
     aprobación. Se integra cuando Binance la apruebe (confirmación automática); mientras tanto todo pago
     entra por depósito directo con aprobación manual. El sistema se diseña para agregarlo sin rehacer nada.
@@ -159,7 +170,8 @@ conectar, cuenta por desconectar, cambio de % de comisión.
 `TradingAccount` (cliente, titular, broker, servidor, número, contraseña operativa cifrada,
 contraseña de inversor cifrada, estado de conexión, capital y riesgo) ·
 `License` (cuenta de trading, plan, inicio, fin, fin de gracia, estado, es_prueba) ·
-`PaymentOrder` (licencia, plan, moneda, red, dirección, monto, expira en, hash, estado, aprobado por) ·
+`PaymentOrder` (licencia, plan, moneda, red, dirección, monto, tasa BTC, expira en, hash único, estado de
+verificación, confirmaciones, monto recibido, aprobado por) · `ChainSetting` (red, confirmaciones mínimas, aprobación automática) ·
 `DepositAddress` (moneda, red, dirección, activa) ·
 `TrialRequest` · `Faq` · `Setting` (días de gracia, Telegram, Myfxbook, broker) · `Notification` · `AuditLog`
 

@@ -19,6 +19,8 @@ Reglas clave:
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
 - **Solo cripto** por ahora: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20), BTC (Bitcoin).
   Al lanzar: **depósito directo con aprobación manual** (direcciones que el admin agrega en el panel).
+  Cada hash reportado se **verifica automáticamente en la blockchain** (destino, moneda, monto, fecha,
+  confirmaciones, hash no repetido) antes de que el admin apruebe; aprobación automática opcional (apagada).
   Binance Pay Merchant está en trámite; se integra cuando Binance lo apruebe.
   Orden de pago válida 1 hora. Pasarela en pesos: fase 2.
 - Vencida la licencia: **3 días de gracia** (editable en admin) y luego pasa a "por desconectar".
