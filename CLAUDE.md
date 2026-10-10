@@ -6,18 +6,26 @@ Plataforma web para vender licencias del software de copy trading **Doc Trader P
 - Información pendiente por recibir: `docs/PENDIENTES.md`
 - Documento de requerimientos formal (RN, RF, RNF, HU, alcance): https://claude.ai/code/artifact/12e017f5-308d-45a5-bf40-89b2d4b6f121
 
+Estado: **modo plan**. No escribir código de la aplicación hasta que el usuario lo pida.
+
 Reglas clave:
 - Se vende una **licencia de uso de software**, nunca "servicio de trading" ni rentabilidad garantizada.
-- Pagos **manuales y no recurrentes** (periodos prepagados + recordatorios). Precios editables desde el admin.
-- Sin devoluciones. Precios en USD; en pesos se cobra el equivalente a la **TRM oficial del día** (Superintendencia Financiera)
-  del pago, redondeado a los 1.000 pesos (todas las licencias).
-  Licencia normal y renovación: 6 meses (5 + 1 de obsequio, cupón automático) por USD 499.
-  Licencia trimestral: 3 meses por USD 319, sin obsequio. Un trimestral puede pasarse a la normal antes de vencer (días se suman).
-  Prueba de 1 mes (USD 50) solo bajo solicitud aprobada por el admin; se completa con USD 450 hasta el último día
-  de la prueba (5 meses más, sumados al final de la prueba, sin obsequio).
+- **Una licencia por cada cuenta de trading.** Pagos **manuales y no recurrentes** (periodos prepagados + recordatorios).
+- Precios en USD, editables desde el admin. Sin devoluciones.
+  Trimestral: 3 meses, USD 319, sin obsequio. Semestral: 6 meses (5 + 1 de obsequio, cupón automático), USD 499.
+  Un trimestral puede pasarse a semestral antes de vencer (días se suman).
+  Prueba de 1 mes (USD 50), solo bajo solicitud aprobada por el admin; se completa **solo a semestral** con USD 450
+  hasta el último día de la prueba (5 meses más, sumados al final, sin obsequio).
+  Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
+- Lanzamiento **solo cripto** (USDT, USDC, BTC): Binance Pay + direcciones de depósito que el admin agrega en el panel.
+  Orden de pago válida 1 hora. Pasarela en pesos: fase 2.
+- Vencida la licencia: **3 días de gracia** (editable en admin) y luego pasa a "por desconectar".
 - Antes de conectar, el cliente sube **un LPOA firmado** (uno por cliente, plantilla de Argemiro) y un admin lo aprueba.
-- Broker sugerido: JustMarkets, link de referido https://one.justmarkets.link/a/5vmbn05zda.
 - La conexión de cuentas al copy trading es **manual** (la hace Argemiro); la plataforma gestiona pagos,
-  suscripciones, datos de cuenta (credenciales cifradas) y colas "por conectar" / "por desconectar".
-- Dos administradores con todos los permisos: Argemiro y el desarrollador (socio con % de ventas).
-- Stack: NestJS (API) + Next.js (web) + PostgreSQL/Prisma. Idioma del producto: español.
+  licencias, datos de cuenta (contraseñas cifradas) y listas "por conectar" / "por desconectar".
+- Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % editable desde su perfil).
+- Registro con datos básicos de contacto. Soporte por Telegram. Broker sugerido: JustMarkets
+  (https://one.justmarkets.link/a/5vmbn05zda).
+- Marca: colores del logo de Argemiro; tipografías y estilos los define el desarrollo, con una página de
+  referencia. Prioridad: UI/UX excelente.
+- Stack: NestJS (API) + Next.js (web) + PostgreSQL con **TypeORM**. Idioma del producto: español.
