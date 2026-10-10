@@ -106,7 +106,9 @@ deben reflejar esto (nunca prometer rentabilidad).
 - **Marca:** logo básico de Argemiro (recibido, en `design/marca/`); los colores salen del logo.
   **Tipografías y estilos los define el desarrollo**, guiados por la página de referencia de Argemiro (https://denmu.com/).
 - **Propuestas de diseño** en `design/` (una carpeta por propuesta, logo compartido en `design/marca/`).
-  Propuesta 1 (landing y panel del cliente) presentada el 2026-10-10; Argemiro elige antes de construir en Next.js.
+  Propuesta 1 (landing y panel del cliente; estética de denmu.com) y propuesta 2 (landing, panel del cliente y panel
+  de administración; DESIGN.md de Refero con los colores del logo), presentadas el 2026-10-10. Argemiro elige antes
+  de construir en Next.js.
 - **Objetivo: un excelente UI/UX** en la página pública y en ambos paneles.
 
 ### Tecnología

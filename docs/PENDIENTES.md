@@ -12,7 +12,8 @@
 
 - [x] **Logo** recibido (`design/marca/logo-original.png`).
 - [x] **Página de referencia:** https://denmu.com/
-- [ ] **Elección de propuesta de diseño:** Argemiro revisa la propuesta 1 (`design/propuesta-1/`) y las siguientes.
+- [ ] **Elección de propuesta de diseño:** Argemiro revisa las propuestas 1 y 2 (`design/README.md` las compara).
+- [ ] **Enlace de Myfxbook de Argemiro:** la landing de la propuesta 2 enlaza por ahora una cuenta de referencia de terceros.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [ ] **Dominio:** ¿ya está comprado? ¿Cuál? ¿Quién tiene acceso a la configuración DNS?
 - [ ] Correo del dominio para envíos (ej. `soporte@dominio.com`).
