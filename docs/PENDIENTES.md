@@ -2,11 +2,11 @@
 
 > Actualizado: 2026-10-10. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
 
-## 🔴 Decisiones abiertas
+## ⏳ En espera
 
-- [ ] **Binance Pay Merchant:** confirmar que la cuenta de Argemiro es de comerciante y tiene llaves de
-      API. Un Binance Pay personal no permite confirmar pagos automáticamente desde la web.
-- [ ] ¿Qué servicio de copy trading usa? (para evaluar más adelante si tiene API).
+- [ ] **Aprobación de Binance Pay Merchant** (Argemiro ya la solicitó). Cuando llegue: llaves de API
+      (primero en modo prueba) para activar la confirmación automática. Mientras tanto: depósito directo
+      con aprobación manual.
 
 ## 🟢 Marca y contenido
 
@@ -31,7 +31,6 @@
 
 - [ ] Cuenta para hosting (Vercel, Railway/Render) y base de datos.
 - [ ] Cuenta de Resend (u otro) para correos, verificada con el dominio.
-- [ ] Llaves API de Binance Pay Merchant (primero en modo prueba).
 - [ ] Direcciones de depósito iniciales: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20) y BTC (Bitcoin).
 - [ ] Correos de las 2 cuentas de administrador (Argemiro y desarrollador).
 
@@ -44,4 +43,4 @@ TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase
 direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
 una prueba por cliente ·
-soporte por Telegram · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.
+soporte por Telegram · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.

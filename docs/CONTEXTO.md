@@ -1,6 +1,6 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-10 (sin LPOA, cédula en el registro, redes cripto, liquidación de comisión)
+> Última actualización: 2026-10-10 (Binance Merchant en trámite, servicio de copy: Social Trader Tools)
 > Estado: **Planeación** (aún no hay código)
 
 ## 1. Resumen
@@ -53,10 +53,11 @@ deben reflejar esto (nunca prometer rentabilidad).
 - Modelo de **periodos prepagados**: si renueva antes de vencer, los días se suman desde el vencimiento actual.
 - **Solo cripto por ahora** (sin transferencias ni pesos). Monedas y redes:
   **USDT en Tron (TRC20)**, **USDC en BNB Smart Chain (BEP20)** y **BTC en la red Bitcoin**.
-  - **Binance Pay:** Argemiro ya lo tiene. Para la confirmación automática se necesita la API de
-    Binance Pay **Merchant** (llaves de comerciante); a confirmar.
-  - **Depósito directo:** el admin **agrega desde el panel todas las direcciones de depósito** que
+  - **Depósito directo (método principal al lanzar):** el admin **agrega desde el panel todas las direcciones de depósito** que
     quiera (moneda + red + dirección, activables). El cliente envía, reporta el hash y el admin aprueba.
+  - **Binance Pay Merchant: en trámite.** Argemiro ya solicitó la cuenta de comerciante y espera la
+    aprobación. Se integra cuando Binance la apruebe (confirmación automática); mientras tanto todo pago
+    entra por depósito directo con aprobación manual. El sistema se diseña para agregarlo sin rehacer nada.
 - **Orden de pago válida por 1 hora.** Pasada la hora, expira y el cliente genera otra.
 - **Pasarela en pesos (COP): fuera del lanzamiento**, queda como funcionalidad futura.
 
@@ -67,7 +68,8 @@ deben reflejar esto (nunca prometer rentabilidad).
   auditoría y Argemiro recibe un aviso.
 
 ### Conexión de cuentas
-- **Manual.** Argemiro conecta y desconecta cada cuenta en su servicio de copy trading.
+- **Manual.** Argemiro conecta y desconecta cada cuenta en su servicio de copy trading:
+  **Social Trader Tools**.
 - La plataforma: (1) sabe quién pagó y quién no, (2) guarda los datos de cada cuenta y (3) muestra
   las listas **"por conectar"** y **"por desconectar"**.
 - **Datos de cada cuenta de trading:** nombre completo, número de cuenta, broker, servidor,
@@ -75,7 +77,7 @@ deben reflejar esto (nunca prometer rentabilidad).
   admins las ven y cada consulta queda en auditoría.
 - **No se pide LPOA** (decisión del 2026-10-10). Con la licencia pagada y los datos completos, la cuenta
   entra directamente a "por conectar".
-- Automatización por API: se evaluará más adelante.
+- Automatización por API de Social Trader Tools: se evaluará en la fase 3.
 
 ### Registro y soporte
 - Registro con **nombre completo, cédula (documento de identidad nacional), correo y teléfono**.
@@ -107,7 +109,7 @@ deben reflejar esto (nunca prometer rentabilidad).
 2. Se registra con nombre, cédula, correo y teléfono (verifica correo, acepta términos y aviso de riesgo).
 3. Elige licencia (trimestral, semestral, o prueba si se la aprobaron) para una cuenta de trading →
    orden de pago **pendiente** (válida 1 hora).
-4. Pago confirmado (Binance Pay o aprobación del admin) → licencia **activa**.
+4. Pago confirmado (aprobación del admin; Binance Pay cuando esté aprobado) → licencia **activa**.
    - En prueba: ve el botón **"Completar a semestral — USD 450"** hasta el último día de la prueba.
 5. Registra los datos de esa cuenta de trading → la cuenta entra a **"por conectar"**.
 6. Argemiro la conecta y la marca como **conectada** → el cliente recibe correo.
@@ -164,8 +166,8 @@ contraseña de inversor cifrada, estado de conexión, capital y riesgo) ·
 ## 7. Fases
 
 - **Fase 1 (lanzamiento):** landing + FAQ + Myfxbook + broker sugerido, registro/login, licencias
-  trimestral/semestral/prueba, pagos cripto (Binance Pay + depósito directo con aprobación),
+  trimestral/semestral/prueba, pagos cripto por depósito directo con aprobación (Binance Pay Merchant en cuanto Binance lo apruebe),
   panel del cliente, panel de admin, perfil de socio, recordatorios y gracia.
 - **Fase 2:** pasarela en pesos (COP), referidos, cupones adicionales, avisos por Telegram/WhatsApp,
   tickets de soporte, versión en inglés.
-- **Fase 3:** conexión/desconexión automática vía API del servicio de copy trading (si existe).
+- **Fase 3:** conexión/desconexión automática vía API de Social Trader Tools (si la ofrece).
