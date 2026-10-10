@@ -32,6 +32,11 @@
 - [x] **Prueba:** se completa hasta el último día de la prueba; los 5 meses se suman al final.
 - [x] **Prueba:** el cliente la solicita con un botón, Argemiro la aprueba y el cliente paga USD 50.
 - [x] **Precios en COP:** prueba **COP 200.000** y completar **COP 1.800.000** (suma COP 2.000.000).
+- [x] **Licencia trimestral:** USD 319 por 3 meses; en COP, el equivalente a la TRM del día. Semestral de USD 599 descartado.
+- [ ] ¿La TRM del día aplica también a la licencia normal, la prueba y el completar, o esas siguen con
+      precio fijo en COP (2.000.000 / 200.000 / 1.800.000)?
+- [ ] ¿Un cliente en licencia trimestral puede pasarse a la de 6 meses antes de vencer? (propuesto: sí, los días se suman).
+- [ ] ¿La prueba puede completarse también con la trimestral? (propuesto: no, solo con los 5 meses de USD 450).
 
 ## 🟡 Operación y cuentas de clientes
 
@@ -54,7 +59,10 @@
 - [ ] Textos: descripción del software, cómo funciona, historia/perfil de Argemiro.
 - [ ] **Preguntas frecuentes** con sus respuestas (depósitos, retiros, brokers, riesgo, capital mínimo…).
 - [ ] **Enlace/código del widget de Myfxbook** de la cuenta auditada.
-- [ ] Lista de brokers recomendados (¿con links de afiliado?).
+- [x] Broker sugerido: JustMarkets con el link de referido de Argemiro.
+- [ ] ¿Hay otros brokers recomendados además de JustMarkets?
+- [ ] **Plantilla del LPOA** (documento que el cliente firma y sube): la entrega Argemiro.
+      ¿Debe firmarse a mano (escaneado) o sirve firma digital? ¿Un LPOA por cada cuenta de trading?
 - [ ] Redes sociales y enlaces de contacto (WhatsApp, Telegram, Instagram, YouTube…).
 - [ ] Páginas de referencia o competencia que le gusten (estilo visual).
 

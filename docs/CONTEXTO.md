@@ -1,6 +1,6 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-06 (precios confirmados)
+> Última actualización: 2026-10-10 (plan trimestral, LPOA y broker sugerido)
 > Estado: **Planeación** (aún no hay código)
 
 ## 1. Resumen
@@ -29,6 +29,10 @@ deben reflejar esto (nunca prometer rentabilidad).
   - El mes de obsequio es un cupón que **se aplica automáticamente** a toda compra (el cliente no
     escribe ningún código). El admin puede cambiarlo o desactivarlo.
   - La **renovación cuesta lo mismo** y también incluye el mes de obsequio.
+- **Licencia trimestral: USD 319** por 3 meses (sin mes de obsequio). Visible en la página pública.
+  - Precio en COP: **el equivalente de USD 319 a la TRM del día** en que se paga.
+  - Se renueva al mismo precio.
+  - Se descartó un plan semestral de USD 599: la opción de 6 meses es la licencia normal (5 + 1) de USD 499.
 - **Licencia de prueba: 1 mes por USD 50 o COP 200.000.**
   - **No se ofrece públicamente:** solo si el cliente la solicita (el admin la habilita).
   - Una sola prueba por cliente.
@@ -70,6 +74,9 @@ deben reflejar esto (nunca prometer rentabilidad).
   4. Servidor del broker
   5. Contraseña operativa (maestra)
   6. Contraseña de inversor
+- **LPOA firmado (poder limitado):** el cliente descarga la plantilla que entrega Argemiro, la firma y
+  la sube como archivo. Se pide **después de pagar y antes de conectar**: la cuenta solo entra a la
+  lista "por conectar" cuando un admin aprueba el LPOA. El archivo se guarda privado (solo admins).
 - Ambas contraseñas se guardan **cifradas** y solo los administradores pueden verlas
   (cada consulta queda en el registro de auditoría).
 
@@ -78,6 +85,9 @@ deben reflejar esto (nunca prometer rentabilidad).
   con estadísticas e historial reales.
 - Sección de **preguntas frecuentes** editable desde el panel (depósitos, retiros, brokers, etc.).
   Los depósitos y retiros los hace cada cliente directamente con su broker.
+- **Broker sugerido por Argemiro:** JustMarkets, con su link de referido
+  `https://one.justmarkets.link/a/5vmbn05zda`. Se muestra como "¿No sabes qué broker elegir? Yo uso este",
+  aclarando que es un enlace de referido y que el cliente puede usar cualquier broker.
 
 ### Tecnología
 - **Backend: NestJS** (el desarrollador lo está aprendiendo) + TypeScript.
@@ -95,7 +105,8 @@ deben reflejar esto (nunca prometer rentabilidad).
 4. Pago confirmado (webhook o aprobación del admin) → licencia **activa** (inicio + días del plan
    + días del cupón).
    - Si es prueba: durante el mes ve el botón **"Completar licencia — USD 450"**, que le suma 5 meses.
-5. Completa el formulario de su cuenta de trading → entra a la cola **"por conectar"**.
+5. Completa el formulario de su cuenta de trading y sube su **LPOA firmado** → un admin aprueba el LPOA →
+   la cuenta entra a la cola **"por conectar"**.
 6. Argemiro la conecta manualmente y la marca como **conectada** → el cliente recibe correo.
 7. Recordatorios de vencimiento: 7, 3 y 1 día antes y el día del vencimiento.
 8. Si renueva → se suman los días. Si no → **vencida** → entra a la cola **"por desconectar"**.
@@ -137,10 +148,12 @@ conectar, cuenta por desconectar.
 ## 6. Modelo de datos (borrador)
 
 `User` (rol: ADMIN | CLIENT; prueba habilitada / usada) ·
-`Plan` (nombre, tipo NORMAL | PRUEBA | COMPLETAR_PRUEBA, días, precio COP, precio USD, visible, activo) ·
+`Plan` (nombre, tipo NORMAL | TRIMESTRAL | PRUEBA | COMPLETAR_PRUEBA, días, precio USD, precio COP fijo
+o calculado con la TRM del día, visible, activo) · `ExchangeRate` (fecha, TRM COP/USD) ·
 `Coupon` (código, días extra o descuento, vigencia, usos) ·
 `Subscription` (usuario, plan, inicio, fin, estado, es_prueba) ·
 `Payment` (usuario, plan, método, moneda, red, monto, hash/referencia, comprobante, estado, aprobado por) ·
+`LpoaDocument` (cuenta, archivo privado, estado PENDIENTE | APROBADO | RECHAZADO, revisado por) ·
 `TradingAccount` (usuario, nombre completo del titular, broker, servidor, número de cuenta,
 contraseña operativa cifrada, contraseña de inversor cifrada, estado de conexión,
 config de riesgo/capital) ·

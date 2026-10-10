@@ -12,6 +12,9 @@ Reglas clave:
 - Sin devoluciones. Licencia normal y renovación: 6 meses (5 + 1 de obsequio, cupón automático) por USD 499
   o COP 2.000.000. Prueba de 1 mes (USD 50 / COP 200.000) solo bajo solicitud aprobada por el admin; se completa con
   USD 450 / COP 1.800.000 hasta el último día de la prueba (5 meses más, sumados al final de la prueba).
+  Licencia trimestral: 3 meses por USD 319 (COP = equivalente a la TRM del día), sin obsequio.
+- Antes de conectar, el cliente sube su **LPOA firmado** (plantilla de Argemiro) y un admin lo aprueba.
+- Broker sugerido: JustMarkets, link de referido https://one.justmarkets.link/a/5vmbn05zda.
 - La conexión de cuentas al copy trading es **manual** (la hace Argemiro); la plataforma gestiona pagos,
   suscripciones, datos de cuenta (credenciales cifradas) y colas "por conectar" / "por desconectar".
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio con % de ventas).
