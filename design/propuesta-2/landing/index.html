@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DocTraderPRO</title>
+<meta name="description" content="Licencia de uso del software DocTraderPRO: conecta tu cuenta de trading y el sistema replica cada operación en tu broker.">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="../../marca/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&display=swap">
+<style>
+/*
+  DocTraderPRO — landing, propuesta 2
+  Sistema: DESIGN.md de Refero (Dala, "constellation floating on black velvet") con los colores del logo.
+  Negro puro, sin tarjetas ni bordes; la jerarquía la dan el tamaño y el espacio.
+  El único gesto fuerte: el logo de Argemiro (cerebro + flecha) hecho de partículas triangulares.
+*/
+:root {
+  color-scheme: dark;
+  --vacio: #000000;
+  --blanco: #FFFFFF;
+  --ceniza: #9A9A9A;
+  --niebla: #BDBDBD;
+  --llama: #FB9819;      /* único color de acción */
+  --llama-viva: #FFAD3D;
+  --senal: #DDDB65;      /* chispa: etiquetas y resaltes */
+  --brasa: #E2531F;      /* solo en partículas */
+
+  --ancho: 1280px;
+  --margen: clamp(20px, 5vw, 64px);
+  --seccion: clamp(88px, 12vw, 168px);
+  --radio: 24px;
+
+  --t-display: clamp(48px, 7.6vw, 113px);
+  --t-grande: clamp(40px, 5.4vw, 78px);
+  --t-medio: clamp(26px, 2.6vw, 36px);
+  --t-cuerpo: 18px;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--vacio); color: var(--blanco);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-optical-sizing: auto; font-feature-settings: "ss01" on, "cv11" on;
+  font-size: var(--t-cuerpo); font-weight: 300; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
+h1, h2, h3 { font-weight: 400; text-wrap: balance; }
+a, button, summary { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--senal); outline-offset: 4px; border-radius: 4px; }
+::selection { background: var(--llama); color: var(--vacio); }
+.cifra { font-variant-numeric: tabular-nums; }
+
+.saltar {
+  position: absolute; left: var(--margen); top: 12px; z-index: 50;
+  padding: 10px 16px; border-radius: var(--radio); background: var(--senal); color: var(--vacio);
+  font-size: 14px; font-weight: 600; text-decoration: none;
+  transform: translateY(-200%); transition: transform 200ms var(--ease-out);
+}
+.saltar:focus-visible { transform: translateY(0); }
+
+.contenedor { width: min(100% - 2 * var(--margen), var(--ancho)); margin-inline: auto; }
+.seccion { padding-block: var(--seccion) 0; }
+
+/* Tipografía de sección */
+.titulo-display { font-size: var(--t-display); line-height: 1; letter-spacing: -0.04em; }
+.titulo-grande { font-size: var(--t-grande); line-height: 1.04; letter-spacing: -0.04em; }
+.titulo-medio { font-size: var(--t-medio); line-height: 1.2; letter-spacing: -0.02em; }
+.texto { color: var(--niebla); max-width: 34em; }
+.texto-blanco { color: var(--blanco); }
+.etiqueta { font-size: 14px; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase; color: var(--senal); }
+.nota { font-size: 14px; color: var(--ceniza); }
+
+/* ---------- Botones ---------- */
+.pildora {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 46px; padding: 14px 22px; border-radius: var(--radio);
+  background: var(--llama); color: var(--vacio);
+  font: inherit; font-size: 14px; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase; line-height: 1;
+  text-decoration: none; white-space: nowrap; border: 0; cursor: pointer;
+  user-select: none; -webkit-user-select: none;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease;
+}
+.pildora:active { transform: scale(0.97); }
+.enlace {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--blanco); font-size: 14px; font-weight: 400; text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.35); text-underline-offset: 6px; text-decoration-thickness: 1px;
+  transition: text-decoration-color 200ms ease, color 200ms ease;
+}
+.enlace-gris { color: var(--ceniza); }
+@media (hover: hover) and (pointer: fine) {
+  .pildora:hover { background: var(--llama-viva); }
+  .enlace:hover { text-decoration-color: currentColor; }
+  .enlace-gris:hover { color: var(--blanco); }
+}
+
+/* ---------- Barra superior ---------- */
+.barra { padding-top: calc(env(safe-area-inset-top, 0px) + 22px); position: relative; z-index: 5; }
+.barra-interior { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.marca { display: inline-flex; align-items: center; gap: 12px; color: var(--blanco); text-decoration: none; min-height: 44px; }
+.marca img { width: 27px; height: auto; }
+.marca span { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.menu { display: flex; align-items: center; gap: clamp(20px, 3vw, 40px); }
+.menu ul { display: flex; gap: clamp(20px, 3vw, 36px); list-style: none; padding: 0; margin: 0; }
+.menu a:not(.pildora) {
+  display: inline-flex; align-items: center; min-height: 44px;
+  font-size: 14px; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase;
+  color: var(--ceniza); text-decoration: none; transition: color 200ms ease;
+}
+@media (hover: hover) and (pointer: fine) { .menu a:not(.pildora):hover { color: var(--blanco); } }
+
+/* ---------- Hero ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: center; gap: clamp(24px, 4vw, 64px); min-height: min(860px, calc(100svh - 90px)); padding-block: 24px 48px; }
+.hero-texto { display: grid; gap: 30px; justify-items: start; }
+.hero-texto .texto { color: var(--blanco); }
+.hero-acciones { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-arte { position: relative; aspect-ratio: 255 / 305; width: 100%; max-height: 78svh; justify-self: center; }
+.hero-arte canvas { position: absolute; inset: -12%; width: 124%; height: 124%; display: block; }
+
+/* ---------- Bloques de dos columnas ---------- */
+.dos { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
+.dos > .cabeza { display: grid; gap: 24px; align-content: start; }
+@media (min-width: 961px) { .dos > .cabeza.fija { position: sticky; top: 48px; } }
+
+/* Problema */
+.problemas { list-style: none; padding: 0; display: grid; gap: clamp(48px, 6vw, 84px); padding-top: 8px; }
+.problemas li { display: grid; gap: 14px; }
+
+/* Cómo funciona: pasos en zigzag */
+.pasos-cabeza { display: grid; gap: 24px; max-width: 760px; }
+.pasos { list-style: none; padding: 0; margin-top: clamp(56px, 8vw, 112px); display: grid; gap: clamp(72px, 10vw, 136px); }
+.paso { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 6vw, 96px); align-items: center; }
+.paso-numero { font-size: clamp(96px, 16vw, 220px); line-height: 0.81; letter-spacing: -0.06em; font-weight: 300; color: var(--ceniza); font-variant-numeric: tabular-nums; }
+.paso:nth-child(even) .paso-numero { order: 2; justify-self: end; }
+.paso-texto { display: grid; gap: 16px; justify-items: start; }
+
+/* Resultados */
+.cifras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: clamp(56px, 7vw, 96px); }
+.cifras div { display: grid; gap: 10px; }
+.cifras dt { font-size: 14px; color: var(--ceniza); order: 2; }
+.cifras dd { font-size: var(--t-grande); line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; order: 1; }
+.cifras dd.pendiente { color: rgb(255 255 255 / 0.22); }
+.resultados-pie { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 8px 32px; align-items: center; }
+.aviso-pendiente { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--senal); }
+.aviso-pendiente::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.funciona { margin-top: clamp(72px, 9vw, 128px); display: grid; gap: 22px; }
+.funciona ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 14px clamp(28px, 4vw, 56px); }
+.funciona li { font-size: clamp(22px, 2.4vw, 32px); letter-spacing: -0.03em; font-weight: 500; color: var(--ceniza); }
+
+/* Precios */
+.planes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(48px, 7vw, 112px); margin-top: clamp(56px, 7vw, 96px); }
+.plan { display: grid; gap: 22px; align-content: start; justify-items: start; }
+.plan-nombre { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; min-height: 32px; }
+.plan-nombre h3 { font-size: 24px; letter-spacing: -0.02em; }
+.etiqueta-pildora { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 9999px; background: rgb(221 219 101 / 0.12); color: var(--senal); font-size: 13px; font-weight: 500; }
+.precio { display: flex; align-items: baseline; gap: 14px; }
+.precio strong { font-size: var(--t-display); font-weight: 400; line-height: 0.9; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.precio span { font-size: 18px; color: var(--ceniza); }
+.plan-incluye { list-style: none; padding: 0; display: grid; gap: 8px; color: var(--niebla); }
+.plan-incluye li { display: flex; gap: 12px; align-items: baseline; }
+.plan-incluye li::before { content: ""; flex: none; width: 6px; height: 6px; transform: translateY(-3px) rotate(45deg); border: 1px solid var(--llama); }
+.prueba { margin-top: clamp(56px, 7vw, 96px); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 48px; align-items: center; max-width: 980px; }
+.prueba p { color: var(--niebla); }
+.prueba p strong { color: var(--blanco); font-weight: 400; }
+.pago-nota { margin-top: 28px; }
+
+/* Preguntas */
+.preguntas { display: grid; }
+.pregunta { padding-block: 22px; }
+.pregunta + .pregunta { border-top: 0; }
+.pregunta summary {
+  list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) 24px; gap: 24px; align-items: center;
+  font-size: 24px; line-height: 1.25; letter-spacing: -0.02em; font-weight: 400; min-height: 44px;
+}
+.pregunta summary::-webkit-details-marker { display: none; }
+.cruz { position: relative; width: 24px; height: 24px; transition: transform 240ms var(--ease-out); }
+.cruz::before, .cruz::after { content: ""; position: absolute; left: 50%; top: 50%; width: 16px; height: 1.5px; background: var(--ceniza); transform: translate(-50%, -50%); transition: background-color 200ms ease; }
+.cruz::after { transform: translate(-50%, -50%) rotate(90deg); }
+.pregunta[open] .cruz { transform: rotate(45deg); }
+.pregunta[open] .cruz::before, .pregunta[open] .cruz::after { background: var(--llama); }
+@media (hover: hover) and (pointer: fine) { .pregunta summary:hover .cruz::before, .pregunta summary:hover .cruz::after { background: var(--blanco); } }
+.pregunta .respuesta { padding-top: 14px; padding-right: 48px; color: var(--niebla); max-width: 40em; display: grid; gap: 12px; }
+.pregunta .respuesta a { color: var(--blanco); text-underline-offset: 4px; }
+.pregunta::details-content { block-size: 0; opacity: 0; overflow: hidden; transition: block-size 260ms var(--ease-out), opacity 200ms ease, content-visibility 260ms allow-discrete; }
+.pregunta[open]::details-content { block-size: auto; opacity: 1; }
+@supports (interpolate-size: allow-keywords) { :root { interpolate-size: allow-keywords; } }
+
+/* Cierre */
+.cierre { position: relative; margin-top: var(--seccion); padding-block: clamp(120px, 16vw, 220px); overflow: hidden; }
+.cierre canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+.cierre .contenedor { position: relative; display: grid; gap: 30px; justify-items: start; }
+.cierre .texto { color: var(--blanco); }
+
+/* Pie */
+.pie { padding-block: 48px calc(40px + env(safe-area-inset-bottom, 0px)); color: var(--ceniza); font-size: 14px; }
+.pie-fila { display: flex; flex-wrap: wrap; gap: 24px 48px; justify-content: space-between; align-items: flex-start; }
+.pie-redes, .pie-legal { display: flex; flex-wrap: wrap; gap: 4px 28px; list-style: none; padding: 0; }
+.pie a { color: var(--ceniza); text-decoration: none; display: inline-flex; min-height: 44px; align-items: center; transition: color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pie a:hover { color: var(--blanco); } }
+.pie-riesgo { margin-top: 28px; max-width: 64em; font-size: 13px; line-height: 1.6; }
+
+.pildora-menu { gap: 0; }
+
+/* ---------- Tableta y celular ---------- */
+@media (max-width: 960px) {
+  .menu ul { display: none; }
+  .hero { grid-template-columns: 1fr; min-height: 0; padding-top: 32px; }
+  .hero-arte { order: -1; width: min(64vw, 360px); max-height: none; }
+  .dos, .paso, .planes, .prueba { grid-template-columns: 1fr; }
+  .paso:nth-child(even) .paso-numero { order: 0; justify-self: start; }
+  .paso { gap: 16px; }
+  .cifras { grid-template-columns: 1fr; gap: 36px; }
+}
+@media (max-width: 560px) {
+  :root { --t-cuerpo: 17px; }
+  .marca span { font-size: 16px; }
+  .solo-ancho { display: none; }
+  .pildora { padding-inline: 18px; }
+  .pregunta summary { font-size: 20px; }
+  .pregunta .respuesta { padding-right: 0; }
+}
+</style>
+</head>
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<header class="barra">
+  <div class="contenedor barra-interior">
+    <a class="marca" href="#inicio" aria-label="DocTraderPRO, inicio">
+      <img src="../../marca/logo-icon-64.png" alt="" width="54" height="64" fetchpriority="high">
+      <span translate="no">DocTraderPRO</span>
+    </a>
+    <nav class="menu" aria-label="Principal">
+      <ul>
+        <li><a href="#como-funciona">Cómo funciona</a></li>
+        <li><a href="#precios">Precios</a></li>
+        <li><a href="#preguntas">Preguntas</a></li>
+      </ul>
+      <a class="pildora pildora-menu" href="#precios">Comprar<span class="solo-ancho">&nbsp;licencia</span></a>
+    </nav>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+
+  <!-- Hero -->
+  <section class="contenedor hero" id="inicio" aria-labelledby="t-hero">
+    <div class="hero-texto">
+      <p class="etiqueta">Licencia de software de copy trading</p>
+      <h1 class="titulo-display" id="t-hero">Opera con el sistema de Argemiro.</h1>
+      <p class="texto">Conecta tu cuenta de trading y el software replica cada operación del sistema en tu broker. Tu dinero no sale de tu cuenta.</p>
+      <div class="hero-acciones">
+        <a class="pildora" href="#precios">Comprar licencia</a>
+        <a class="enlace" href="#como-funciona">Ver cómo funciona</a>
+      </div>
+    </div>
+    <div class="hero-arte">
+      <canvas id="cerebro" role="img" aria-label="El logo de DocTraderPRO, un cerebro con barras y una flecha que sube, formado por partículas"></canvas>
+    </div>
+  </section>
+
+  <!-- Problema -->
+  <section class="contenedor seccion dos" aria-labelledby="t-problema">
+    <div class="cabeza fija">
+      <h2 class="titulo-grande" id="t-problema">Operar a mano cuesta más que tiempo.</h2>
+    </div>
+    <ul class="problemas">
+      <li>
+        <h3 class="titulo-medio">No puedes estar frente a la pantalla todo el día.</h3>
+        <p class="texto">El mercado se mueve de domingo a viernes, a cualquier hora. Las entradas no esperan a que salgas del trabajo.</p>
+      </li>
+      <li>
+        <h3 class="titulo-medio">Las emociones deciden por ti.</h3>
+        <p class="texto">El miedo cierra antes de tiempo y la esperanza deja correr las pérdidas. Un sistema sigue sus reglas siempre.</p>
+      </li>
+      <li>
+        <h3 class="titulo-medio">Las señales no se pueden comprobar.</h3>
+        <p class="texto">Un grupo de mensajes o una captura de pantalla no muestran el historial completo. El de este sistema lo audita <span translate="no">Myfxbook</span>.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Cómo funciona -->
+  <section class="contenedor seccion" id="como-funciona" aria-labelledby="t-como">
+    <div class="pasos-cabeza">
+      <h2 class="titulo-grande" id="t-como">Cuatro pasos y tu cuenta queda conectada.</h2>
+    </div>
+    <ol class="pasos">
+      <li class="paso">
+        <span class="paso-numero" aria-hidden="true">1</span>
+        <div class="paso-texto">
+          <h3 class="titulo-medio">Crea tu cuenta</h3>
+          <p class="texto">Con tu nombre, cédula, correo y teléfono. Toma menos de un minuto.</p>
+        </div>
+      </li>
+      <li class="paso">
+        <span class="paso-numero" aria-hidden="true">2</span>
+        <div class="paso-texto">
+          <h3 class="titulo-medio">Agrega tu cuenta de trading</h3>
+          <p class="texto">Broker, servidor, número de cuenta y contraseñas. Las guardamos cifradas.</p>
+          <a class="enlace enlace-gris" href="https://one.justmarkets.link/a/5vmbn05zda" target="_blank" rel="noopener sponsored">¿No sabes qué broker elegir? Yo uso <span translate="no">&nbsp;JustMarkets</span></a>
+        </div>
+      </li>
+      <li class="paso">
+        <span class="paso-numero" aria-hidden="true">3</span>
+        <div class="paso-texto">
+          <h3 class="titulo-medio">Paga la licencia en cripto</h3>
+          <p class="texto">Con USDT, USDC o Bitcoin. Revisamos tu pago directamente en la blockchain.</p>
+        </div>
+      </li>
+      <li class="paso">
+        <span class="paso-numero" aria-hidden="true">4</span>
+        <div class="paso-texto">
+          <h3 class="titulo-medio">Argemiro conecta tu cuenta</h3>
+          <p class="texto">Te avisamos por correo cuando quede conectada. Desde ahí, cada operación del sistema se replica en tu cuenta.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- Resultados y con qué funciona -->
+  <section class="contenedor seccion" id="resultados" aria-labelledby="t-resultados">
+    <div class="dos">
+      <div class="cabeza">
+        <h2 class="titulo-grande" id="t-resultados">Resultados que puedes revisar tú mismo.</h2>
+      </div>
+      <p class="texto" style="padding-top: 10px;"><span translate="no">Myfxbook</span> es un verificador independiente: lee el historial directamente del broker, así que nadie puede editarlo. Antes de comprar, revisa cada operación.</p>
+    </div>
+    <dl class="cifras">
+      <div><dt>Ganancia total</dt><dd class="pendiente" data-pendiente="Myfxbook">—&nbsp;%</dd></div>
+      <div><dt>Caída máxima</dt><dd class="pendiente" data-pendiente="Myfxbook">—&nbsp;%</dd></div>
+      <div><dt>Tiempo auditado</dt><dd class="pendiente" data-pendiente="Myfxbook">—&nbsp;años</dd></div>
+    </dl>
+    <div class="resultados-pie">
+      <p class="aviso-pendiente">Cifras pendientes: se llenan con la cuenta auditada de Argemiro</p>
+      <a class="enlace enlace-gris" href="https://www.myfxbook.com/es/members/BonusMAXI/aurum-2/12250704" target="_blank" rel="noopener" data-pendiente="cuenta de referencia temporal">Ver la cuenta de referencia en <span translate="no">&nbsp;Myfxbook</span></a>
+    </div>
+    <p class="nota" style="margin-top: 12px;">Los resultados pasados no garantizan resultados futuros.</p>
+
+    <div class="funciona">
+      <h3 class="nota">Con qué funciona</h3>
+      <ul translate="no">
+        <li>Myfxbook</li>
+        <li>Social Trader Tools</li>
+        <li>JustMarkets</li>
+        <li>Tron</li>
+        <li>BNB Smart Chain</li>
+        <li>Bitcoin</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Precios -->
+  <section class="contenedor seccion" id="precios" aria-labelledby="t-precios">
+    <div class="dos">
+      <div class="cabeza">
+        <h2 class="titulo-grande" id="t-precios">Una licencia por cuenta de trading.</h2>
+      </div>
+      <p class="texto" style="padding-top: 10px;">Pagas una vez por periodo, sin renovación automática. Te avisamos antes de que venza para que decidas si renuevas.</p>
+    </div>
+
+    <div class="planes">
+      <article class="plan" aria-labelledby="t-trimestral">
+        <div class="plan-nombre"><h3 id="t-trimestral">Trimestral</h3></div>
+        <p class="precio"><strong class="cifra">319</strong><span>USD por 3&nbsp;meses</span></p>
+        <ul class="plan-incluye">
+          <li><span>Equivale a USD&nbsp;106 al mes</span></li>
+          <li><span>Una cuenta de trading conectada</span></li>
+          <li><span>Soporte por <span translate="no">Telegram</span></span></li>
+          <li><span>Puedes pasarla a semestral antes de que venza</span></li>
+        </ul>
+        <a class="enlace" href="/registro?plan=trimestral">Comprar trimestral</a>
+      </article>
+
+      <article class="plan" aria-labelledby="t-semestral">
+        <div class="plan-nombre"><h3 id="t-semestral">Semestral</h3><span class="etiqueta-pildora">1 mes de obsequio</span></div>
+        <p class="precio"><strong class="cifra">499</strong><span>USD por 6&nbsp;meses</span></p>
+        <ul class="plan-incluye">
+          <li><span>Pagas 5&nbsp;meses: equivale a USD&nbsp;83 al mes</span></li>
+          <li><span>Una cuenta de trading conectada</span></li>
+          <li><span>Soporte por <span translate="no">Telegram</span></span></li>
+          <li><span>El sexto mes se suma solo, como cupón</span></li>
+        </ul>
+        <a class="pildora" href="/registro?plan=semestral">Comprar semestral</a>
+      </article>
+    </div>
+
+    <div class="prueba">
+      <p><strong>¿Quieres probar primero?</strong> Pide un mes de prueba por USD&nbsp;50. Es una sola vez por persona y, si te gusta, la completas a semestral por USD&nbsp;450.</p>
+      <a class="enlace" href="/registro?plan=prueba">Solicitar prueba</a>
+    </div>
+    <p class="nota pago-nota">Pagas con USDT (Tron), USDC (BNB Smart Chain) o Bitcoin. Sin devoluciones.</p>
+  </section>
+
+  <!-- Preguntas -->
+  <section class="contenedor seccion dos" id="preguntas" aria-labelledby="t-preguntas">
+    <div class="cabeza fija">
+      <h2 class="titulo-grande" id="t-preguntas">Preguntas frecuentes.</h2>
+      <p class="texto">¿No encuentras la tuya? <a class="enlace" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener">Escríbenos por <span translate="no">&nbsp;Telegram</span></a></p>
+    </div>
+    <div class="preguntas">
+      <details class="pregunta" name="faq">
+        <summary>¿Qué estoy comprando?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>Una licencia de uso del software <span translate="no">DocTraderPRO</span> para una cuenta de trading. No es asesoría de inversión ni administración de tu dinero: el software replica en tu cuenta las operaciones del sistema.</p></div>
+      </details>
+      <details class="pregunta" name="faq">
+        <summary>¿Mi dinero sale de mi cuenta?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>No. Tu dinero se queda en tu broker. Los depósitos y los retiros los haces tú, directamente con él.</p></div>
+      </details>
+      <details class="pregunta" name="faq">
+        <summary>¿Qué broker puedo usar?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>El que prefieras, siempre que sea compatible con el copiado. Si no tienes uno, yo uso <a href="https://one.justmarkets.link/a/5vmbn05zda" target="_blank" rel="noopener sponsored" translate="no">JustMarkets</a>. Es un enlace de referido.</p></div>
+      </details>
+      <details class="pregunta" name="faq">
+        <summary>¿Cuánto capital necesito?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>Argemiro te recomienda un capital y un nivel de riesgo para cada cuenta. Los ves en tu panel después de agregarla.</p></div>
+      </details>
+      <details class="pregunta" name="faq">
+        <summary>¿Cómo pago?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>Con USDT (red Tron), USDC (BNB Smart Chain) o Bitcoin. Al comprar recibes una orden con la dirección y el monto exacto, válida por 1&nbsp;hora. Cuando reportas el código de la transacción, lo verificamos en la blockchain.</p></div>
+      </details>
+      <details class="pregunta" name="faq">
+        <summary>¿Qué pasa cuando vence mi licencia?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>Te avisamos antes. Si no renuevas, tienes 3&nbsp;días de gracia con la cuenta conectada; después se desconecta del copiado.</p></div>
+      </details>
+      <details class="pregunta" name="faq">
+        <summary>¿Hay devoluciones?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>No. Por eso existe el mes de prueba: puedes probar por USD&nbsp;50 antes de comprar el semestral.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Cierre -->
+  <section class="cierre" aria-labelledby="t-cierre">
+    <canvas id="ambiente" aria-hidden="true"></canvas>
+    <div class="contenedor">
+      <h2 class="titulo-display" id="t-cierre">Empieza con una cuenta.</h2>
+      <p class="texto">Elige tu licencia y en minutos tienes tu orden de pago lista.</p>
+      <a class="pildora" href="#precios">Comprar licencia</a>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="contenedor">
+    <div class="pie-fila">
+      <ul class="pie-redes">
+        <li><a href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener" translate="no">Telegram</a></li>
+        <li><a href="https://www.instagram.com/doctraderproiasystem/" target="_blank" rel="noopener" translate="no">Instagram</a></li>
+        <li><a href="/ingresar">Ingresar</a></li>
+      </ul>
+      <ul class="pie-legal">
+        <li><a href="/legal/terminos">Términos</a></li>
+        <li><a href="/legal/datos">Tratamiento de datos</a></li>
+        <li><a href="/legal/riesgo">Aviso de riesgo</a></li>
+      </ul>
+    </div>
+    <p class="pie-riesgo"><span translate="no">DocTraderPRO</span> es una licencia de uso de software. No es asesoría de inversión ni administra capital de terceros. Operar en mercados financieros implica riesgo de pérdida; los resultados pasados no garantizan resultados futuros.</p>
+  </div>
+</footer>
+
+<script>
+/*
+  Partículas: el logo (cerebro + barras + flecha) muestreado del PNG en puntos x,y + color.
+  Cada punto es un triángulo con borde de 1px. Al cargar se ensamblan una sola vez; luego respiran apenas.
+  Formato: 6 caracteres por punto -> x (2 hex), y (3 hex), color (0 rojo del cerebro, 1 naranja de barras y flecha).
+*/
+var PUNTOS = "660dc1e40480440200c00d41ac09a14e0ce05604005010008a0a81960b61ba0801360b00980f009a07807c0fe1e404e01c0400c80641660260ea09c0ae0ce1780220440360620da1d608e19802a02208c0140580cc0f413a08c0d409a19e0720c604814c08607804205e0aa02c0940d40ea15408603607207811a0620260780a41440f412c07e08006c00e06e06209e0540ee12c02c08a0f612403a0a40a61380f409c1100900aa15c1121c60f40ec0660820f01680900be0cc01c0ac0ca06c1d20f01cc09e1820f61540920a40ac1c405411006a0c60b61360440d00d01ae10c1a411619c02006a11613a05208e10614c0180d20ba12a0920e80580d60c61760800a80980d00981580e002c0820480d603e0740840e219a0ce1ae04c0be0c20780d41b40901e406c0660b81e208207603e0c80a414c0680f009409a0700be05009e06a09e0d416003e05e1021781220d20be17606a05a0fc1be0520660500ae04a08610018410e13609a08406a03c0f618e1021140940680380881081300420821220400b20940820d40ee17a10a18211a0400f00ac06a0b604801e05408006801604e03e0ae07404008a0cc1380a00a607e03609c0520f01b208a0c00aa19609407a10819e11605e0560660be1660d815c05a0600da0d209a14c01e0c00fc07601a05c0ea1a00e21ce08605603008a11a02403805a0e00880da18603c0c605c1a80f41700ae19e0c207a0e21760260800da1e40aa08a0c81bc0be09804808a03a0d004e1420be0840a618009e1ce0b21981060220ae0cc0c815607806e0b218a04009e0ee15a07a09a0aa00e08405a0f218604603409c0741140c00da1780ce12c0760c00a00b20280c206609602c09a1120980ea08e0c00800f018003e04201e09400e0b80320520cc0a40c41a005007a0fe1d20881300820200660c00b81200820a610a1860160a411004005a0b20981ca0fa0580660ee0900760b219c0fa16c08a07411c02e0740660b605e0f611a0420900b418206e02807205c0700320e603a0680820280500ee07807c0be09e04c0780a60a81d20501c004e05c1140540f61ce06810a08205803e0660bc1c20f808e08a0d40c811a0760460fe1b001a0740d40b009414c05c0440a00540280760a819c0b41ca0601f607c06e0a20680ee13e04e0ca0c41d60ba18c1181400c008404005a06c06807205410616a0be1781141ca0400280620960b015800e0e608804206c0780c61980e80f408a0a40ec1680b61a40a219204e0ae0e411c07e0b60300c21021c20b015c06204609c04809a0bc0b208403a09e04e02a03805808601a07e0a00d21780c20740b214201c0640ba1640ec17603203605603002a0640c212c0460f60780f807e03e0fc15e0580c40d21c00b416404e05203607410806a07c0880fe1ee09803a0700c007c1a00b21d40861ec0940a60c81620e61660e01c20d01c20c615c0760f006c02c03602a0300560920800c613202c0c80561bc0d808c10212e0320a40e615405007a0e612409c0ae0b80dc05617e0cc14208009005a06600e0600c61a61061800a81a60ac1760240c20dc14802000c0780a203e0280b60ac10c17403e0c40b41c41001ba0320820be11206a0b20360800780a40a816a0da15e10a14203603e0360821121320b80d40501c40e41ac0e21c00d21a80ca1900600aa0e213205e03e06a0600860a211615810a1c407c1a60640a80e61a20c40740dc07c0c81840f219c00e0ee09c01e04c0d20ca1800fa1840d816402e0be0da0a40540400720600ee1500d41ae0ec1a00a20300ac0640be1d00b81d00f808a0d214c06e03c0e21b808c1480820500ec0220400540e812a0a202806008c12019e0fe14606002e07206a0e61440920820640c40480c006c09008e0800e011606603a09e0ca0a017a11e0660780c20fe0a803603e0f008a0ec1b209c17604c0c20e21980cc0860ee1a810e05c0520d40801a80e813208403207007602205c04409e1041ec05a08c0dc1b20560cc0d018402606a0560ce08e12a0a404c06c0a005e03205a0d00481a60d816800e0a00a41a006e05c06e0f00900460f01ac08607a11c0e809c0360840bc0b40920900e00460520ca03e07809c02c05800809e0ac15e0a005600e07605e0760ec18c0cc19202609c0b015c07202406205a0b00821021c809616809202c0a606c00c03c0660c007e17c10616c0ba12c0440340ae05802007203a0a20ce13204a09e0d214210418811e04409a0840e41ec09e06804e09400c0a00f61840d019003809601c08003c06010e18206c0fa06c0e408607610419a0a80240b20860800e20bc0c00e81520ea1b009c19007a0820fc18401e0e208805a0ea1880f416a0e217804a0320ac0ee0a00dc0400480c00e00420c20541d00e61e207e0140620a80c21c40a41ec0560c80f61820dc12a04807605a0cc0981580a00a80140940200ce0f41ac0c81a80180940b614806003605a0800360b208805402e06600c0180600a60ce16c0100540f01840140d00e41f80800780ca14a0980ae0bc1500ce0a20f21b402003a0ba02a04004205e0660fa18e1161d00a41d006016603405805a0d00c618c0a817611a06200e0b006408c11a18a08802e0b807e09a1561101821101aa01a0440c20c20f60c60cc1a00600720180ca0da1600be0800580a80d016e03e07008a0b610a01a0a60920be05c05002a0620160940c008018203606e00a0b010a19601e09e0c803c08a0540e61c40980be0ae01809405a0600560c80ba02005e00e09e0760ac04c08002e0cc0a01d806a0680e617e10213a0500e404a09a1040981000c406009007405410215805c04609a0bc0d20e807e08405c09a00c08c0ce1540560a80da19e0dc1380b00ac0f81e20860ca0621ea0620a40e01a81141be0781d40d21ac02e03407c0ec09a07811e12605603002e07203c0a00120d40e617e0da1540ce1e809e08c0ee13a0760d60581c80e61760480a404605e0220c00ae19e0600d00a61a80e21a210814008e0260a20a80dc1cc0a617e12417c0ec11c0aa0dc03e0cc0421560e204c0b60760660660e61860360620f81a003c0a006c03a0fc16c03c0740de09401a05a0a00e40ae0760500340bc0d40ac1640e41801001ce0ba12e06e0660e41ac02c05401009c0da1800dc18c0ec15002e06a07807806e03c0320bc0881be0ba05a0f01440800800620e404c02e0b60ac1041ee06c05e05407a09a17810c1c40cc1580180640ee1c60f814c07a0c80fa06805209801e06009c06402a01c08407a0d817805805e0e21ba08a1aa0be1c60741500860800c018c10a19a0ea06410a19a0b21920ae1820aa18a1001ac0e41900ac16805a04e02e05e00c0900820bc1040a21041a80c01860fa1d00401aa0d01880a81640840ce0c01320720820600280a40480860760de15210a07c10a1840840b00ca14801c02e0420cc0f00780a818800e0840d61640b60280560640e01f80740d60e419a0f60cc04c14205a0680e21a809c11c04404609403a0200560fc1a80ec12c0b80a006a0780c81740a61c01041e40960c80a81a00cc16a0720ce0b01500280e004003004805403a08411e0a40e41c006e03a0220aa0e019a0e00500300d004a1500120c40f21520f21da0521560140a60c41c00d817a0a619e06e0a00700a209e0f406e03e04403a04404a09a0820480700ac1ba08213c0a202208205602e05a0e213c0200a011e0b00dc1aa02e0a60240e006c0c602a0be0d809608408206207805e09600e0ce0a213a0fe14c06a04c07009e0e217404409c0e61bc0c00960300a60300300fa0a007a0ca04c1a60c008007a0d409e13402407801e0c00a615c0ee1ae0c019e11a1c40f61200c00640920c20240ce0e81140640681061c00c01800f81220a60d20dc18e10816002203c07801808409c00c07208805403605a10a13a0b00360f606a0f810e0880d20c81b00e21aa0cc15c06c01408e03a0360ce0441ae10e1841261260a00f20720a60a419a0ec03e10219e0b61aa0d41bc0de08402c0960b81a00ea1760f41880c20b00f418e00c07a0a015001409808404209003e0bc07605806a05a07801c06000e09a0e80360460760340b40340d60901c805e15c0580d00d613004a0f608004e0560280700d00da1740ae1581021a005a0d20a015e1100900520f00680500f00c605415a06a0de0a40140920ba01e0b403208211e07e0ca1320ba09c0d415e09e0a80aa1ce0a61a00f419a00e0600260d60d411a06e06202a07c0a819006c0360ae08210a1a20f016c0ae04c09805c05602206a0a810c1d20fa18c0ea19e0f01880ee1861220740d80861181ea08801609c0f608405c10217e0fc1580920740fe06a05e0ca0a813c03605c0300a00440600780320f807410a08005401c0a804c0d61420f008203005805809c0dc1a60fe19e10c0ae0d41520fa18604007610011e07c0c80de1600460380600ca05410c07c0581041540e401207a0400fa17811817605c0bc0ac0880880c60e018a0fc1e00860c40a81be0ac0820460bc0f60ca0280d00e21ac0160ee06404e0b207c0ce1a80280aa0180c40ac1b80921a005205a10012a0ec0441021b00b40560cc1d60541ca0de1e80800ac1101d00b616a0520bc0e20520880800d01e60a60400ee0ac0981ae1101bc0320c80e81c009c06201c0c40641520d412207e0cc0ba17411e0c60761da03a06c0bc18c0b41c60ae1720aa17610213e0be0a00c60ca03e04c0660580ea11e08608404e0f208a05a06e0d609e1d404a1c00220be0fc0780680440820881121c00f802005e0840c81ea05604e0d00500cc0660380440fe1b00660bc0ca07605401a04806610a16a09209c07a0980b01c40f80780f619a0560780f21bc0b00c20ec1420a00781001a01081bc0e808a10a1ee0660620c61c80461cc0d216a07e0300e806009e0c00d018203201a0a204e07208c0400180a00c60a616a10a18404c0c204a06808009e0ca14c04c0520320400ae05e05207c0e01380fa1760e61d60961a20de1960820620a00ca0be12605a0580700c40ca1780620c20de18e00e05a0c613c0de0c409605c07a0c60d81e80820180820d40c01d20c617c11218a0aa1520c20aa0fe1ca0ba15808409c0f816c0ac0ca0b01480680460da1c20d21840180b00fa13e04603e06c0c005017e1220960ac0be04e07607c04809c07e0be19602e02e0760bc0bc0bc0f00820680a407a05c05c04c02805c0ae08406c02c04a05a0520780440be0d405c0600ba0340760f818402a03001c0cc0b41400ba0981100560f81a802c09c08603e0680860140760a617e0981aa0740260800620ba03c0a40741040e60800540a20d40f41380340760f215c0460a610e04006c0a003e0820d617c0a018c0e419408009a0d013a04605602a06411204c0b408209c18c0ca1600e61ac0d217008c0b608815a0760a60de1aa0ce1be0e804c0aa0880f611a07c0c60601ac09e1340fc1da0360d60941d00961800a015c0e41881141f006e0360860b209418401a0c40bc1680b405a05a07805c0c006a0a60f014803604007c0940380900700be0bc0601061ce0d012c0b605e0f41c809e12807808201c0da0561a60d61c409a09e0c608c0b01ae07606c00e0880840ca0701b010013a0a205607404c04e0da03e0140600a01141860f01820260521001a00d612c0800c80fe19e0e61c60e214e08602a0940d608811e06a0d40b81d20561d20861ac10814601e08402406a06e0c806e1cc0fa07804e09c07808e0b41e60ac0bc04007806a04c04a0c009e07810e1601100d20d01ea0a80be08a1200400ca0cc1880ae1400880e20b004410012a09a0b00921820f41c41021840ec1b608209401c0ea0a60820d419e05c09c0540d206c0320aa0820780d60a016603008e03a0660ea1280580c40fa05e0de14c0720c405c0ae0700640d60740d60920660840f616a0540da05819e05a0a00420300460c604c1ce0cc1c80d01c806c1640aa09c0a60360ba08e1181120920580ac06000a09e00e0680e81e604c0a20880900580820120be0e00b00200320400840ac19003c07c1041a402c08610a1ca0c013008407c0c411405e0ca0ee1ae0820741100840f419e0f819a0520e206a0600f01f206c06a1081a00ac13c0b805605a0ee09203a0e00860c818e0b213004c1ca05018a0080ca0bc17e0a21c605e14005001206605605606a08e0a60f81880420660e21980f80ac0ea1560fa1d20cc12e0a807606403a0540461041d20f605c0e21960c20d60e019a11005a0440840440a40de18a0f41a20f619207e0aa1101cc08a0460980661081c202609811609c0e011a0a403a0f20420940a409c03e0de0520f81640300ac0bc1a40100a00b014e02a0740e007a1121520940be0b00cc0f608a0ac1780380d00441d80380bc10206001a0da0501b202e0ac02a0640dc1400be0d20da1c60d21820820840e810c08405410818c0d017a0a819a0e20b803606805c03a0640d608613a08a07601c06a08c05606e0420b00380860ce05c1700b41b808415c0940ea0820780ac1d00840640f81cc0581a80c41100900c40a01540ec1360240880ac1c207219a0240601081e206e03e0e01380ae0e80aa0380ba03a0620c60bc14609e0b00e41200540160520ae10a17a0fa15a08c0920740bc0f40680de17201402e04a01809a0260b20c607015010a0c20c819404c08006004a01808a01009e0840500960960460dc03a0980fa03e0a009802209e0d81a20560740120c00dc18409e1c010002807e07a1200c00240cc0c618e08e03605e0861081980d20b20921e608207809e12e03005c02e0900780c20d416a00c08a0c61720400a60be05e10e1b411009c0220b00c015401402608e05610416a0dc1680f414c0740840600b60200b009e1200ae03404a07e11817c1001d209c10c0820860b20c00e418a11c03c0760e20480d60981ac0d81ae09217a1141b807c0bc0b80820180c20a01a80c81a008600c06a08a03c0740ca0120620980d809e0d016410211e06c08203e02403c0f408809a0ba1d008e12e0a60440fa1860180761121d40d017c11418e11c1d209818003203c0bc0980b81360fe1500ea0c206809204c0f208e0da0541c80f805e11411e0600b404a05001806603209e0400c20ac13c08e0b808a14e01802a0720c607818407c0bc0a80620be16a1061780d81860d21800a616611817604a0c80ea1360480bc0d001a0500d20c41ce06213002c0780460cc0d418402e0ce0e615403205a0e616210a1780d21cc03a0bc0e408e03c0b401e08412005410a13c0f41180960ae0c81c604e1cc0dc1b00e01a21001680780ce0aa1a80d21680200c60be1980ba1541041b00c617804808c0f41580ec16610419402803e0f61f80760aa10016e0b01a60dc1760720ec0820c204e1d60b81801220c60ea19409206c0160680240d60a61d009417410c0aa07605e0920c00c419a10c0400220a205c0800f21600240881001d00cc1d40ae1641140880c415e0fe1c604a13006e03c0fa11e05e08010a1c40681c407a15002c08a0e614a09c0ae0200d60bc14e0ba0bc0c206400c01e04003209802408005c00e07201a0760700a00fe1ca0721a00400ca0c21f607209e0f61820e611808606806e0600760620ec1841121c802804006a0540ca0600480d005c1aa0960b210612e02c09c0aa1780e815411203c1001be0e209c0f41c60a81640e618e08c03e06e03e0b008001c0720b21360580a20e21c20ba18804407e0f417e0e414a08405e0be0cc0fc15802a01006e0a20fa1c209e1800720e60520780c40ae0f01c207e1be0821540f414804e0a60f21220800820fa17c0a61640a00ca0f419a11407602808a1161640c417004207a1041a60a21a81121ae09c15009408c08a0740fa09e04203202806a03c09a0b610c0800e407c0700840760e014205c0d409818e10e1c80cc1ac09203402a0c00fe09c1120ce0901a21100760f61cc08e1ae11403405c0760200ae1081840200a610215e0ac0ac0de17e1001cc05013e0200540300c406e1640fc17e0e013e0a20d40821660220bc1000bc02004409c07a0ca16a0680d00ce1820ce1be05415410012206605e0e619c0760b20460741000bc0801aa02c01e0a80a40780420c007e0f018e0b61c60a41ec06808c08802c0700660fe1b60941320820820140c606c18c11e12c09209201e0f807a06010417c0d01aa09e1aa0c412c03807802a0c402406210e1c207415802e06a0b81d60da15400e0920b817801809811a02a05a0960220d605015a11015605408002c08203a07401806c01806e0400bc0c60c208215010207200c0d00ae12a0b406a06008205e0d00561d00c015c0ac0d004c13c0420ca0d813808808009c1ae01e05203801a0520aa0ea14009e0ea0580641001ea0a205610819e03e0c404605809e0a609a0ca0b81dc03c0580ae06a0100a81101c40260780fc1bc0e00ae0720d00d81580520a401204c0d41680620d60521a80c61b40961580f41cc0ae1c60721400e01b60861bc0ee08c1141680580c80a61660840460340860e011c05005a10418a1101d40f619006e0ca0b618006a03605c03403c0a20b01380620b403608003a0a00640160600b601e0c00561640f01a00fa16211615e0ec1f60880600fa1f209001205e0a001005a05e07609c06a0fc1c60d413406a06402807c1241c80a21740f403a07809c08801e07e0a00ec1c20220ae06a03c0340a80bc0320740780da1d204417c11a09a0fe08c01009e05006210018a1141ce09c1de0561ee09408207003e07604207c08006408602006e08e00c08802209c05e01c0c00ca1e20b207c0d814410619a1020c60aa1c00ba19c0d216610c17e10e1ec05e0a410019000a06408205a08809e07009c07204a04a09007209809407c11e0ae04e06806800a0700660700820800820540300760a207009c0c80ce06611a04c01008a0e00480a60a612a07409c0920580400a40720540fe1d80360460d60e808808404a02e09206c0be1880aa17607404804c08610613206e04e02c0ce0d81460f41880d018011017a10e1d609219206c09c0d81c60e61360740a00de11409809609e0de04e0ac01a0840700240680781021ce0fa1a00ca18011215a0ec15806a0c40f40a01001a80e016404a03607007e0c617411a0cc06017c0ee18011e0ce0641c60c21d40e01f80780580fe12c0480c60ce1e607e0880140bc0f20cc0ec1";
+var LOGO_W = 255, LOGO_H = 305;
+var reducir = window.matchMedia('(prefers-reduced-motion: reduce)');
+var COLORES = ['#E2531F', '#FB9819', '#DDDB65', '#FFFFFF'];
+
+function azar(a, b) { return a + Math.random() * (b - a); }
+
+function crearTriangulo(t, x, y, tam, giro, alfa) {
+  t.globalAlpha = alfa;
+  var r = tam;
+  t.moveTo(x + r * Math.cos(giro), y + r * Math.sin(giro));
+  t.lineTo(x + r * Math.cos(giro + 2.094), y + r * Math.sin(giro + 2.094));
+  t.lineTo(x + r * Math.cos(giro + 4.189), y + r * Math.sin(giro + 4.189));
+  t.closePath();
+}
+
+function escena(canvas, opciones) {
+  var ctx = canvas.getContext('2d');
+  var particulas = [], ancho = 0, alto = 0, dpr = 1, inicio = 0, visible = true, cuadro = 0;
+  var puntero = { x: -9999, y: -9999 };
+
+  function construir() {
+    var caja = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    ancho = caja.width; alto = caja.height;
+    canvas.width = Math.round(ancho * dpr); canvas.height = Math.round(alto * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    particulas = [];
+    if (opciones.logo) {
+      var esc = Math.min(ancho / LOGO_W, alto / LOGO_H) * 0.8;
+      var ox = (ancho - LOGO_W * esc) / 2, oy = (alto - LOGO_H * esc) / 2;
+      for (var i = 0; i < PUNTOS.length; i += 6) {
+        var x = parseInt(PUNTOS.substr(i, 2), 16), y = parseInt(PUNTOS.substr(i + 2, 3), 16), c = +PUNTOS[i + 5];
+        var color = Math.random() < 0.06 ? 2 : (Math.random() < 0.03 ? 3 : c);
+        var tx = ox + x * esc + azar(-1, 1), ty = oy + y * esc + azar(-1, 1);
+        var ang = azar(0, Math.PI * 2), dist = azar(0.35, 0.9) * Math.max(ancho, alto);
+        particulas.push({
+          tx: tx, ty: ty, sx: ancho / 2 + Math.cos(ang) * dist, sy: alto / 2 + Math.sin(ang) * dist,
+          tam: azar(1.4, 3) * Math.max(esc / 1.6, 0.75), giro: azar(0, 6.28), vg: azar(-0.4, 0.4),
+          fase: azar(0, 6.28), color: color, alfa: azar(0.7, 1), retraso: azar(0, 650), dx: 0, dy: 0
+        });
+      }
+    }
+    var sueltas = opciones.sueltas || 0;
+    for (var k = 0; k < sueltas; k++) {
+      var px = azar(0, ancho), py = azar(0, alto);
+      particulas.push({
+        tx: px, ty: py, sx: px, sy: py, tam: azar(1.4, 3), giro: azar(0, 6.28), vg: azar(-0.3, 0.3),
+        fase: azar(0, 6.28), color: [0, 1, 2, 1][k % 4], alfa: azar(0.15, 0.45), retraso: 0, deriva: azar(4, 14), dx: 0, dy: 0
+      });
+    }
+  }
+
+  function facilidad(t) { return 1 - Math.pow(1 - t, 5); }
+
+  function pintar(ahora) {
+    var t = (ahora - inicio);
+    ctx.clearRect(0, 0, ancho, alto);
+    ctx.lineWidth = 1;
+    for (var c = 0; c < COLORES.length; c++) {
+      ctx.strokeStyle = COLORES[c];
+      for (var i = 0; i < particulas.length; i++) {
+        var p = particulas[i];
+        if (p.color !== c) continue;
+        var avance = reducir.matches ? 1 : Math.min(1, Math.max(0, (t - p.retraso) / 1500));
+        var e = facilidad(avance);
+        var x = p.sx + (p.tx - p.sx) * e, y = p.sy + (p.ty - p.sy) * e;
+        if (!reducir.matches) {
+          var amp = p.deriva || 1.2;
+          x += Math.sin(t / 2400 + p.fase) * amp * (p.deriva ? 1 : e);
+          y += Math.cos(t / 2900 + p.fase) * amp * (p.deriva ? 1 : e);
+          // el puntero aparta las partículas cercanas; vuelven solas
+          var ddx = x - puntero.x, ddy = y - puntero.y, d2 = ddx * ddx + ddy * ddy;
+          var fx = 0, fy = 0;
+          if (d2 < 3600) { var d = Math.sqrt(d2) || 1, f = (60 - d) / 60 * 18; fx = ddx / d * f; fy = ddy / d * f; }
+          p.dx += (fx - p.dx) * 0.12; p.dy += (fy - p.dy) * 0.12;
+          x += p.dx; y += p.dy;
+        }
+        ctx.beginPath();
+        crearTriangulo(ctx, x, y, p.tam, p.giro + (reducir.matches ? 0 : t / 1000 * p.vg), p.alfa * (0.25 + 0.75 * e));
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function bucle(ahora) {
+    pintar(ahora);
+    if (!reducir.matches && visible && !document.hidden) cuadro = requestAnimationFrame(bucle);
+    else cuadro = 0;
+  }
+  function arrancar() { if (!cuadro) cuadro = requestAnimationFrame(bucle); }
+
+  construir();
+  inicio = performance.now();
+  arrancar();
+
+  new ResizeObserver(function () { construir(); if (reducir.matches) pintar(inicio + 99999); arrancar(); }).observe(canvas);
+  new IntersectionObserver(function (e) { visible = e[0].isIntersecting; if (visible) arrancar(); }).observe(canvas);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) arrancar(); });
+  reducir.addEventListener('change', function () { arrancar(); pintar(performance.now()); });
+
+  if (opciones.puntero && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    canvas.parentElement.addEventListener('pointermove', function (ev) {
+      var caja = canvas.getBoundingClientRect(); puntero.x = ev.clientX - caja.left; puntero.y = ev.clientY - caja.top;
+    });
+    canvas.parentElement.addEventListener('pointerleave', function () { puntero.x = puntero.y = -9999; });
+  }
+}
+
+function iniciar() {
+  escena(document.getElementById('cerebro'), { logo: true, sueltas: 70, puntero: true });
+  escena(document.getElementById('ambiente'), { sueltas: window.innerWidth < 700 ? 60 : 140 });
+}
+// El ensamblaje arranca cuando la fuente está lista, para que el titular no salte mientras se mueve
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(iniciar); else window.addEventListener('load', iniciar);
+</script>
+</body>
+</html>

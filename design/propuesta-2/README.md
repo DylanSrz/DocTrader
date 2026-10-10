@@ -1,6 +1,6 @@
 # Propuesta 2
 
-> Estado: **recibiendo el contexto de diseño**. Todavía no hay prototipos.
+> Estado: **landing lista** (2026-10-10). Falta presentarla a Argemiro.
 
 ## Contexto de diseño (`contexto/diseno/`)
 
@@ -18,11 +18,31 @@ Es el material que guía esta propuesta. Lo entrega el usuario por partes.
 
 ## Concepto
 
-_Se define cuando esté el contexto._
+Usa el sistema de diseño de Refero (`contexto/diseno/DESIGN.md`, estilo de Dala, "constellation floating on black velvet"),
+adaptado a la marca:
+- Negro puro, sin tarjetas ni bordes.
+- Titulares enormes en Inter peso 400 con interletrado cerrado.
+- Botones en píldora en el naranja del logo, como único color de acción.
+
+El gesto propio: el logo de Argemiro (cerebro, barras y flecha) hecho de 2.200 partículas triangulares que se
+ensamblan al cargar la página.
 
 ## Piezas
 
-_Por definir._
+| Pieza | Prototipo | Enlace para compartir | Notas |
+|---|---|---|---|
+| Landing | [`landing/index.html`](landing/index.html) | https://claude.ai/artifact/RX6NGDrxrvHL28XM7UszqE | [`landing/NOTAS.md`](landing/NOTAS.md) |
+
+La landing tiene estas secciones:
+- Hero.
+- Problema.
+- Cómo funciona.
+- Resultados de Myfxbook y "Con qué funciona".
+- Precios.
+- Preguntas frecuentes.
+- Cierre.
+
+Las cifras de Myfxbook están pendientes. Mientras tanto, el enlace apunta a una cuenta de referencia de terceros.
 
 ## Comentarios de Argemiro
 
