@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panel DocTraderPRO</title>
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="../../marca/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..600&display=swap">
+<style>
+/*
+  Panel del cliente — propuesta 2. Mismo sistema que la landing: DESIGN.md de Refero (Dala) con los colores del logo.
+  Negro puro, sin tarjetas ni bordes; el titular de cada vista es el dato más importante.
+  Rasgo propio: el tiempo de la licencia se dibuja con triángulos, una fila por mes y uno por día,
+  el mismo triángulo con el que la landing arma el logo.
+*/
+:root {
+  color-scheme: dark;
+  --vacio: #000000;
+  --blanco: #FFFFFF;
+  --ceniza: #9A9A9A;
+  --niebla: #BDBDBD;
+  --llama: #FB9819;
+  --llama-viva: #FFAD3D;
+  --senal: #DDDB65;
+  --error: #FF7A59;
+  --campo: rgb(255 255 255 / 0.07);
+  --campo-foco: rgb(255 255 255 / 0.11);
+
+  --ancho: 1280px;
+  --margen: clamp(20px, 5vw, 64px);
+  --radio: 24px;
+
+  --t-display: clamp(56px, 8vw, 113px);
+  --t-grande: clamp(38px, 5vw, 78px);
+  --t-medio: clamp(26px, 2.6vw, 36px);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-cajon: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--vacio); color: var(--blanco);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-optical-sizing: auto; font-feature-settings: "ss01" on, "cv11" on;
+  font-size: 17px; font-weight: 300; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+@media (pointer: fine) { html { overscroll-behavior: none; } }
+h1, h2, h3, p, ul, ol, dl, dd, figure, fieldset { margin: 0; }
+h1, h2, h3 { font-weight: 400; text-wrap: balance; }
+a, button, summary, label { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--senal); outline-offset: 4px; border-radius: 6px; }
+::selection { background: var(--llama); color: var(--vacio); }
+.cifra { font-variant-numeric: tabular-nums; }
+.oculto { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.saltar {
+  position: absolute; left: var(--margen); top: 12px; z-index: 60;
+  padding: 10px 16px; border-radius: var(--radio); background: var(--senal); color: var(--vacio);
+  font-size: 14px; font-weight: 600; text-decoration: none;
+  transform: translateY(-200%); transition: transform 200ms var(--ease-out);
+}
+.saltar:focus-visible { transform: translateY(0); }
+
+.contenedor { width: min(100% - 2 * var(--margen), var(--ancho)); margin-inline: auto; }
+.titulo-display { font-size: var(--t-display); line-height: 1; letter-spacing: -0.04em; }
+.titulo-grande { font-size: var(--t-grande); line-height: 1.04; letter-spacing: -0.04em; }
+.titulo-medio { font-size: var(--t-medio); line-height: 1.2; letter-spacing: -0.02em; }
+.texto { color: var(--niebla); max-width: 36em; }
+.nota { font-size: 14px; color: var(--ceniza); }
+.etiqueta { font-size: 14px; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase; color: var(--senal); }
+
+/* ---------- Botones ---------- */
+.pildora {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 46px; padding: 14px 22px; border-radius: var(--radio); border: 0;
+  background: var(--llama); color: var(--vacio);
+  font: inherit; font-size: 14px; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase; line-height: 1;
+  text-decoration: none; white-space: nowrap; cursor: pointer; user-select: none; -webkit-user-select: none;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, opacity 200ms ease;
+}
+.pildora:active { transform: scale(0.97); }
+.pildora[disabled] { opacity: 0.45; cursor: not-allowed; }
+.pildora[disabled]:active { transform: none; }
+.pildora-clara { background: var(--campo); color: var(--blanco); }
+.enlace {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--blanco); font: inherit; font-size: 14px; font-weight: 400; white-space: nowrap;
+  text-decoration: underline; text-decoration-color: rgb(255 255 255 / 0.35); text-underline-offset: 6px; text-decoration-thickness: 1px;
+  transition: text-decoration-color 200ms ease, color 200ms ease;
+}
+.enlace-gris { color: var(--ceniza); }
+.enlace[disabled] { color: var(--ceniza); text-decoration: none; cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .pildora:not([disabled]):hover { background: var(--llama-viva); }
+  .pildora-clara:not([disabled]):hover { background: var(--campo-foco); }
+  .enlace:not([disabled]):hover { text-decoration-color: currentColor; }
+  .enlace-gris:not([disabled]):hover { color: var(--blanco); }
+}
+.acciones { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; }
+
+/* ---------- Estados: forma + palabra ---------- */
+.estado {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 10px; border-radius: 9999px;
+  font-size: 13px; font-weight: 500; line-height: 1.2; white-space: nowrap;
+}
+.estado::before { content: ""; width: 8px; height: 7px; flex: none; background: currentColor; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.estado-conectada { color: var(--senal); background: rgb(221 219 101 / 0.12); }
+.estado-vence { color: var(--llama); background: rgb(251 152 25 / 0.14); }
+.estado-por-conectar, .estado-pendiente, .estado-expirada { color: var(--blanco); background: rgb(255 255 255 / 0.08); }
+.estado-por-conectar::before, .estado-pendiente::before, .estado-expirada::before {
+  background: none; clip-path: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 7'%3E%3Cpath d='M4 .9 7.3 6.5H.7Z' fill='none' stroke='%23FFFFFF' stroke-width='1'/%3E%3C/svg%3E");
+}
+.estado-expirada { color: var(--ceniza); }
+.estado-aprobado { color: var(--senal); background: rgb(221 219 101 / 0.12); }
+
+/* ---------- Barra superior ---------- */
+.prototipo { padding: calc(env(safe-area-inset-top, 0px) + 10px) var(--margen) 0; font-size: 12px; color: var(--senal); text-align: center; }
+.barra { padding-top: 14px; }
+.barra-interior { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 24px; min-height: 64px; }
+.marca { display: inline-flex; align-items: center; gap: 12px; color: var(--blanco); text-decoration: none; min-height: 44px; }
+.marca img { width: 27px; height: auto; }
+.marca span { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.pestanas { display: flex; justify-content: center; gap: clamp(20px, 3vw, 40px); list-style: none; padding: 0; margin: 0; }
+.pestana {
+  position: relative; display: inline-flex; align-items: center; min-height: 44px;
+  font-size: 14px; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase;
+  color: var(--ceniza); text-decoration: none; transition: color 200ms ease;
+}
+.pestana[aria-current="page"] { color: var(--blanco); }
+.pestana[aria-current="page"]::after {
+  content: ""; position: absolute; left: 50%; bottom: 2px; width: 8px; height: 7px; transform: translateX(-50%);
+  background: var(--llama); clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+@media (hover: hover) and (pointer: fine) { .pestana:hover { color: var(--blanco); } }
+.usuario { display: flex; align-items: center; gap: 20px; font-size: 14px; color: var(--ceniza); }
+
+/* ---------- Vistas ---------- */
+main { padding-bottom: 120px; }
+.vista[hidden] { display: none; }
+.vista-titulo:focus { outline: none; }
+.cabeza-vista { display: grid; gap: 26px; justify-items: start; padding-top: clamp(56px, 8vw, 120px); max-width: 980px; }
+.cabeza-vista .texto { color: var(--blanco); }
+.bloque { margin-top: clamp(96px, 12vw, 168px); }
+.bloque-cabeza { display: flex; align-items: baseline; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; margin-bottom: clamp(40px, 5vw, 64px); }
+
+/* Leyenda de los triángulos */
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 22px; list-style: none; padding: 0; font-size: 13px; color: var(--ceniza); }
+.leyenda li { display: inline-flex; align-items: center; gap: 8px; }
+.leyenda svg { width: 10px; height: 9px; }
+
+/* ---------- Cuentas ---------- */
+.cuentas { list-style: none; padding: 0; display: grid; gap: clamp(88px, 10vw, 140px); }
+.cuenta { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 32px clamp(32px, 6vw, 96px); align-items: start; }
+.cuenta-id { display: grid; gap: 18px; justify-items: start; }
+.cuenta-numero { font-size: clamp(32px, 3.4vw, 42px); line-height: 1.1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.cuenta-broker { font-size: 15px; color: var(--ceniza); margin-top: -12px; }
+.cuenta-datos { display: grid; grid-template-columns: auto auto; justify-content: start; gap: 6px 24px; font-size: 15px; margin-top: 10px; }
+.cuenta-datos dt { color: var(--ceniza); }
+.cuenta-datos dd { color: var(--blanco); }
+.cuenta-tiempo { display: grid; gap: 22px; justify-items: start; }
+.dias-cifra { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.dias-cifra strong { font-size: var(--t-grande); font-weight: 400; line-height: 0.9; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.cuenta[data-estado="por-vencer"] .dias-cifra strong { color: var(--llama); }
+.dias-cifra span { color: var(--niebla); font-size: 15px; }
+.calendario { width: min(100%, 380px); height: auto; display: block; overflow: visible; }
+.calendario text { font: 400 10px "Inter", sans-serif; fill: var(--ceniza); }
+.cuenta-nota { color: var(--niebla); font-size: 15px; max-width: 32em; }
+
+/* Prueba y soporte */
+.dos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px clamp(32px, 6vw, 96px); }
+.dos > section { display: grid; gap: 18px; align-content: start; justify-items: start; }
+.precio-linea { display: flex; align-items: baseline; gap: 12px; }
+.precio-linea strong { font-size: var(--t-grande); font-weight: 400; line-height: 0.9; letter-spacing: -0.05em; }
+.precio-linea span { color: var(--ceniza); font-size: 15px; }
+.mensaje { font-size: 15px; color: var(--senal); }
+.mensaje[hidden] { display: none; }
+
+/* ---------- Pagos ---------- */
+.orden { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 64px clamp(32px, 6vw, 96px); margin-top: clamp(64px, 8vw, 104px); align-items: start; }
+.regresiva { display: grid; gap: 8px; }
+.regresiva strong { font-size: clamp(88px, 13vw, 180px); font-weight: 300; line-height: 0.85; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; }
+.regresiva[data-urgente="true"] strong { color: var(--llama); }
+.resumen { display: grid; gap: 14px; margin-top: 40px; font-size: 15px; }
+.resumen div { display: grid; grid-template-columns: 9.5em 1fr; gap: 12px; }
+.resumen dt { color: var(--ceniza); }
+.pago { display: grid; gap: 40px; }
+.paso-pago { display: grid; gap: 14px; justify-items: start; }
+.paso-pago > .nota { margin-bottom: -4px; }
+.redes { display: flex; flex-wrap: wrap; gap: 8px; }
+.red {
+  display: grid; gap: 2px; min-height: 52px; padding: 9px 20px; border: 0; border-radius: var(--radio);
+  background: var(--campo); color: var(--niebla); font: inherit; font-size: 15px; font-weight: 500; text-align: left; line-height: 1.2; cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+.red small { font-size: 12px; font-weight: 300; color: inherit; opacity: 0.8; }
+.red[aria-checked="true"] { background: var(--blanco); color: var(--vacio); }
+@media (hover: hover) and (pointer: fine) { .red[aria-checked="false"]:hover { background: var(--campo-foco); color: var(--blanco); } }
+.monto { font-size: clamp(40px, 4.6vw, 64px); line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.direccion { display: flex; align-items: center; gap: 8px 16px; width: 100%; padding: 6px 6px 6px 20px; border-radius: var(--radio); background: var(--campo); }
+.direccion code { flex: 1; min-width: 0; font-family: inherit; font-size: 15px; font-weight: 400; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; padding-block: 8px; }
+.advertencia { font-size: 15px; color: var(--niebla); }
+.advertencia strong { color: var(--llama); font-weight: 500; }
+
+.campo { display: grid; gap: 8px; width: 100%; }
+.campo label, .campo legend { font-size: 15px; font-weight: 400; color: var(--blanco); }
+.campo .ayuda { font-size: 14px; color: var(--ceniza); }
+.campo input {
+  width: 100%; min-height: 52px; padding: 14px 20px; border: 0; border-radius: var(--radio);
+  background: var(--campo); color: var(--blanco); font: inherit; font-size: 16px; font-weight: 400;
+  transition: background-color 200ms ease, box-shadow 200ms ease;
+}
+.campo input::placeholder { color: rgb(255 255 255 / 0.35); }
+.campo input:focus-visible { outline: none; background: var(--campo-foco); box-shadow: 0 0 0 2px var(--senal); }
+.campo input[aria-invalid="true"] { box-shadow: 0 0 0 1.5px var(--error); }
+.error { font-size: 14px; color: var(--error); }
+.error[hidden] { display: none; }
+.fila-campo { display: flex; gap: 8px; align-items: stretch; }
+.fila-campo input { flex: 1; min-width: 0; }
+
+.verificacion { display: grid; gap: 18px; }
+.verificacion[hidden] { display: none; }
+.verificacion-titulo { font-size: 20px; font-weight: 400; letter-spacing: -0.01em; }
+.confirmaciones { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.confirmaciones svg { height: 14px; width: auto; max-width: 100%; overflow: visible; }
+.confirmaciones path { fill: none; stroke: var(--ceniza); stroke-width: 1; transition: fill 200ms ease, stroke 200ms ease; }
+.confirmaciones path[data-ok="true"] { fill: var(--senal); stroke: var(--senal); }
+.confirmaciones span { font-size: 14px; color: var(--ceniza); font-variant-numeric: tabular-nums; }
+.verificacion ol { list-style: none; padding: 0; display: grid; gap: 8px; font-size: 15px; color: var(--ceniza); }
+.verificacion li { display: flex; gap: 12px; align-items: center; transition: color 200ms ease; }
+.verificacion li::before {
+  content: ""; width: 9px; height: 8px; flex: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 8'%3E%3Cpath d='M4.5 .9 8.2 7.5H.8Z' fill='none' stroke='%239A9A9A' stroke-width='1'/%3E%3C/svg%3E");
+}
+.verificacion li[data-ok="true"] { color: var(--blanco); }
+.verificacion li[data-ok="true"]::before { background: var(--senal); background-image: none; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+/* Historial: sin líneas, solo espacio */
+.tabla-envoltura { position: relative; overflow-x: auto; margin-inline: -8px; padding-inline: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 760px; }
+th { text-align: left; font-size: 13px; font-weight: 400; color: var(--ceniza); padding: 0 16px 14px 0; }
+td { padding: 18px 16px 18px 0; vertical-align: top; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td small { display: block; color: var(--ceniza); font-size: 13px; }
+
+/* ---------- Perfil ---------- */
+.datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px clamp(32px, 6vw, 96px); margin-top: clamp(64px, 8vw, 104px); max-width: 980px; }
+.dato { display: grid; gap: 6px; }
+.dato dt { font-size: 14px; color: var(--ceniza); }
+.dato dd { font-size: clamp(22px, 2.2vw, 27px); letter-spacing: -0.02em; font-weight: 400; overflow-wrap: anywhere; }
+.perfil-pie { margin-top: 56px; display: grid; gap: 28px; max-width: 980px; }
+
+/* ---------- Pie ---------- */
+.pie { padding-block: 40px calc(40px + env(safe-area-inset-bottom, 0px)); font-size: 13px; color: var(--ceniza); }
+.pie .contenedor { display: flex; flex-wrap: wrap; gap: 16px 48px; justify-content: space-between; }
+.pie p { max-width: 60em; }
+.pie nav { display: flex; gap: 4px 24px; flex-wrap: wrap; }
+.pie a { color: var(--ceniza); text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { .pie a:hover { color: var(--blanco); } }
+
+/* ---------- Panel lateral: agregar cuenta ---------- */
+.lateral {
+  margin: 0 0 0 auto; height: 100dvh; max-height: none; width: min(560px, 100vw); max-width: 100vw;
+  padding: 0; border: 0; border-radius: var(--radio) 0 0 var(--radio);
+  background: var(--vacio); color: var(--blanco); overscroll-behavior: contain;
+  transform: translateX(100%);
+  transition: transform 320ms var(--ease-cajon), overlay 320ms allow-discrete, display 320ms allow-discrete;
+}
+.lateral[open] { transform: translateX(0); }
+@starting-style { .lateral[open] { transform: translateX(100%); } }
+.lateral::backdrop { background: rgb(0 0 0 / 0.72); opacity: 0; transition: opacity 320ms var(--ease-out), overlay 320ms allow-discrete, display 320ms allow-discrete; }
+.lateral[open]::backdrop { opacity: 1; }
+@starting-style { .lateral[open]::backdrop { opacity: 0; } }
+.lateral-interior { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+.lateral-cabeza { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: calc(28px + env(safe-area-inset-top, 0px)) 32px 8px; }
+.lateral-cabeza h2 { font-size: clamp(36px, 5vw, 48px); line-height: 1.05; letter-spacing: -0.04em; }
+.cerrar { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--campo); color: var(--blanco); cursor: pointer; transition: background-color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .cerrar:hover { background: var(--campo-foco); } }
+.cerrar svg { width: 14px; height: 14px; }
+.lateral-cuerpo { overflow-y: auto; padding: 24px 32px 32px; display: grid; gap: 22px; align-content: start; overscroll-behavior: contain; }
+.lateral-pie { padding: 18px 32px calc(22px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 12px 24px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+.nota-cifrado { font-size: 14px; color: var(--niebla); }
+.ver-clave { min-width: 96px; border: 0; border-radius: var(--radio); background: var(--campo); color: var(--blanco); font: inherit; font-size: 14px; cursor: pointer; }
+@media (hover: hover) and (pointer: fine) { .ver-clave:hover { background: var(--campo-foco); } }
+.opciones { border: 0; padding: 0; display: grid; gap: 4px; }
+.opciones legend { margin-bottom: 8px; padding: 0; }
+.opcion { display: grid; grid-template-columns: 20px 1fr auto; gap: 14px; align-items: center; padding: 12px 0; cursor: pointer; color: var(--ceniza); transition: color 200ms ease; }
+.opcion input { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin: 0; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ceniza); cursor: pointer; transition: box-shadow 200ms var(--ease-out); }
+.opcion input:checked { box-shadow: inset 0 0 0 6px var(--llama); }
+.opcion input:focus-visible { outline: 2px solid var(--senal); outline-offset: 3px; }
+.opcion:has(input:checked) { color: var(--blanco); }
+.opcion strong { font-size: 32px; font-weight: 400; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.opcion span { font-size: 15px; }
+.opcion span small { display: block; font-size: 13px; color: var(--ceniza); }
+
+/* Aviso breve */
+.aviso {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 70;
+  max-width: calc(100vw - 32px); padding: 13px 20px; border-radius: var(--radio);
+  background: var(--blanco); color: var(--vacio); font-size: 14px; font-weight: 500;
+  transform: translate(-50%, 160%); opacity: 0; pointer-events: none;
+  transition: transform 260ms var(--ease-out), opacity 200ms var(--ease-out);
+}
+.aviso[data-visible="true"] { transform: translate(-50%, 0); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lateral, .lateral::backdrop { transition: opacity 150ms ease, overlay 150ms allow-discrete, display 150ms allow-discrete; transform: none; }
+  @starting-style { .lateral[open] { transform: none; opacity: 0; } }
+  .aviso { transform: translate(-50%, 0); transition: opacity 150ms ease; }
+  .pildora, .red, .opcion input, .confirmaciones path, .verificacion li { transition-duration: 0s; }
+}
+
+/* ---------- Tableta y celular ---------- */
+@media (max-width: 960px) {
+  .barra-interior { grid-template-columns: 1fr auto auto; gap: 0 16px; }
+  .usuario-nombre { display: none; }
+  .pestanas {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; justify-content: space-around; gap: 0;
+    padding: 18px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(to top, var(--vacio) 70%, rgb(0 0 0 / 0));
+  }
+  .pestanas li { flex: 1; display: flex; justify-content: center; }
+  .pestana { min-height: 52px; }
+  main { padding-bottom: 160px; }
+  .pie { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+  .cuenta, .orden, .dos { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .marca span { font-size: 16px; }
+  .datos { grid-template-columns: 1fr; }
+  .resumen div { grid-template-columns: 8em 1fr; }
+  .direccion { flex-direction: column; align-items: stretch; padding: 12px; border-radius: 20px; }
+  .direccion code { padding: 4px 8px; }
+  .fila-campo:not(.con-clave) { flex-direction: column; }
+  .lateral { border-radius: 0; }
+  .lateral-cabeza, .lateral-cuerpo, .lateral-pie { padding-inline: 20px; }
+}
+</style>
+</head>
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<p class="prototipo">Prototipo con datos de ejemplo al 10 de octubre de 2026</p>
+
+<header class="barra">
+  <div class="contenedor barra-interior">
+    <a class="marca" href="#cuentas" aria-label="DocTraderPRO, mis cuentas"><img src="../../marca/logo-icon-64.png" alt="" width="54" height="64"><span translate="no">DocTraderPRO</span></a>
+    <nav aria-label="Panel">
+      <ul class="pestanas">
+        <li><a class="pestana" href="#cuentas" data-vista="cuentas">Mis cuentas</a></li>
+        <li><a class="pestana" href="#pagos" data-vista="pagos">Pagos</a></li>
+        <li><a class="pestana" href="#perfil" data-vista="perfil">Perfil</a></li>
+      </ul>
+    </nav>
+    <div class="usuario">
+      <span class="usuario-nombre">Laura Gómez</span>
+      <a class="enlace enlace-gris" href="/salir">Salir</a>
+    </div>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+
+  <!-- ================= MIS CUENTAS ================= -->
+  <section class="vista contenedor" id="vista-cuentas" aria-labelledby="t-cuentas">
+    <div class="cabeza-vista">
+      <h1 class="titulo-display vista-titulo" id="t-cuentas">Una licencia vence en 5&nbsp;días.</h1>
+      <p class="texto">La de la cuenta <span class="cifra">50277120</span>. Renuévala antes del 15 de octubre para que siga conectada.</p>
+      <div class="acciones">
+        <a class="pildora" href="#pagos" data-orden="renovar">Renovar trimestral</a>
+        <a class="enlace" href="#pagos" data-orden="semestral">Pasar a semestral</a>
+      </div>
+    </div>
+
+    <section class="bloque" aria-labelledby="t-lista">
+      <div class="bloque-cabeza">
+        <h2 class="titulo-medio" id="t-lista">3 cuentas, una licencia cada una</h2>
+        <div class="acciones">
+          <ul class="leyenda" aria-label="Cómo leer el calendario">
+            <li><svg viewBox="0 0 10 9" aria-hidden="true"><path d="M5 1 9 8H1Z" fill="none" stroke="#9A9A9A" stroke-opacity=".45"/></svg>Día usado</li>
+            <li><svg viewBox="0 0 10 9" aria-hidden="true"><path d="M5 1 9 8H1Z" fill="none" stroke="#FB9819"/></svg>Día restante</li>
+            <li><svg viewBox="0 0 10 9" aria-hidden="true"><path d="M5 1 9 8H1Z" fill="#FB9819" stroke="#FB9819"/></svg>Hoy</li>
+            <li><svg viewBox="0 0 10 9" aria-hidden="true"><path d="M5 1 9 8H1Z" fill="none" stroke="#DDDB65"/></svg>Mes de obsequio</li>
+          </ul>
+          <button class="enlace" type="button" data-abrir="agregar">Agregar cuenta</button>
+        </div>
+      </div>
+
+      <ol class="cuentas" aria-label="Cuentas de trading">
+        <li class="cuenta" data-estado="por-vencer">
+          <div class="cuenta-id">
+            <span class="estado estado-vence">Vence pronto</span>
+            <h3 class="cuenta-numero"><span class="oculto">Cuenta </span>50277120</h3>
+            <p class="cuenta-broker"><span translate="no">JustMarkets</span>, servidor JustMarkets-Live</p>
+            <dl class="cuenta-datos">
+              <dt>Licencia</dt><dd>Trimestral, del 15 jul al 15 oct 2026</dd>
+              <dt>Capital recomendado</dt><dd class="cifra">USD 1.000</dd>
+              <dt>Nivel de riesgo</dt><dd>Conservador</dd>
+            </dl>
+          </div>
+          <div class="cuenta-tiempo">
+            <p class="dias-cifra"><strong>5</strong><span>días restantes de 92</span></p>
+            <svg class="calendario" data-inicio="2026-07-15" data-meses="3" role="img" aria-label="Licencia de 3 meses: quedan 5 días del último mes"></svg>
+            <p class="cuenta-nota">Si vence, tienes 3&nbsp;días de gracia con la cuenta conectada.</p>
+            <div class="acciones">
+              <a class="enlace" href="#pagos" data-orden="renovar">Renovar</a>
+              <a class="enlace" href="#pagos" data-orden="semestral">Pasar a semestral</a>
+            </div>
+          </div>
+        </li>
+
+        <li class="cuenta" data-estado="activa">
+          <div class="cuenta-id">
+            <span class="estado estado-conectada">Conectada</span>
+            <h3 class="cuenta-numero"><span class="oculto">Cuenta </span>50213847</h3>
+            <p class="cuenta-broker"><span translate="no">JustMarkets</span>, servidor JustMarkets-Live</p>
+            <dl class="cuenta-datos">
+              <dt>Licencia</dt><dd>Semestral, del 2 jul 2026 al 2 ene 2027</dd>
+              <dt>Capital recomendado</dt><dd class="cifra">USD 2.000</dd>
+              <dt>Nivel de riesgo</dt><dd>Moderado</dd>
+            </dl>
+          </div>
+          <div class="cuenta-tiempo">
+            <p class="dias-cifra"><strong>84</strong><span>días restantes de 184</span></p>
+            <svg class="calendario" data-inicio="2026-07-02" data-meses="6" data-regalo="1" role="img" aria-label="Licencia de 6 meses: van 100 días y quedan 84; el sexto mes es de obsequio"></svg>
+            <div class="acciones">
+              <a class="enlace" href="#pagos" data-orden="renovar-semestral">Renovar</a>
+            </div>
+          </div>
+        </li>
+
+        <li class="cuenta" data-estado="por-conectar">
+          <div class="cuenta-id">
+            <span class="estado estado-por-conectar">Por conectar</span>
+            <h3 class="cuenta-numero"><span class="oculto">Cuenta </span>8812406</h3>
+            <p class="cuenta-broker">IC Markets, servidor ICMarketsSC-Live07</p>
+            <dl class="cuenta-datos">
+              <dt>Licencia</dt><dd>Semestral, del 9 oct 2026 al 9 abr 2027</dd>
+            </dl>
+          </div>
+          <div class="cuenta-tiempo">
+            <p class="dias-cifra"><strong>181</strong><span>días restantes de 182</span></p>
+            <svg class="calendario" data-inicio="2026-10-09" data-meses="6" data-regalo="1" role="img" aria-label="Licencia de 6 meses que acaba de empezar; el sexto mes es de obsequio"></svg>
+            <p class="cuenta-nota">Recibimos tus datos. Argemiro conectará la cuenta y te avisaremos por correo.</p>
+            <div class="acciones">
+              <button class="enlace" type="button" data-abrir="agregar" data-editar="8812406">Editar datos</button>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <div class="bloque dos">
+      <section aria-labelledby="t-prueba">
+        <h2 class="titulo-medio" id="t-prueba">¿Quieres probar con otra cuenta?</h2>
+        <p class="precio-linea"><strong class="cifra">50</strong><span>USD por 1&nbsp;mes de prueba</span></p>
+        <p class="texto">Puedes pedirla una sola vez. Si te gusta, la completas a semestral por USD&nbsp;450 antes de que termine.</p>
+        <button class="enlace" type="button" id="pedir-prueba">Solicitar prueba</button>
+        <p class="mensaje" id="prueba-enviada" role="status" hidden>Solicitud enviada. Te avisaremos por correo cuando Argemiro la apruebe.</p>
+      </section>
+      <section aria-labelledby="t-soporte">
+        <h2 class="titulo-medio" id="t-soporte">¿Necesitas ayuda?</h2>
+        <p class="texto">Te respondemos por <span translate="no">Telegram</span>. Ten a mano el número de tu cuenta de trading.</p>
+        <div class="acciones">
+          <a class="enlace" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener">Escribir por&nbsp;<span translate="no">Telegram</span></a>
+          <a class="enlace enlace-gris" href="https://www.instagram.com/doctraderproiasystem/" target="_blank" rel="noopener">Ver&nbsp;<span translate="no">Instagram</span></a>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ================= PAGOS ================= -->
+  <section class="vista contenedor" id="vista-pagos" aria-labelledby="t-pagos" hidden>
+    <div class="cabeza-vista">
+      <h1 class="titulo-grande vista-titulo" id="t-pagos">Envía el pago dentro de la hora.</h1>
+      <p class="texto">Verificamos cada pago en la blockchain antes de activar la licencia.</p>
+    </div>
+
+    <section class="orden" aria-labelledby="t-orden">
+      <div>
+        <h2 class="oculto" id="t-orden">Orden de pago</h2>
+        <div class="regresiva" id="regresiva">
+          <strong id="regresiva-tiempo">60:00</strong>
+          <span class="nota">Tiempo que queda. Si se acaba, crea una orden nueva.</span>
+        </div>
+        <dl class="resumen">
+          <div><dt>Licencia</dt><dd id="orden-licencia">Trimestral, 3&nbsp;meses</dd></div>
+          <div><dt>Cuenta de trading</dt><dd class="cifra" id="orden-cuenta">50277120</dd></div>
+          <div><dt>Nuevo vencimiento</dt><dd id="orden-vence">15 de enero de 2027</dd></div>
+          <div><dt>Total</dt><dd class="cifra" id="orden-total">USD 319</dd></div>
+        </dl>
+      </div>
+
+      <div class="pago">
+        <div class="paso-pago">
+          <p class="nota" id="t-redes">Elige con qué pagas</p>
+          <div class="redes" role="radiogroup" aria-labelledby="t-redes">
+            <button class="red" type="button" role="radio" aria-checked="true" data-red="usdt">USDT<small>Tron (TRC20)</small></button>
+            <button class="red" type="button" role="radio" aria-checked="false" tabindex="-1" data-red="usdc">USDC<small>BNB Smart Chain (BEP20)</small></button>
+            <button class="red" type="button" role="radio" aria-checked="false" tabindex="-1" data-red="btc">BTC<small>Bitcoin</small></button>
+          </div>
+        </div>
+
+        <div class="paso-pago">
+          <p class="nota">Envía exactamente</p>
+          <p class="monto" id="monto">319.00 USDT</p>
+          <p class="nota" id="monto-nota">Las comisiones de la red las pagas tú; el monto que llega debe ser este.</p>
+        </div>
+
+        <div class="paso-pago">
+          <p class="nota" id="t-direccion">A esta dirección</p>
+          <div class="direccion">
+            <code id="direccion" aria-labelledby="t-direccion">TXq7Ejemp1oDirecc1onTRC20xx9Rk3aZ</code>
+            <button class="pildora pildora-clara" type="button" id="copiar">Copiar</button>
+          </div>
+          <p class="advertencia" id="advertencia"><strong>Usa solo la red Tron (TRC20).</strong> Si envías por otra red, el pago se pierde y no lo podemos recuperar.</p>
+        </div>
+
+        <form class="paso-pago" id="form-reporte" novalidate>
+          <div class="campo">
+            <label for="hash">Código de la transacción (hash)</label>
+            <span class="ayuda" id="hash-ayuda">Lo encuentras en tu billetera o exchange, en el detalle del envío.</span>
+            <div class="fila-campo">
+              <input id="hash" name="hash" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ej.: 7f3a9c…e21b" aria-describedby="hash-ayuda hash-error">
+              <button class="pildora" type="submit" id="reportar">Reportar pago</button>
+            </div>
+            <span class="error" id="hash-error" hidden>Pega el código completo de la transacción. Tiene al menos 40 caracteres.</span>
+          </div>
+        </form>
+
+        <div class="verificacion" id="verificacion" hidden>
+          <p class="verificacion-titulo" id="verif-titulo" role="status">Buscando tu transacción en la blockchain…</p>
+          <div class="confirmaciones">
+            <svg id="conf-triangulos" aria-hidden="true"></svg>
+            <span id="verif-conf"></span>
+          </div>
+          <ol>
+            <li data-paso="encontrada">Transacción encontrada</li>
+            <li data-paso="destino">Llegó a la dirección de esta orden</li>
+            <li data-paso="monto">El monto es correcto</li>
+            <li data-paso="confirmaciones">Tiene las confirmaciones necesarias</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloque" aria-labelledby="t-historial">
+      <div class="bloque-cabeza"><h2 class="titulo-medio" id="t-historial">Historial de pagos</h2></div>
+      <div class="tabla-envoltura" tabindex="0" role="region" aria-labelledby="t-historial">
+        <table>
+          <thead>
+            <tr><th scope="col">Fecha</th><th scope="col">Concepto</th><th scope="col">Pagado con</th><th scope="col" class="num">Monto</th><th scope="col">Estado</th><th scope="col"><span class="oculto">Comprobante</span></th></tr>
+          </thead>
+          <tbody>
+            <tr><td>9 oct 2026</td><td>Licencia semestral<small>Cuenta 8812406</small></td><td>BTC<small>Bitcoin</small></td><td class="num">0.00398 BTC<small>USD 499</small></td><td><span class="estado estado-aprobado">Aprobado</span></td><td><a class="enlace enlace-gris" href="https://mempool.space/" target="_blank" rel="noopener">Ver en el explorador</a></td></tr>
+            <tr><td>15 jul 2026</td><td>Licencia trimestral<small>Cuenta 50277120</small></td><td>USDT<small>Tron (TRC20)</small></td><td class="num">319.00 USDT<small>USD 319</small></td><td><span class="estado estado-aprobado">Aprobado</span></td><td><a class="enlace enlace-gris" href="https://tronscan.org/" target="_blank" rel="noopener">Ver en el explorador</a></td></tr>
+            <tr><td>2 jul 2026</td><td>Licencia semestral<small>Cuenta 50213847</small></td><td>USDC<small>BNB Smart Chain (BEP20)</small></td><td class="num">499.00 USDC<small>USD 499</small></td><td><span class="estado estado-aprobado">Aprobado</span></td><td><a class="enlace enlace-gris" href="https://bscscan.com/" target="_blank" rel="noopener">Ver en el explorador</a></td></tr>
+            <tr><td>2 jul 2026</td><td>Licencia semestral<small>Cuenta 50213847</small></td><td>USDT<small>Tron (TRC20)</small></td><td class="num">499.00 USDT<small>USD 499</small></td><td><span class="estado estado-expirada">Expirada</span></td><td><small>No se pagó dentro de la hora</small></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= PERFIL ================= -->
+  <section class="vista contenedor" id="vista-perfil" aria-labelledby="t-perfil" hidden>
+    <div class="cabeza-vista">
+      <h1 class="titulo-grande vista-titulo" id="t-perfil">Laura Gómez Restrepo</h1>
+      <p class="texto">Cliente desde el 2 de julio de 2026.</p>
+    </div>
+    <dl class="datos">
+      <div class="dato"><dt>Cédula</dt><dd class="cifra">•••• 4521</dd></div>
+      <div class="dato"><dt>Correo</dt><dd>laura.gomez@ejemplo.com</dd></div>
+      <div class="dato"><dt>Teléfono</dt><dd class="cifra">+57 300 000 0000</dd></div>
+      <div class="dato"><dt>Mes de prueba</dt><dd>Disponible, una sola vez</dd></div>
+    </dl>
+    <div class="perfil-pie">
+      <div class="acciones">
+        <a class="enlace" href="/perfil/editar">Editar datos</a>
+        <a class="enlace" href="/perfil/contrasena">Cambiar contraseña</a>
+      </div>
+      <p class="texto">Tu cédula se guarda cifrada y solo la ve el administrador. La usamos para que cada persona tenga una sola prueba. Para cambiarla, escríbenos por <a class="enlace" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener" style="font-size: inherit; min-height: 0;" translate="no">Telegram</a>.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="contenedor">
+    <p><span translate="no">DocTraderPRO</span> es una licencia de uso de software. No es asesoría de inversión ni administra capital de terceros. Operar en mercados financieros implica riesgo de pérdida.</p>
+    <nav aria-label="Legal">
+      <a href="/legal/terminos">Términos</a>
+      <a href="/legal/datos">Tratamiento de datos</a>
+      <a href="/legal/riesgo">Aviso de riesgo</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- Panel lateral: agregar cuenta -->
+<dialog class="lateral" id="agregar" aria-labelledby="t-agregar">
+  <form class="lateral-interior" id="form-cuenta" method="dialog" novalidate>
+    <div class="lateral-cabeza">
+      <h2 id="t-agregar">Agregar cuenta de trading</h2>
+      <button class="cerrar" type="button" data-cerrar aria-label="Cerrar">
+        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+    <div class="lateral-cuerpo">
+      <p class="nota-cifrado">Tus contraseñas se guardan cifradas. Solo el administrador las ve para conectar tu cuenta.</p>
+      <div class="campo">
+        <label for="c-titular">Nombre del titular de la cuenta</label>
+        <input id="c-titular" name="titular" type="text" autocomplete="name" value="Laura Gómez Restrepo" required aria-describedby="e-titular">
+        <span class="error" id="e-titular" hidden>Escribe el nombre como aparece en tu broker.</span>
+      </div>
+      <div class="campo">
+        <label for="c-broker">Broker</label>
+        <input id="c-broker" name="broker" type="text" list="brokers" autocomplete="off" spellcheck="false" placeholder="Ej.: JustMarkets" required aria-describedby="e-broker">
+        <datalist id="brokers"><option value="JustMarkets"></option></datalist>
+        <span class="error" id="e-broker" hidden>Escribe el nombre de tu broker.</span>
+      </div>
+      <div class="campo">
+        <label for="c-servidor">Servidor</label>
+        <input id="c-servidor" name="servidor" type="text" autocomplete="off" spellcheck="false" placeholder="Ej.: JustMarkets-Live" required aria-describedby="a-servidor e-servidor">
+        <span class="ayuda" id="a-servidor">Aparece en el correo que te envió el broker al abrir la cuenta.</span>
+        <span class="error" id="e-servidor" hidden>Escribe el servidor de tu cuenta.</span>
+      </div>
+      <div class="campo">
+        <label for="c-numero">Número de cuenta</label>
+        <input id="c-numero" name="numero" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="Ej.: 50213847" required aria-describedby="e-numero">
+        <span class="error" id="e-numero" hidden>Escribe solo los números de tu cuenta.</span>
+      </div>
+      <div class="campo">
+        <label for="c-operativa">Contraseña operativa</label>
+        <div class="fila-campo con-clave">
+          <input id="c-operativa" name="operativa" type="password" autocomplete="off" required aria-describedby="e-operativa">
+          <button class="ver-clave" type="button" data-ver="c-operativa" aria-pressed="false">Mostrar</button>
+        </div>
+        <span class="error" id="e-operativa" hidden>Escribe la contraseña operativa (la de operar, no la de inversor).</span>
+      </div>
+      <div class="campo">
+        <label for="c-inversor">Contraseña de inversor</label>
+        <div class="fila-campo con-clave">
+          <input id="c-inversor" name="inversor" type="password" autocomplete="off" required aria-describedby="e-inversor">
+          <button class="ver-clave" type="button" data-ver="c-inversor" aria-pressed="false">Mostrar</button>
+        </div>
+        <span class="error" id="e-inversor" hidden>Escribe la contraseña de inversor (solo lectura).</span>
+      </div>
+      <fieldset class="opciones campo">
+        <legend>Licencia para esta cuenta</legend>
+        <label class="opcion"><input type="radio" name="licencia" value="trimestral"><span>Trimestral<small>3&nbsp;meses</small></span><strong>319</strong></label>
+        <label class="opcion"><input type="radio" name="licencia" value="semestral" checked><span>Semestral<small>5&nbsp;meses + 1 de obsequio</small></span><strong>499</strong></label>
+      </fieldset>
+    </div>
+    <div class="lateral-pie">
+      <button class="enlace" type="button" data-cerrar>Cancelar</button>
+      <button class="pildora" type="submit" value="guardar">Guardar e ir a pagar</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var HOY = new Date(2026, 9, 10); // fecha de los datos de ejemplo
+  var SVG = 'http://www.w3.org/2000/svg';
+  var MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+  function triangulo(x, y, t) { return 'M' + (x + t / 2) + ' ' + y + ' L' + (x + t) + ' ' + (y + t * 0.88) + ' L' + x + ' ' + (y + t * 0.88) + 'Z'; }
+  function nodo(tipo, attrs) { var n = document.createElementNS(SVG, tipo); for (var k in attrs) n.setAttribute(k, attrs[k]); return n; }
+
+  // ---------- Calendario de la licencia: una fila por mes real, un triángulo por día ----------
+  function dibujarCalendario(svg) {
+    var p = svg.dataset.inicio.split('-'), inicio = new Date(+p[0], +p[1] - 1, +p[2]);
+    var meses = +svg.dataset.meses, regalo = svg.dataset.regalo === '1';
+    var celda = 10, tam = 7, etiqueta = 30, fila = 15;
+    svg.setAttribute('viewBox', '0 0 ' + (etiqueta + 31 * celda) + ' ' + (meses * fila - (fila - celda)));
+    var hoyMarcado = false;
+    for (var m = 0; m < meses; m++) {
+      var desde = new Date(inicio.getFullYear(), inicio.getMonth() + m, inicio.getDate());
+      var hasta = new Date(inicio.getFullYear(), inicio.getMonth() + m + 1, inicio.getDate());
+      var dias = Math.round((hasta - desde) / 864e5), y = m * fila;
+      var esRegalo = regalo && m === meses - 1;
+      var rotulo = nodo('text', { x: 0, y: y + tam, 'aria-hidden': 'true' });
+      rotulo.textContent = MESES[desde.getMonth()];
+      svg.appendChild(rotulo);
+      var usados = '', restantes = '', hoyD = '';
+      for (var d = 0; d < dias; d++) {
+        var dia = new Date(desde.getFullYear(), desde.getMonth(), desde.getDate() + d);
+        var ruta = triangulo(etiqueta + d * celda, y, tam);
+        if (dia < HOY) usados += ruta;
+        else if (!hoyMarcado) { hoyD = ruta; hoyMarcado = true; }
+        else restantes += ruta;
+      }
+      var color = esRegalo ? '#DDDB65' : '#FB9819';
+      if (usados) svg.appendChild(nodo('path', { d: usados, fill: 'none', stroke: '#9A9A9A', 'stroke-opacity': '0.4', 'stroke-width': '1' }));
+      if (restantes) svg.appendChild(nodo('path', { d: restantes, fill: 'none', stroke: color, 'stroke-width': '1' }));
+      if (hoyD) svg.appendChild(nodo('path', { d: hoyD, fill: color, stroke: color, 'stroke-width': '1' }));
+    }
+  }
+  document.querySelectorAll('.calendario').forEach(dibujarCalendario);
+
+  // ---------- Vistas con enlace propio (#cuentas, #pagos, #perfil) ----------
+  var vistas = ['cuentas', 'pagos', 'perfil'];
+  function mostrar(vista, enfocar) {
+    if (vistas.indexOf(vista) < 0) vista = 'cuentas';
+    vistas.forEach(function (v) { document.getElementById('vista-' + v).hidden = v !== vista; });
+    document.querySelectorAll('.pestana').forEach(function (p) {
+      if (p.dataset.vista === vista) p.setAttribute('aria-current', 'page'); else p.removeAttribute('aria-current');
+    });
+    document.title = { cuentas: 'Mis cuentas', pagos: 'Pagos', perfil: 'Perfil' }[vista] + ' · Panel DocTraderPRO';
+    if (enfocar) { var t = document.querySelector('#vista-' + vista + ' h1'); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); window.scrollTo(0, 0); }
+  }
+  window.addEventListener('hashchange', function () { mostrar(location.hash.slice(1), true); });
+  mostrar(location.hash.slice(1), false);
+
+  // ---------- Aviso breve ----------
+  var aviso = document.getElementById('aviso'), avisoTimer;
+  function avisar(texto) {
+    aviso.textContent = texto; aviso.dataset.visible = 'true';
+    clearTimeout(avisoTimer); avisoTimer = setTimeout(function () { aviso.dataset.visible = 'false'; }, 2600);
+  }
+
+  // ---------- Orden de pago ----------
+  var ORDENES = {
+    renovar:            { licencia: 'Trimestral, 3 meses', cuenta: '50277120', vence: '15 de enero de 2027', usd: 319 },
+    semestral:          { licencia: 'Semestral, 5 meses + 1 de obsequio', cuenta: '50277120', vence: '15 de abril de 2027', usd: 499 },
+    'renovar-semestral':{ licencia: 'Semestral, 5 meses + 1 de obsequio', cuenta: '50213847', vence: '2 de julio de 2027', usd: 499 }
+  };
+  var REDES = {
+    usdt: { moneda: 'USDT', red: 'Tron (TRC20)', dir: 'TXq7Ejemp1oDirecc1onTRC20xx9Rk3aZ', conf: 20, nota: 'Las comisiones de la red las pagas tú; el monto que llega debe ser este.' },
+    usdc: { moneda: 'USDC', red: 'BNB Smart Chain (BEP20)', dir: '0x9eE1Ejemplo0000Direcc1on0BEP20aa77c41D2', conf: 15, nota: 'Las comisiones de la red las pagas tú; el monto que llega debe ser este.' },
+    btc:  { moneda: 'BTC', red: 'Bitcoin', dir: 'bc1qejemplod1recc1onb1tc0in7h4m9x2l0p3s', conf: 2, nota: 'Precio de ejemplo: USD 125.400 por BTC, fijo durante la hora de la orden.' }
+  };
+  var PRECIO_BTC = 125400;
+  var orden = ORDENES.renovar, red = 'usdt';
+  var fmt2 = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var fmtBtc = new Intl.NumberFormat('en-US', { minimumFractionDigits: 5, maximumFractionDigits: 5 });
+  var fmtUsd = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'USD', currencyDisplay: 'code', maximumFractionDigits: 0 });
+
+  function pintarOrden() {
+    var r = REDES[red];
+    document.getElementById('orden-licencia').textContent = orden.licencia;
+    document.getElementById('orden-cuenta').textContent = orden.cuenta || 'La que acabas de agregar';
+    document.getElementById('orden-vence').textContent = orden.vence;
+    document.getElementById('orden-total').textContent = fmtUsd.format(orden.usd);
+    document.getElementById('monto').textContent = red === 'btc' ? fmtBtc.format(orden.usd / PRECIO_BTC) + ' BTC' : fmt2.format(orden.usd) + ' ' + r.moneda;
+    document.getElementById('monto-nota').textContent = r.nota;
+    document.getElementById('direccion').textContent = r.dir;
+    document.getElementById('advertencia').innerHTML = '<strong>Usa solo la red ' + r.red + '.</strong> Si envías por otra red, el pago se pierde y no lo podemos recuperar.';
+  }
+
+  var radios = Array.prototype.slice.call(document.querySelectorAll('.red'));
+  function elegirRed(boton, enfocar) {
+    radios.forEach(function (b) { var si = b === boton; b.setAttribute('aria-checked', si); b.tabIndex = si ? 0 : -1; });
+    red = boton.dataset.red; pintarOrden(); reiniciarReporte(); if (enfocar) boton.focus();
+  }
+  radios.forEach(function (b, i) {
+    b.addEventListener('click', function () { elegirRed(b, false); });
+    b.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+      if (d) { e.preventDefault(); elegirRed(radios[(i + d + radios.length) % radios.length], true); }
+    });
+  });
+
+  // Cuenta regresiva de 1 hora
+  var fin = Date.now() + 60 * 60 * 1000, reloj = document.getElementById('regresiva-tiempo');
+  function tic() {
+    var s = Math.max(0, Math.round((fin - Date.now()) / 1000));
+    reloj.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    document.getElementById('regresiva').dataset.urgente = s < 600 ? 'true' : 'false';
+  }
+  tic(); setInterval(tic, 1000);
+
+  document.querySelectorAll('[data-orden]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      orden = ORDENES[a.dataset.orden]; fin = Date.now() + 60 * 60 * 1000; tic(); pintarOrden(); reiniciarReporte();
+    });
+  });
+
+  // Copiar dirección
+  document.getElementById('copiar').addEventListener('click', function () {
+    var boton = this, texto = document.getElementById('direccion').textContent;
+    function hecho() { boton.textContent = 'Copiada'; avisar('Dirección copiada'); setTimeout(function () { boton.textContent = 'Copiar'; }, 1800); }
+    function seleccionar() {
+      var rango = document.createRange(); rango.selectNodeContents(document.getElementById('direccion'));
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(rango);
+      avisar('Dirección seleccionada: cópiala con tu teclado');
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(hecho, seleccionar); else seleccionar();
+  });
+
+  // Reportar el hash y simular la verificación: las confirmaciones se llenan como triángulos
+  var form = document.getElementById('form-reporte'), hash = document.getElementById('hash'), error = document.getElementById('hash-error');
+  var verif = document.getElementById('verificacion'), confSvg = document.getElementById('conf-triangulos'), timers = [];
+  function reiniciarReporte() {
+    timers.forEach(clearTimeout); timers = [];
+    verif.hidden = true; hash.value = ''; hash.removeAttribute('aria-invalid'); error.hidden = true;
+    var b = document.getElementById('reportar'); b.disabled = false; b.textContent = 'Reportar pago';
+  }
+  hash.addEventListener('blur', function () { if (hash.value && hash.value.trim().length < 40) { hash.setAttribute('aria-invalid', 'true'); error.hidden = false; } });
+  hash.addEventListener('input', function () { if (!error.hidden && hash.value.trim().length >= 40) { hash.removeAttribute('aria-invalid'); error.hidden = true; } });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (hash.value.trim().length < 40) { hash.setAttribute('aria-invalid', 'true'); error.hidden = false; hash.focus(); return; }
+    var boton = document.getElementById('reportar'); boton.disabled = true; boton.textContent = 'Verificando…';
+    verif.hidden = false;
+    var titulo = document.getElementById('verif-titulo'), conf = document.getElementById('verif-conf');
+    var pasos = verif.querySelectorAll('li'); pasos.forEach(function (p) { p.dataset.ok = 'false'; });
+    var total = REDES[red].conf, celda = 14;
+    confSvg.innerHTML = ''; confSvg.setAttribute('viewBox', '0 0 ' + (total * celda) + ' 12');
+    confSvg.style.width = (total * celda) + 'px';
+    var tri = [];
+    for (var i = 0; i < total; i++) { var t = nodo('path', { d: triangulo(i * celda + 1, 1, 10) }); confSvg.appendChild(t); tri.push(t); }
+    titulo.textContent = 'Buscando tu transacción en la blockchain…'; conf.textContent = '0 de ' + total + ' confirmaciones';
+    function paso(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    paso(900, function () { pasos[0].dataset.ok = 'true'; pasos[1].dataset.ok = 'true'; });
+    paso(1500, function () { pasos[2].dataset.ok = 'true'; titulo.textContent = 'Esperando confirmaciones'; });
+    var cada = Math.max(140, Math.round(2400 / total));
+    for (var k = 1; k <= total; k++) {
+      (function (k) { paso(1500 + k * cada, function () { tri[k - 1].dataset.ok = 'true'; conf.textContent = k + ' de ' + total + ' confirmaciones'; }); })(k);
+    }
+    paso(1700 + total * cada, function () {
+      pasos[3].dataset.ok = 'true';
+      titulo.textContent = 'Pago verificado. Un administrador lo aprobará en breve y te avisaremos por correo.';
+      boton.textContent = 'Pago reportado';
+    });
+  });
+
+  // ---------- Solicitar prueba ----------
+  document.getElementById('pedir-prueba').addEventListener('click', function () {
+    this.disabled = true; this.textContent = 'Solicitud enviada';
+    document.getElementById('prueba-enviada').hidden = false;
+  });
+
+  // ---------- Panel lateral: agregar cuenta ----------
+  var dlg = document.getElementById('agregar'), formCuenta = document.getElementById('form-cuenta'), origen = null;
+  document.querySelectorAll('[data-abrir="agregar"]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      origen = b;
+      document.getElementById('t-agregar').textContent = b.dataset.editar ? 'Editar cuenta ' + b.dataset.editar : 'Agregar cuenta de trading';
+      if (b.dataset.editar) {
+        document.getElementById('c-numero').value = b.dataset.editar;
+        document.getElementById('c-broker').value = 'IC Markets';
+        document.getElementById('c-servidor').value = 'ICMarketsSC-Live07';
+      }
+      dlg.showModal();
+    });
+  });
+  dlg.addEventListener('close', function () { if (origen) origen.focus(); });
+  dlg.querySelectorAll('[data-cerrar]').forEach(function (b) { b.addEventListener('click', function () { dlg.close(); }); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+  document.querySelectorAll('[data-ver]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = document.getElementById(b.dataset.ver), ver = i.type === 'password';
+      i.type = ver ? 'text' : 'password'; b.textContent = ver ? 'Ocultar' : 'Mostrar'; b.setAttribute('aria-pressed', ver);
+    });
+  });
+
+  var reglas = {
+    'c-titular': function (v) { return v.trim().length >= 3; },
+    'c-broker': function (v) { return v.trim().length >= 2; },
+    'c-servidor': function (v) { return v.trim().length >= 3; },
+    'c-numero': function (v) { return /^\d{4,12}$/.test(v.trim()); },
+    'c-operativa': function (v) { return v.length >= 4; },
+    'c-inversor': function (v) { return v.length >= 4; }
+  };
+  function validar(id) {
+    var i = document.getElementById(id), ok = reglas[id](i.value), err = document.getElementById('e-' + id.slice(2));
+    if (ok) { i.removeAttribute('aria-invalid'); err.hidden = true; } else { i.setAttribute('aria-invalid', 'true'); err.hidden = false; }
+    return ok;
+  }
+  Object.keys(reglas).forEach(function (id) {
+    var i = document.getElementById(id);
+    i.addEventListener('blur', function () { if (i.value) validar(id); });
+    i.addEventListener('input', function () { if (i.getAttribute('aria-invalid')) validar(id); });
+  });
+  formCuenta.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var primero = null;
+    Object.keys(reglas).forEach(function (id) { if (!validar(id) && !primero) primero = id; });
+    if (primero) { document.getElementById(primero).focus(); return; }
+    var lic = formCuenta.querySelector('input[name="licencia"]:checked').value, num = document.getElementById('c-numero').value.trim();
+    orden = lic === 'trimestral'
+      ? { licencia: 'Trimestral, 3 meses', cuenta: num, vence: 'Tres meses desde el pago', usd: 319 }
+      : { licencia: 'Semestral, 5 meses + 1 de obsequio', cuenta: num, vence: 'Seis meses desde el pago', usd: 499 };
+    origen = null; dlg.close(); fin = Date.now() + 60 * 60 * 1000; tic(); pintarOrden(); reiniciarReporte();
+    location.hash = 'pagos'; avisar('Cuenta guardada. Ahora paga la licencia.');
+  });
+
+  pintarOrden();
+})();
+</script>
+</body>
+</html>

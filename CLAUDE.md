@@ -58,7 +58,8 @@ Reglas clave:
   - **Propuesta 1** (`design/propuesta-1/`, presentada el 2026-10-10, esperando comentarios): estética de denmu.com
     (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo. Piezas: landing y panel del cliente.
   - **Propuesta 2** (`design/propuesta-2/`): sistema de diseño = `contexto/diseno/DESIGN.md` de Refero (Dala) con
-    los colores del logo (naranja como único color de acción) e Inter. Pieza: landing (`landing/`, notas en `NOTAS.md`).
+    los colores del logo (naranja como único color de acción) e Inter. Piezas: landing y panel del cliente
+    (`landing/`, `panel-cliente/`, notas en cada `NOTAS.md`).
     Cifras de Myfxbook pendientes; el enlace actual es una cuenta de referencia de terceros que hay que reemplazar.
   - Ninguna propuesta es la referencia definitiva hasta que Argemiro elija; no mezclar estilos entre propuestas.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm

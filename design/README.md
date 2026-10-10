@@ -6,7 +6,7 @@ una mezcla), esa será la referencia para construir la web en Next.js.
 | Propuesta | Concepto | Piezas | Estado |
 |---|---|---|---|
 | [Propuesta 1](propuesta-1/README.md) | Retícula de gráfico: estética de denmu.com, marca gigante, Archivo expandida | Landing y panel del cliente | Presentada el 2026-10-10; esperando comentarios |
-| [Propuesta 2](propuesta-2/README.md) | Constelación sobre negro: DESIGN.md de Refero (Dala) con los colores del logo; el logo hecho de partículas | Landing | Lista el 2026-10-10; falta presentarla |
+| [Propuesta 2](propuesta-2/README.md) | Constelación sobre negro: DESIGN.md de Refero (Dala) con los colores del logo; el logo hecho de partículas | Landing y panel del cliente | Listas el 2026-10-10; falta presentarlas |
 
 ## Estructura
 

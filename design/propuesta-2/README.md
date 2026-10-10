@@ -1,6 +1,6 @@
 # Propuesta 2
 
-> Estado: **landing lista** (2026-10-10). Falta presentarla a Argemiro.
+> Estado: **landing y panel del cliente listos** (2026-10-10). Falta presentarlos a Argemiro.
 
 ## Contexto de diseño (`contexto/diseno/`)
 
@@ -32,6 +32,7 @@ ensamblan al cargar la página.
 | Pieza | Prototipo | Enlace para compartir | Notas |
 |---|---|---|---|
 | Landing | [`landing/index.html`](landing/index.html) | https://claude.ai/artifact/RX6NGDrxrvHL28XM7UszqE | [`landing/NOTAS.md`](landing/NOTAS.md) |
+| Panel del cliente | [`panel-cliente/index.html`](panel-cliente/index.html) | https://claude.ai/artifact/YGziRJuprX4GhHikkn8fx7 | [`panel-cliente/NOTAS.md`](panel-cliente/NOTAS.md) |
 
 La landing tiene estas secciones:
 - Hero.
@@ -41,6 +42,12 @@ La landing tiene estas secciones:
 - Precios.
 - Preguntas frecuentes.
 - Cierre.
+
+El panel del cliente tiene:
+- Mis cuentas: el titular dice qué requiere atención y cada licencia es un calendario de triángulos, uno por día.
+- Pagos: cuenta regresiva grande y confirmaciones de la blockchain dibujadas como triángulos.
+- Perfil.
+- Panel lateral para agregar una cuenta.
 
 Las cifras de Myfxbook están pendientes. Mientras tanto, el enlace apunta a una cuenta de referencia de terceros.
 
