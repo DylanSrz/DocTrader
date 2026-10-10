@@ -11,7 +11,7 @@ Es el material que guía esta propuesta. Lo entrega el usuario por partes.
 | `referencia-1.png` | Captura completa de Xapo Bank — https://www.xapobank.com/en | Recibida: captura propia del 2026-10-10, 1440×10130 px, sin avisos de cookies ni aviso legal |
 | `referencia-2.png` | Captura completa de la segunda página de referencia | Pendiente |
 | `cta-1.png` | Captura de un llamado a la acción de referencia (si aplica) | Pendiente |
-| `DESIGN.md` | Sistema de diseño exportado de Refero (si se tiene) | Pendiente |
+| `DESIGN.md` | Sistema de diseño exportado de Refero: estilo de Dala ("constellation floating on black velvet") | Recibido, copiado tal cual |
 | `componentes.md` | Una línea por sección de la página, con el enlace a su referencia | Pendiente |
 | `logo.svg` | Logo en vector | Pendiente: solo hay PNG en `../marca/` |
 | `iconos/` | Íconos 3D de 3dicons (si se usan) | Pendiente |
