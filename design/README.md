@@ -6,6 +6,7 @@ una mezcla), esa será la referencia para construir la web en Next.js.
 | Propuesta | Concepto | Piezas | Estado |
 |---|---|---|---|
 | [Propuesta 1](propuesta-1/README.md) | Retícula de gráfico: estética de denmu.com, marca gigante, Archivo expandida | Landing y panel del cliente | Presentada el 2026-10-10; esperando comentarios |
+| [Propuesta 2](propuesta-2/README.md) | Por definir | Por definir | Recibiendo el contexto de diseño |
 
 ## Estructura
 
@@ -14,6 +15,7 @@ design/
 ├── marca/          logo de Argemiro y sus derivados; los usan todas las propuestas
 └── propuesta-N/
     ├── README.md   concepto, piezas, enlaces para compartir y comentarios recibidos
+    ├── contexto/   material de referencia (capturas, DESIGN.md, componentes, logo, íconos), si lo hay
     └── <pieza>/    index.html (prototipo) + NOTAS.md (decisiones, movimiento y auditoría)
 ```
 

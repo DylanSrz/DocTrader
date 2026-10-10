@@ -57,6 +57,8 @@ Reglas clave:
   con su README (concepto, piezas, enlaces, comentarios de Argemiro); el logo compartido está en `design/marca/`.
   - **Propuesta 1** (`design/propuesta-1/`, presentada el 2026-10-10, esperando comentarios): estética de denmu.com
     (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo. Piezas: landing y panel del cliente.
+  - **Propuesta 2** (`design/propuesta-2/`): recibiendo el contexto de diseño en `contexto/diseno/` (capturas de
+    referencia, `DESIGN.md` de Refero, `componentes.md`, `logo.svg`, íconos de 3dicons). Sin prototipos todavía.
   - Ninguna propuesta es la referencia definitiva hasta que Argemiro elija; no mezclar estilos entre propuestas.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render
