@@ -131,5 +131,4 @@ Reglas descargadas de `vercel-labs/web-interface-guidelines` el 2026-10-10.
 ## Pendiente de contenido real
 
 - Código del widget de Myfxbook y enlace a la cuenta auditada.
-- Enlace de Telegram.
 - Textos legales: términos, tratamiento de datos y aviso de riesgo.

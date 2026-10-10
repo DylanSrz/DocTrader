@@ -29,7 +29,8 @@ Reglas clave:
   licencias, datos de cuenta (contraseñas cifradas) y listas "por conectar" / "por desconectar".
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
-- Registro con nombre, **cédula**, correo y teléfono; una prueba por cliente (controlada por cédula). Soporte por Telegram. Broker sugerido: JustMarkets
+- Registro con nombre, **cédula**, correo y teléfono; una prueba por cliente (controlada por cédula). Soporte por Telegram
+  (https://t.me/+cdmWH_xLubdhMDhh), Instagram (https://www.instagram.com/doctraderproiasystem/). Broker sugerido: JustMarkets
   (https://one.justmarkets.link/a/5vmbn05zda).
 - Marca: colores del logo de Argemiro; tipografías y estilos los define el desarrollo, con una página de
   referencia. Prioridad: UI/UX excelente.
@@ -55,6 +56,8 @@ Reglas clave:
 - **Prototipo de la landing:** `design/landing/` (`index.html`, notas de diseño y auditoría en `NOTAS.md`).
   Estética de denmu.com (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo como tipografía.
   Es la referencia visual para construir la web en Next.js.
+- **Prototipo del panel del cliente:** `design/panel-cliente/` (mis cuentas, pagos, perfil y panel para agregar cuenta;
+  notas en `NOTAS.md`). Mismo sistema visual que la landing.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render
   sin Docker. Idioma del producto: español.

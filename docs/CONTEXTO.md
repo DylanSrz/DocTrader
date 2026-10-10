@@ -94,7 +94,8 @@ deben reflejar esto (nunca prometer rentabilidad).
 - Registro con **nombre completo, cédula (documento de identidad nacional), correo y teléfono**.
   La cédula es única por cliente y sirve para controlar que haya una sola prueba por persona. Se trata
   como dato personal protegido (Ley 1581 de 2012).
-- **Soporte por Telegram.**
+- **Soporte por Telegram:** https://t.me/+cdmWH_xLubdhMDhh
+- **Instagram:** https://www.instagram.com/doctraderproiasystem/
 
 ### Contenido y marca
 - Widget de **Myfxbook** de la cuenta auditada (~2 años).

@@ -10,15 +10,15 @@
 
 ## 🟢 Marca y contenido
 
-- [ ] **Logo** (lo comparte el desarrollador; de ahí salen los colores).
-- [ ] **Página de referencia** para toda la parte visual.
+- [x] **Logo** recibido (`design/landing/assets/logo-original.png`).
+- [x] **Página de referencia:** https://denmu.com/
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [ ] **Dominio:** ¿ya está comprado? ¿Cuál? ¿Quién tiene acceso a la configuración DNS?
 - [ ] Correo del dominio para envíos (ej. `soporte@dominio.com`).
 - [ ] Textos: descripción del software, cómo funciona, perfil de Argemiro.
 - [ ] **Preguntas frecuentes** con sus respuestas (depósitos, retiros, brokers, riesgo, capital mínimo…).
 - [ ] **Código del widget de Myfxbook** de la cuenta auditada.
-- [ ] **Enlace de Telegram** de soporte y demás redes.
+- [x] **Redes:** Telegram https://t.me/+cdmWH_xLubdhMDhh · Instagram https://www.instagram.com/doctraderproiasystem/
 
 ## ⚖️ Legal
 

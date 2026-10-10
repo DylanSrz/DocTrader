@@ -306,6 +306,9 @@ h1, h2, h3 { margin: 0; font-weight: inherit; }
 .sesiones-nota { color: var(--niebla); margin-top: 8px; font-size: 12px; }
 .pie-soporte { grid-column: 3 / span 2; display: grid; gap: 14px; align-content: start; padding-left: 8px; }
 .pie-soporte p { font-size: 15px; }
+.pie-redes { display: flex; flex-wrap: wrap; gap: 10px; }
+.enlace-texto { color: var(--hueso); text-decoration: underline; text-decoration-color: var(--llama); text-underline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) { .enlace-texto:hover { color: var(--llama); } }
 .pie-legal { grid-column: 5 / -1; display: grid; gap: 8px; align-content: start; padding-left: 8px; font-size: 14px; }
 .pie-legal a { color: var(--niebla); text-decoration: none; }
 @media (hover: hover) and (pointer: fine) { .pie-legal a:hover { color: var(--hueso); } }
@@ -589,7 +592,7 @@ h1, h2, h3 { margin: 0; font-weight: inherit; }
     <section id="preguntas" class="seccion marco" aria-labelledby="titulo-preguntas">
       <div class="seccion-cabeza">
         <h2 id="titulo-preguntas" class="titulo-seccion display revelar">Preguntas frecuentes</h2>
-        <p class="texto">¿Te queda una duda? Escríbenos por Telegram.</p>
+        <p class="texto">¿Te queda una duda? <a class="enlace-texto" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener">Escríbenos por <span translate="no">Telegram</span></a>.</p>
       </div>
       <div class="preguntas">
         <details class="pregunta" name="faq">
@@ -635,7 +638,7 @@ h1, h2, h3 { margin: 0; font-weight: inherit; }
     </div>
     <div class="pie-soporte">
       <p>¿Tienes una pregunta? Te respondemos por Telegram.</p>
-      <div><a class="boton" href="https://t.me/" data-pendiente="enlace de Telegram">Escribir por Telegram</a></div>
+      <div class="pie-redes"><a class="boton" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener">Escribir por <span translate="no">Telegram</span></a><a class="boton" href="https://www.instagram.com/doctraderproiasystem/" target="_blank" rel="noopener">Seguir en <span translate="no">Instagram</span></a></div>
     </div>
     <nav class="pie-legal" aria-label="Legal">
       <a href="/legal/terminos">Términos de la licencia</a>
