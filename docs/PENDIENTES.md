@@ -10,8 +10,9 @@
 
 ## 🟢 Marca y contenido
 
-- [x] **Logo** recibido (`design/landing/assets/logo-original.png`).
+- [x] **Logo** recibido (`design/marca/logo-original.png`).
 - [x] **Página de referencia:** https://denmu.com/
+- [ ] **Elección de propuesta de diseño:** Argemiro revisa la propuesta 1 (`design/propuesta-1/`) y las siguientes.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [ ] **Dominio:** ¿ya está comprado? ¿Cuál? ¿Quién tiene acceso a la configuración DNS?
 - [ ] Correo del dominio para envíos (ej. `soporte@dominio.com`).

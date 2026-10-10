@@ -103,8 +103,10 @@ deben reflejar esto (nunca prometer rentabilidad).
 - **Broker sugerido:** JustMarkets (único por ahora), link de referido
   `https://one.justmarkets.link/a/5vmbn05zda`, como "¿No sabes qué broker elegir? Yo uso este",
   aclarando que es un enlace de referido y que el cliente puede usar cualquier broker.
-- **Marca:** Argemiro tiene un logo básico (pendiente de recibir); los colores salen del logo.
-  **Tipografías y estilos los define el desarrollo**, guiados por una página de referencia (pendiente).
+- **Marca:** logo básico de Argemiro (recibido, en `design/marca/`); los colores salen del logo.
+  **Tipografías y estilos los define el desarrollo**, guiados por la página de referencia de Argemiro (https://denmu.com/).
+- **Propuestas de diseño** en `design/` (una carpeta por propuesta, logo compartido en `design/marca/`).
+  Propuesta 1 (landing y panel del cliente) presentada el 2026-10-10; Argemiro elige antes de construir en Next.js.
 - **Objetivo: un excelente UI/UX** en la página pública y en ambos paneles.
 
 ### Tecnología

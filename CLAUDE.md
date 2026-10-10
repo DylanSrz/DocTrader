@@ -53,11 +53,11 @@ Reglas clave:
     pida desplegar. `vercel-cli-with-tokens` y `vercel-optimize` aplican después de publicar.
   - No aplican a este proyecto (instaladas con su repositorio): `write-swift`, `animate-expo`,
     `vercel-react-native-skills`.
-- **Prototipo de la landing:** `design/landing/` (`index.html`, notas de diseño y auditoría en `NOTAS.md`).
-  Estética de denmu.com (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo como tipografía.
-  Es la referencia visual para construir la web en Next.js.
-- **Prototipo del panel del cliente:** `design/panel-cliente/` (mis cuentas, pagos, perfil y panel para agregar cuenta;
-  notas en `NOTAS.md`). Mismo sistema visual que la landing.
+- **Propuestas de diseño:** `design/` (índice en `design/README.md`). Cada propuesta vive en `design/propuesta-N/`
+  con su README (concepto, piezas, enlaces, comentarios de Argemiro); el logo compartido está en `design/marca/`.
+  - **Propuesta 1** (`design/propuesta-1/`, presentada el 2026-10-10, esperando comentarios): estética de denmu.com
+    (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo. Piezas: landing y panel del cliente.
+  - Ninguna propuesta es la referencia definitiva hasta que Argemiro elija; no mezclar estilos entre propuestas.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render
   sin Docker. Idioma del producto: español.
