@@ -4,22 +4,14 @@
 
 ## 🔴 Decisiones abiertas
 
-- [ ] **Pagos en pesos al lanzamiento:** sin pasarela COP, ¿el cliente solo puede pagar en cripto, o
-      también por transferencia bancaria con comprobante que un admin aprueba (a la TRM del día)?
 - [ ] **Binance Pay Merchant:** confirmar que la cuenta de Argemiro es de comerciante y tiene llaves de
       API. Un Binance Pay personal no permite confirmar pagos automáticamente desde la web.
-- [ ] **Red de USDC** (y de USDT) que se aceptará; se configura al agregar las direcciones en el panel.
-- [ ] **Comisión:** ¿el 10 % se calcula sobre el valor bruto o el neto (después de comisiones de Binance)?
-      ¿Cada cuánto se liquida? ¿Desde qué fecha aplica?
-- [ ] ¿La prueba es **una por cliente** o una por cada cuenta de trading? (propuesto: una por cliente).
-- [ ] ¿El LPOA debe firmarse a mano (escaneado) o sirve firma digital?
 - [ ] ¿Qué servicio de copy trading usa? (para evaluar más adelante si tiene API).
 
 ## 🟢 Marca y contenido
 
 - [ ] **Logo** (lo comparte el desarrollador; de ahí salen los colores).
 - [ ] **Página de referencia** para toda la parte visual.
-- [ ] **Archivo de la plantilla del LPOA** (lo envía Argemiro).
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [ ] **Dominio:** ¿ya está comprado? ¿Cuál? ¿Quién tiene acceso a la configuración DNS?
 - [ ] Correo del dominio para envíos (ej. `soporte@dominio.com`).
@@ -40,14 +32,16 @@
 - [ ] Cuenta para hosting (Vercel, Railway/Render) y base de datos.
 - [ ] Cuenta de Resend (u otro) para correos, verificada con el dominio.
 - [ ] Llaves API de Binance Pay Merchant (primero en modo prueba).
-- [ ] Direcciones de depósito iniciales (USDT, USDC, BTC) para cargarlas en el panel.
+- [ ] Direcciones de depósito iniciales: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20) y BTC (Bitcoin).
 - [ ] Correos de las 2 cuentas de administrador (Argemiro y desarrollador).
 
 ## ✅ Resuelto (resumen)
 
-Stack NestJS + Next.js + PostgreSQL/TypeORM · comisión 10 % editable desde el perfil del socio ·
+Stack NestJS + Next.js + PostgreSQL/TypeORM · comisión 10 % del valor bruto, editable desde el perfil del
+socio, liquidada los 15 y 30 de cada mes ·
 licencias trimestral USD 319, semestral USD 499 (5 + 1), prueba USD 50, completar USD 450 (solo a semestral) ·
 TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase 2 · Binance Pay +
-direcciones de depósito configurables · USDT, USDC, BTC · orden válida 1 hora · 3 días de gracia
-(editable) · una licencia por cuenta de trading · un LPOA por cliente · registro con datos de contacto ·
+direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
+(editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
+una prueba por cliente ·
 soporte por Telegram · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.

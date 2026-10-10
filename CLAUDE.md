@@ -17,14 +17,16 @@ Reglas clave:
   Prueba de 1 mes (USD 50), solo bajo solicitud aprobada por el admin; se completa **solo a semestral** con USD 450
   hasta el último día de la prueba (5 meses más, sumados al final, sin obsequio).
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
-- Lanzamiento **solo cripto** (USDT, USDC, BTC): Binance Pay + direcciones de depósito que el admin agrega en el panel.
+- **Solo cripto** por ahora: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20), BTC (Bitcoin).
+  Binance Pay + direcciones de depósito que el admin agrega en el panel.
   Orden de pago válida 1 hora. Pasarela en pesos: fase 2.
 - Vencida la licencia: **3 días de gracia** (editable en admin) y luego pasa a "por desconectar".
-- Antes de conectar, el cliente sube **un LPOA firmado** (uno por cliente, plantilla de Argemiro) y un admin lo aprueba.
+- **No hay LPOA**: con licencia pagada y datos completos, la cuenta pasa a "por conectar".
 - La conexión de cuentas al copy trading es **manual** (la hace Argemiro); la plataforma gestiona pagos,
   licencias, datos de cuenta (contraseñas cifradas) y listas "por conectar" / "por desconectar".
-- Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % editable desde su perfil).
-- Registro con datos básicos de contacto. Soporte por Telegram. Broker sugerido: JustMarkets
+- Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
+  liquidada los 15 y 30 de cada mes).
+- Registro con nombre, **cédula**, correo y teléfono; una prueba por cliente (controlada por cédula). Soporte por Telegram. Broker sugerido: JustMarkets
   (https://one.justmarkets.link/a/5vmbn05zda).
 - Marca: colores del logo de Argemiro; tipografías y estilos los define el desarrollo, con una página de
   referencia. Prioridad: UI/UX excelente.
