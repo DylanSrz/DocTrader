@@ -33,4 +33,6 @@ Reglas clave:
   (https://one.justmarkets.link/a/5vmbn05zda).
 - Marca: colores del logo de Argemiro; tipografías y estilos los define el desarrollo, con una página de
   referencia. Prioridad: UI/UX excelente.
-- Stack: NestJS (API) + Next.js (web) + PostgreSQL con **TypeORM**. Idioma del producto: español.
+- Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
+  (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render
+  sin Docker. Idioma del producto: español.

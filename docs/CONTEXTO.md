@@ -1,6 +1,6 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-10 (verificación automática de pagos en blockchain)
+> Última actualización: 2026-10-10 (Docker solo en desarrollo, estructura del repositorio y worker)
 > Estado: **Planeación** (aún no hay código)
 
 ## 1. Resumen
@@ -110,9 +110,17 @@ deben reflejar esto (nunca prometer rentabilidad).
 - **Backend: NestJS** + TypeScript.
 - **Frontend: Next.js (React)** + Tailwind.
 - Base de datos: **PostgreSQL** con **TypeORM**.
-- Correos: Resend (o similar). Tareas programadas (recordatorios, gracia, expiración de órdenes,
-  TRM diaria): `@nestjs/schedule`.
-- Hosting propuesto: frontend en Vercel; API NestJS + Postgres en Railway / Render.
+- Correos: Resend (o similar).
+- **Tareas en segundo plano en un proceso aparte (worker)**: recordatorios, gracia, expiración de
+  órdenes, verificación en blockchain y cortes de comisión, con **BullMQ + Redis** (reintentos y sin
+  ejecuciones duplicadas). Misma base de código que la API, distinto comando de arranque.
+- **Repositorio único** con espacios de trabajo de pnpm: `apps/api` (NestJS: API + worker),
+  `apps/web` (Next.js), `packages/shared` (tipos y reglas compartidas), `docker/` (entorno de desarrollo).
+- **Docker solo en desarrollo:** `docker compose up` levanta PostgreSQL, Redis, Mailpit (correos de
+  prueba) y Adminer (ver la base de datos). La API, el worker y la web corren en local con recarga
+  automática (o también en contenedores, según prefiera el desarrollador).
+- **Producción sin Docker:** web en Vercel; API, worker, PostgreSQL y Redis administrados en Railway o
+  Render, desplegados desde el código. Migraciones de TypeORM como paso aparte antes de cada despliegue.
 
 ## 4. Flujo del cliente
 

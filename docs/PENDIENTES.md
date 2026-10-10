@@ -29,14 +29,14 @@
 
 ## 🔧 Accesos técnicos (cuando empecemos)
 
-- [ ] Cuenta para hosting (Vercel, Railway/Render) y base de datos.
+- [ ] Cuentas de hosting: Vercel (web) y Railway o Render (API, worker, PostgreSQL y Redis).
 - [ ] Cuenta de Resend (u otro) para correos, verificada con el dominio.
 - [ ] Direcciones de depósito iniciales: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20) y BTC (Bitcoin).
 - [ ] Correos de las 2 cuentas de administrador (Argemiro y desarrollador).
 
 ## ✅ Resuelto (resumen)
 
-Stack NestJS + Next.js + PostgreSQL/TypeORM · comisión 10 % del valor bruto, editable desde el perfil del
+Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 10 % del valor bruto, editable desde el perfil del
 socio, liquidada los 15 y 30 de cada mes ·
 licencias trimestral USD 319, semestral USD 499 (5 + 1), prueba USD 50, completar USD 450 (solo a semestral) ·
 TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase 2 · Binance Pay +
