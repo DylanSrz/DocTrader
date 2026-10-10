@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DocTraderPRO</title>
+<meta name="description" content="Licencia de uso del software DocTraderPRO: conecta tu cuenta de trading y replica cada operación del sistema en el broker que tú elijas.">
+<meta name="theme-color" content="#070E16">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap">
+<style>
+/*
+  DocTraderPRO — landing
+  Concepto: la retícula de columnas de la referencia (Denmu) se lee como la cuadrícula de un gráfico.
+  El único gesto fuerte es la marca del logo (barras + flecha) dibujándose a escala de página.
+  Todo lo demás es tinta, líneas finas y texto blanco.
+*/
+:root {
+  color-scheme: dark;
+
+  /* Paleta tomada del logo */
+  --abismo: #070E16;   /* fondo: el azul tinta de las esquinas del logo */
+  --tinta: #0D1A26;    /* superficies elevadas: el centro del fondo del logo */
+  --brasa: #9E1911;    /* rojo de "Doc" y "PRO" */
+  --llama: #FB9819;    /* naranja de "Trader" y de las barras */
+  --senal: #DDDB65;    /* verde limón de "IA System": foco y estados */
+  --hueso: #EEF1F4;    /* texto principal */
+  --niebla: #95A3B3;   /* texto secundario */
+  --linea: rgb(238 241 244 / 0.09);
+  --linea-fuerte: rgb(238 241 244 / 0.28);
+
+  /* Tipografía: una sola familia, Archivo, usando su eje de ancho */
+  --fuente: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --ancho-display: 125;
+  --ancho-texto: 100;
+
+  /* Retícula */
+  --cols: 6;
+  --margen: max(clamp(16px, 2.8vw, 40px), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+
+  /* Movimiento (Emil Kowalski) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  interpolate-size: allow-keywords;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 24px; }
+body {
+  margin: 0;
+  background: var(--abismo);
+  color: var(--hueso);
+  font-family: var(--fuente);
+  font-variation-settings: "wdth" var(--ancho-texto);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: clip;
+}
+img, svg { display: block; max-width: 100%; }
+a, summary, button { touch-action: manipulation; }
+@media (pointer: fine) { html { overscroll-behavior: none; } }
+a { color: inherit; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-weight: inherit; }
+::selection { background: var(--llama); color: var(--abismo); }
+
+:focus-visible { outline: 2px solid var(--senal); outline-offset: 3px; }
+
+.saltar {
+  position: absolute; left: var(--margen); top: 12px; z-index: 50;
+  background: var(--senal); color: var(--abismo); padding: 10px 14px;
+  font-weight: 600; text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 200ms var(--ease-out);
+}
+.saltar:focus-visible { transform: translateY(0); }
+
+/* ---------- Retícula de fondo (líneas de columna, como la referencia y como un gráfico) ---------- */
+.reticula {
+  position: fixed; inset: 0 var(--margen); z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, var(--linea) 1px, transparent 1px);
+  background-size: calc(100% / var(--cols)) 100%;
+  border-right: 1px solid var(--linea);
+}
+.pagina { position: relative; z-index: 1; }
+.marco {
+  padding-inline: var(--margen);
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+}
+
+/* ---------- Tipos ---------- */
+.display {
+  font-variation-settings: "wdth" var(--ancho-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+.titulo-seccion { font-size: clamp(30px, 3.3vw, 52px); }
+.texto { max-width: 34em; color: var(--niebla); text-wrap: pretty; }
+.texto strong { color: var(--hueso); font-weight: 600; }
+.cifra { font-variant-numeric: tabular-nums; }
+
+/* ---------- Botones: rectangulares y con borde, como la referencia ---------- */
+.boton {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 12px 20px;
+  border: 1px solid var(--linea-fuerte);
+  background: transparent; color: var(--hueso);
+  font: inherit; font-weight: 500; font-size: 15px; line-height: 1.2;
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+.boton:active { transform: scale(0.97); }
+.boton-principal { background: var(--llama); border-color: var(--llama); color: var(--abismo); font-weight: 600; }
+@media (hover: hover) and (pointer: fine) {
+  .boton:hover { border-color: var(--hueso); }
+  .boton-principal:hover { background: #FFAD3D; border-color: #FFAD3D; }
+}
+
+/* ---------- Encabezado: la marca gigante de la referencia ---------- */
+.cabecera { padding-top: clamp(10px, 1.6vw, 22px); container-type: inline-size; overflow-x: clip; }
+.marca-gigante {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-variation-settings: "wdth" 125;
+  font-weight: 800;
+  font-size: 9.4vw;
+  font-size: 11.18cqi; /* "DocTraderPRO" en Archivo ancho 125 mide 8,92 veces su tamaño: llena la retícula exacta */
+  line-height: 0.82;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  color: var(--hueso);
+  width: max-content;
+}
+.navegacion {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: subgrid;
+  align-items: center;
+  margin-top: clamp(14px, 2vw, 26px);
+  border-top: 1px solid var(--linea);
+  border-bottom: 1px solid var(--linea);
+  min-height: 52px;
+  position: relative;
+}
+.nav-marca { display: flex; align-items: center; gap: 10px; text-decoration: none; padding-left: 8px; }
+.nav-marca img { width: 30px; height: auto; }
+.nav-marca span { font-size: 13px; color: var(--senal); letter-spacing: 0.01em; }
+.nav-marca img { transition: transform 200ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .nav-marca:hover img { transform: rotate(-6deg); } }
+.nav-lista { display: contents; list-style: none; margin: 0; padding: 0; }
+.nav-lista li { padding-left: 8px; }
+.enlace-nav {
+  display: inline-flex; align-items: center; min-height: 44px;
+  font-size: 14px; text-decoration: none; color: var(--niebla);
+}
+.rodillo { position: relative; display: block; overflow: hidden; height: 1.4em; line-height: 1.4em; }
+.rodillo span { display: block; transition: transform 240ms var(--ease-out); }
+.rodillo span + span { position: absolute; inset: 0 auto auto 0; transform: translateY(110%); color: var(--hueso); }
+@media (hover: hover) and (pointer: fine) {
+  .enlace-nav:hover .rodillo span:first-child { transform: translateY(-110%); }
+  .enlace-nav:hover .rodillo span + span { transform: translateY(0); }
+}
+.nav-acciones { display: flex; gap: 8px; justify-content: flex-end; padding-right: 0; }
+.nav-acciones .boton { min-height: 40px; padding: 8px 14px; font-size: 14px; }
+.nav-movil { display: none; }
+
+/* ---------- Héroe: el gráfico del logo a escala de página ---------- */
+.heroe { padding-top: clamp(8px, 2vw, 24px); }
+.grafico {
+  grid-column: 1 / -1;
+  width: 100%; height: auto;
+  margin-top: clamp(-4px, -1vw, 0px);
+  overflow: visible;
+}
+.grafico .base { stroke: var(--linea-fuerte); }
+.barra { transform-box: fill-box; transform-origin: 50% 100%; }
+.trazo { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.heroe-cuerpo {
+  grid-column: 1 / -1;
+  display: grid; grid-template-columns: subgrid;
+  padding-block: clamp(20px, 3vw, 40px) clamp(56px, 8vw, 120px);
+  border-top: 1px solid var(--linea-fuerte);
+}
+.declaracion {
+  grid-column: 1 / span 4;
+  font-size: clamp(26px, 3.3vw, 48px);
+  line-height: 1.04;
+  max-width: 19em;
+  padding-right: 4%;
+}
+.heroe-lateral { grid-column: 5 / -1; display: grid; gap: 22px; align-content: start; padding-left: 8px; }
+.heroe-lateral .texto { font-size: 15px; }
+.heroe-acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+.tarjeta-myfx {
+  display: grid; grid-template-columns: 54px 1fr; gap: 14px; align-items: center;
+  padding: 12px; border: 1px solid var(--linea-fuerte); background: rgb(13 26 38 / 0.72);
+  text-decoration: none; font-size: 13px; line-height: 1.35;
+  transition: border-color 200ms ease;
+}
+.tarjeta-myfx svg { width: 54px; height: 40px; }
+.tarjeta-myfx strong { display: block; font-weight: 600; font-size: 14px; }
+.tarjeta-myfx span { color: var(--niebla); }
+@media (hover: hover) and (pointer: fine) { .tarjeta-myfx:hover { border-color: var(--hueso); } }
+.nota-riesgo { font-size: 12px; color: var(--niebla); max-width: 40em; }
+
+/* ---------- Secciones ---------- */
+.seccion { padding-block: clamp(72px, 11vw, 160px); border-top: 1px solid var(--linea); }
+.seccion-cabeza { grid-column: 1 / span 2; padding-right: 24px; display: grid; gap: 18px; align-content: start; }
+.seccion-cabeza .texto { max-width: none; }
+
+/* Cómo funciona: una secuencia real, por eso lleva números */
+.pasos { grid-column: 3 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; counter-reset: paso; }
+.paso { counter-increment: paso; padding: 0 8px; display: grid; gap: 12px; align-content: start; }
+.paso:nth-child(1) { margin-top: 0; }
+.paso:nth-child(2) { margin-top: clamp(40px, 7vw, 110px); }
+.paso:nth-child(3) { margin-top: clamp(80px, 14vw, 220px); }
+.paso:nth-child(4) { margin-top: clamp(120px, 21vw, 330px); }
+.paso::before {
+  content: counter(paso);
+  font-variation-settings: "wdth" 125; font-weight: 300;
+  font-size: clamp(56px, 6.5vw, 104px); line-height: 0.8; color: var(--llama);
+  font-variant-numeric: tabular-nums;
+}
+.paso h3 { font-size: 19px; font-weight: 600; line-height: 1.2; }
+.paso p { font-size: 15px; color: var(--niebla); }
+
+/* Resultados */
+.resultados-cuerpo { grid-column: 3 / -1; display: grid; grid-template-columns: subgrid; gap: 0; }
+.visor {
+  grid-column: 1 / span 3;
+  border: 1px solid var(--linea-fuerte); background: var(--tinta);
+  aspect-ratio: 16 / 10; position: relative;
+  display: grid; place-items: center; overflow: hidden;
+}
+.visor-lineas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.visor-aviso { position: relative; text-align: center; font-size: 14px; color: var(--niebla); padding: 20px; max-width: 26em; }
+.resultados-lado { grid-column: 4 / -1; padding-left: 8px; display: grid; gap: 22px; align-content: end; }
+
+/* Licencias */
+.licencias-cuerpo { grid-column: 3 / -1; display: grid; grid-template-columns: subgrid; align-items: start; }
+.licencia {
+  display: grid; gap: 22px; padding: 26px 22px 22px;
+  border: 1px solid var(--linea-fuerte); background: rgb(7 14 22 / 0.86);
+}
+.licencia-trimestral { grid-column: 1 / span 2; margin-top: clamp(0px, 6vw, 90px); }
+.licencia-semestral { grid-column: 3 / span 2; border-color: var(--llama); }
+.licencia h3 { font-size: 15px; font-weight: 500; color: var(--niebla); }
+.precio { display: flex; align-items: baseline; gap: 10px; }
+.precio strong { font-variation-settings: "wdth" 125; font-weight: 700; font-size: clamp(48px, 5vw, 76px); line-height: 0.9; font-variant-numeric: tabular-nums; }
+.precio span { font-size: 15px; color: var(--niebla); }
+.licencia ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 15px; }
+.licencia li { padding-left: 18px; position: relative; }
+.licencia li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 8px; height: 1px; background: var(--llama); }
+.regalo { color: var(--senal); }
+.licencias-notas { grid-column: 1 / -1; margin-top: 28px; padding-left: 8px; display: grid; gap: 8px; font-size: 14px; color: var(--niebla); max-width: 46em; }
+
+/* Broker sugerido */
+.broker { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: end; row-gap: 28px; }
+.broker .titulo-seccion { grid-column: 1 / span 4; font-size: clamp(30px, 4.2vw, 64px); padding-right: 24px; }
+.broker-lado { grid-column: 5 / -1; padding-left: 8px; display: grid; gap: 16px; }
+
+/* Preguntas */
+.preguntas { grid-column: 3 / -1; border-top: 1px solid var(--linea-fuerte); }
+.pregunta { border-bottom: 1px solid var(--linea-fuerte); }
+.pregunta summary {
+  list-style: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  padding: 22px 8px; min-height: 48px;
+  font-size: clamp(17px, 1.6vw, 21px); font-weight: 500; line-height: 1.3;
+  touch-action: manipulation;
+}
+.pregunta summary::-webkit-details-marker { display: none; }
+.cruz { flex: none; width: 14px; height: 14px; position: relative; transition: transform 200ms var(--ease-out); }
+.cruz::before, .cruz::after { content: ""; position: absolute; inset: 6.5px 0 auto; height: 1px; background: currentColor; }
+.cruz::after { transform: rotate(90deg); }
+.pregunta[open] .cruz { transform: rotate(45deg); }
+.pregunta::details-content {
+  block-size: 0; overflow: hidden; opacity: 0;
+  transition: block-size 200ms var(--ease-out), opacity 200ms var(--ease-out), content-visibility 200ms allow-discrete;
+}
+.pregunta[open]::details-content { block-size: auto; opacity: 1; }
+.respuesta { padding: 0 8px 24px; color: var(--niebla); max-width: 40em; }
+@media (hover: hover) and (pointer: fine) { .pregunta summary:hover { color: var(--llama); } }
+
+/* Pie: los relojes de la referencia, convertidos en sesiones del mercado */
+.pie { padding-block: clamp(64px, 9vw, 120px) calc(32px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--linea); }
+.sesiones { grid-column: 1 / span 2; display: grid; gap: 4px; font-size: 13px; padding-right: 8px; }
+.sesiones h2 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.sesion { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center; }
+.sesion time { font-variant-numeric: tabular-nums; }
+.estado { display: inline-flex; align-items: center; gap: 6px; color: var(--niebla); min-width: 6.5em; }
+.estado::before { content: ""; width: 7px; height: 7px; border: 1px solid var(--niebla); }
+.estado[data-abierta="true"] { color: var(--senal); }
+.estado[data-abierta="true"]::before { background: var(--senal); border-color: var(--senal); }
+.sesiones-nota { color: var(--niebla); margin-top: 8px; font-size: 12px; }
+.pie-soporte { grid-column: 3 / span 2; display: grid; gap: 14px; align-content: start; padding-left: 8px; }
+.pie-soporte p { font-size: 15px; }
+.pie-legal { grid-column: 5 / -1; display: grid; gap: 8px; align-content: start; padding-left: 8px; font-size: 14px; }
+.pie-legal a { color: var(--niebla); text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { .pie-legal a:hover { color: var(--hueso); } }
+.pie-final { grid-column: 1 / -1; margin-top: clamp(48px, 7vw, 96px); padding-top: 20px; border-top: 1px solid var(--linea); display: grid; grid-template-columns: subgrid; gap: 16px; font-size: 12px; color: var(--niebla); }
+.pie-final p:first-child { grid-column: 1 / span 4; max-width: 60em; }
+.pie-final p:last-child { grid-column: 5 / -1; padding-left: 8px; }
+
+/* ---------- Movimiento: una sola secuencia de entrada, y revelado de títulos ---------- */
+.js .marca-gigante { clip-path: inset(0 0 100% 0); }
+.js .barra { transform: scaleY(0.02); opacity: 0; }
+.js .trazo-linea { stroke-dashoffset: 1; }
+.js .trazo-punta { opacity: 0; transform: translate(-14px, 14px); }
+.js .declaracion, .js .heroe-lateral { opacity: 0; }
+.js .revelar { clip-path: inset(0 0 100% 0); }
+
+.listo .marca-gigante { clip-path: inset(0 0 0 0); transition: clip-path 700ms var(--ease-in-out); }
+.listo .barra {
+  transform: scaleY(1); opacity: 1;
+  transition: transform 520ms var(--ease-out), opacity 200ms var(--ease-out);
+  transition-delay: calc(380ms + var(--i) * 55ms);
+}
+.listo .trazo-linea { stroke-dashoffset: 0; transition: stroke-dashoffset 1100ms var(--ease-in-out) 760ms; }
+.listo .trazo-punta { opacity: 1; transform: none; transition: opacity 240ms var(--ease-out) 1780ms, transform 320ms var(--ease-out) 1780ms; }
+.listo .declaracion { opacity: 1; transition: opacity 600ms var(--ease-out) 520ms; }
+.listo .heroe-lateral { opacity: 1; transition: opacity 600ms var(--ease-out) 760ms; }
+.revelar.visible { clip-path: inset(0 0 0 0); transition: clip-path 600ms var(--ease-in-out); }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .marca-gigante, .js .revelar { clip-path: none; }
+  .js .barra { transform: none; opacity: 1; }
+  .js .trazo-linea { stroke-dashoffset: 0; }
+  .js .trazo-punta { opacity: 1; transform: none; }
+  .js .declaracion, .js .heroe-lateral { opacity: 1; }
+  .listo .declaracion, .listo .heroe-lateral { transition: none; }
+  .enlace-nav span, .boton, .cruz, .saltar { transition-duration: 0s; }
+  .pregunta::details-content { transition: opacity 150ms ease; }
+}
+
+/* ---------- Menú compacto antes de que el menú completo se apriete ---------- */
+@media (max-width: 1180px) {
+  .navegacion { display: flex; justify-content: space-between; }
+  .nav-lista, .nav-acciones .boton-secundario { display: none; }
+  .nav-movil { display: block; }
+  .visor, .resultados-lado { grid-column: 1 / -1; }
+  .resultados-lado { padding-left: 0; margin-top: 24px; }
+}
+
+/* ---------- Tableta y celular: la retícula pasa a 2 columnas ---------- */
+@media (max-width: 960px) {
+  :root { --cols: 2; }
+  .navegacion { display: flex; justify-content: space-between; padding-inline: 0; }
+  .nav-lista, .nav-acciones .boton-secundario { display: none; }
+  .nav-acciones { padding-right: 0; }
+  .nav-movil { display: block; }
+  .declaracion, .heroe-lateral, .seccion-cabeza, .pasos, .resultados-cuerpo, .licencias-cuerpo,
+  .preguntas, .broker .titulo-seccion, .broker-lado, .sesiones, .pie-soporte, .pie-legal,
+  .pie-final p:first-child, .pie-final p:last-child { grid-column: 1 / -1; }
+  .heroe-lateral, .resultados-lado, .broker-lado, .pie-soporte, .pie-legal, .pie-final p:last-child { padding-left: 0; }
+  .heroe-lateral { margin-top: 28px; }
+  .seccion-cabeza { margin-bottom: 44px; padding-right: 0; }
+  .pasos { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 40px; }
+  .paso:nth-child(n) { margin-top: 0; }
+  .paso:nth-child(even) { margin-top: 48px; }
+  .visor, .resultados-lado { grid-column: 1 / -1; }
+  .resultados-lado { margin-top: 24px; }
+  .licencia-trimestral, .licencia-semestral { grid-column: 1 / -1; margin-top: 0; }
+  .licencia-semestral { margin-top: 16px; }
+  .licencias-notas { padding-left: 0; }
+  .pie-soporte, .pie-legal { margin-top: 40px; }
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .pasos { grid-template-columns: 1fr; }
+  .paso:nth-child(even) { margin-top: 0; }
+  .paso { padding: 0; }
+  .nav-marca span { display: none; }
+}
+
+/* Menú de celular: <details> nativo, sin JS */
+.nav-movil summary {
+  list-style: none; cursor: pointer; min-height: 44px; min-width: 44px;
+  display: grid; place-items: center; font-size: 14px; padding-inline: 12px;
+  border: 1px solid var(--linea-fuerte);
+}
+.nav-movil summary::-webkit-details-marker { display: none; }
+.nav-movil[open] summary { border-color: var(--hueso); }
+.nav-movil-panel {
+  position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 20;
+  background: var(--tinta); border: 1px solid var(--linea-fuerte);
+  display: grid; padding: 8px;
+  transform-origin: top right;
+}
+.nav-movil-panel a { padding: 14px 12px; text-decoration: none; font-size: 16px; border-bottom: 1px solid var(--linea); }
+.nav-movil-panel a:last-child { border-bottom: 0; }
+.nav-movil[open] .nav-movil-panel { animation: menu-entra 200ms var(--ease-out); }
+@keyframes menu-entra { from { opacity: 0; transform: scale(0.97) translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .nav-movil[open] .nav-movil-panel { animation: none; } }
+</style>
+</head>
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<div class="reticula" aria-hidden="true"></div>
+
+<div class="pagina">
+  <header class="cabecera marco">
+    <p class="marca-gigante" aria-hidden="true" translate="no">DocTraderPRO</p>
+
+    <nav class="navegacion" aria-label="Principal">
+      <a class="nav-marca" href="#contenido" aria-label="DocTraderPRO, inicio">
+        <img src="assets/logo-icon-64.png" alt="" width="54" height="64" fetchpriority="high">
+        <span translate="no">IA System</span>
+      </a>
+      <ul class="nav-lista">
+        <li><a class="enlace-nav" href="#como-funciona"><span class="rodillo"><span>Cómo funciona</span><span aria-hidden="true">Cómo funciona</span></span></a></li>
+        <li><a class="enlace-nav" href="#resultados"><span class="rodillo"><span>Resultados</span><span aria-hidden="true">Resultados</span></span></a></li>
+        <li><a class="enlace-nav" href="#licencias"><span class="rodillo"><span>Licencias</span><span aria-hidden="true">Licencias</span></span></a></li>
+        <li><a class="enlace-nav" href="#preguntas"><span class="rodillo"><span>Preguntas</span><span aria-hidden="true">Preguntas</span></span></a></li>
+      </ul>
+      <div class="nav-acciones">
+        <a class="boton boton-secundario" href="/ingresar">Ingresar</a>
+        <a class="boton boton-principal" href="#licencias">Comprar licencia</a>
+        <details class="nav-movil">
+          <summary>Menú</summary>
+          <div class="nav-movil-panel">
+            <a href="#como-funciona">Cómo funciona</a>
+            <a href="#resultados">Resultados</a>
+            <a href="#licencias">Licencias</a>
+            <a href="#preguntas">Preguntas</a>
+            <a href="/ingresar">Ingresar</a>
+          </div>
+        </details>
+      </div>
+    </nav>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <section class="heroe marco" aria-labelledby="titulo-heroe">
+      <svg class="grafico" viewBox="0 0 1200 440" role="img" aria-label="Barras que crecen y una flecha que sube, el símbolo de DocTraderPRO">
+        <defs>
+          <linearGradient id="g-barra" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#9E1911"/>
+            <stop offset="0.55" stop-color="#E2661A"/>
+            <stop offset="1" stop-color="#FB9819"/>
+          </linearGradient>
+          <linearGradient id="g-trazo" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#9E1911"/>
+            <stop offset="0.5" stop-color="#FB9819"/>
+            <stop offset="1" stop-color="#FFC24D"/>
+          </linearGradient>
+          <filter id="brillo" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="10"/>
+          </filter>
+        </defs>
+        <g class="barras">
+          <rect class="barra" style="--i:0"  x="22"   y="366" width="56" height="74"  fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:1"  x="122"  y="340" width="56" height="100" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:2"  x="222"  y="352" width="56" height="88"  fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:3"  x="322"  y="306" width="56" height="134" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:4"  x="422"  y="272" width="56" height="168" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:5"  x="522"  y="292" width="56" height="148" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:6"  x="622"  y="232" width="56" height="208" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:7"  x="722"  y="190" width="56" height="250" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:8"  x="822"  y="212" width="56" height="228" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:9"  x="922"  y="146" width="56" height="294" fill="url(#g-barra)"/>
+          <rect class="barra" style="--i:10" x="1022" y="104" width="56" height="336" fill="url(#g-barra)"/>
+        </g>
+        <path class="trazo trazo-linea" pathLength="1" stroke-dasharray="1" filter="url(#brillo)" stroke="url(#g-trazo)" stroke-width="14" opacity="0.55"
+              d="M 30 330 L 150 300 L 250 318 L 350 268 L 450 232 L 550 256 L 650 192 L 750 150 L 850 174 L 950 104 L 1060 58 L 1150 22"/>
+        <path class="trazo trazo-linea" pathLength="1" stroke-dasharray="1" stroke="url(#g-trazo)" stroke-width="7"
+              d="M 30 330 L 150 300 L 250 318 L 350 268 L 450 232 L 550 256 L 650 192 L 750 150 L 850 174 L 950 104 L 1060 58 L 1150 22"/>
+        <path class="trazo-punta" fill="#FFC24D" d="M 1176 8 L 1132 12 L 1160 44 Z"/>
+        <line class="base" x1="0" y1="440" x2="1200" y2="440" stroke-width="1"/>
+      </svg>
+
+      <div class="heroe-cuerpo">
+        <h1 id="titulo-heroe" class="declaracion display">Conecta tu cuenta de trading y replica cada operación del sistema, en el broker que tú elijas.</h1>
+        <div class="heroe-lateral">
+          <p class="texto"><span translate="no">DocTraderPRO</span> es una <strong>licencia de uso de software</strong>. Tu dinero se queda en tu cuenta, a tu nombre, en tu broker. Tú depositas y retiras; el software solo replica las operaciones.</p>
+          <div class="heroe-acciones">
+            <a class="boton boton-principal" href="#licencias">Ver licencias</a>
+            <a class="boton" href="#como-funciona">Cómo funciona</a>
+          </div>
+          <a class="tarjeta-myfx" href="#resultados">
+            <svg viewBox="0 0 54 40" aria-hidden="true"><rect x="0.5" y="0.5" width="53" height="39" fill="none" stroke="#95A3B3" stroke-opacity="0.5"/><polyline points="6,31 15,26 22,28 30,19 38,21 47,9" fill="none" stroke="#FB9819" stroke-width="2"/></svg>
+            <span><strong>Cuenta auditada en <span translate="no">Myfxbook</span></strong>Revisa el historial completo antes de comprar.</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="como-funciona" class="seccion marco" aria-labelledby="titulo-como">
+      <div class="seccion-cabeza">
+        <h2 id="titulo-como" class="titulo-seccion display revelar">Cómo funciona</h2>
+        <p class="texto">Cuatro pasos y tu cuenta queda conectada. Sin instalar nada en tu computador.</p>
+      </div>
+      <ol class="pasos">
+        <li class="paso">
+          <h3>Abre tu cuenta en un broker</h3>
+          <p>Usa el broker que prefieras. Si no conoces ninguno, te contamos cuál usamos.</p>
+        </li>
+        <li class="paso">
+          <h3>Compra tu licencia</h3>
+          <p>Trimestral o semestral, con USDT, USDC o BTC. Cada cuenta de trading lleva su propia licencia.</p>
+        </li>
+        <li class="paso">
+          <h3>Envía los datos de tu cuenta</h3>
+          <p>Número de cuenta, broker, servidor y contraseñas. Se guardan cifradas y solo las ve el administrador.</p>
+        </li>
+        <li class="paso">
+          <h3>Conectamos tu cuenta</h3>
+          <p>La conectamos al sistema y te avisamos por correo. Desde ese momento replica cada operación.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="resultados" class="seccion marco" aria-labelledby="titulo-resultados">
+      <div class="seccion-cabeza">
+        <h2 id="titulo-resultados" class="titulo-seccion display revelar">Resultados auditados</h2>
+      </div>
+      <div class="resultados-cuerpo">
+        <div class="visor">
+          <svg class="visor-lineas" viewBox="0 0 400 250" preserveAspectRatio="none" aria-hidden="true">
+            <g stroke="#EEF1F4" stroke-opacity="0.07">
+              <line x1="0" y1="50" x2="400" y2="50"/><line x1="0" y1="100" x2="400" y2="100"/><line x1="0" y1="150" x2="400" y2="150"/><line x1="0" y1="200" x2="400" y2="200"/>
+              <line x1="80" y1="0" x2="80" y2="250"/><line x1="160" y1="0" x2="160" y2="250"/><line x1="240" y1="0" x2="240" y2="250"/><line x1="320" y1="0" x2="320" y2="250"/>
+            </g>
+          </svg>
+          <p class="visor-aviso">Aquí va el widget de <span translate="no">Myfxbook</span> con las estadísticas y el historial reales de la cuenta del sistema.</p>
+        </div>
+        <div class="resultados-lado">
+          <p class="texto">No tienes que creernos. <strong><span translate="no">Myfxbook</span></strong>, un verificador independiente, audita la cuenta del sistema desde hace más de dos años y publica cada operación.</p>
+          <div><a class="boton" href="https://www.myfxbook.com/" target="_blank" rel="noopener" data-pendiente="enlace a la cuenta auditada"><span>Ver el historial en <span translate="no">Myfxbook</span></span></a></div>
+          <p class="nota-riesgo">Los resultados pasados no garantizan resultados futuros. Operar en mercados financieros implica riesgo de pérdida.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="licencias" class="seccion marco" aria-labelledby="titulo-licencias">
+      <div class="seccion-cabeza">
+        <h2 id="titulo-licencias" class="titulo-seccion display revelar">Licencias</h2>
+        <p class="texto">Pagas por periodo, sin cobros automáticos. Te avisamos antes de que venza para que renueves.</p>
+      </div>
+      <div class="licencias-cuerpo">
+        <article class="licencia licencia-trimestral" aria-labelledby="lic-trimestral">
+          <h3 id="lic-trimestral">Licencia trimestral</h3>
+          <p class="precio"><strong>319</strong><span>USD por 3&nbsp;meses</span></p>
+          <ul>
+            <li>Una cuenta de trading conectada</li>
+            <li>Equivale a <span class="cifra">USD&nbsp;106</span> al mes</li>
+            <li>Puedes pasarte a la semestral antes de que venza</li>
+          </ul>
+          <a class="boton" href="/ingresar">Comprar trimestral</a>
+        </article>
+        <article class="licencia licencia-semestral" aria-labelledby="lic-semestral">
+          <h3 id="lic-semestral">Licencia semestral</h3>
+          <p class="precio"><strong>499</strong><span>USD por 6&nbsp;meses</span></p>
+          <ul>
+            <li>Una cuenta de trading conectada</li>
+            <li class="regalo">Pagas 5&nbsp;meses, el sexto es de regalo</li>
+            <li>Equivale a <span class="cifra">USD&nbsp;83</span> al mes</li>
+          </ul>
+          <a class="boton boton-principal" href="/ingresar">Comprar semestral</a>
+        </article>
+        <div class="licencias-notas">
+          <p>Pagas con USDT (red Tron, TRC20), USDC (BNB Smart Chain, BEP20) o BTC. Verificamos cada pago en la blockchain.</p>
+          <p>Cada cuenta de trading necesita su propia licencia. No hay devoluciones.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion marco" aria-labelledby="titulo-broker">
+      <div class="broker">
+        <h2 id="titulo-broker" class="titulo-seccion display revelar">¿No sabes qué broker elegir? Yo uso <span translate="no">JustMarkets</span>.</h2>
+        <div class="broker-lado">
+          <p class="texto">Puedes usar el broker que prefieras. Este es el que usa Argemiro, creador del sistema. El enlace es de referido.</p>
+          <div><a class="boton" href="https://one.justmarkets.link/a/5vmbn05zda" target="_blank" rel="noopener sponsored"><span>Abrir cuenta en <span translate="no">JustMarkets</span></span></a></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="preguntas" class="seccion marco" aria-labelledby="titulo-preguntas">
+      <div class="seccion-cabeza">
+        <h2 id="titulo-preguntas" class="titulo-seccion display revelar">Preguntas frecuentes</h2>
+        <p class="texto">¿Te queda una duda? Escríbenos por Telegram.</p>
+      </div>
+      <div class="preguntas">
+        <details class="pregunta" name="faq">
+          <summary>¿El software maneja mi dinero?<span class="cruz" aria-hidden="true"></span></summary>
+          <p class="respuesta">No. Tu dinero queda en tu cuenta, en tu broker y a tu nombre. El software solo replica las operaciones del sistema en tu cuenta.</p>
+        </details>
+        <details class="pregunta" name="faq">
+          <summary>¿Cómo deposito y retiro?<span class="cruz" aria-hidden="true"></span></summary>
+          <p class="respuesta">Directamente en tu broker, con los métodos que él ofrezca. Nosotros no recibimos ni movemos fondos de tu cuenta de trading.</p>
+        </details>
+        <details class="pregunta" name="faq">
+          <summary>¿Qué broker puedo usar?<span class="cruz" aria-hidden="true"></span></summary>
+          <p class="respuesta">El que prefieras. Si todavía no tienes uno, Argemiro usa <span translate="no">JustMarkets</span>.</p>
+        </details>
+        <details class="pregunta" name="faq">
+          <summary>¿Cómo pago la licencia?<span class="cruz" aria-hidden="true"></span></summary>
+          <p class="respuesta">Con USDT (red Tron, TRC20), USDC (BNB Smart Chain, BEP20) o BTC. Al crear la orden ves la dirección y el monto exacto; tienes 1&nbsp;hora para enviar el pago.</p>
+        </details>
+        <details class="pregunta" name="faq">
+          <summary>¿Qué pasa cuando vence mi licencia?<span class="cruz" aria-hidden="true"></span></summary>
+          <p class="respuesta">Te avisamos 7, 3 y 1&nbsp;día antes. Si no renuevas, tienes 3&nbsp;días de gracia con la cuenta conectada; después se desconecta.</p>
+        </details>
+        <details class="pregunta" name="faq">
+          <summary>¿Puedo conectar varias cuentas?<span class="cruz" aria-hidden="true"></span></summary>
+          <p class="respuesta">Sí. Cada cuenta de trading necesita su propia licencia.</p>
+        </details>
+        <details class="pregunta" name="faq">
+          <summary>¿Hay devoluciones?<span class="cruz" aria-hidden="true"></span></summary>
+          <p class="respuesta">No. Por eso puedes revisar el historial auditado en <span translate="no">Myfxbook</span> antes de comprar.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie marco">
+    <div class="sesiones">
+      <h2>Sesiones del mercado</h2>
+      <p class="sesion"><span>Sídney</span><time data-zona="Australia/Sydney">--:--</time><span class="estado" data-zona="Australia/Sydney">Cerrada</span></p>
+      <p class="sesion"><span>Tokio</span><time data-zona="Asia/Tokyo">--:--</time><span class="estado" data-zona="Asia/Tokyo">Cerrada</span></p>
+      <p class="sesion"><span>Londres</span><time data-zona="Europe/London">--:--</time><span class="estado" data-zona="Europe/London">Cerrada</span></p>
+      <p class="sesion"><span>Nueva York</span><time data-zona="America/New_York">--:--</time><span class="estado" data-zona="America/New_York">Cerrada</span></p>
+      <p class="sesiones-nota">Horario aproximado de cada sesión: 8:00&nbsp;a&nbsp;17:00, hora local, de lunes a viernes.</p>
+    </div>
+    <div class="pie-soporte">
+      <p>¿Tienes una pregunta? Te respondemos por Telegram.</p>
+      <div><a class="boton" href="https://t.me/" data-pendiente="enlace de Telegram">Escribir por Telegram</a></div>
+    </div>
+    <nav class="pie-legal" aria-label="Legal">
+      <a href="/legal/terminos">Términos de la licencia</a>
+      <a href="/legal/datos">Tratamiento de datos</a>
+      <a href="/legal/riesgo">Aviso de riesgo</a>
+    </nav>
+    <div class="pie-final">
+      <p><span translate="no">DocTraderPRO</span> vende una licencia de uso de software. No es asesoría de inversión ni administra capital de terceros. Operar en mercados financieros implica riesgo de pérdida, y los resultados pasados no garantizan resultados futuros.</p>
+      <p>© <span class="cifra" id="anio">2026</span> <span translate="no">DocTraderPRO</span></p>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var raiz = document.documentElement;
+  raiz.classList.add('js');
+
+  // Secuencia de entrada: un solo momento orquestado, cuando las fuentes ya cargaron
+  function arrancar() { requestAnimationFrame(function () { raiz.classList.add('listo'); }); }
+  if (document.fonts && document.fonts.ready) {
+    Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 1200); })]).then(arrancar);
+  } else { arrancar(); }
+
+  // Títulos de sección: se revelan una sola vez al entrar en pantalla
+  var titulos = document.querySelectorAll('.revelar');
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -12% 0px' });
+    titulos.forEach(function (t) { obs.observe(t); });
+  } else {
+    titulos.forEach(function (t) { t.classList.add('visible'); });
+  }
+
+  // Sesiones del mercado: hora local y si está abierta (lunes a viernes, 8:00&nbsp;a&nbsp;17:00)
+  function pintarSesiones() {
+    var ahora = new Date();
+    document.querySelectorAll('time[data-zona]').forEach(function (el) {
+      var zona = el.getAttribute('data-zona');
+      var partes = new Intl.DateTimeFormat('es-CO', { timeZone: zona, hour: '2-digit', minute: '2-digit', weekday: 'short', hour12: false }).formatToParts(ahora);
+      var h = 0, m = 0, dia = '';
+      partes.forEach(function (p) { if (p.type === 'hour') h = +p.value % 24; if (p.type === 'minute') m = +p.value; if (p.type === 'weekday') dia = p.value; });
+      el.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+      el.setAttribute('datetime', String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'));
+      var finDeSemana = /^(sáb|dom)/i.test(dia);
+      var abierta = !finDeSemana && h >= 8 && h < 17;
+      var estado = document.querySelector('.estado[data-zona="' + zona + '"]');
+      estado.dataset.abierta = abierta ? 'true' : 'false';
+      estado.textContent = abierta ? 'Abierta' : 'Cerrada';
+    });
+  }
+  pintarSesiones();
+  setInterval(pintarSesiones, 30000);
+
+  document.getElementById('anio').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>

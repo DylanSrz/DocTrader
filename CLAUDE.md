@@ -52,6 +52,9 @@ Reglas clave:
     pida desplegar. `vercel-cli-with-tokens` y `vercel-optimize` aplican después de publicar.
   - No aplican a este proyecto (instaladas con su repositorio): `write-swift`, `animate-expo`,
     `vercel-react-native-skills`.
+- **Prototipo de la landing:** `design/landing/` (`index.html`, notas de diseño y auditoría en `NOTAS.md`).
+  Estética de denmu.com (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo como tipografía.
+  Es la referencia visual para construir la web en Next.js.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render
   sin Docker. Idioma del producto: español.
