@@ -1,6 +1,6 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-10 (plan trimestral, LPOA y broker sugerido)
+> Última actualización: 2026-10-10 (TRM para todas las licencias, LPOA único por cliente)
 > Estado: **Planeación** (aún no hay código)
 
 ## 1. Resumen
@@ -25,20 +25,21 @@ deben reflejar esto (nunca prometer rentabilidad).
 
 ### Negocio
 - Solo se cobra la **licencia/suscripción al software**. No hay cobro por desempeño ni % de ganancias.
-- **Licencia normal: USD 499 o COP 2.000.000** = 5 meses pagados + **1 mes de obsequio** = **6 meses**.
+- **Precios en USD.** En pesos se cobra el **equivalente a la TRM del día** en que se paga, para todas las licencias.
+- **Licencia normal: USD 499** = 5 meses pagados + **1 mes de obsequio** = **6 meses**.
   - El mes de obsequio es un cupón que **se aplica automáticamente** a toda compra (el cliente no
     escribe ningún código). El admin puede cambiarlo o desactivarlo.
   - La **renovación cuesta lo mismo** y también incluye el mes de obsequio.
 - **Licencia trimestral: USD 319** por 3 meses (sin mes de obsequio). Visible en la página pública.
-  - Precio en COP: **el equivalente de USD 319 a la TRM del día** en que se paga.
   - Se renueva al mismo precio.
+  - Un cliente trimestral puede **pasarse a la licencia normal antes de vencer**; los días se suman.
   - Se descartó un plan semestral de USD 599: la opción de 6 meses es la licencia normal (5 + 1) de USD 499.
-- **Licencia de prueba: 1 mes por USD 50 o COP 200.000.**
+- **Licencia de prueba: 1 mes por USD 50.**
   - **No se ofrece públicamente:** solo si el cliente la solicita (el admin la habilita).
   - Una sola prueba por cliente.
   - Cómo se pide: botón **"Solicitar prueba"** en el panel del cliente → Argemiro la aprueba →
     el cliente paga los USD 50.
-  - Si al cliente le gustó, **completa con USD 450 o COP 1.800.000** y recibe **5 meses más**, que se suman al final
+  - Si al cliente le gustó, **completa con USD 450** y recibe **5 meses más** (sin mes de obsequio), que se suman al final
     de la prueba (total: 6 meses por USD 500 desde el inicio de la prueba).
   - Plazo para completar: **hasta el último día de la prueba**.
   - Si no completa a tiempo, para continuar paga una **licencia normal de 6 meses (USD 499)**.
@@ -74,7 +75,7 @@ deben reflejar esto (nunca prometer rentabilidad).
   4. Servidor del broker
   5. Contraseña operativa (maestra)
   6. Contraseña de inversor
-- **LPOA firmado (poder limitado):** el cliente descarga la plantilla que entrega Argemiro, la firma y
+- **LPOA firmado (poder limitado):** **uno por cliente** (no por cuenta). El cliente descarga la plantilla que entrega Argemiro, la firma y
   la sube como archivo. Se pide **después de pagar y antes de conectar**: la cuenta solo entra a la
   lista "por conectar" cuando un admin aprueba el LPOA. El archivo se guarda privado (solo admins).
 - Ambas contraseñas se guardan **cifradas** y solo los administradores pueden verlas
@@ -134,7 +135,7 @@ Datos de la cuenta de trading (editar) · Estado de conexión · Configuración 
 - **Clientes:** ficha completa, datos de la cuenta (descifrados solo aquí), configuración de
   riesgo/capital, notas internas, activar/suspender, extender días manualmente.
 - **Configuración:** planes y precios (COP y USD), monedas/redes cripto, direcciones de billetera,
-  FAQ, brokers recomendados, enlaces de contacto, widget de Myfxbook.
+  FAQ, broker sugerido (por ahora solo JustMarkets), enlaces de contacto, widget de Myfxbook.
 - **Socios / comisiones:** % del socio desarrollador sobre las ventas, comisión acumulada por
   periodo, pagos de comisión registrados.
 - **Auditoría:** registro de quién hizo qué (aprobaciones, cambios de precios, vistas de credenciales).
@@ -148,12 +149,12 @@ conectar, cuenta por desconectar.
 ## 6. Modelo de datos (borrador)
 
 `User` (rol: ADMIN | CLIENT; prueba habilitada / usada) ·
-`Plan` (nombre, tipo NORMAL | TRIMESTRAL | PRUEBA | COMPLETAR_PRUEBA, días, precio USD, precio COP fijo
-o calculado con la TRM del día, visible, activo) · `ExchangeRate` (fecha, TRM COP/USD) ·
+`Plan` (nombre, tipo NORMAL | TRIMESTRAL | PRUEBA | COMPLETAR_PRUEBA, días, precio USD, visible, activo;
+el precio COP se calcula con la TRM del día) · `ExchangeRate` (fecha, TRM COP/USD) ·
 `Coupon` (código, días extra o descuento, vigencia, usos) ·
 `Subscription` (usuario, plan, inicio, fin, estado, es_prueba) ·
 `Payment` (usuario, plan, método, moneda, red, monto, hash/referencia, comprobante, estado, aprobado por) ·
-`LpoaDocument` (cuenta, archivo privado, estado PENDIENTE | APROBADO | RECHAZADO, revisado por) ·
+`LpoaDocument` (usuario — uno por cliente, archivo privado, estado PENDIENTE | APROBADO | RECHAZADO, revisado por) ·
 `TradingAccount` (usuario, nombre completo del titular, broker, servidor, número de cuenta,
 contraseña operativa cifrada, contraseña de inversor cifrada, estado de conexión,
 config de riesgo/capital) ·

@@ -26,16 +26,18 @@
 - [x] **Prueba:** USD 50 por 1 mes, solo si el cliente la solicita. Completar: USD 450 por 5 meses más.
 
 ### Precios
-- [x] **Licencia normal:** 5 meses + 1 de obsequio = 6 meses por USD 499 o COP 2.000.000.
+- [x] **Licencia normal:** 5 meses + 1 de obsequio = 6 meses por USD 499.
 - [x] **Cupón del mes de obsequio:** se aplica automáticamente.
 - [x] **Renovación:** cuesta lo mismo (incluye el mes de obsequio).
 - [x] **Prueba:** se completa hasta el último día de la prueba; los 5 meses se suman al final.
 - [x] **Prueba:** el cliente la solicita con un botón, Argemiro la aprueba y el cliente paga USD 50.
-- [x] **Precios en COP:** prueba **COP 200.000** y completar **COP 1.800.000** (suma COP 2.000.000).
-- [x] **Licencia trimestral:** USD 319 por 3 meses; en COP, el equivalente a la TRM del día. Semestral de USD 599 descartado.
-- [ ] ¿La TRM del día aplica también a la licencia normal, la prueba y el completar, o esas siguen con
-      precio fijo en COP (2.000.000 / 200.000 / 1.800.000)?
-- [ ] ¿Un cliente en licencia trimestral puede pasarse a la de 6 meses antes de vencer? (propuesto: sí, los días se suman).
+- [x] **Precios en COP:** todas las licencias se cobran al equivalente de su precio en USD con la TRM del día.
+      (Reemplaza los precios fijos COP 2.000.000 / 200.000 / 1.800.000.)
+- [x] **Licencia trimestral:** USD 319 por 3 meses. Semestral de USD 599 descartado.
+- [x] Un cliente trimestral puede pasarse a la licencia de 6 meses antes de vencer; los días se suman.
+- [x] Completar la prueba **no** lleva mes de obsequio.
+- [ ] Fuente de la TRM (propuesto: la TRM oficial publicada por la Superintendencia Financiera / datos.gov.co)
+      y si se redondea el precio en pesos (propuesto: a los 1.000 pesos más cercanos).
 - [ ] ¿La prueba puede completarse también con la trimestral? (propuesto: no, solo con los 5 meses de USD 450).
 
 ## 🟡 Operación y cuentas de clientes
@@ -60,9 +62,10 @@
 - [ ] **Preguntas frecuentes** con sus respuestas (depósitos, retiros, brokers, riesgo, capital mínimo…).
 - [ ] **Enlace/código del widget de Myfxbook** de la cuenta auditada.
 - [x] Broker sugerido: JustMarkets con el link de referido de Argemiro.
-- [ ] ¿Hay otros brokers recomendados además de JustMarkets?
-- [ ] **Plantilla del LPOA** (documento que el cliente firma y sube): la entrega Argemiro.
-      ¿Debe firmarse a mano (escaneado) o sirve firma digital? ¿Un LPOA por cada cuenta de trading?
+- [x] Solo JustMarkets como broker recomendado por ahora.
+- [x] **LPOA:** uno por cliente.
+- [ ] **Archivo de la plantilla del LPOA:** Argemiro lo envía más adelante.
+- [ ] ¿El LPOA debe firmarse a mano (escaneado) o sirve firma digital?
 - [ ] Redes sociales y enlaces de contacto (WhatsApp, Telegram, Instagram, YouTube…).
 - [ ] Páginas de referencia o competencia que le gusten (estilo visual).
 
