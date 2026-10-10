@@ -56,7 +56,8 @@ Reglas clave:
 - **Propuestas de diseño:** `design/` (índice en `design/README.md`). Cada propuesta vive en `design/propuesta-N/`
   con su README (concepto, piezas, enlaces, comentarios de Argemiro); el logo compartido está en `design/marca/`.
   - **Propuesta 1** (`design/propuesta-1/`, presentada el 2026-10-10, esperando comentarios): estética de denmu.com
-    (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo. Piezas: landing y panel del cliente.
+    (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo. Piezas: landing, panel del cliente y panel
+    de administración (`landing/`, `panel-cliente/`, `panel-admin/`).
   - **Propuesta 2** (`design/propuesta-2/`, presentada el 2026-10-10, esperando comentarios): sistema de diseño =
     `contexto/diseno/DESIGN.md` de Refero (Dala) con los colores del logo (naranja como único color de acción) e Inter.
     Piezas: landing, panel del cliente y panel de administración (`landing/`, `panel-cliente/`, `panel-admin/`, notas en cada `NOTAS.md`).

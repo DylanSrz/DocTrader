@@ -25,6 +25,7 @@ Los rasgos propios de la marca:
 |---|---|---|---|
 | Landing | [`landing/index.html`](landing/index.html) | https://claude.ai/artifact/2AryVBb5qp9WEVEeKNZszr | [`landing/NOTAS.md`](landing/NOTAS.md) |
 | Panel del cliente | [`panel-cliente/index.html`](panel-cliente/index.html) | https://claude.ai/artifact/Hd9RvTX7jN7Xc5xMotnAr9 | [`panel-cliente/NOTAS.md`](panel-cliente/NOTAS.md) |
+| Panel de administración | [`panel-admin/index.html`](panel-admin/index.html) | https://claude.ai/artifact/BuqcvZDRzqb1KEXE42yoVA | [`panel-admin/NOTAS.md`](panel-admin/NOTAS.md) |
 
 **Landing:**
 - Marca gigante.
@@ -41,12 +42,15 @@ Los rasgos propios de la marca:
 - Perfil.
 - Panel lateral para agregar una cuenta de trading.
 
-Las dos piezas se probaron a 320, 390, 768, 1024 y 1440 px, con movimiento reducido y con la auditoría
+**Panel de administración:**
+- Seis vistas con las mismas funciones y datos que el de la propuesta 2: Hoy, Pagos, Cuentas, Licencias, Ajustes y Socio.
+- Todo va apoyado en la retícula, y las ventas se dibujan como bloques apilados que recuerdan las barras del logo.
+
+Las tres piezas se probaron a 320, 390, 768, 1024 y 1440 px, con movimiento reducido y con la auditoría
 web-design-guidelines de Vercel (detalle en cada `NOTAS.md`).
 
 ## Qué no incluye todavía
 
-- Panel de administración: ventas, aprobación de pagos, listas "por conectar" y "por desconectar", y comisión del socio.
 - Pantallas de registro e ingreso.
 - Contenido real: textos, preguntas frecuentes, widget de Myfxbook y documentos legales (ver `docs/PENDIENTES.md`).
 

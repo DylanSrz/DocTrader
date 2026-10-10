@@ -4,11 +4,11 @@ Cada propuesta es un sistema visual completo, con prototipos navegables en HTML.
 una mezcla), esa será la referencia para construir la web en Next.js.
 
 Para enviarle a Argemiro: [`propuestas.html`](propuestas.html), una sola página con las dos propuestas, una muestra de
-cada estilo y sus cinco enlaces. Enlace para compartir: https://claude.ai/artifact/RVhBw28JCGnL1ERnphfdpq
+cada estilo y sus seis enlaces. Enlace para compartir: https://claude.ai/artifact/RVhBw28JCGnL1ERnphfdpq
 
 | Propuesta | Concepto | Piezas | Estado |
 |---|---|---|---|
-| [Propuesta 1](propuesta-1/README.md) | Retícula de gráfico: estética de denmu.com, marca gigante, Archivo expandida | Landing y panel del cliente | Presentada el 2026-10-10; esperando comentarios |
+| [Propuesta 1](propuesta-1/README.md) | Retícula de gráfico: estética de denmu.com, marca gigante, Archivo expandida | Landing, panel del cliente y panel de administración | Presentada el 2026-10-10; esperando comentarios |
 | [Propuesta 2](propuesta-2/README.md) | Constelación sobre negro: DESIGN.md de Refero (Dala) con los colores del logo; el logo hecho de partículas | Landing, panel del cliente y panel de administración | Presentada el 2026-10-10; esperando comentarios |
 
 ## Cómo se diferencian
@@ -21,7 +21,7 @@ cada estilo y sus cinco enlaces. Enlace para compartir: https://claude.ai/artifa
 | Botones | Rectángulos con borde | Píldoras; un solo botón naranja por vista |
 | Gesto de marca | Las barras y la flecha del logo a escala de página | El logo hecho de partículas triangulares |
 | Licencia en el panel | Barra dividida en meses | Calendario de triángulos, uno por día |
-| Panel de administración | No incluido | Incluido |
+| Panel de administración | Incluido: mismas funciones, ventas en bloques apilados | Incluido: mismas funciones, ventas en triángulos |
 | Sensación | Técnica, de gráfico de trading | Silenciosa y premium, de banca privada |
 
 ## Estructura
