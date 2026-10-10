@@ -33,8 +33,14 @@ Reglas clave:
   (https://one.justmarkets.link/a/5vmbn05zda).
 - Marca: colores del logo de Argemiro; tipografías y estilos los define el desarrollo, con una página de
   referencia. Prioridad: UI/UX excelente.
-- Para todo trabajo de interfaz (landing, paneles, componentes) usar la skill del proyecto **frontend-design**
-  (`.claude/skills/frontend-design`).
+- Skills de diseño del proyecto (en `.claude/skills/`):
+  - **frontend-design** — dirección estética: paleta, tipografía y composición propias, evitando plantillas.
+  - **ui-ux-pro-max** — reglas de UX y calidad (accesibilidad, formularios, navegación, rendimiento) y guías
+    por stack (`nextjs`, `shadcn`, `html-tailwind`). Su buscador es local, sin red:
+    `python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<consulta>" --domain ux` (o `--stack nextjs`).
+    Si se usa `--persist`, pasar siempre `--output-dir` apuntando a la raíz del repo.
+  - Si se contradicen en lo visual, manda frontend-design (sus estilos sugeridos para "crypto/fintech" son
+    genéricos: modo oscuro + glassmorphism). Por encima de ambas: el logo y la página de referencia de Argemiro.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render
   sin Docker. Idioma del producto: español.
