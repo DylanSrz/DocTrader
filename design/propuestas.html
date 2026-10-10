@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/png" href="marca/favicon.png">
+</head>
+<body style="margin:0">
+<title>Propuestas DocTraderPRO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Inter:opsz,wght@14..32,300..600&display=swap">
+<style>
+/* Página neutral que presenta dos propuestas: dos columnas iguales, cada una con una muestra viva de su estilo; texto propio en un gris tibio para no inclinarse por ninguna. Tema oscuro único, a propósito: las dos propuestas son oscuras. */
+:root {
+  color-scheme: dark;
+  --fondo: #0C0C0D;
+  --superficie: #141416;
+  --texto: #F2F2F0;
+  --suave: #A6A6A2;
+  --tenue: #6F6F6B;
+  --linea: rgb(242 242 240 / 0.12);
+  --llama: #FB9819;
+  --senal: #DDDB65;
+  /* muestras de cada propuesta */
+  --p1-fondo: #070E16;
+  --p1-linea: rgb(238 241 244 / 0.09);
+  --p2-fondo: #000000;
+  --f-texto: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-p1: "Archivo", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--fondo); color: var(--texto); font-family: var(--f-texto); font-size: 16px; font-weight: 300; line-height: 1.55;
+  -webkit-font-smoothing: antialiased; padding-inline: clamp(16px, 5vw, 56px); padding-block: 0;
+}
+h1, h2, h3, p, ul, dl, dd { margin: 0; }
+h1, h2, h3 { font-weight: 400; text-wrap: balance; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--senal); outline-offset: 3px; border-radius: 6px; }
+.pagina { max-width: 1180px; margin-inline: auto; padding-block: clamp(40px, 7vw, 88px) 72px; display: grid; gap: clamp(56px, 8vw, 96px); }
+
+.cabeza { display: grid; gap: 18px; max-width: 760px; }
+.marca { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--suave); }
+.marca img { width: 22px; height: auto; }
+.cabeza h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.03em; }
+.cabeza p { color: var(--suave); font-size: 17px; max-width: 40em; }
+.cabeza p strong { color: var(--texto); font-weight: 400; }
+
+/* Las dos propuestas */
+.propuestas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 3vw, 32px); }
+.propuesta { display: grid; grid-template-rows: auto auto auto 1fr; gap: 22px; min-width: 0; }
+.propuesta-cabeza { display: grid; gap: 6px; }
+.propuesta-cabeza small { font-size: 13px; color: var(--tenue); font-variant-numeric: tabular-nums; }
+.propuesta-cabeza h2 { font-size: 28px; letter-spacing: -0.02em; }
+.propuesta-cabeza p { color: var(--suave); }
+
+.muestra { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 14px; overflow: hidden; display: grid; align-content: space-between; padding: clamp(16px, 3vw, 26px); }
+.muestra-1 {
+  background-color: var(--p1-fondo);
+  background-image: linear-gradient(to right, var(--p1-linea) 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+  font-family: var(--f-p1);
+}
+.muestra-1 .m-marca { font-variation-settings: "wdth" 125; font-weight: 800; font-size: clamp(22px, 4.2vw, 46px); line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase; color: #EEF1F4; }
+.muestra-1 .m-frase { font-variation-settings: "wdth" 125; font-weight: 700; font-size: clamp(11px, 1.4vw, 15px); text-transform: uppercase; color: #95A3B3; max-width: 22em; line-height: 1.2; }
+.muestra-1 .m-boton { justify-self: start; border: 1px solid #FB9819; color: #FB9819; padding: 7px 12px; font-family: var(--f-p1); font-size: 12px; font-weight: 600; }
+.muestra-1 .m-barras { position: absolute; right: 7%; bottom: 0; display: flex; align-items: flex-end; gap: 6px; height: 58%; }
+.muestra-1 .m-barras i { width: clamp(10px, 2.2vw, 22px); background: linear-gradient(#FB9819, #9E1911); }
+.muestra-2 { background: var(--p2-fondo); font-family: var(--f-texto); }
+.muestra-2 .m-frase { font-size: clamp(20px, 3.6vw, 40px); font-weight: 400; letter-spacing: -0.04em; line-height: 1; color: #FFFFFF; max-width: 9em; position: relative; }
+.muestra-2 .m-texto { font-size: clamp(11px, 1.3vw, 13px); color: #BDBDBD; max-width: 24em; position: relative; }
+.muestra-2 .m-boton { justify-self: start; background: #FB9819; color: #000; border-radius: 999px; padding: 7px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase; position: relative; }
+.muestra-2 canvas { position: absolute; right: 0; top: 0; width: 55%; height: 100%; }
+
+.piezas { list-style: none; padding: 0; display: grid; }
+.piezas li + li { border-top: 1px solid var(--linea); }
+.pieza { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding-block: 14px; text-decoration: none; }
+.pieza b { font-weight: 500; }
+.pieza span { grid-column: 1; font-size: 14px; color: var(--suave); }
+.pieza em { grid-column: 2; grid-row: 1 / span 2; font-style: normal; font-size: 14px; color: var(--llama); white-space: nowrap; }
+a.pieza:hover em { text-decoration: underline; text-underline-offset: 4px; }
+.pieza-falta b { color: var(--tenue); }
+.pieza-falta em { color: var(--tenue); }
+
+/* Comparación */
+.seccion { display: grid; gap: 24px; }
+.seccion h2 { font-size: clamp(24px, 3vw, 32px); letter-spacing: -0.02em; }
+.tabla-envoltura { overflow-x: auto; }
+table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 14px 18px 14px 0; border-bottom: 1px solid var(--linea); }
+thead th { font-size: 13px; font-weight: 400; color: var(--tenue); padding-top: 0; }
+tbody th { font-weight: 400; color: var(--suave); width: 22%; }
+td { width: 39%; }
+
+.pendiente { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 32px; list-style: none; padding: 0; }
+.pendiente li { display: grid; gap: 6px; min-width: 0; }
+.pendiente b { font-weight: 500; }
+.pendiente li > span { color: var(--suave); font-size: 15px; }
+
+.pie { color: var(--tenue); font-size: 13px; }
+
+@media (max-width: 820px) {
+  .propuestas { grid-template-columns: minmax(0, 1fr); gap: 64px; }
+  .pendiente { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+<main class="pagina">
+  <header class="cabeza">
+    <p class="marca"><img src="marca/logo-icon-64.png" alt="" width="54" height="64"><span translate="no">DocTraderPRO</span></p>
+    <h1>Dos propuestas de diseño para la plataforma</h1>
+    <p>Cada propuesta es un estilo completo para la página de venta y los paneles. Ábrelas en el computador y en el celular y <strong>cuéntanos cuál prefieres</strong>, o qué tomarías de cada una. Todo usa datos de ejemplo; los textos y las cifras de <span translate="no">Myfxbook</span> son provisionales.</p>
+  </header>
+
+  <section class="propuestas" aria-label="Propuestas">
+    <article class="propuesta" aria-labelledby="t-p1">
+      <div class="propuesta-cabeza">
+        <small>Propuesta 1</small>
+        <h2 id="t-p1">Retícula de gráfico</h2>
+        <p>Inspirada en denmu.com: una cuadrícula visible como la de un gráfico de trading, la marca a todo el ancho y letras anchas en mayúsculas.</p>
+      </div>
+      <div class="muestra muestra-1" role="img" aria-label="Muestra del estilo: fondo azul casi negro con líneas verticales, la marca en letras anchas y un botón rectangular con borde naranja">
+        <p class="m-marca" translate="no">DocTrader<br>PRO</p>
+        <p class="m-frase">Copia cada operación del sistema en tu cuenta</p>
+        <span class="m-boton">Comprar licencia</span>
+        <div class="m-barras" aria-hidden="true"><i style="height:35%"></i><i style="height:55%"></i><i style="height:75%"></i><i style="height:100%"></i></div>
+      </div>
+      <ul class="piezas">
+        <li><a class="pieza" href="https://claude.ai/artifact/2AryVBb5qp9WEVEeKNZszr" target="_blank" rel="noopener"><b>Página de venta</b><span>Cómo funciona, resultados, licencias, broker y preguntas</span><em>Abrir</em></a></li>
+        <li><a class="pieza" href="https://claude.ai/artifact/Hd9RvTX7jN7Xc5xMotnAr9" target="_blank" rel="noopener"><b>Panel del cliente</b><span>Cuentas, pagos en cripto y perfil</span><em>Abrir</em></a></li>
+        <li><div class="pieza pieza-falta"><b>Panel de administración</b><span>No se diseñó en esta propuesta</span><em>No incluido</em></div></li>
+      </ul>
+    </article>
+
+    <article class="propuesta" aria-labelledby="t-p2">
+      <div class="propuesta-cabeza">
+        <small>Propuesta 2</small>
+        <h2 id="t-p2">Constelación sobre negro</h2>
+        <p>Negro puro, titulares enormes y livianos, botones en píldora. El logo se arma con partículas, y en los paneles el tiempo se cuenta en triángulos.</p>
+      </div>
+      <div class="muestra muestra-2" role="img" aria-label="Muestra del estilo: fondo negro puro, un titular grande en letra liviana, un botón naranja en forma de píldora y triángulos pequeños de colores">
+        <canvas id="muestra-particulas" aria-hidden="true"></canvas>
+        <p class="m-frase">Opera con el sistema de Argemiro.</p>
+        <p class="m-texto">Tu dinero no sale de tu cuenta.</p>
+        <span class="m-boton">Comprar licencia</span>
+      </div>
+      <ul class="piezas">
+        <li><a class="pieza" href="https://claude.ai/artifact/RX6NGDrxrvHL28XM7UszqE" target="_blank" rel="noopener"><b>Página de venta</b><span>Problema, cómo funciona, resultados, precios y preguntas</span><em>Abrir</em></a></li>
+        <li><a class="pieza" href="https://claude.ai/artifact/YGziRJuprX4GhHikkn8fx7" target="_blank" rel="noopener"><b>Panel del cliente</b><span>Cuentas, pagos en cripto y perfil</span><em>Abrir</em></a></li>
+        <li><a class="pieza" href="https://claude.ai/artifact/U7886432GshaU1wJ5JyZ4i" target="_blank" rel="noopener"><b>Panel de administración</b><span>Pendientes, pagos, cuentas, licencias, ajustes y comisión</span><em>Abrir</em></a></li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="seccion" aria-labelledby="t-comparar">
+    <h2 id="t-comparar">En qué se diferencian</h2>
+    <div class="tabla-envoltura" role="region" aria-labelledby="t-comparar" tabindex="0">
+      <table>
+        <thead><tr><th scope="col"><span style="position:absolute;left:-9999px">Aspecto</span></th><th scope="col">Propuesta 1</th><th scope="col">Propuesta 2</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Fondo</th><td>Azul casi negro del logo, con la cuadrícula a la vista</td><td>Negro puro, sin líneas ni recuadros</td></tr>
+          <tr><th scope="row">Letra</th><td>Archivo, ancha, en negrita y mayúsculas</td><td>Inter, liviana, titulares muy grandes</td></tr>
+          <tr><th scope="row">Botones</th><td>Rectángulos con borde</td><td>Píldoras, un solo botón naranja por pantalla</td></tr>
+          <tr><th scope="row">Detalle de marca</th><td>Las barras y la flecha del logo, en grande</td><td>El logo hecho de partículas que se arman al entrar</td></tr>
+          <tr><th scope="row">Tiempo de la licencia</th><td>Una barra dividida en meses</td><td>Un calendario con un triángulo por día</td></tr>
+          <tr><th scope="row">Panel de administración</th><td>No incluido</td><td>Incluido</td></tr>
+          <tr><th scope="row">Sensación</th><td>Técnica, de gráfico de trading</td><td>Silenciosa y premium, de banca privada</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="seccion" aria-labelledby="t-falta">
+    <h2 id="t-falta">Qué falta en las dos</h2>
+    <ul class="pendiente">
+      <li><b>Tu cuenta de <span translate="no">Myfxbook</span></b><span>El enlace y las cifras de la cuenta auditada. Mientras tanto hay espacios marcados como pendientes.</span></li>
+      <li><b>Textos definitivos</b><span>Descripción del software, preguntas frecuentes con sus respuestas y documentos legales.</span></li>
+      <li><b>Registro e ingreso</b><span>Se diseñan con el estilo que elijas.</span></li>
+    </ul>
+  </section>
+
+  <p class="pie">Prototipos del 10 de octubre de 2026. Las direcciones de depósito, los clientes y las cifras que aparecen son de ejemplo.</p>
+</main>
+
+<script>
+// Muestra de la propuesta 2: unos triángulos con los colores del logo, quietos si se pide menos movimiento
+(function () {
+  var c = document.getElementById('muestra-particulas'); if (!c) return;
+  var ctx = c.getContext('2d'), quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var colores = ['#E2531F', '#FB9819', '#FB9819', '#DDDB65'], p = [], w = 0, h = 0;
+  function preparar() {
+    var r = c.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+    w = r.width; h = r.height; c.width = w * d; c.height = h * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    p = [];
+    for (var i = 0; i < 90; i++) {
+      var a = Math.random() * 6.28, rad = Math.sqrt(Math.random()) * Math.min(w, h) * 0.42;
+      p.push({ x: w * 0.55 + Math.cos(a) * rad, y: h * 0.5 + Math.sin(a) * rad * 0.9, t: 2 + Math.random() * 2.5, g: Math.random() * 6.28, f: Math.random() * 6.28, c: colores[i % 4] });
+    }
+  }
+  function pintar(ms) {
+    ctx.clearRect(0, 0, w, h); ctx.lineWidth = 1;
+    p.forEach(function (q) {
+      var x = q.x + (quieto ? 0 : Math.sin(ms / 2200 + q.f) * 1.5), y = q.y + (quieto ? 0 : Math.cos(ms / 2600 + q.f) * 1.5), g = q.g + (quieto ? 0 : ms / 4000);
+      ctx.strokeStyle = q.c; ctx.beginPath();
+      for (var k = 0; k < 3; k++) { var ang = g + k * 2.094; ctx[k ? 'lineTo' : 'moveTo'](x + q.t * Math.cos(ang), y + q.t * Math.sin(ang)); }
+      ctx.closePath(); ctx.stroke();
+    });
+    if (!quieto) requestAnimationFrame(pintar);
+  }
+  preparar(); pintar(0); if (!quieto) requestAnimationFrame(pintar);
+  new ResizeObserver(function () { preparar(); if (quieto) pintar(0); }).observe(c);
+})();
+</script>
+
+</body>
+</html>

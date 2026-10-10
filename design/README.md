@@ -3,6 +3,9 @@
 Cada propuesta es un sistema visual completo, con prototipos navegables en HTML. Cuando Argemiro elija una (o
 una mezcla), esa será la referencia para construir la web en Next.js.
 
+Para enviarle a Argemiro: [`propuestas.html`](propuestas.html), una sola página con las dos propuestas, una muestra de
+cada estilo y sus cinco enlaces. Enlace para compartir: https://claude.ai/artifact/RVhBw28JCGnL1ERnphfdpq
+
 | Propuesta | Concepto | Piezas | Estado |
 |---|---|---|---|
 | [Propuesta 1](propuesta-1/README.md) | Retícula de gráfico: estética de denmu.com, marca gigante, Archivo expandida | Landing y panel del cliente | Presentada el 2026-10-10; esperando comentarios |
