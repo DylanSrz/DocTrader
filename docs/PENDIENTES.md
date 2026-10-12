@@ -8,6 +8,16 @@
       (primero en modo prueba) para activar la confirmación automática. Mientras tanto: depósito directo
       con aprobación manual.
 
+## ❓ Por confirmar con Argemiro
+
+- [ ] **Completar la prueba a semestral:** se asumió que, al pagar USD 449 (USD 499 en total), **sí lleva el mes de
+      obsequio** y la licencia cuenta desde el inicio de la prueba. Antes se había confirmado lo contrario para la
+      regla vieja (USD 450, sin obsequio).
+- [ ] **La prueba en la página pública:** RN-05 dice que la prueba no aparece en la página pública, pero la landing
+      de la propuesta 2 invita a "Solicitar prueba" debajo de los precios. ¿Se muestra la invitación o se quita?
+- [ ] **Verificar el teléfono por SMS o WhatsApp** para pedir la prueba: ayuda contra el abuso, pero cada mensaje
+      tiene costo.
+
 ## 🟢 Marca y contenido
 
 - [x] **Logo** recibido (`design/marca/logo-original.png`).
