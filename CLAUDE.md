@@ -16,7 +16,7 @@ Reglas clave:
   Mensual → trimestral o semestral, y trimestral → semestral, antes de vencer (se paga el plan nuevo; los días se suman).
   Prueba de **15 días** (USD 50), solo bajo solicitud aprobada por el admin; se completa a cualquier plan pagando la
   **diferencia** (USD 70, 269 o 449) hasta el último día de la prueba; la licencia cuenta desde el inicio de la prueba.
-  **Una prueba por cliente y por cuenta de trading**, con control antiabuso (ver `docs/CONTEXTO.md`, "Control de la prueba").
+  **Una prueba por cliente y por cuenta de trading**, con control antiabuso (ver `docs/CONTEXTO.md`, "Control de la prueba"); para pedirla, correo y teléfono verificados (**SMS**).
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
 - **Solo cripto** por ahora: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20), BTC (Bitcoin).
   Al lanzar: **depósito directo con aprobación manual** (direcciones que el admin agrega en el panel).

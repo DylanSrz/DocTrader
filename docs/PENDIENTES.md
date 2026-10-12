@@ -1,22 +1,12 @@
 # Pendientes — información por recibir
 
-> Actualizado: 2026-10-10. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
+> Actualizado: 2026-10-12. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
 
 ## ⏳ En espera
 
 - [ ] **Aprobación de Binance Pay Merchant** (Argemiro ya la solicitó). Cuando llegue: llaves de API
       (primero en modo prueba) para activar la confirmación automática. Mientras tanto: depósito directo
       con aprobación manual.
-
-## ❓ Por confirmar con Argemiro
-
-- [ ] **Completar la prueba a semestral:** se asumió que, al pagar USD 449 (USD 499 en total), **sí lleva el mes de
-      obsequio** y la licencia cuenta desde el inicio de la prueba. Antes se había confirmado lo contrario para la
-      regla vieja (USD 450, sin obsequio).
-- [ ] **La prueba en la página pública:** RN-05 dice que la prueba no aparece en la página pública, pero la landing
-      de la propuesta 2 invita a "Solicitar prueba" debajo de los precios. ¿Se muestra la invitación o se quita?
-- [ ] **Verificar el teléfono por SMS o WhatsApp** para pedir la prueba: ayuda contra el abuso, pero cada mensaje
-      tiene costo.
 
 ## 🟢 Marca y contenido
 
@@ -52,7 +42,8 @@
 
 Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 10 % del valor bruto, editable desde el perfil del
 socio, liquidada los 15 y 30 de cada mes ·
-licencias mensual USD 120, trimestral USD 319, semestral USD 499 (6 + 1), prueba de 15 días USD 50 que se completa pagando la diferencia ·
+licencias mensual USD 120, trimestral USD 319, semestral USD 499 (6 + 1), prueba de 15 días USD 50 que se completa pagando la diferencia (a semestral, con el mes de obsequio; la licencia cuenta desde el inicio de la prueba) ·
+la landing invita a solicitar la prueba · teléfono verificado por SMS para pedir la prueba ·
 TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase 2 · Binance Pay +
 direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·

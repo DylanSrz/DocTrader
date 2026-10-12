@@ -35,8 +35,8 @@ deben reflejar esto (nunca prometer rentabilidad).
 | **Mensual** | USD 120 | 1 mes | Sin obsequio. Se renueva al mismo precio (nueva el 2026-10-12) |
 | **Trimestral** | USD 319 | 3 meses | Sin obsequio. Se renueva al mismo precio |
 | **Semestral** | USD 499 | **7 meses = 6 + 1 de obsequio** | El mes de obsequio es un cupón que se aplica solo. La renovación cuesta lo mismo y también lo lleva (antes era 5 + 1; cambió el 2026-10-12) |
-| **Prueba** | USD 50 | **15 días** | No pública: el cliente la solicita y el admin la aprueba. **Una sola vez por cliente y por cuenta de trading** (ver "Control de la prueba") |
-| **Completar la prueba** | La diferencia: USD 70 (mensual), USD 269 (trimestral) o USD 449 (semestral) | La del plan elegido | Hasta el último día de la prueba. Los USD 50 se abonan y los 15 días hacen parte del plan: la licencia cuenta desde el día en que empezó la prueba |
+| **Prueba** | USD 50 | **15 días** | No se compra directo: la landing invita a solicitarla y el admin la aprueba. **Una sola vez por cliente y por cuenta de trading** (ver "Control de la prueba") |
+| **Completar la prueba** | La diferencia: USD 70 (mensual), USD 269 (trimestral) o USD 449 (semestral) | La del plan elegido | Hasta el último día de la prueba. Los USD 50 se abonan y los 15 días hacen parte del plan: la licencia cuenta desde el día en que empezó la prueba. A semestral lleva el mes de obsequio (7 meses en total; confirmado el 2026-10-12) |
 
 - **Cambio de plan antes de vencer:** un mensual puede pasarse a trimestral o semestral, y un trimestral a semestral.
   Se paga el plan nuevo completo y los días se suman al vencimiento actual.
@@ -59,8 +59,8 @@ dispositivo y otra billetera, y aun así el admin ve las coincidencias antes de 
   con el broker y el servidor normalizados (minúsculas, sin espacios ni guiones).
 - **Correo o teléfono** ya ligados a una prueba. El correo se normaliza (minúsculas; en Gmail se ignoran los puntos y
   lo que va después de "+") y el teléfono se guarda en formato internacional.
-- Una solicitud solo se puede hacer con el correo y el teléfono **verificados** (propuesto: código al correo y por SMS
-  o WhatsApp al teléfono; el SMS o WhatsApp tiene un costo por mensaje).
+- Una solicitud solo se puede hacer con el correo y el teléfono **verificados**: código al correo y **código por SMS**
+  al teléfono (confirmado el 2026-10-12; cada SMS tiene un costo).
 
 **2. Señales para el admin** (no bloquean, pero aparecen junto a la solicitud, que siempre requiere aprobación):
 - El mismo **número de cuenta** usado antes en otro broker.
@@ -182,7 +182,8 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 
 ## 4. Flujo del cliente
 
-1. Visita la landing → ve licencias, cómo funciona, widget de Myfxbook, broker sugerido y FAQ.
+1. Visita la landing → ve licencias, la invitación a solicitar la prueba, cómo funciona, widget de Myfxbook, broker
+   sugerido y FAQ.
 2. Se registra con nombre, cédula, correo y teléfono (verifica correo, acepta términos y aviso de riesgo).
 3. Elige licencia (mensual, trimestral, semestral, o prueba de 15 días si se la aprobaron) para una cuenta de
    trading → orden de pago **pendiente** (válida 1 hora).

@@ -91,3 +91,8 @@ Reunión del 2026-10-12: eligió esta propuesta y pidió estos cambios de negoci
   por cliente y por cuenta de trading, con control antiabuso.
 - **Tickets de soporte** dentro de la plataforma, que conviven con Telegram.
 - Correo oficial: **doctraderpro@gmail.com**.
+
+Confirmado después de la reunión:
+- Completar la prueba a semestral lleva el mes de obsequio; la licencia cuenta desde el inicio de la prueba.
+- La landing mantiene la invitación a solicitar la prueba debajo de los precios.
+- El teléfono se verifica por **SMS** para pedir la prueba.
