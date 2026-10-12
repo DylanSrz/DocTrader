@@ -1,6 +1,6 @@
 # Propuesta 1 — Retícula de gráfico
 
-> Presentada a Argemiro el 2026-10-10. Estado: **esperando comentarios**.
+> Presentada a Argemiro el 2026-10-10. **Archivada:** Argemiro eligió la propuesta 2 el 2026-10-12.
 
 ## Concepto
 

@@ -1,6 +1,6 @@
 # Propuesta 2 — Constelación sobre negro
 
-> Presentada a Argemiro el 2026-10-10. Estado: **esperando comentarios**.
+> Presentada a Argemiro el 2026-10-10. **Elegida el 2026-10-12**: es la referencia para construir en Next.js.
 
 ## Concepto
 
@@ -84,4 +84,10 @@ Las tres piezas se probaron a 320, 390, 768, 1024 y 1440 px y con movimiento red
 
 ## Comentarios de Argemiro
 
-_Pendientes._
+Reunión del 2026-10-12: eligió esta propuesta y pidió estos cambios de negocio, que se llevan a los prototipos:
+- Nueva licencia **mensual** de USD 120.
+- La **semestral** pasa a 6 + 1 de obsequio (7 meses), al mismo precio de USD 499.
+- La **prueba** pasa a 15 días por USD 50. Se completa a cualquier plan pagando la diferencia, y se da una sola vez
+  por cliente y por cuenta de trading, con control antiabuso.
+- **Tickets de soporte** dentro de la plataforma, que conviven con Telegram.
+- Correo oficial: **doctraderpro@gmail.com**.

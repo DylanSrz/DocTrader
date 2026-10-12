@@ -12,11 +12,13 @@
 
 - [x] **Logo** recibido (`design/marca/logo-original.png`).
 - [x] **Página de referencia:** https://denmu.com/
-- [ ] **Elección de propuesta de diseño:** Argemiro revisa las propuestas 1 y 2 (`design/README.md` las compara).
+- [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
+- [x] **Correo oficial:** doctraderpro@gmail.com (2026-10-12).
 - [ ] **Enlace de Myfxbook de Argemiro:** la landing de la propuesta 2 enlaza por ahora una cuenta de referencia de terceros.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [ ] **Dominio:** ¿ya está comprado? ¿Cuál? ¿Quién tiene acceso a la configuración DNS?
-- [ ] Correo del dominio para envíos (ej. `soporte@dominio.com`).
+- [ ] **Dominio para enviar correos automáticos** (Resend no envía como `@gmail.com`). Mientras tanto, SMTP de Gmail
+      con límite de unos 500 correos al día.
 - [ ] Textos: descripción del software, cómo funciona, perfil de Argemiro.
 - [ ] **Preguntas frecuentes** con sus respuestas (depósitos, retiros, brokers, riesgo, capital mínimo…).
 - [ ] **Código del widget de Myfxbook** de la cuenta auditada.
@@ -40,9 +42,9 @@
 
 Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 10 % del valor bruto, editable desde el perfil del
 socio, liquidada los 15 y 30 de cada mes ·
-licencias trimestral USD 319, semestral USD 499 (5 + 1), prueba USD 50, completar USD 450 (solo a semestral) ·
+licencias mensual USD 120, trimestral USD 319, semestral USD 499 (6 + 1), prueba de 15 días USD 50 que se completa pagando la diferencia ·
 TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase 2 · Binance Pay +
 direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
-una prueba por cliente ·
-verificación automática de pagos en blockchain · soporte por Telegram · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.
+una prueba por cliente y por cuenta de trading, con control antiabuso · tickets de soporte en la plataforma ·
+verificación automática de pagos en blockchain · soporte por tickets y Telegram · correo oficial doctraderpro@gmail.com · propuesta de diseño 2 · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.

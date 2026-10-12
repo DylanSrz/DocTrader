@@ -12,10 +12,11 @@ Reglas clave:
 - Se vende una **licencia de uso de software**, nunca "servicio de trading" ni rentabilidad garantizada.
 - **Una licencia por cada cuenta de trading.** Pagos **manuales y no recurrentes** (periodos prepagados + recordatorios).
 - Precios en USD, editables desde el admin. Sin devoluciones.
-  Trimestral: 3 meses, USD 319, sin obsequio. Semestral: 6 meses (5 + 1 de obsequio, cupón automático), USD 499.
-  Un trimestral puede pasarse a semestral antes de vencer (días se suman).
-  Prueba de 1 mes (USD 50), solo bajo solicitud aprobada por el admin; se completa **solo a semestral** con USD 450
-  hasta el último día de la prueba (5 meses más, sumados al final, sin obsequio).
+  Mensual: 1 mes, USD 120. Trimestral: 3 meses, USD 319. Semestral: **7 meses (6 + 1 de obsequio, cupón automático)**, USD 499.
+  Mensual → trimestral o semestral, y trimestral → semestral, antes de vencer (se paga el plan nuevo; los días se suman).
+  Prueba de **15 días** (USD 50), solo bajo solicitud aprobada por el admin; se completa a cualquier plan pagando la
+  **diferencia** (USD 70, 269 o 449) hasta el último día de la prueba; la licencia cuenta desde el inicio de la prueba.
+  **Una prueba por cliente y por cuenta de trading**, con control antiabuso (ver `docs/CONTEXTO.md`, "Control de la prueba").
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
 - **Solo cripto** por ahora: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20), BTC (Bitcoin).
   Al lanzar: **depósito directo con aprobación manual** (direcciones que el admin agrega en el panel).
@@ -29,8 +30,9 @@ Reglas clave:
   licencias, datos de cuenta (contraseñas cifradas) y listas "por conectar" / "por desconectar".
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
-- Registro con nombre, **cédula**, correo y teléfono; una prueba por cliente (controlada por cédula). Soporte por Telegram
-  (https://t.me/+cdmWH_xLubdhMDhh), Instagram (https://www.instagram.com/doctraderproiasystem/). Broker sugerido: JustMarkets
+- Registro con nombre, **cédula**, correo y teléfono. Correo oficial: **doctraderpro@gmail.com** (contacto y Reply-To).
+  Soporte con **tickets dentro de la plataforma** (convive con Telegram https://t.me/+cdmWH_xLubdhMDhh).
+  Instagram: https://www.instagram.com/doctraderproiasystem/. Broker sugerido: JustMarkets
   (https://one.justmarkets.link/a/5vmbn05zda).
 - Marca: colores del logo de Argemiro; tipografías y estilos los define el desarrollo, con una página de
   referencia. Prioridad: UI/UX excelente.
@@ -55,14 +57,15 @@ Reglas clave:
     `vercel-react-native-skills`.
 - **Propuestas de diseño:** `design/` (índice en `design/README.md`). Cada propuesta vive en `design/propuesta-N/`
   con su README (concepto, piezas, enlaces, comentarios de Argemiro); el logo compartido está en `design/marca/`.
-  - **Propuesta 1** (`design/propuesta-1/`, presentada el 2026-10-10, esperando comentarios): estética de denmu.com
+  - **Elegida: propuesta 2** (Argemiro, 2026-10-12). Es la referencia visual para construir en Next.js.
+  - **Propuesta 1** (`design/propuesta-1/`, archivada; no se eligió): estética de denmu.com
     (retícula de 6 columnas visible, marca gigante), paleta del logo y Archivo. Piezas: landing, panel del cliente y panel
     de administración (`landing/`, `panel-cliente/`, `panel-admin/`).
-  - **Propuesta 2** (`design/propuesta-2/`, presentada el 2026-10-10, esperando comentarios): sistema de diseño =
+  - **Propuesta 2** (`design/propuesta-2/`, **elegida**): sistema de diseño =
     `contexto/diseno/DESIGN.md` de Refero (Dala) con los colores del logo (naranja como único color de acción) e Inter.
     Piezas: landing, panel del cliente y panel de administración (`landing/`, `panel-cliente/`, `panel-admin/`, notas en cada `NOTAS.md`).
     Cifras de Myfxbook pendientes; el enlace actual es una cuenta de referencia de terceros que hay que reemplazar.
-  - Ninguna propuesta es la referencia definitiva hasta que Argemiro elija; no mezclar estilos entre propuestas.
+  - No mezclar estilos: todo lo nuevo se diseña con el sistema de la propuesta 2.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render
   sin Docker. Idioma del producto: español.

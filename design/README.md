@@ -1,15 +1,17 @@
 # Diseño — propuestas para Argemiro
 
-Cada propuesta es un sistema visual completo, con prototipos navegables en HTML. Cuando Argemiro elija una (o
-una mezcla), esa será la referencia para construir la web en Next.js.
+Cada propuesta es un sistema visual completo, con prototipos navegables en HTML.
+
+> **Argemiro eligió la propuesta 2** (2026-10-12). Es la referencia para construir la web en Next.js; la propuesta 1
+> queda archivada.
 
 Para enviarle a Argemiro: [`propuestas.html`](propuestas.html), una sola página con las dos propuestas, una muestra de
 cada estilo y sus seis enlaces. Enlace para compartir: https://claude.ai/artifact/RVhBw28JCGnL1ERnphfdpq
 
 | Propuesta | Concepto | Piezas | Estado |
 |---|---|---|---|
-| [Propuesta 1](propuesta-1/README.md) | Retícula de gráfico: estética de denmu.com, marca gigante, Archivo expandida | Landing, panel del cliente y panel de administración | Presentada el 2026-10-10; esperando comentarios |
-| [Propuesta 2](propuesta-2/README.md) | Constelación sobre negro: DESIGN.md de Refero (Dala) con los colores del logo; el logo hecho de partículas | Landing, panel del cliente y panel de administración | Presentada el 2026-10-10; esperando comentarios |
+| [Propuesta 1](propuesta-1/README.md) | Retícula de gráfico: estética de denmu.com, marca gigante, Archivo expandida | Landing, panel del cliente y panel de administración | Archivada: no se eligió |
+| [Propuesta 2](propuesta-2/README.md) | Constelación sobre negro: DESIGN.md de Refero (Dala) con los colores del logo; el logo hecho de partículas | Landing, panel del cliente y panel de administración | **Elegida** el 2026-10-12 |
 
 ## Cómo se diferencian
 
