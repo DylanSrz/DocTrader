@@ -1,0 +1,1299 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Administración DocTraderPRO</title>
+<meta name="theme-color" content="#070E16">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="../../marca/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap">
+<style>
+/*
+  Panel de administración — propuesta 1. Mismo sistema que la landing y el panel del cliente de esta propuesta:
+  retícula de 6 columnas visible, Archivo (ancho 125 en titulares), paleta del logo, botones rectangulares con borde.
+  Cada bloque se apoya en la retícula: título en las columnas 1–2, contenido en las 3–6.
+  Las ventas se dibujan como las barras del logo: un bloque por licencia vendida, apilados por día.
+*/
+:root {
+  color-scheme: dark;
+  --abismo: #070E16;
+  --tinta: #0D1A26;
+  --tinta-2: #12222F;
+  --brasa: #9E1911;
+  --brasa-texto: #FF7A62;
+  --llama: #FB9819;
+  --llama-viva: #FFAD3D;
+  --senal: #DDDB65;
+  --hueso: #EEF1F4;
+  --niebla: #95A3B3;
+  --linea: rgb(238 241 244 / 0.09);
+  --linea-fuerte: rgb(238 241 244 / 0.28);
+  /* Gráfica: validados con el validador de dataviz sobre #070E16 (banda, croma, daltonismo y contraste) */
+  --g-semestral: #D17A0C;
+  --g-trimestral: #4A88D8;
+  --g-prueba: #969430;
+
+  --fuente: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --cols: 6;
+  --margen: max(clamp(16px, 2.8vw, 40px), env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 96px; }
+body {
+  margin: 0; background: var(--abismo); color: var(--hueso);
+  font-family: var(--fuente); font-variation-settings: "wdth" 100; font-size: 16px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; overflow-x: clip;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; }
+p, h1, h2, h3, ul, ol, dl, dd, figure, fieldset { margin: 0; }
+h1, h2, h3 { font-weight: inherit; }
+a, summary, button, label { touch-action: manipulation; }
+@media (pointer: fine) { html { overscroll-behavior: none; } }
+:focus-visible { outline: 2px solid var(--senal); outline-offset: 3px; }
+::selection { background: var(--llama); color: var(--abismo); }
+.cifra { font-variant-numeric: tabular-nums; }
+.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.saltar { position: absolute; left: var(--margen); top: 12px; z-index: 60; background: var(--senal); color: var(--abismo); padding: 10px 14px; font-weight: 600; text-decoration: none; transform: translateY(-160%); transition: transform 200ms var(--ease-out); }
+.saltar:focus-visible { transform: translateY(0); }
+
+/* Retícula visible */
+.reticula { position: fixed; inset: 0 var(--margen); z-index: 0; pointer-events: none; background-image: linear-gradient(to right, var(--linea) 1px, transparent 1px); background-size: calc(100% / var(--cols)) 100%; border-right: 1px solid var(--linea); }
+.contenedor { position: relative; z-index: 1; padding-inline: var(--margen); }
+.seis { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); }
+
+/* Tipografía */
+.vista-titulo, .titulo-medio, .cifra-heroe, .pendientes strong, .resumen-cuentas dd, .porcentaje strong, .item-nombre, .recibido strong {
+  font-variation-settings: "wdth" 125; font-weight: 700; letter-spacing: -0.01em;
+}
+.vista-titulo { font-size: clamp(40px, 6.4vw, 96px); line-height: 0.95; text-transform: uppercase; text-wrap: balance; }
+.vista-titulo:focus { outline: none; }
+.titulo-medio { font-size: clamp(18px, 1.9vw, 24px); line-height: 1.1; text-transform: uppercase; text-wrap: balance; }
+.texto { color: var(--niebla); max-width: 42em; }
+.nota { font-size: 14px; color: var(--niebla); }
+
+/* ---------- Botones: rectángulos con borde ---------- */
+.boton {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; white-space: nowrap;
+  border: 1px solid var(--linea-fuerte); background: transparent; color: var(--hueso);
+  font: inherit; font-weight: 500; font-size: 15px; line-height: 1.2; text-decoration: none; cursor: pointer; user-select: none; -webkit-user-select: none;
+  transition: transform 160ms var(--ease-out), background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+.boton:active { transform: scale(0.97); }
+.boton-principal { background: var(--llama); border-color: var(--llama); color: var(--abismo); font-weight: 600; }
+.boton[disabled] { opacity: 0.45; cursor: not-allowed; }
+.boton[disabled]:active { transform: none; }
+.enlace {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--hueso); font: inherit; font-size: 15px; white-space: nowrap; text-decoration: underline; text-decoration-color: var(--linea-fuerte); text-underline-offset: 4px;
+  transition: color 200ms ease, text-decoration-color 200ms ease;
+}
+.enlace-gris { color: var(--niebla); }
+.enlace-peligro { color: var(--brasa-texto); text-decoration-color: rgb(255 122 98 / 0.45); }
+.enlace[disabled] { color: var(--niebla); text-decoration: none; cursor: default; opacity: 0.7; }
+@media (hover: hover) and (pointer: fine) {
+  .boton:not([disabled]):hover { border-color: var(--hueso); }
+  .boton-principal:not([disabled]):hover { background: var(--llama-viva); border-color: var(--llama-viva); }
+  .enlace:not([disabled]):hover { text-decoration-color: currentColor; }
+  .enlace-gris:not([disabled]):hover { color: var(--hueso); }
+}
+.acciones { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 20px; }
+
+/* ---------- Estados: forma + palabra ---------- */
+.estado { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px; font-size: 13px; line-height: 1.2; white-space: nowrap; border: 1px solid currentColor; }
+.estado::before { content: ""; width: 7px; height: 7px; background: currentColor; flex: none; }
+.estado-ok { color: var(--senal); }
+.estado-alerta { color: var(--llama); }
+.estado-error { color: var(--brasa-texto); }
+.estado-error::before { transform: rotate(45deg); }
+.estado-neutro { color: var(--hueso); }
+.estado-gris { color: var(--niebla); }
+.estado-neutro::before, .estado-gris::before { background: transparent; border: 1px solid currentColor; }
+
+/* ---------- Franja del prototipo y barra superior ---------- */
+.prototipo { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 6px 16px; padding: calc(env(safe-area-inset-top, 0px) + 6px) var(--margen) 6px; font-size: 12px; color: var(--abismo); background: var(--senal); text-align: center; position: relative; z-index: 2; }
+.ver-como { display: inline-flex; border: 1px solid var(--abismo); }
+.ver-como button { min-height: 28px; padding: 3px 10px; border: 0; background: transparent; color: var(--abismo); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.ver-como button[aria-pressed="true"] { background: var(--abismo); color: var(--senal); }
+.barra { position: sticky; top: 0; z-index: 30; background: rgb(7 14 22 / 0.94); border-bottom: 1px solid var(--linea); }
+@supports (backdrop-filter: blur(1px)) { .barra { background: rgb(7 14 22 / 0.8); backdrop-filter: blur(14px); } }
+.barra-interior { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: stretch; min-height: 64px; }
+.marca { grid-column: 1; display: flex; align-items: center; gap: 10px; text-decoration: none; padding-left: 8px; min-width: 0; }
+.marca img { width: 26px; height: auto; flex: none; }
+.marca span { font-variation-settings: "wdth" 125; font-weight: 800; font-size: 17px; letter-spacing: -0.02em; }
+.marca small { display: none; }
+.barra-interior nav { grid-column: 2 / span 4; display: flex; }
+.pestanas { display: flex; gap: clamp(14px, 2vw, 28px); list-style: none; margin: 0; padding: 0 0 0 8px; }
+.pestanas li { display: flex; }
+.pestana { display: flex; align-items: center; gap: 6px; font-size: 15px; color: var(--niebla); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color 200ms ease, border-color 200ms ease; }
+.pestana[aria-current="page"] { color: var(--hueso); border-bottom-color: var(--llama); }
+.pestana .cuenta-pendientes { min-width: 20px; padding: 1px 5px; background: var(--llama); color: var(--abismo); font-size: 11px; font-weight: 700; text-align: center; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.pestana .cuenta-pendientes[data-cero="true"] { display: none; }
+@media (hover: hover) and (pointer: fine) { .pestana:hover { color: var(--hueso); } }
+.usuario { grid-column: 6; display: flex; justify-content: flex-end; align-items: center; gap: 16px; font-size: 14px; color: var(--niebla); }
+
+/* ---------- Vistas ---------- */
+main { position: relative; z-index: 1; padding-bottom: 120px; }
+.vista[hidden] { display: none; }
+.cabeza-vista { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: end; row-gap: 18px; padding-top: clamp(40px, 6vw, 80px); }
+.cabeza-vista > .vista-titulo { grid-column: 1 / span 4; }
+.cabeza-vista > .texto { grid-column: 1 / span 4; grid-row: 2; padding-left: 8px; }
+.cabeza-vista > :not(.vista-titulo):not(.texto) { grid-column: 5 / -1; grid-row: 1; justify-self: end; }
+.bloque { margin-top: clamp(64px, 8vw, 112px); }
+.bloque-cabeza { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); align-items: baseline; row-gap: 10px; margin-bottom: 24px; }
+.bloque-cabeza > h2 { grid-column: 1 / span 2; padding-left: 8px; }
+.bloque-cabeza > :not(h2) { grid-column: 3 / -1; padding-left: 8px; justify-self: start; }
+
+/* Hoy */
+.fila-pendientes { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); border-top: 1px solid var(--linea-fuerte); padding-top: 20px; }
+.fila-pendientes > h2 { grid-column: 1 / span 2; padding-left: 8px; }
+.pendientes { grid-column: 3 / -1; list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 28px; }
+.pendientes a { display: grid; gap: 4px; padding-left: 8px; text-decoration: none; }
+.pendientes strong { font-size: clamp(48px, 6vw, 88px); line-height: 0.9; font-variant-numeric: tabular-nums; transition: color 200ms ease; }
+.pendientes span { color: var(--niebla); font-size: 15px; }
+.pendientes small { font-size: 14px; color: var(--hueso); text-decoration: underline; text-decoration-color: var(--linea-fuerte); text-underline-offset: 4px; margin-top: 6px; justify-self: start; }
+.pendientes li[data-cero="true"] strong { color: var(--niebla); }
+@media (hover: hover) and (pointer: fine) { .pendientes a:hover strong { color: var(--llama); } }
+
+.ventas { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); border-top: 1px solid var(--linea-fuerte); padding-top: 20px; }
+.ventas > div { grid-column: 1 / span 2; padding-left: 8px; display: grid; gap: 8px; align-content: start; }
+.ventas > figure { grid-column: 3 / -1; padding-left: 8px; }
+.cifra-heroe { font-size: clamp(36px, 4.4vw, 64px); line-height: 0.95; font-variant-numeric: tabular-nums; }
+.cifras-pequenas { display: grid; gap: 10px; margin-top: 18px; }
+.cifras-pequenas div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--linea); padding-bottom: 8px; }
+.cifras-pequenas dt { color: var(--niebla); font-size: 14px; }
+.cifras-pequenas dd { font-variant-numeric: tabular-nums; }
+.por-moneda { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 8px; font-size: 14px; }
+.por-moneda div { display: flex; gap: 8px; }
+.por-moneda dt { color: var(--niebla); }
+.por-moneda dd { font-variant-numeric: tabular-nums; }
+.grafica { position: relative; display: grid; gap: 16px; }
+.grafica svg { width: 100%; height: auto; overflow: visible; }
+.grafica .eje { font: 400 11px var(--fuente); fill: var(--niebla); }
+.grafica .eje-hoy { fill: var(--hueso); font-weight: 600; }
+.grafica .linea-base { stroke: var(--linea-fuerte); stroke-width: 1; }
+.grafica .zona { fill: transparent; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 20px; list-style: none; padding: 0; font-size: 13px; color: var(--niebla); }
+.leyenda li { display: inline-flex; align-items: center; gap: 8px; }
+.leyenda svg { width: 12px; height: 9px; }
+.tooltip { position: absolute; z-index: 5; pointer-events: none; min-width: 170px; padding: 10px 12px; background: var(--tinta-2); border: 1px solid var(--linea-fuerte); font-size: 13px; line-height: 1.45; transform: translate(-50%, calc(-100% - 10px)); opacity: 0; transition: opacity 120ms ease; }
+.tooltip[data-visible="true"] { opacity: 1; }
+.tooltip b { font-weight: 600; }
+.tooltip span { display: block; color: var(--niebla); }
+.tabla-grafica[hidden] { display: none; }
+.resumen-cuentas { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); margin-top: 48px; row-gap: 24px; }
+.resumen-cuentas > div { display: grid; gap: 4px; padding-left: 8px; align-content: start; }
+.resumen-cuentas > div:nth-child(1) { grid-column: 3; }
+.resumen-cuentas dt { order: 2; font-size: 14px; color: var(--niebla); }
+.resumen-cuentas dd { order: 1; font-size: clamp(28px, 3vw, 44px); line-height: 1; font-variant-numeric: tabular-nums; }
+
+.actividad { list-style: none; padding: 0; border-top: 1px solid var(--linea-fuerte); }
+.actividad li { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); padding-block: 12px; border-bottom: 1px solid var(--linea); }
+.actividad time { grid-column: 1 / span 2; padding-left: 8px; color: var(--niebla); font-size: 14px; font-variant-numeric: tabular-nums; }
+.actividad p { grid-column: 3 / -1; padding-left: 8px; color: var(--niebla); }
+.actividad b { color: var(--hueso); font-weight: 500; }
+.socio .actividad li { grid-template-columns: 8em 1fr; }
+.socio .actividad time, .socio .actividad p { grid-column: auto; }
+
+/* ---------- Listas de trabajo (pagos, pruebas, cuentas) ---------- */
+.lista-trabajo { list-style: none; padding: 0; border-top: 1px solid var(--linea-fuerte); }
+.item { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); row-gap: 20px; padding-block: 24px; border-bottom: 1px solid var(--linea-fuerte); }
+.item-quien { grid-column: 1 / span 2; padding-left: 8px; display: grid; gap: 10px; justify-items: start; align-content: start; }
+.item-detalle { grid-column: 3 / -1; padding-left: 8px; display: grid; gap: 18px; justify-items: start; align-content: start; }
+.item-nombre { font-size: clamp(20px, 2vw, 26px); line-height: 1.1; letter-spacing: -0.02em; }
+.item-sub { color: var(--niebla); font-size: 14px; }
+.ficha-datos { display: grid; grid-template-columns: auto 1fr; gap: 4px 20px; font-size: 15px; }
+.ficha-datos dt { color: var(--niebla); }
+.ficha-datos dd { overflow-wrap: anywhere; }
+.recibido { display: grid; gap: 2px; }
+.recibido strong { font-size: clamp(28px, 3.2vw, 44px); line-height: 1; font-variant-numeric: tabular-nums; }
+.recibido span { font-size: 14px; color: var(--niebla); }
+.hash { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; color: var(--niebla); }
+.hash code { font-family: inherit; color: var(--hueso); font-variant-numeric: tabular-nums; }
+.chequeos { list-style: none; padding: 0; display: grid; gap: 4px; font-size: 15px; }
+.chequeos li { display: flex; gap: 10px; align-items: baseline; }
+.chequeos li::before { content: ""; flex: none; width: 7px; height: 7px; background: var(--senal); transform: translateY(-2px); }
+.chequeos li[data-ok="no"] { color: var(--brasa-texto); }
+.chequeos li[data-ok="no"]::before { background: var(--brasa-texto); transform: translateY(-2px) rotate(45deg); }
+.chequeos li[data-ok="espera"] { color: var(--niebla); }
+.chequeos li[data-ok="espera"]::before { background: transparent; border: 1px solid currentColor; }
+.chequeos small { color: var(--niebla); font-size: 13px; }
+.item.saliendo { opacity: 0; transform: translateY(-6px); transition: opacity 220ms ease, transform 220ms var(--ease-out); }
+.vacio-tabla { padding: 24px 8px; color: var(--niebla); }
+.vacio-tabla[hidden] { display: none; }
+.dato-copiable { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dato-copiable .enlace { min-height: 30px; font-size: 13px; }
+.clave { font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }
+.campos-linea { display: flex; flex-wrap: wrap; gap: 12px; width: 100%; }
+.campos-linea .campo { flex: 1 1 160px; }
+
+/* ---------- Tablas ---------- */
+.tabla-envoltura { position: relative; overflow-x: auto; border-top: 1px solid var(--linea-fuerte); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tabla-ancha { min-width: 820px; }
+th { text-align: left; font-weight: 500; color: var(--niebla); font-size: 13px; padding: 12px 8px; border-bottom: 1px solid var(--linea-fuerte); white-space: nowrap; }
+td { padding: 14px 8px; border-bottom: 1px solid var(--linea); vertical-align: top; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td small { display: block; color: var(--niebla); font-size: 13px; }
+tr[hidden] { display: none; }
+
+/* Licencias */
+.filtros { display: flex; flex-wrap: wrap; border: 1px solid var(--linea-fuerte); width: fit-content; max-width: 100%; margin-bottom: 16px; }
+.filtro { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 14px; border: 0; border-right: 1px solid var(--linea-fuerte); background: transparent; color: var(--niebla); font: inherit; font-size: 14px; cursor: pointer; transition: background-color 200ms ease, color 200ms ease; }
+.filtro:last-child { border-right: 0; }
+.filtro small { font-size: 12px; font-variant-numeric: tabular-nums; }
+.filtro[aria-pressed="true"] { background: var(--hueso); color: var(--abismo); }
+@media (hover: hover) and (pointer: fine) { .filtro[aria-pressed="false"]:hover { color: var(--hueso); } }
+.barra-tabla { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 16px; }
+.buscar { flex: 0 1 340px; }
+
+/* ---------- Campos ---------- */
+.campo { display: grid; gap: 6px; align-content: start; }
+.campo label, .campo legend { font-size: 14px; font-weight: 500; padding: 0; }
+.campo .ayuda { font-size: 13px; color: var(--niebla); }
+.campo input, .campo select, .campo textarea {
+  width: 100%; min-height: 48px; padding: 12px 14px; background: var(--abismo); color: var(--hueso);
+  border: 1px solid var(--linea-fuerte); border-radius: 0; font: inherit; font-size: 16px; transition: border-color 200ms ease;
+}
+.campo textarea { min-height: 100px; resize: vertical; }
+.campo select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--niebla) 50%), linear-gradient(135deg, var(--niebla) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 40px; }
+.campo input:focus-visible, .campo select:focus-visible, .campo textarea:focus-visible { outline: 2px solid var(--senal); outline-offset: 0; border-color: transparent; }
+.campo input[aria-invalid="true"] { border-color: var(--brasa-texto); }
+.con-unidad { position: relative; }
+.con-unidad input { padding-right: 60px; }
+.con-unidad span { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--niebla); pointer-events: none; }
+.error { font-size: 13px; color: var(--brasa-texto); }
+.error[hidden] { display: none; }
+.fila-campo { display: flex; gap: 10px; align-items: stretch; }
+.fila-campo .campo { flex: 1; }
+
+/* Interruptor rectangular */
+.interruptor { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; min-height: 44px; }
+.interruptor input { appearance: none; -webkit-appearance: none; position: relative; flex: none; width: 44px; height: 24px; margin: 0; border: 1px solid var(--linea-fuerte); background: var(--abismo); cursor: pointer; transition: background-color 200ms ease, border-color 200ms ease; }
+.interruptor input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: var(--niebla); transition: transform 220ms var(--ease-out), background-color 200ms ease; }
+.interruptor input:checked { background: var(--llama); border-color: var(--llama); }
+.interruptor input:checked::after { transform: translateX(20px); background: var(--abismo); }
+.interruptor span { font-size: 15px; text-align: left; }
+.interruptor small { display: block; font-size: 13px; color: var(--niebla); }
+
+/* ---------- Ajustes ---------- */
+.ajustes { display: grid; border-top: 1px solid var(--linea-fuerte); }
+.grupo { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); row-gap: 16px; padding-block: 28px; border-bottom: 1px solid var(--linea-fuerte); }
+.grupo-cabeza { grid-column: 1 / span 2; padding-left: 8px; display: grid; gap: 8px; align-content: start; }
+.grupo-cuerpo { grid-column: 3 / span 3; padding-left: 8px; display: grid; gap: 18px; }
+.rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.direcciones { list-style: none; padding: 0; display: grid; border-top: 1px solid var(--linea); }
+.direccion { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; align-items: center; padding-block: 12px; border-bottom: 1px solid var(--linea); }
+.direccion b { font-weight: 600; }
+.direccion code { grid-column: 1; font-family: inherit; font-size: 14px; color: var(--niebla); overflow-wrap: anywhere; }
+.direccion .interruptor { grid-column: 2; grid-row: 1 / span 2; }
+.nueva-direccion { display: grid; gap: 14px; }
+.nueva-direccion[hidden] { display: none; }
+.guardar-barra { display: flex; justify-content: flex-end; gap: 12px 20px; align-items: center; flex-wrap: wrap; margin-top: 28px; }
+
+/* ---------- Socio ---------- */
+.socio { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); row-gap: 48px; margin-top: clamp(48px, 6vw, 80px); border-top: 1px solid var(--linea-fuerte); padding-top: 20px; }
+.socio > .porcentaje { grid-column: 1 / span 2; padding-left: 8px; }
+.socio > div:last-child { grid-column: 3 / -1; padding-left: 8px; }
+.porcentaje { display: grid; gap: 10px; justify-items: start; align-content: start; }
+.porcentaje strong { font-size: clamp(64px, 9vw, 128px); line-height: 0.9; font-variant-numeric: tabular-nums; }
+.editar-porcentaje { display: grid; gap: 12px; width: 100%; max-width: 360px; }
+.editar-porcentaje[hidden] { display: none; }
+
+/* Pie */
+.pie { position: relative; z-index: 1; padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--linea); font-size: 12px; color: var(--niebla); }
+.pie p { padding-left: 8px; }
+
+/* ---------- Diálogos ---------- */
+.lateral {
+  margin: 0 0 0 auto; height: 100dvh; max-height: none; width: min(580px, 100vw); max-width: 100vw;
+  padding: 0; border: 0; border-left: 1px solid var(--linea-fuerte); background: var(--tinta); color: var(--hueso);
+  overscroll-behavior: contain; transform: translateX(100%);
+  transition: transform 300ms var(--ease-drawer), overlay 300ms allow-discrete, display 300ms allow-discrete;
+}
+.lateral[open] { transform: translateX(0); }
+@starting-style { .lateral[open] { transform: translateX(100%); } }
+.lateral::backdrop, .modal::backdrop { background: rgb(3 7 11 / 0.65); opacity: 0; transition: opacity 300ms var(--ease-out), overlay 300ms allow-discrete, display 300ms allow-discrete; }
+.lateral[open]::backdrop, .modal[open]::backdrop { opacity: 1; }
+@starting-style { .lateral[open]::backdrop, .modal[open]::backdrop { opacity: 0; } }
+.lateral-interior { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+.lateral-cabeza { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: calc(18px + env(safe-area-inset-top, 0px)) 24px 18px; border-bottom: 1px solid var(--linea-fuerte); }
+.lateral-cabeza h2 { font-variation-settings: "wdth" 125; font-weight: 700; font-size: 22px; line-height: 1.1; text-transform: uppercase; }
+.lateral-cabeza p { margin-top: 6px; }
+.cerrar { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border: 1px solid var(--linea-fuerte); background: transparent; color: var(--hueso); cursor: pointer; }
+.cerrar svg { width: 14px; height: 14px; }
+.lateral-cuerpo { overflow-y: auto; padding: 24px; display: grid; gap: 28px; align-content: start; overscroll-behavior: contain; }
+.lateral-cuerpo section { display: grid; gap: 14px; }
+.lateral-cuerpo h3 { font-size: 15px; font-weight: 600; }
+.lateral-pie { padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--linea-fuerte); display: flex; gap: 10px 20px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+.modal {
+  width: min(500px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--linea-fuerte); background: var(--tinta); color: var(--hueso);
+  opacity: 0; transform: scale(0.97);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+.modal[open] { opacity: 1; transform: scale(1); }
+@starting-style { .modal[open] { opacity: 0; transform: scale(0.97); } }
+.modal form { display: grid; gap: 20px; }
+.modal h2 { font-variation-settings: "wdth" 125; font-weight: 700; font-size: 20px; line-height: 1.15; text-transform: uppercase; }
+.radios { display: grid; gap: 0; border: 0; padding: 0; margin: 0; }
+.radios legend { padding: 0; margin-bottom: 8px; font-size: 14px; color: var(--niebla); }
+.opcion-radio { display: flex; gap: 12px; align-items: center; min-height: 40px; cursor: pointer; }
+.opcion-radio input { appearance: none; -webkit-appearance: none; flex: none; width: 18px; height: 18px; margin: 0; border: 1px solid var(--linea-fuerte); background: var(--abismo); cursor: pointer; transition: box-shadow 200ms var(--ease-out), border-color 200ms ease; }
+.opcion-radio input:checked { border-color: var(--llama); box-shadow: inset 0 0 0 4px var(--abismo), inset 0 0 0 10px var(--llama); }
+
+/* Aviso breve */
+.aviso { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 70; max-width: calc(100vw - 32px); padding: 12px 16px; background: var(--hueso); color: var(--abismo); font-size: 14px; font-weight: 500; transform: translate(-50%, 150%); opacity: 0; pointer-events: none; transition: transform 260ms var(--ease-out), opacity 200ms var(--ease-out); }
+.aviso[data-visible="true"] { transform: translate(-50%, 0); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lateral, .lateral::backdrop, .modal, .modal::backdrop { transition: opacity 150ms ease, overlay 150ms allow-discrete, display 150ms allow-discrete; transform: none; }
+  @starting-style { .lateral[open], .modal[open] { transform: none; opacity: 0; } }
+  .aviso { transform: translate(-50%, 0); transition: opacity 150ms ease; }
+  .item.saliendo { transform: none; }
+  .boton, .filtro, .pestana, .interruptor input, .interruptor input::after, .opcion-radio input { transition-duration: 0s; }
+}
+
+/* ---------- Tableta y celular ---------- */
+@media (max-width: 1180px) {
+  .usuario-nombre { display: none; }
+  .barra-interior nav { grid-column: 2 / span 4; }
+}
+@media (max-width: 960px) {
+  :root { --cols: 2; }
+  .barra-interior { grid-template-columns: 1fr auto; }
+  .usuario { grid-column: 2; padding-right: 8px; }
+  .barra-interior nav { grid-column: 1 / -1; grid-row: 2; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--margen)); padding-inline: var(--margen); }
+  .barra-interior nav::-webkit-scrollbar { display: none; }
+  .pestanas { padding-left: 8px; }
+  .pestana { min-height: 48px; }
+  .cabeza-vista > .vista-titulo, .cabeza-vista > .texto { grid-column: 1 / -1; }
+  .cabeza-vista > :not(.vista-titulo):not(.texto) { grid-column: 1 / -1; grid-row: auto; justify-self: start; margin-left: 8px; }
+  .bloque-cabeza > h2, .bloque-cabeza > :not(h2), .fila-pendientes > h2, .pendientes, .ventas > div, .ventas > figure,
+  .item-quien, .item-detalle, .grupo-cabeza, .grupo-cuerpo, .socio > .porcentaje, .socio > div:last-child,
+  .actividad time, .actividad p { grid-column: 1 / -1; }
+  .pendientes { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
+  .resumen-cuentas > div:nth-child(1) { grid-column: auto; }
+  .ventas > figure { margin-top: 28px; }
+}
+@media (max-width: 560px) {
+  .marca span { font-size: 15px; }
+  .rejilla { grid-template-columns: minmax(0, 1fr); }
+  .fila-campo { flex-direction: column; }
+  .lateral-cabeza, .lateral-cuerpo, .lateral-pie { padding-inline: 16px; }
+  .prototipo { gap: 4px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="reticula" aria-hidden="true"></div>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<div class="prototipo">
+  <span>Prototipo con datos de ejemplo al 10 de octubre de 2026</span>
+  <span class="ver-como" role="group" aria-label="Ver el panel como">
+    <button type="button" aria-pressed="true" data-ver-como="argemiro">Argemiro</button>
+    <button type="button" aria-pressed="false" data-ver-como="socio">Socio desarrollador</button>
+  </span>
+</div>
+
+<header class="barra">
+  <div class="contenedor barra-interior">
+    <a class="marca" href="#hoy" aria-label="DocTraderPRO, administración"><img src="../../marca/logo-icon-64.png" alt="" width="54" height="64"><span translate="no">DocTraderPRO</span><small>Administración</small></a>
+    <nav aria-label="Administración">
+      <ul class="pestanas">
+        <li><a class="pestana" href="#hoy" data-vista="hoy">Hoy</a></li>
+        <li><a class="pestana" href="#pagos" data-vista="pagos">Pagos <span class="cuenta-pendientes" id="n-pagos-tab">5</span></a></li>
+        <li><a class="pestana" href="#cuentas" data-vista="cuentas">Cuentas <span class="cuenta-pendientes" id="n-cuentas-tab">3</span></a></li>
+        <li><a class="pestana" href="#licencias" data-vista="licencias">Licencias</a></li>
+        <li><a class="pestana" href="#ajustes" data-vista="ajustes">Ajustes</a></li>
+        <li><a class="pestana" href="#socio" data-vista="socio">Socio</a></li>
+      </ul>
+    </nav>
+    <div class="usuario">
+      <span class="usuario-nombre" id="usuario-nombre">Argemiro</span>
+      <a class="enlace enlace-gris" href="/salir">Salir</a>
+    </div>
+  </div>
+</header>
+
+<main id="contenido" tabindex="-1">
+
+  <!-- ================= HOY ================= -->
+  <section class="vista contenedor" id="vista-hoy" aria-labelledby="t-hoy">
+    <div class="cabeza-vista">
+      <h1 class="vista-titulo" id="t-hoy">Hoy</h1>
+      <p class="texto">Tienes <span id="n-total">8</span> pendientes. Empieza por los pagos: un cliente no puede conectarse hasta que apruebes el suyo.</p>
+      <a class="boton boton-principal" href="#pagos">Revisar pagos</a>
+    </div>
+
+    <div class="bloque fila-pendientes">
+    <h2 class="titulo-medio" id="t-pendientes">Pendientes</h2>
+    <ul class="pendientes" aria-labelledby="t-pendientes">
+      <li data-pend="pagos"><a href="#pagos"><strong class="cifra" id="n-pagos">3</strong><span>pagos por revisar</span><small>Ir a pagos</small></a></li>
+      <li data-pend="pruebas"><a href="#pagos-pruebas" data-ir="pagos"><strong class="cifra" id="n-pruebas">2</strong><span>pruebas por aprobar</span><small>Ver solicitudes</small></a></li>
+      <li data-pend="conectar"><a href="#cuentas"><strong class="cifra" id="n-conectar">2</strong><span>cuentas por conectar</span><small>Ver datos</small></a></li>
+      <li data-pend="desconectar"><a href="#cuentas-desconectar" data-ir="cuentas"><strong class="cifra" id="n-desconectar">1</strong><span>cuenta por desconectar</span><small>Ver cuál</small></a></li>
+    </ul>
+    </div>
+
+    <section class="bloque" aria-labelledby="t-ventas">
+      <div class="bloque-cabeza"><h2 class="titulo-medio" id="t-ventas">Ventas de octubre</h2></div>
+      <div class="ventas">
+        <div>
+          <p class="cifra-heroe">USD&nbsp;3.682</p>
+          <p class="nota">Ventas brutas aprobadas del 1 al 10 de octubre: 9 licencias.</p>
+          <dl class="cifras-pequenas">
+            <div><dt>Hoy</dt><dd>USD 499</dd></div>
+            <div><dt>Septiembre</dt><dd>USD 7.003</dd></div>
+            <div><dt>En 2026</dt><dd>USD 41.870</dd></div>
+          </dl>
+          <dl class="por-moneda" aria-label="Octubre por moneda">
+            <div><dt>USDT</dt><dd>2.185</dd></div>
+            <div><dt>USDC</dt><dd>998</dd></div>
+            <div><dt>BTC</dt><dd>499</dd></div>
+          </dl>
+        </div>
+        <figure class="grafica" id="grafica">
+          <ul class="leyenda" aria-label="Leyenda">
+            <li><svg viewBox="0 0 12 9" aria-hidden="true"><rect width="12" height="9" fill="var(--g-semestral)"/></svg>Semestral</li>
+            <li><svg viewBox="0 0 12 9" aria-hidden="true"><rect width="12" height="9" fill="var(--g-trimestral)"/></svg>Trimestral</li>
+            <li><svg viewBox="0 0 12 9" aria-hidden="true"><rect x=".75" y=".75" width="10.5" height="7.5" fill="none" stroke="var(--g-prueba)" stroke-width="1.5"/></svg>Mes de prueba</li>
+          </ul>
+          <svg id="grafica-svg" role="img" aria-labelledby="grafica-desc"></svg>
+          <figcaption class="acciones">
+            <span class="nota" id="grafica-desc">Un bloque por licencia vendida, día por día.</span>
+            <button class="enlace enlace-gris" type="button" id="ver-tabla" aria-expanded="false" aria-controls="tabla-grafica">Ver como tabla</button>
+          </figcaption>
+          <div class="tooltip" id="tooltip" aria-hidden="true"></div>
+          <div class="tabla-envoltura tabla-grafica" id="tabla-grafica" hidden>
+            <table>
+              <thead><tr><th scope="col">Día</th><th scope="col" class="num">Semestral</th><th scope="col" class="num">Trimestral</th><th scope="col" class="num">Prueba</th><th scope="col" class="num">Total USD</th></tr></thead>
+              <tbody id="tabla-grafica-cuerpo"></tbody>
+            </table>
+          </div>
+        </figure>
+      </div>
+      <dl class="resumen-cuentas">
+        <div><dt>Cuentas conectadas</dt><dd>47</dd></div>
+        <div><dt>Nuevas en octubre</dt><dd>5</dd></div>
+        <div><dt>Renovaciones en octubre</dt><dd>4</dd></div>
+        <div><dt>Vencen en 7 días</dt><dd>3</dd></div>
+      </dl>
+    </section>
+
+    <section class="bloque" aria-labelledby="t-actividad">
+      <div class="bloque-cabeza">
+        <h2 class="titulo-medio" id="t-actividad">Actividad reciente</h2>
+        <a class="enlace enlace-gris" href="/admin/auditoria.csv">Exportar auditoría</a>
+      </div>
+      <ol class="actividad" id="actividad">
+        <li><time datetime="2026-10-10T10:42">Hoy 10:42</time><p><b>Camilo Herrera</b> reportó un pago de 499.00 USDT. La verificación en la blockchain lo dio por bueno.</p></li>
+        <li><time datetime="2026-10-10T09:15">Hoy 09:15</time><p><b>Argemiro</b> vio las contraseñas de la cuenta 50288813.</p></li>
+        <li><time datetime="2026-10-09T18:03">Ayer 18:03</time><p><b>Argemiro</b> aprobó el pago de Laura Gómez: semestral, cuenta 8812406.</p></li>
+        <li><time datetime="2026-10-09T11:20">Ayer 11:20</time><p><b>Juan Pablo Mejía</b> pidió un mes de prueba.</p></li>
+        <li><time datetime="2026-10-08T00:00">8 oct</time><p>Terminó la gracia de la cuenta 50177421 de <b>Jorge Ramírez</b>. Pasó a por desconectar.</p></li>
+      </ol>
+    </section>
+  </section>
+
+  <!-- ================= PAGOS ================= -->
+  <section class="vista contenedor" id="vista-pagos" aria-labelledby="t-pagos" hidden>
+    <div class="cabeza-vista">
+      <h1 class="vista-titulo" id="t-pagos">Pagos</h1>
+      <p class="texto"><span id="n-pagos-titulo">3</span> pagos por revisar. Cada pago ya pasó por la verificación en la blockchain. Apruébalo para activar la licencia; la cuenta pasa sola a por conectar.</p>
+      <label class="interruptor">
+        <input type="checkbox" id="auto-aprobar" data-sincronizar="auto">
+        <span>Aprobar solos los pagos verificados<small>Apagado: tú apruebas cada pago</small></span>
+      </label>
+    </div>
+
+    <section class="bloque" aria-label="Pagos por revisar">
+      <ol class="lista-trabajo" id="lista-pagos">
+        <li class="item" data-tipo="pago">
+          <div class="item-quien">
+            <span class="estado estado-ok">Verificado</span>
+            <h2 class="item-nombre">Camilo Herrera</h2>
+            <p class="item-sub">Cuenta 50291102, <span translate="no">JustMarkets</span></p>
+            <dl class="ficha-datos">
+              <dt>Licencia</dt><dd>Semestral, nueva</dd>
+              <dt>Orden</dt><dd>Hoy 10:31, vence 11:31</dd>
+              <dt>Debía enviar</dt><dd class="cifra">499.00 USDT</dd>
+            </dl>
+          </div>
+          <div class="item-detalle">
+            <p class="recibido"><strong>499.00 USDT</strong><span>Recibido por Tron (TRC20) en la dirección principal</span></p>
+            <p class="hash"><span>Hash</span><code>3f9a8c71…be05c21e</code><a class="enlace enlace-gris" href="https://tronscan.org/" target="_blank" rel="noopener">Ver en el explorador</a></p>
+            <ul class="chequeos" aria-label="Verificación">
+              <li>El hash no se había usado</li>
+              <li>Llegó a la dirección de la orden, en USDT por Tron</li>
+              <li>El monto es igual al de la orden</li>
+              <li>Se envió después de crear la orden</li>
+              <li>20 de 20 confirmaciones</li>
+            </ul>
+            <div class="acciones">
+              <button class="boton boton-principal" type="button" data-aprobar="Camilo Herrera" data-cuenta="50291102">Aprobar pago</button>
+              <button class="enlace enlace-gris" type="button" data-rechazar="Camilo Herrera">Rechazar</button>
+            </div>
+          </div>
+        </li>
+
+        <li class="item" data-tipo="pago">
+          <div class="item-quien">
+            <span class="estado estado-error">Monto incompleto</span>
+            <h2 class="item-nombre">María Fernanda Ortiz</h2>
+            <p class="item-sub">Cuenta 7710352, IC Markets</p>
+            <dl class="ficha-datos">
+              <dt>Licencia</dt><dd>Trimestral, nueva</dd>
+              <dt>Orden</dt><dd>Hoy 08:12, venció 09:12</dd>
+              <dt>Debía enviar</dt><dd class="cifra">319.00 USDC</dd>
+            </dl>
+          </div>
+          <div class="item-detalle">
+            <p class="recibido"><strong>300.00 USDC</strong><span>Recibido por BNB Smart Chain (BEP20). Faltan 19.00 USDC</span></p>
+            <p class="hash"><span>Hash</span><code>0x8d21e4…77a0f913</code><a class="enlace enlace-gris" href="https://bscscan.com/" target="_blank" rel="noopener">Ver en el explorador</a></p>
+            <ul class="chequeos" aria-label="Verificación">
+              <li>El hash no se había usado</li>
+              <li>Llegó a la dirección de la orden, en USDC por BNB Smart Chain</li>
+              <li data-ok="no">El monto es menor al de la orden <small>(300.00 de 319.00)</small></li>
+              <li>Se envió después de crear la orden</li>
+              <li>15 de 15 confirmaciones</li>
+            </ul>
+            <p class="nota">Lo usual es pedirle al cliente que envíe los 19.00 USDC que faltan y luego aprobar.</p>
+            <div class="acciones">
+              <button class="enlace" type="button" data-rechazar="María Fernanda Ortiz">Rechazar</button>
+              <button class="enlace enlace-gris" type="button" data-aprobar="María Fernanda Ortiz" data-cuenta="7710352">Aprobar de todos modos</button>
+            </div>
+          </div>
+        </li>
+
+        <li class="item" data-tipo="pago">
+          <div class="item-quien">
+            <span class="estado estado-neutro">Esperando confirmaciones</span>
+            <h2 class="item-nombre">Laura Gómez Restrepo</h2>
+            <p class="item-sub">Cuenta 50277120, <span translate="no">JustMarkets</span></p>
+            <dl class="ficha-datos">
+              <dt>Licencia</dt><dd>Trimestral, renovación</dd>
+              <dt>Orden</dt><dd>Hoy 10:50, vence 11:50</dd>
+              <dt>Debía enviar</dt><dd class="cifra">0.00254 BTC</dd>
+            </dl>
+          </div>
+          <div class="item-detalle">
+            <p class="recibido"><strong>0.00254 BTC</strong><span>Recibido por la red Bitcoin</span></p>
+            <p class="hash"><span>Hash</span><code>b71c0e9a…4d2f8a60</code><a class="enlace enlace-gris" href="https://mempool.space/" target="_blank" rel="noopener">Ver en el explorador</a></p>
+            <ul class="chequeos" aria-label="Verificación">
+              <li>El hash no se había usado</li>
+              <li>Llegó a la dirección de la orden, en la red Bitcoin</li>
+              <li>El monto es igual al de la orden</li>
+              <li>Se envió después de crear la orden</li>
+              <li data-ok="espera">1 de 2 confirmaciones <small>(unos 10 minutos más)</small></li>
+            </ul>
+            <div class="acciones">
+              <button class="enlace" type="button" disabled>Aprobar al completar las confirmaciones</button>
+              <button class="enlace enlace-gris" type="button" data-rechazar="Laura Gómez Restrepo">Rechazar</button>
+            </div>
+          </div>
+        </li>
+      </ol>
+      <p class="vacio-tabla" id="pagos-vacio" hidden>No hay pagos por revisar. Los nuevos aparecen aquí apenas el cliente reporta el hash.</p>
+    </section>
+
+    <section class="bloque" id="pagos-pruebas" aria-labelledby="t-pruebas" tabindex="-1">
+      <div class="bloque-cabeza">
+        <h2 class="titulo-medio" id="t-pruebas">Solicitudes de prueba</h2>
+        <p class="texto">Una prueba por persona. La plataforma revisa la cédula contra las pruebas anteriores.</p>
+      </div>
+      <ol class="lista-trabajo" id="lista-pruebas">
+        <li class="item" data-tipo="prueba">
+          <div class="item-quien">
+            <span class="estado estado-ok">Sin pruebas anteriores</span>
+            <h3 class="item-nombre">Andrés Peña</h3>
+            <p class="item-sub">Cédula terminada en 7781. Pidió la prueba hoy a las 07:58</p>
+          </div>
+          <div class="item-detalle">
+            <p class="texto">Al aprobar, el cliente recibe una orden de USD&nbsp;50 por 1&nbsp;mes. Puede completarla a semestral por USD&nbsp;450.</p>
+            <div class="acciones">
+              <button class="boton" type="button" data-aprobar-prueba="Andrés Peña">Aprobar prueba</button>
+              <button class="enlace enlace-gris" type="button" data-rechazar-prueba="Andrés Peña">Rechazar</button>
+            </div>
+          </div>
+        </li>
+        <li class="item" data-tipo="prueba">
+          <div class="item-quien">
+            <span class="estado estado-error">Ya tuvo una prueba</span>
+            <h3 class="item-nombre">Juan Pablo Mejía</h3>
+            <p class="item-sub">Cédula terminada en 0934. Pidió la prueba ayer a las 11:20</p>
+          </div>
+          <div class="item-detalle">
+            <p class="texto">Esta cédula tuvo una prueba del 3 de marzo al 3 de abril de 2026, con la cuenta 50122987.</p>
+            <div class="acciones">
+              <button class="enlace" type="button" data-rechazar-prueba="Juan Pablo Mejía">Rechazar</button>
+              <button class="enlace enlace-gris" type="button" data-aprobar-prueba="Juan Pablo Mejía">Aprobar de todos modos</button>
+            </div>
+          </div>
+        </li>
+      </ol>
+      <p class="vacio-tabla" id="pruebas-vacio" hidden>No hay solicitudes de prueba pendientes.</p>
+    </section>
+
+    <section class="bloque" aria-labelledby="t-expiradas">
+      <div class="bloque-cabeza"><h2 class="titulo-medio" id="t-expiradas">Órdenes expiradas esta semana</h2></div>
+      <div class="tabla-envoltura" tabindex="0" role="region" aria-labelledby="t-expiradas">
+        <table class="tabla-ancha">
+          <thead><tr><th scope="col">Creada</th><th scope="col">Cliente</th><th scope="col">Licencia</th><th scope="col" class="num">Monto</th><th scope="col">Qué pasó</th></tr></thead>
+          <tbody>
+            <tr><td>9 oct, 22:14</td><td>Valentina Cruz<small>Cuenta 50293340</small></td><td>Semestral</td><td class="num">499.00 USDT</td><td>No llegó ningún depósito en la hora</td></tr>
+            <tr><td>7 oct, 15:40</td><td>Laura Gómez Restrepo<small>Cuenta 50213847</small></td><td>Semestral</td><td class="num">499.00 USDT</td><td>Creó otra orden y pagó con USDC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= CUENTAS ================= -->
+  <section class="vista contenedor" id="vista-cuentas" aria-labelledby="t-cuentas" hidden>
+    <div class="cabeza-vista">
+      <h1 class="vista-titulo" id="t-cuentas">Cuentas</h1>
+      <p class="texto"><span id="n-conectar-titulo">2</span> cuentas por conectar en Social Trader Tools. Ya pagaron y sus datos están completos. Cuando termines de conectar una en Social Trader Tools, márcala aquí y el cliente recibe un correo.</p>
+    </div>
+
+    <section class="bloque" aria-label="Por conectar">
+      <ol class="lista-trabajo" id="lista-conectar">
+        <li class="item" data-tipo="conectar">
+          <div class="item-quien">
+            <span class="estado estado-neutro">Por conectar desde ayer</span>
+            <h2 class="item-nombre">Laura Gómez Restrepo</h2>
+            <p class="item-sub">Semestral, pagada el 9 oct con BTC</p>
+            <div class="campos-linea">
+              <div class="campo"><label for="cap-1">Capital recomendado</label><div class="con-unidad"><input id="cap-1" type="text" inputmode="numeric" value="1.500"><span>USD</span></div></div>
+              <div class="campo"><label for="ries-1">Nivel de riesgo</label><select id="ries-1"><option>Conservador</option><option selected>Moderado</option><option>Agresivo</option></select></div>
+            </div>
+          </div>
+          <div class="item-detalle">
+            <dl class="ficha-datos">
+              <dt>Titular</dt><dd>Laura Gómez Restrepo</dd>
+              <dt>Broker</dt><dd>IC Markets</dd>
+              <dt>Servidor</dt><dd><span class="dato-copiable">ICMarketsSC-Live07 <button class="enlace enlace-gris" type="button" data-copiar="ICMarketsSC-Live07">Copiar</button></span></dd>
+              <dt>Número</dt><dd><span class="dato-copiable"><span class="cifra">8812406</span> <button class="enlace enlace-gris" type="button" data-copiar="8812406">Copiar</button></span></dd>
+              <dt>Contraseña operativa</dt><dd><span class="dato-copiable"><span class="clave" data-clave="Ej-Op-7731!">••••••••</span></span></dd>
+              <dt>Contraseña de inversor</dt><dd><span class="dato-copiable"><span class="clave" data-clave="Ej-Inv-2208">••••••••</span></span></dd>
+            </dl>
+            <div class="acciones">
+              <button class="enlace" type="button" data-ver-claves>Ver contraseñas</button>
+              <span class="nota">Verlas queda en la auditoría.</span>
+            </div>
+            <button class="boton" type="button" data-conectada="Laura Gómez Restrepo" data-cuenta="8812406">Marcar como conectada</button>
+          </div>
+        </li>
+
+        <li class="item" data-tipo="conectar">
+          <div class="item-quien">
+            <span class="estado estado-neutro">Por conectar desde el 8 oct</span>
+            <h2 class="item-nombre">Diana Salazar</h2>
+            <p class="item-sub">Semestral, pagada el 8 oct con USDT</p>
+            <div class="campos-linea">
+              <div class="campo"><label for="cap-2">Capital recomendado</label><div class="con-unidad"><input id="cap-2" type="text" inputmode="numeric" value="2.000"><span>USD</span></div></div>
+              <div class="campo"><label for="ries-2">Nivel de riesgo</label><select id="ries-2"><option>Conservador</option><option selected>Moderado</option><option>Agresivo</option></select></div>
+            </div>
+          </div>
+          <div class="item-detalle">
+            <dl class="ficha-datos">
+              <dt>Titular</dt><dd>Diana Salazar Mora</dd>
+              <dt>Broker</dt><dd translate="no">JustMarkets</dd>
+              <dt>Servidor</dt><dd><span class="dato-copiable">JustMarkets-Live <button class="enlace enlace-gris" type="button" data-copiar="JustMarkets-Live">Copiar</button></span></dd>
+              <dt>Número</dt><dd><span class="dato-copiable"><span class="cifra">50288813</span> <button class="enlace enlace-gris" type="button" data-copiar="50288813">Copiar</button></span></dd>
+              <dt>Contraseña operativa</dt><dd><span class="dato-copiable"><span class="clave" data-clave="Ej-Op-5120?">••••••••</span></span></dd>
+              <dt>Contraseña de inversor</dt><dd><span class="dato-copiable"><span class="clave" data-clave="Ej-Inv-9043">••••••••</span></span></dd>
+            </dl>
+            <div class="acciones">
+              <button class="enlace" type="button" data-ver-claves>Ver contraseñas</button>
+              <span class="nota">Verlas queda en la auditoría.</span>
+            </div>
+            <button class="boton" type="button" data-conectada="Diana Salazar" data-cuenta="50288813">Marcar como conectada</button>
+          </div>
+        </li>
+
+        <li class="item" data-tipo="espera">
+          <div class="item-quien">
+            <span class="estado estado-alerta">Falta aprobar el pago</span>
+            <h2 class="item-nombre">Camilo Herrera</h2>
+            <p class="item-sub">Semestral, pago verificado hoy con USDT</p>
+          </div>
+          <div class="item-detalle">
+            <p class="texto">Sus datos están completos. Aparece lista para conectar apenas apruebes su pago.</p>
+            <a class="enlace" href="#pagos">Ir a aprobar el pago</a>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="bloque" id="cuentas-desconectar" aria-labelledby="t-desconectar" tabindex="-1">
+      <div class="bloque-cabeza">
+        <h2 class="titulo-medio" id="t-desconectar">Por desconectar</h2>
+        <p class="texto">Licencias vencidas a las que ya se les acabaron los 3&nbsp;días de gracia.</p>
+      </div>
+      <ol class="lista-trabajo" id="lista-desconectar">
+        <li class="item" data-tipo="desconectar">
+          <div class="item-quien">
+            <span class="estado estado-error">Gracia terminada</span>
+            <h3 class="item-nombre">Jorge Ramírez</h3>
+            <p class="item-sub">Cuenta 50177421, <span translate="no">JustMarkets</span>, servidor JustMarkets-Live</p>
+          </div>
+          <div class="item-detalle">
+            <p class="texto">Su licencia trimestral venció el 5 de octubre y la gracia terminó el 8. No ha renovado. Le enviamos tres recordatorios.</p>
+            <div class="acciones">
+              <button class="boton" type="button" data-desconectada="Jorge Ramírez" data-cuenta="50177421">Marcar como desconectada</button>
+              <a class="enlace enlace-gris" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener">Escribirle</a>
+            </div>
+          </div>
+        </li>
+      </ol>
+      <p class="vacio-tabla" id="desconectar-vacio" hidden>No hay cuentas por desconectar.</p>
+    </section>
+  </section>
+
+  <!-- ================= LICENCIAS ================= -->
+  <section class="vista contenedor" id="vista-licencias" aria-labelledby="t-licencias" hidden>
+    <div class="cabeza-vista">
+      <h1 class="vista-titulo" id="t-licencias">Licencias</h1>
+      <p class="texto">47 activas; 3 vencen esta semana. Busca por cliente o cuenta y abre la ficha para ajustar capital, riesgo, notas o días.</p>
+    </div>
+
+    <section class="bloque" aria-label="Licencias">
+      <div class="filtros" role="group" aria-label="Filtrar licencias">
+        <button class="filtro" type="button" aria-pressed="true" data-filtro="todas">Todas <small>10</small></button>
+        <button class="filtro" type="button" aria-pressed="false" data-filtro="vence">Vence en 7 días <small>3</small></button>
+        <button class="filtro" type="button" aria-pressed="false" data-filtro="gracia">En gracia <small>1</small></button>
+        <button class="filtro" type="button" aria-pressed="false" data-filtro="vencida">Vencidas <small>1</small></button>
+        <button class="filtro" type="button" aria-pressed="false" data-filtro="pendiente">Pendientes de pago <small>2</small></button>
+        <button class="filtro" type="button" aria-pressed="false" data-filtro="prueba">En prueba <small>1</small></button>
+      </div>
+      <div class="barra-tabla">
+        <div class="campo buscar"><label class="oculto" for="buscar">Buscar por cliente o cuenta</label><input id="buscar" type="search" placeholder="Buscar por cliente o cuenta" autocomplete="off" spellcheck="false"></div>
+        <button class="enlace enlace-gris" type="button" id="exportar">Exportar CSV</button>
+      </div>
+      <div class="tabla-envoltura" tabindex="0" role="region" aria-label="Lista de licencias">
+        <table class="tabla-ancha" id="tabla-licencias">
+          <thead><tr><th scope="col">Cuenta</th><th scope="col">Cliente</th><th scope="col">Licencia</th><th scope="col">Vence</th><th scope="col" class="num">Días</th><th scope="col">Estado</th><th scope="col"><span class="oculto">Ficha</span></th></tr></thead>
+          <tbody>
+            <tr data-f="vence"><td class="cifra">50277120<small>JustMarkets</small></td><td>Laura Gómez Restrepo</td><td>Trimestral</td><td>15 oct 2026</td><td class="num">5</td><td><span class="estado estado-alerta">Vence pronto</span></td><td><button class="enlace" type="button" data-ficha="Laura Gómez Restrepo">Ver ficha</button></td></tr>
+            <tr data-f="vence"><td class="cifra">50254418<small>JustMarkets</small></td><td>Sebastián Toro</td><td>Semestral</td><td>13 oct 2026</td><td class="num">3</td><td><span class="estado estado-alerta">Vence pronto</span></td><td><button class="enlace" type="button" data-ficha="Sebastián Toro">Ver ficha</button></td></tr>
+            <tr data-f="vence"><td class="cifra">7704518<small>IC Markets</small></td><td>Paola Andrea Ríos</td><td>Trimestral</td><td>16 oct 2026</td><td class="num">6</td><td><span class="estado estado-alerta">Vence pronto</span></td><td><button class="enlace" type="button" data-ficha="Paola Andrea Ríos">Ver ficha</button></td></tr>
+            <tr data-f="activa"><td class="cifra">50213847<small>JustMarkets</small></td><td>Laura Gómez Restrepo</td><td>Semestral</td><td>2 ene 2027</td><td class="num">84</td><td><span class="estado estado-ok">Conectada</span></td><td><button class="enlace" type="button" data-ficha="Laura Gómez Restrepo">Ver ficha</button></td></tr>
+            <tr data-f="activa"><td class="cifra">8812406<small>IC Markets</small></td><td>Laura Gómez Restrepo</td><td>Semestral</td><td>9 abr 2027</td><td class="num">181</td><td><span class="estado estado-neutro">Por conectar</span></td><td><button class="enlace" type="button" data-ficha="Laura Gómez Restrepo">Ver ficha</button></td></tr>
+            <tr data-f="activa"><td class="cifra">50288813<small>JustMarkets</small></td><td>Diana Salazar</td><td>Semestral</td><td>8 abr 2027</td><td class="num">180</td><td><span class="estado estado-neutro">Por conectar</span></td><td><button class="enlace" type="button" data-ficha="Diana Salazar">Ver ficha</button></td></tr>
+            <tr data-f="gracia"><td class="cifra">50199306<small>JustMarkets</small></td><td>Felipe Arango</td><td>Trimestral</td><td>8 oct 2026</td><td class="num">−2</td><td><span class="estado estado-alerta">En gracia, 1 día</span></td><td><button class="enlace" type="button" data-ficha="Felipe Arango">Ver ficha</button></td></tr>
+            <tr data-f="vencida"><td class="cifra">50177421<small>JustMarkets</small></td><td>Jorge Ramírez</td><td>Trimestral</td><td>5 oct 2026</td><td class="num">−5</td><td><span class="estado estado-error">Por desconectar</span></td><td><button class="enlace" type="button" data-ficha="Jorge Ramírez">Ver ficha</button></td></tr>
+            <tr data-f="pendiente"><td class="cifra">50291102<small>JustMarkets</small></td><td>Camilo Herrera</td><td>Semestral</td><td>Al aprobar</td><td class="num">—</td><td><span class="estado estado-gris">Pendiente de pago</span></td><td><button class="enlace" type="button" data-ficha="Camilo Herrera">Ver ficha</button></td></tr>
+            <tr data-f="pendiente"><td class="cifra">7710352<small>IC Markets</small></td><td>María Fernanda Ortiz</td><td>Trimestral</td><td>Al aprobar</td><td class="num">—</td><td><span class="estado estado-gris">Pendiente de pago</span></td><td><button class="enlace" type="button" data-ficha="María Fernanda Ortiz">Ver ficha</button></td></tr>
+            <tr data-f="prueba"><td class="cifra">50286654<small>JustMarkets</small></td><td>Natalia Duque</td><td>Prueba</td><td>28 oct 2026</td><td class="num">18</td><td><span class="estado estado-ok">En prueba</span></td><td><button class="enlace" type="button" data-ficha="Natalia Duque">Ver ficha</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="vacio-tabla" id="licencias-vacio" hidden>Ninguna licencia coincide. Prueba con otro filtro o búsqueda.</p>
+      <p class="nota" style="margin-top: 16px;">Muestra de ejemplo: en el panel real la lista trae todas las licencias.</p>
+    </section>
+  </section>
+
+  <!-- ================= AJUSTES ================= -->
+  <section class="vista contenedor" id="vista-ajustes" aria-labelledby="t-ajustes" hidden>
+    <div class="cabeza-vista">
+      <h1 class="vista-titulo" id="t-ajustes">Ajustes</h1>
+      <p class="texto">Los cambios de precio y de días aplican a órdenes nuevas; las licencias ya pagadas no cambian.</p>
+    </div>
+
+    <form class="ajustes bloque" id="form-ajustes" novalidate>
+      <div class="grupo">
+        <div class="grupo-cabeza"><h2 class="titulo-medio">Precios</h2><p class="nota">En dólares.</p></div>
+        <div class="grupo-cuerpo rejilla">
+          <div class="campo"><label for="p-trim">Trimestral, 3&nbsp;meses</label><div class="con-unidad"><input id="p-trim" inputmode="numeric" value="319"><span>USD</span></div></div>
+          <div class="campo"><label for="p-sem">Semestral, 5 + 1 de obsequio</label><div class="con-unidad"><input id="p-sem" inputmode="numeric" value="499"><span>USD</span></div></div>
+          <div class="campo"><label for="p-prueba">Mes de prueba</label><div class="con-unidad"><input id="p-prueba" inputmode="numeric" value="50"><span>USD</span></div></div>
+          <div class="campo"><label for="p-comp">Completar prueba a semestral</label><div class="con-unidad"><input id="p-comp" inputmode="numeric" value="450"><span>USD</span></div></div>
+        </div>
+      </div>
+
+      <div class="grupo">
+        <div class="grupo-cabeza"><h2 class="titulo-medio">Licencias</h2></div>
+        <div class="grupo-cuerpo">
+          <div class="rejilla">
+            <div class="campo"><label for="gracia">Días de gracia</label><div class="con-unidad"><input id="gracia" inputmode="numeric" value="3"><span>días</span></div><span class="ayuda">Después de vencer, la cuenta sigue conectada estos días.</span></div>
+            <div class="campo"><label for="orden-min">Vigencia de la orden de pago</label><div class="con-unidad"><input id="orden-min" inputmode="numeric" value="60"><span>min</span></div></div>
+          </div>
+          <label class="interruptor"><input type="checkbox" checked><span>Mes de obsequio en la semestral<small>Se suma solo como cupón</small></span></label>
+        </div>
+      </div>
+
+      <div class="grupo">
+        <div class="grupo-cabeza"><h2 class="titulo-medio">Verificación de pagos</h2><p class="nota">Confirmaciones mínimas antes de dar un pago por bueno.</p></div>
+        <div class="grupo-cuerpo">
+          <div class="rejilla">
+            <div class="campo"><label for="c-tron">Tron (USDT)</label><input id="c-tron" inputmode="numeric" value="20"></div>
+            <div class="campo"><label for="c-bsc">BNB Smart Chain (USDC)</label><input id="c-bsc" inputmode="numeric" value="15"></div>
+            <div class="campo"><label for="c-btc">Bitcoin</label><input id="c-btc" inputmode="numeric" value="2"></div>
+          </div>
+          <label class="interruptor"><input type="checkbox" data-sincronizar="auto"><span>Aprobar solos los pagos verificados<small>Apagado: un administrador aprueba cada pago</small></span></label>
+        </div>
+      </div>
+
+      <div class="grupo">
+        <div class="grupo-cabeza"><h2 class="titulo-medio">Direcciones de depósito</h2><p class="nota">Solo las activas se ofrecen en las órdenes nuevas.</p></div>
+        <div class="grupo-cuerpo">
+          <ul class="direcciones" id="direcciones">
+            <li class="direccion"><b>USDT por Tron (TRC20)</b><code>TXq7Ejemp1oDirecc1onTRC20xx9Rk3aZ</code><label class="interruptor"><input type="checkbox" checked aria-label="USDT por Tron activa"></label></li>
+            <li class="direccion"><b>USDC por BNB Smart Chain (BEP20)</b><code>0x9eE1Ejemplo0000Direcc1on0BEP20aa77c41D2</code><label class="interruptor"><input type="checkbox" checked aria-label="USDC por BNB Smart Chain activa"></label></li>
+            <li class="direccion"><b>BTC por la red Bitcoin</b><code>bc1qejemplod1recc1onb1tc0in7h4m9x2l0p3s</code><label class="interruptor"><input type="checkbox" checked aria-label="BTC activa"></label></li>
+            <li class="direccion"><b>USDT por Tron, dirección anterior</b><code>TLm2Ejemp1oAnter1orTRC20aa41Pq8wX</code><label class="interruptor"><input type="checkbox" aria-label="USDT por Tron, dirección anterior, activa"></label></li>
+          </ul>
+          <div class="nueva-direccion" id="nueva-direccion" hidden>
+            <div class="rejilla">
+              <div class="campo"><label for="nd-red">Moneda y red</label><select id="nd-red"><option>USDT por Tron (TRC20)</option><option>USDC por BNB Smart Chain (BEP20)</option><option>BTC por la red Bitcoin</option></select></div>
+              <div class="campo"><label for="nd-dir">Dirección</label><input id="nd-dir" autocomplete="off" spellcheck="false" placeholder="Pega la dirección completa" aria-describedby="nd-error"><span class="error" id="nd-error" hidden>Pega una dirección completa (al menos 26 caracteres).</span></div>
+            </div>
+            <div class="acciones"><button class="boton" type="button" id="nd-guardar">Agregar esta dirección</button><button class="enlace enlace-gris" type="button" id="nd-cancelar">Cancelar</button></div>
+          </div>
+          <button class="enlace" type="button" id="nd-abrir" aria-expanded="false" aria-controls="nueva-direccion">Agregar dirección</button>
+        </div>
+      </div>
+
+      <div class="grupo">
+        <div class="grupo-cabeza"><h2 class="titulo-medio">Enlaces de la página</h2></div>
+        <div class="grupo-cuerpo">
+          <div class="campo"><label for="l-tel">Soporte por Telegram</label><input id="l-tel" type="url" value="https://t.me/+cdmWH_xLubdhMDhh" spellcheck="false"></div>
+          <div class="campo"><label for="l-ig">Instagram</label><input id="l-ig" type="url" value="https://www.instagram.com/doctraderproiasystem/" spellcheck="false"></div>
+          <div class="campo"><label for="l-broker">Broker sugerido (enlace de referido)</label><input id="l-broker" type="url" value="https://one.justmarkets.link/a/5vmbn05zda" spellcheck="false"></div>
+          <div class="campo"><label for="l-mfx">Cuenta auditada en Myfxbook</label><input id="l-mfx" type="url" placeholder="Pendiente: enlace de la cuenta de Argemiro" spellcheck="false"></div>
+          <a class="enlace" href="/admin/preguntas">Editar preguntas frecuentes (7)</a>
+        </div>
+      </div>
+    </form>
+    <div class="guardar-barra">
+      <span class="nota" id="ajustes-estado">Sin cambios</span>
+      <button class="boton boton-principal" type="submit" form="form-ajustes" id="ajustes-guardar" disabled>Guardar cambios</button>
+    </div>
+  </section>
+
+  <!-- ================= SOCIO ================= -->
+  <section class="vista contenedor" id="vista-socio" aria-labelledby="t-socio" hidden>
+    <div class="cabeza-vista">
+      <h1 class="vista-titulo" id="t-socio">Socio</h1>
+      <p class="texto">Comisión acumulada para el 15 de octubre: <b class="cifra" style="color: var(--hueso); font-weight: 600;">USD&nbsp;<span id="comision-actual">368,20</span></b>. Es el <span id="pct-texto">10&nbsp;%</span> de USD&nbsp;3.682 en ventas brutas aprobadas del 1 al 10 de octubre y sigue sumando hasta el 15.</p>
+    </div>
+
+    <div class="socio">
+      <div class="porcentaje">
+        <p class="nota">Porcentaje de comisión</p>
+        <strong id="pct-grande">10&nbsp;%</strong>
+        <p class="nota" id="pct-permiso">Solo el socio desarrollador puede cambiarlo, desde su perfil.</p>
+        <form class="editar-porcentaje" id="form-pct" novalidate hidden>
+          <div class="fila-campo">
+            <div class="campo"><label for="pct">Nuevo porcentaje</label><div class="con-unidad"><input id="pct" inputmode="decimal" value="10" aria-describedby="pct-ayuda pct-error"><span>%</span></div></div>
+          </div>
+          <span class="ayuda nota" id="pct-ayuda">Aplica solo a ventas posteriores al cambio. Argemiro recibe un aviso y el cambio queda en la auditoría.</span>
+          <span class="error" id="pct-error" hidden>Escribe un porcentaje entre 0 y 50.</span>
+          <div><button class="boton boton-principal" type="submit">Guardar porcentaje</button></div>
+        </form>
+      </div>
+      <div>
+        <section aria-labelledby="t-liquidaciones">
+          <h2 class="titulo-medio" id="t-liquidaciones" style="margin-bottom: 28px;">Liquidaciones</h2>
+          <div class="tabla-envoltura" tabindex="0" role="region" aria-labelledby="t-liquidaciones">
+            <table>
+              <thead><tr><th scope="col">Periodo</th><th scope="col" class="num">Ventas brutas</th><th scope="col" class="num">Comisión</th><th scope="col">Estado</th></tr></thead>
+              <tbody>
+                <tr><td>1 al 15 oct 2026</td><td class="num">USD 3.682</td><td class="num" id="comision-fila">USD 368,20</td><td><span class="estado estado-neutro">Se liquida el 15 oct</span></td></tr>
+                <tr><td>16 al 30 sep 2026</td><td class="num">USD 4.129</td><td class="num">USD 412,90</td><td><span class="estado estado-ok">Pagada el 30 sep</span></td></tr>
+                <tr><td>1 al 15 sep 2026</td><td class="num">USD 2.874</td><td class="num">USD 287,40</td><td><span class="estado estado-ok">Pagada el 15 sep</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="bloque" aria-labelledby="t-cambios" style="margin-top: 64px;">
+          <h2 class="titulo-medio" id="t-cambios" style="margin-bottom: 20px;">Cambios de porcentaje</h2>
+          <ol class="actividad" id="cambios-pct">
+            <li><time datetime="2026-07-01">1 jul 2026</time><p>Porcentaje inicial: <b>10&nbsp;%</b>.</p></li>
+          </ol>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="contenedor"><p>Panel de administración de <span translate="no">DocTraderPRO</span>. Cada acción sobre pagos, contraseñas y comisiones queda en la auditoría.</p></div>
+</footer>
+
+<!-- Ficha del cliente -->
+<dialog class="lateral" id="ficha" aria-labelledby="t-ficha">
+  <form class="lateral-interior" id="form-ficha" method="dialog" novalidate>
+    <div class="lateral-cabeza">
+      <div><h2 id="t-ficha">Laura Gómez Restrepo</h2><p class="nota">Cliente desde el 2 de julio de 2026</p></div>
+      <button class="cerrar" type="button" data-cerrar aria-label="Cerrar">
+        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+    <div class="lateral-cuerpo">
+      <section aria-labelledby="t-contacto">
+        <h3 id="t-contacto">Contacto</h3>
+        <dl class="ficha-datos">
+          <dt>Cédula</dt><dd><span class="dato-copiable"><span class="cifra" id="ficha-cedula">•••• 4521</span><button class="enlace enlace-gris" type="button" id="ver-cedula">Ver completa</button></span></dd>
+          <dt>Correo</dt><dd>laura.gomez@ejemplo.com</dd>
+          <dt>Teléfono</dt><dd class="cifra">+57 300 000 0000</dd>
+          <dt>Mes de prueba</dt><dd>No lo ha usado</dd>
+        </dl>
+      </section>
+      <section aria-labelledby="t-ajustar">
+        <h3 id="t-ajustar">Ajustar la licencia</h3>
+        <div class="campos-linea">
+          <div class="campo"><label for="f-cap">Capital recomendado</label><div class="con-unidad"><input id="f-cap" inputmode="numeric" value="1.000"><span>USD</span></div></div>
+          <div class="campo"><label for="f-ries">Nivel de riesgo</label><select id="f-ries"><option selected>Conservador</option><option>Moderado</option><option>Agresivo</option></select></div>
+        </div>
+        <div class="fila-campo" style="align-items: end;">
+          <div class="campo"><label for="f-dias">Extender días</label><div class="con-unidad"><input id="f-dias" inputmode="numeric" placeholder="0"><span>días</span></div><span class="ayuda">Se suman al vencimiento actual. Úsalo para compensar una falla.</span></div>
+        </div>
+      </section>
+      <section aria-labelledby="t-notas">
+        <h3 id="t-notas"><label for="f-notas">Notas internas</label></h3>
+        <div class="campo"><textarea id="f-notas" placeholder="Solo las ven los administradores">Prefiere que le escriban por Telegram en la tarde.</textarea></div>
+      </section>
+      <section aria-labelledby="t-suspender">
+        <h3 id="t-suspender">Suspender</h3>
+        <p class="nota">La cuenta pasa a por desconectar aunque la licencia siga vigente. Úsalo solo ante un problema con el cliente.</p>
+        <div><button class="enlace enlace-peligro" type="button" id="suspender">Suspender licencia</button></div>
+      </section>
+    </div>
+    <div class="lateral-pie">
+      <button class="enlace" type="button" data-cerrar>Cancelar</button>
+      <button class="boton boton-principal" type="submit" value="guardar">Guardar ficha</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Rechazo -->
+<dialog class="modal" id="rechazo" aria-labelledby="t-rechazo">
+  <form method="dialog" id="form-rechazo">
+    <h2 id="t-rechazo">Rechazar el pago de <span id="rechazo-nombre">Camilo Herrera</span></h2>
+    <fieldset class="radios">
+      <legend>Motivo, se lo enviamos al cliente por correo</legend>
+      <label class="opcion-radio"><input type="radio" name="motivo" value="monto" checked>El monto no está completo</label>
+      <label class="opcion-radio"><input type="radio" name="motivo" value="red">Lo envió por otra red</label>
+      <label class="opcion-radio"><input type="radio" name="motivo" value="hash">No encontramos la transacción</label>
+      <label class="opcion-radio"><input type="radio" name="motivo" value="otro">Otro motivo</label>
+    </fieldset>
+    <div class="acciones" style="justify-content: flex-end;">
+      <button class="enlace" type="button" data-cerrar>Cancelar</button>
+      <button class="boton" type="submit" value="rechazar">Rechazar pago</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var SVG = 'http://www.w3.org/2000/svg';
+  function nodo(tipo, attrs) { var n = document.createElementNS(SVG, tipo); for (var k in attrs) n.setAttribute(k, attrs[k]); return n; }
+  var fmtUsd = new Intl.NumberFormat('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // ---------- Aviso breve ----------
+  var aviso = document.getElementById('aviso'), avisoTimer;
+  function avisar(texto) { aviso.textContent = texto; aviso.dataset.visible = 'true'; clearTimeout(avisoTimer); avisoTimer = setTimeout(function () { aviso.dataset.visible = 'false'; }, 3000); }
+  function registrar(html) {
+    var li = document.createElement('li');
+    li.innerHTML = '<time>Ahora</time><p>' + html + '</p>';
+    var lista = document.getElementById('actividad'); lista.insertBefore(li, lista.firstChild);
+  }
+
+  // ---------- Vistas ----------
+  var vistas = ['hoy', 'pagos', 'cuentas', 'licencias', 'ajustes', 'socio'];
+  var TITULOS = { hoy: 'Hoy', pagos: 'Pagos', cuentas: 'Cuentas', licencias: 'Licencias', ajustes: 'Ajustes', socio: 'Socio' };
+  function mostrar(hash, enfocar) {
+    var vista = hash, ancla = null;
+    if (hash === 'pagos-pruebas') { vista = 'pagos'; ancla = hash; }
+    if (hash === 'cuentas-desconectar') { vista = 'cuentas'; ancla = hash; }
+    if (vistas.indexOf(vista) < 0) vista = 'hoy';
+    vistas.forEach(function (v) { document.getElementById('vista-' + v).hidden = v !== vista; });
+    document.querySelectorAll('.pestana').forEach(function (p) { if (p.dataset.vista === vista) p.setAttribute('aria-current', 'page'); else p.removeAttribute('aria-current'); });
+    document.title = TITULOS[vista] + ' · Administración DocTraderPRO';
+    if (ancla) { var a = document.getElementById(ancla); a.focus({ preventScroll: true }); a.scrollIntoView(); return; }
+    if (enfocar) { var t = document.querySelector('#vista-' + vista + ' h1'); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); window.scrollTo(0, 0); }
+  }
+  window.addEventListener('hashchange', function () { mostrar(location.hash.slice(1), true); });
+  mostrar(location.hash.slice(1), false);
+
+  // ---------- Contadores de pendientes ----------
+  function contar() {
+    var n = {
+      pagos: document.querySelectorAll('#lista-pagos .item').length,
+      pruebas: document.querySelectorAll('#lista-pruebas .item').length,
+      conectar: document.querySelectorAll('#lista-conectar .item[data-tipo="conectar"]').length,
+      desconectar: document.querySelectorAll('#lista-desconectar .item').length
+    };
+    Object.keys(n).forEach(function (k) {
+      document.getElementById('n-' + k).textContent = n[k];
+      document.querySelector('[data-pend="' + k + '"]').dataset.cero = n[k] === 0;
+    });
+    document.getElementById('n-pagos-titulo').textContent = n.pagos;
+    document.getElementById('n-conectar-titulo').textContent = n.conectar;
+    var tp = document.getElementById('n-pagos-tab'), tc = document.getElementById('n-cuentas-tab');
+    tp.textContent = n.pagos + n.pruebas; tp.dataset.cero = n.pagos + n.pruebas === 0;
+    tc.textContent = n.conectar + n.desconectar; tc.dataset.cero = n.conectar + n.desconectar === 0;
+    document.getElementById('n-total').textContent = n.pagos + n.pruebas + n.conectar + n.desconectar;
+    document.getElementById('pagos-vacio').hidden = n.pagos > 0;
+    document.getElementById('pruebas-vacio').hidden = n.pruebas > 0;
+    document.getElementById('desconectar-vacio').hidden = n.desconectar > 0;
+  }
+  function quitar(item, despues) {
+    var mover = item.nextElementSibling || item.previousElementSibling;
+    item.classList.add('saliendo');
+    setTimeout(function () {
+      item.remove(); contar(); if (despues) despues();
+      var foco = mover && mover.isConnected ? mover.querySelector('button, a') : null;
+      if (foco) foco.focus({ preventScroll: true });
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220);
+  }
+
+  // ---------- Gráfica: un bloque por licencia, apilados como las barras del logo ----------
+  var VENTAS = { 1: ['s'], 2: ['t'], 4: ['s', 'p'], 5: ['s'], 7: ['t'], 8: ['s'], 9: ['s'], 10: ['s'] };
+  var PRECIO = { s: 499, t: 319, p: 50 }, NOMBRE = { s: 'semestral', t: 'trimestral', p: 'prueba' };
+  var COLOR = { s: 'var(--g-semestral)', t: 'var(--g-trimestral)', p: 'var(--g-prueba)' };
+  var angosta = window.matchMedia('(max-width: 560px)');
+  function grafica() {
+    var svg = document.getElementById('grafica-svg'), tip = document.getElementById('tooltip'), fig = document.getElementById('grafica');
+    var dias = angosta.matches ? 15 : 31;
+    svg.innerHTML = ''; document.getElementById('tabla-grafica-cuerpo').innerHTML = '';
+    var paso = 22, t = 16, h = 11, alto = 4 * (h + 2), base = alto + 2, ancho = dias * paso;
+    svg.setAttribute('viewBox', '0 -6 ' + ancho + ' ' + (base + 26));
+    svg.appendChild(nodo('line', { x1: 0, x2: ancho, y1: base, y2: base, class: 'linea-base' }));
+    var cuerpo = document.getElementById('tabla-grafica-cuerpo');
+    for (var d = 1; d <= dias; d++) {
+      var x = (d - 1) * paso + (paso - t) / 2, ventas = VENTAS[d] || [];
+      if (d === 1 || d % 5 === 0) {
+        var et = nodo('text', { x: (d - 1) * paso + paso / 2, y: base + 18, 'text-anchor': 'middle', class: 'eje' + (d === 10 ? ' eje-hoy' : '') });
+        et.textContent = d === 10 ? 'hoy' : d; svg.appendChild(et);
+      }
+      var zona = nodo('rect', { x: (d - 1) * paso, y: -6, width: paso, height: base + 6, class: 'zona' });
+      var g = nodo('g', {});
+      ventas.forEach(function (k, i) {
+        var y = base - (i + 1) * (h + 2);
+        g.appendChild(k === 'p'
+          ? nodo('rect', { x: x + 0.75, y: y + 0.75, width: t - 1.5, height: h - 1.5, fill: 'none', stroke: COLOR[k], 'stroke-width': 1.5 })
+          : nodo('rect', { x: x, y: y, width: t, height: h, fill: COLOR[k] }));
+      });
+      svg.appendChild(zona); svg.appendChild(g);
+      if (d <= 10) {
+        var c = { s: 0, t: 0, p: 0 }; ventas.forEach(function (k) { c[k]++; });
+        var total = ventas.reduce(function (a, k) { return a + PRECIO[k]; }, 0);
+        var fila = document.createElement('tr');
+        fila.innerHTML = '<td>' + d + ' oct</td><td class="num">' + c.s + '</td><td class="num">' + c.t + '</td><td class="num">' + c.p + '</td><td class="num">' + total + '</td>';
+        cuerpo.appendChild(fila);
+        (function (d, ventas, total, zona) {
+          zona.addEventListener('pointerenter', function () {
+            var lineas = ventas.length ? ventas.map(function (k) { return '<span>1 ' + NOMBRE[k] + ', USD ' + PRECIO[k] + '</span>'; }).join('') : '<span>Sin ventas</span>';
+            tip.innerHTML = '<b>' + d + ' de octubre' + (ventas.length ? ': USD ' + total : '') + '</b>' + lineas;
+            var cs = svg.getBoundingClientRect(), cf = fig.getBoundingClientRect(), esc = cs.width / ancho;
+            tip.style.left = (cs.left - cf.left + ((d - 1) * paso + paso / 2) * esc) + 'px';
+            tip.style.top = (cs.top - cf.top + (base - Math.max(1, ventas.length) * (h + 2)) * esc) + 'px';
+            tip.dataset.visible = 'true';
+          });
+          zona.addEventListener('pointerleave', function () { tip.dataset.visible = 'false'; });
+        })(d, ventas, total, zona);
+      }
+    }
+  }
+  grafica();
+  angosta.addEventListener('change', grafica);
+  var ver = document.getElementById('ver-tabla'), tabla = document.getElementById('tabla-grafica');
+  ver.addEventListener('click', function () {
+    var abrir = tabla.hidden; tabla.hidden = !abrir; ver.setAttribute('aria-expanded', abrir); ver.textContent = abrir ? 'Ocultar tabla' : 'Ver como tabla';
+  });
+
+  // ---------- Pagos y pruebas ----------
+  var rechazo = document.getElementById('rechazo'), pendienteRechazo = null;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.aprobar) {
+      var item = b.closest('.item');
+      quitar(item, function () { avisar('Pago aprobado. La cuenta ' + b.dataset.cuenta + ' pasó a por conectar.'); });
+      registrar('<b>Tú</b> aprobaste el pago de ' + b.dataset.aprobar + '.');
+    }
+    if (b.dataset.rechazar) {
+      pendienteRechazo = b.closest('.item');
+      document.getElementById('rechazo-nombre').textContent = b.dataset.rechazar;
+      rechazo.showModal();
+    }
+    if (b.dataset.aprobarPrueba) {
+      quitar(b.closest('.item'), function () { avisar('Prueba aprobada. ' + b.dataset.aprobarPrueba + ' recibe su orden de USD 50 por correo.'); });
+      registrar('<b>Tú</b> aprobaste la prueba de ' + b.dataset.aprobarPrueba + '.');
+    }
+    if (b.dataset.rechazarPrueba) {
+      quitar(b.closest('.item'), function () { avisar('Solicitud rechazada. Le avisamos a ' + b.dataset.rechazarPrueba + ' por correo.'); });
+      registrar('<b>Tú</b> rechazaste la prueba de ' + b.dataset.rechazarPrueba + '.');
+    }
+    if (b.dataset.conectada) {
+      quitar(b.closest('.item'), function () { avisar('Cuenta ' + b.dataset.cuenta + ' conectada. Le enviamos un correo a ' + b.dataset.conectada + '.'); });
+      registrar('<b>Tú</b> conectaste la cuenta ' + b.dataset.cuenta + ' de ' + b.dataset.conectada + '.');
+    }
+    if (b.dataset.desconectada) {
+      quitar(b.closest('.item'), function () { avisar('Cuenta ' + b.dataset.cuenta + ' marcada como desconectada.'); });
+      registrar('<b>Tú</b> desconectaste la cuenta ' + b.dataset.cuenta + '.');
+    }
+    if (b.hasAttribute('data-ver-claves')) {
+      var detalle = b.closest('.item-detalle'), ver = b.textContent === 'Ver contraseñas';
+      detalle.querySelectorAll('.clave').forEach(function (c) { c.textContent = ver ? c.dataset.clave : '••••••••'; });
+      b.textContent = ver ? 'Ocultar contraseñas' : 'Ver contraseñas';
+      if (ver) { avisar('Quedó registrado en la auditoría.'); registrar('<b>Tú</b> viste las contraseñas de una cuenta por conectar.'); }
+    }
+    if (b.dataset.copiar) {
+      var texto = b.dataset.copiar;
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(function () { avisar('Copiado: ' + texto); }, function () { avisar('No se pudo copiar; selecciónalo a mano.'); });
+      else avisar('No se pudo copiar; selecciónalo a mano.');
+    }
+  });
+  document.getElementById('form-rechazo').addEventListener('submit', function (e) {
+    if (e.submitter && e.submitter.value === 'rechazar' && pendienteRechazo) {
+      var nombre = document.getElementById('rechazo-nombre').textContent;
+      quitar(pendienteRechazo, function () { avisar('Pago rechazado. Le enviamos el motivo a ' + nombre + '.'); });
+      registrar('<b>Tú</b> rechazaste el pago de ' + nombre + '.');
+      pendienteRechazo = null;
+    }
+  });
+  rechazo.querySelectorAll('[data-cerrar]').forEach(function (b) { b.addEventListener('click', function () { rechazo.close(); }); });
+
+  // Interruptor de aprobación automática: el mismo en Pagos y en Ajustes
+  document.querySelectorAll('[data-sincronizar="auto"]').forEach(function (i) {
+    i.addEventListener('change', function () {
+      document.querySelectorAll('[data-sincronizar="auto"]').forEach(function (o) { o.checked = i.checked; });
+      document.querySelectorAll('[data-sincronizar="auto"] + span small').forEach(function (s) { s.textContent = i.checked ? 'Encendido: los pagos verificados se aprueban solos' : 'Apagado: un administrador aprueba cada pago'; });
+      avisar(i.checked ? 'Los pagos verificados se aprobarán solos.' : 'Cada pago vuelve a esperar tu aprobación.');
+      registrar('<b>Tú</b> ' + (i.checked ? 'encendiste' : 'apagaste') + ' la aprobación automática.');
+    });
+  });
+
+  // ---------- Licencias: filtros, búsqueda y exportar ----------
+  var filas = Array.prototype.slice.call(document.querySelectorAll('#tabla-licencias tbody tr')), filtro = 'todas';
+  function filtrar() {
+    var q = document.getElementById('buscar').value.trim().toLowerCase(), visibles = 0;
+    filas.forEach(function (f) {
+      var ok = (filtro === 'todas' || f.dataset.f === filtro) && (!q || f.textContent.toLowerCase().indexOf(q) >= 0);
+      f.hidden = !ok; if (ok) visibles++;
+    });
+    document.getElementById('licencias-vacio').hidden = visibles > 0;
+  }
+  document.querySelectorAll('.filtro').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.filtro').forEach(function (o) { o.setAttribute('aria-pressed', o === b); });
+      filtro = b.dataset.filtro; filtrar();
+    });
+  });
+  document.getElementById('buscar').addEventListener('input', filtrar);
+  document.getElementById('exportar').addEventListener('click', function () {
+    var lineas = [['Cuenta', 'Broker', 'Cliente', 'Licencia', 'Vence', 'Días', 'Estado']];
+    filas.filter(function (f) { return !f.hidden; }).forEach(function (f) {
+      var c = f.cells; lineas.push([c[0].firstChild.textContent.trim(), c[0].querySelector('small').textContent, c[1].textContent, c[2].textContent, c[3].textContent, c[4].textContent, c[5].textContent]);
+    });
+    var csv = lineas.map(function (l) { return l.map(function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
+    var n = lineas.length - 1;
+    if (descargas) {
+      // Publicado como Artifact: el visor pide confirmación antes de guardar
+      descargas.save({ filename: 'licencias-doctraderpro.csv', data: '\ufeff' + csv }).then(
+        function () { avisar('Exportadas ' + n + ' licencias.'); },
+        function (e) { if (e && e.code !== 'declined') avisar('No se pudo exportar desde esta vista.'); });
+      return;
+    }
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'licencias-doctraderpro.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    avisar('Exportadas ' + n + ' licencias.');
+  });
+  var descargas = null;
+  if (window.claude && typeof window.claude.use === 'function') window.claude.use('downloads').then(function (d) { descargas = d; }, function () {});
+
+  // Ficha del cliente
+  var ficha = document.getElementById('ficha'), origenFicha = null;
+  document.querySelectorAll('[data-ficha]').forEach(function (b) {
+    b.addEventListener('click', function () { origenFicha = b; document.getElementById('t-ficha').textContent = b.dataset.ficha; ficha.showModal(); });
+  });
+  ficha.querySelectorAll('[data-cerrar]').forEach(function (b) { b.addEventListener('click', function () { ficha.close(); }); });
+  ficha.addEventListener('click', function (e) { if (e.target === ficha) ficha.close(); });
+  ficha.addEventListener('close', function () { if (origenFicha) origenFicha.focus(); });
+  document.getElementById('form-ficha').addEventListener('submit', function (e) {
+    if (e.submitter && e.submitter.value === 'guardar') {
+      var dias = parseInt(document.getElementById('f-dias').value, 10);
+      avisar(dias > 0 ? 'Ficha guardada. Se sumaron ' + dias + ' días a la licencia.' : 'Ficha guardada.');
+      registrar('<b>Tú</b> actualizaste la ficha de ' + document.getElementById('t-ficha').textContent + (dias > 0 ? ' y sumaste ' + dias + ' días' : '') + '.');
+      document.getElementById('f-dias').value = '';
+    }
+  });
+  document.getElementById('ver-cedula').addEventListener('click', function () {
+    var c = document.getElementById('ficha-cedula'), ver = this.textContent === 'Ver completa';
+    c.textContent = ver ? '1.037.654.521' : '•••• 4521'; this.textContent = ver ? 'Ocultar' : 'Ver completa';
+    if (ver) registrar('<b>Tú</b> viste la cédula completa de ' + document.getElementById('t-ficha').textContent + '.');
+  });
+  document.getElementById('suspender').addEventListener('click', function () {
+    if (this.dataset.confirmar) {
+      ficha.close(); avisar('Licencia suspendida. La cuenta pasó a por desconectar.');
+      registrar('<b>Tú</b> suspendiste la licencia de ' + document.getElementById('t-ficha').textContent + '.');
+      delete this.dataset.confirmar; this.textContent = 'Suspender licencia';
+    } else { this.dataset.confirmar = '1'; this.textContent = 'Confirmar: suspender ahora'; }
+  });
+
+  // ---------- Ajustes ----------
+  var formAjustes = document.getElementById('form-ajustes'), guardar = document.getElementById('ajustes-guardar'), estado = document.getElementById('ajustes-estado');
+  formAjustes.addEventListener('input', function () { guardar.disabled = false; estado.textContent = 'Tienes cambios sin guardar'; });
+  formAjustes.addEventListener('change', function (e) { if (!e.target.matches('[data-sincronizar]')) { guardar.disabled = false; estado.textContent = 'Tienes cambios sin guardar'; } });
+  formAjustes.addEventListener('submit', function (e) {
+    e.preventDefault(); guardar.disabled = true; estado.textContent = 'Guardado';
+    avisar('Ajustes guardados. Aplican a las órdenes nuevas.'); registrar('<b>Tú</b> cambiaste los ajustes.');
+  });
+  var nd = document.getElementById('nueva-direccion'), ndAbrir = document.getElementById('nd-abrir');
+  ndAbrir.addEventListener('click', function () { nd.hidden = false; ndAbrir.hidden = true; ndAbrir.setAttribute('aria-expanded', 'true'); document.getElementById('nd-dir').focus(); });
+  document.getElementById('nd-cancelar').addEventListener('click', function () { nd.hidden = true; ndAbrir.hidden = false; ndAbrir.setAttribute('aria-expanded', 'false'); ndAbrir.focus(); });
+  document.getElementById('nd-guardar').addEventListener('click', function () {
+    var dir = document.getElementById('nd-dir'), err = document.getElementById('nd-error');
+    if (dir.value.trim().length < 26) { dir.setAttribute('aria-invalid', 'true'); err.hidden = false; dir.focus(); return; }
+    dir.removeAttribute('aria-invalid'); err.hidden = true;
+    var li = document.createElement('li'); li.className = 'direccion';
+    var red = document.getElementById('nd-red').value;
+    li.innerHTML = '<b></b><code></code><label class="interruptor"><input type="checkbox" checked></label>';
+    li.querySelector('b').textContent = red; li.querySelector('code').textContent = dir.value.trim();
+    li.querySelector('input').setAttribute('aria-label', red + ' activa');
+    document.getElementById('direcciones').appendChild(li);
+    dir.value = ''; nd.hidden = true; ndAbrir.hidden = false; ndAbrir.setAttribute('aria-expanded', 'false'); ndAbrir.focus();
+    avisar('Dirección agregada y activa.'); registrar('<b>Tú</b> agregaste una dirección de ' + red + '.');
+  });
+
+  // ---------- Ver como: Argemiro o socio ----------
+  var formPct = document.getElementById('form-pct');
+  document.querySelectorAll('[data-ver-como]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('[data-ver-como]').forEach(function (o) { o.setAttribute('aria-pressed', o === b); });
+      var socio = b.dataset.verComo === 'socio';
+      document.getElementById('usuario-nombre').textContent = socio ? 'Socio desarrollador' : 'Argemiro';
+      formPct.hidden = !socio;
+      document.getElementById('pct-permiso').textContent = socio ? 'Tu porcentaje sobre las ventas brutas.' : 'Solo el socio desarrollador puede cambiarlo, desde su perfil.';
+    });
+  });
+  formPct.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var i = document.getElementById('pct'), err = document.getElementById('pct-error'), v = parseFloat(i.value.replace(',', '.'));
+    if (isNaN(v) || v < 0 || v > 50) { i.setAttribute('aria-invalid', 'true'); err.hidden = false; i.focus(); return; }
+    i.removeAttribute('aria-invalid'); err.hidden = true;
+    var txt = String(v).replace('.', ',') + ' %';
+    document.getElementById('pct-grande').textContent = txt;
+    var li = document.createElement('li'); li.innerHTML = '<time>Hoy</time><p>Nuevo porcentaje: <b></b>. Aplica a las ventas desde ahora.</p>';
+    li.querySelector('b').textContent = txt;
+    var lista = document.getElementById('cambios-pct'); lista.insertBefore(li, lista.firstChild);
+    avisar('Porcentaje guardado. Argemiro recibió un aviso.'); registrar('<b>El socio</b> cambió su comisión a ' + txt + '.');
+  });
+
+  contar();
+})();
+</script>
+</body>
+</html>
