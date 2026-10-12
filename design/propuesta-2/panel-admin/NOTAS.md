@@ -87,3 +87,29 @@ Con `prefers-reduced-motion` solo quedan cambios de opacidad.
 - Vista completa de auditoría (hay "Exportar auditoría" y la actividad reciente).
 - Correos y alertas, que se definen en `docs/CONTEXTO.md`.
 - Binance Pay, que se agrega cuando Binance apruebe la cuenta de comerciante.
+
+## Cambios del 2026-10-12 (reunión con Argemiro)
+
+- **Vista nueva "Soporte":**
+  - Bandeja con filtros: sin responder, abiertos, resueltos y todos.
+  - Cada ticket muestra cuánto lleva esperando, en naranja si pasa de unas horas, y a quién está asignado.
+  - Panel lateral con el hilo, asignación, prioridad, respuestas guardadas y **notas internas** que el cliente no
+    ve, resaltadas en verde limón.
+  - Al responder, el ticket pasa a "Respondido". "Marcar como resuelto" lo cierra a los 7 días si el cliente no
+    responde.
+  - Los tickets sin responder se cuentan en Hoy, en la pestaña y en el titular de la vista.
+- **Solicitudes de prueba con el control antiabuso:**
+  - Cada solicitud muestra los chequeos que pasó y las **señales** que encontró. Un ejemplo es el mismo
+    dispositivo e IP que una prueba anterior y un número de cuenta parecido.
+  - Debajo aparecen las bloqueadas automáticamente del mes y su motivo: cédula, cuenta o teléfono repetidos.
+- **Ajustes:**
+  - Precio mensual, prueba de USD 50 y su duración (15 días).
+  - La diferencia para completar la prueba se calcula sola.
+  - Grupo "Control de la prueba": el bloqueo siempre está encendido; las verificaciones, las señales y la foto de la
+    cédula son opcionales.
+  - Grupo "Soporte": cierre automático y correo oficial como respuesta.
+- **Gráfica de ventas:**
+  - Se suma el plan mensual con el magenta `#C0589A`. Los cuatro colores pasaron otra vez el validador de dataviz
+    sobre negro, con ΔE 11 en el par más cercano.
+  - Ventas de octubre: USD 3.802 y 10 licencias. La comisión del socio pasa a USD 380,20.
+- **Licencias:** las pruebas duran 15 días. Se suma la cuenta en prueba de Laura (50299031).

@@ -183,6 +183,52 @@ main { padding-bottom: 120px; }
 .mensaje { font-size: 15px; color: var(--senal); }
 .mensaje[hidden] { display: none; }
 
+/* Completar la prueba */
+.completar { list-style: none; padding: 0; display: grid; gap: 2px; }
+.completar li { display: flex; align-items: baseline; gap: 4px 16px; flex-wrap: wrap; }
+.completar span { font-size: 14px; color: var(--ceniza); }
+
+/* ---------- Soporte ---------- */
+.punto-nuevo { width: 7px; height: 7px; border-radius: 50%; background: var(--llama); margin-left: 6px; display: inline-block; vertical-align: middle; }
+.punto-nuevo[hidden] { display: none; }
+#t-ticket { font-size: clamp(26px, 3vw, 32px); }
+.lateral-cabeza > div { display: grid; gap: 8px; }
+.tickets { list-style: none; padding: 0; display: grid; gap: 8px; }
+.ticket {
+  width: 100%; display: grid; grid-template-columns: minmax(150px, auto) minmax(0, 1fr) auto; grid-template-areas: "estado asunto cuando" "estado meta cuando";
+  gap: 4px 32px; align-items: center; padding: 22px 0; border: 0; background: none; color: inherit; text-align: left; font: inherit; cursor: pointer;
+}
+.ticket .estado { grid-area: estado; justify-self: start; }
+.ticket-asunto { grid-area: asunto; font-size: clamp(20px, 2vw, 26px); letter-spacing: -0.02em; font-weight: 400; transition: color 200ms ease; }
+.ticket-meta { grid-area: meta; font-size: 14px; color: var(--ceniza); }
+.ticket-cuando { grid-area: cuando; font-size: 14px; color: var(--ceniza); font-variant-numeric: tabular-nums; }
+@media (hover: hover) and (pointer: fine) { .ticket:hover .ticket-asunto { color: var(--llama); } }
+.hilo { list-style: none; padding: 0; display: grid; gap: 28px; }
+.mensaje-hilo { display: grid; gap: 6px; padding-left: 16px; }
+.mensaje-hilo.de-equipo { padding-left: 0; }
+.mensaje-autor { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; font-size: 14px; }
+.mensaje-autor b { font-weight: 500; }
+.mensaje-autor span { color: var(--ceniza); }
+.de-equipo .mensaje-autor b::before { content: ""; display: inline-block; width: 8px; height: 7px; margin-right: 8px; background: var(--llama); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.mensaje-texto { color: var(--niebla); }
+.de-equipo .mensaje-texto { color: var(--blanco); }
+.adjuntos { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; }
+.adjuntos li { padding: 5px 12px; border-radius: 9999px; background: var(--campo); color: var(--niebla); }
+.responder { display: grid; gap: 18px; padding-top: 8px; }
+.responder[hidden], .resuelto-nota[hidden] { display: none; }
+.resuelto-nota { display: grid; gap: 10px; justify-items: start; }
+.campo .ayuda { font-weight: 300; }
+.campo select, .campo textarea {
+  width: 100%; min-height: 52px; padding: 14px 20px; border: 0; border-radius: var(--radio);
+  background: var(--campo); color: var(--blanco); font: inherit; font-size: 16px; font-weight: 400;
+}
+.campo textarea { resize: vertical; line-height: 1.5; border-radius: 20px; }
+.campo select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--niebla) 50%), linear-gradient(135deg, var(--niebla) 50%, transparent 50%); background-position: calc(100% - 24px) 52%, calc(100% - 19px) 52%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 44px; }
+.campo select:focus-visible, .campo textarea:focus-visible { outline: none; background-color: var(--campo-foco); box-shadow: 0 0 0 2px var(--senal); }
+.campo textarea[aria-invalid="true"] { box-shadow: 0 0 0 1.5px var(--error); }
+.campo input[type="file"] { min-height: 0; padding: 12px 16px; font-size: 14px; color: var(--niebla); }
+.campo input[type="file"]::file-selector-button { margin-right: 14px; padding: 8px 14px; border: 0; border-radius: 9999px; background: var(--campo-foco); color: var(--blanco); font: inherit; font-size: 13px; cursor: pointer; }
+
 /* ---------- Pagos ---------- */
 .orden { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 64px clamp(32px, 6vw, 96px); margin-top: clamp(64px, 8vw, 104px); align-items: start; }
 .regresiva { display: grid; gap: 8px; }
@@ -330,7 +376,8 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
   .pestana { min-height: 52px; }
   main { padding-bottom: 160px; }
   .pie { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
-  .cuenta, .orden, .dos { grid-template-columns: 1fr; }
+  .cuenta, .orden, .dos { grid-template-columns: minmax(0, 1fr); }
+  .ticket { grid-template-columns: minmax(0, 1fr); grid-template-areas: "estado" "asunto" "meta" "cuando"; gap: 8px; }
 }
 @media (max-width: 560px) {
   .marca span { font-size: 16px; }
@@ -356,6 +403,7 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
       <ul class="pestanas">
         <li><a class="pestana" href="#cuentas" data-vista="cuentas">Mis cuentas</a></li>
         <li><a class="pestana" href="#pagos" data-vista="pagos">Pagos</a></li>
+        <li><a class="pestana" href="#soporte" data-vista="soporte">Soporte <span class="punto-nuevo" id="soporte-nuevo" aria-hidden="true"></span><span class="oculto" id="soporte-nuevo-texto">, 1 respuesta nueva</span></a></li>
         <li><a class="pestana" href="#perfil" data-vista="perfil">Perfil</a></li>
       </ul>
     </nav>
@@ -381,7 +429,7 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
 
     <section class="bloque" aria-labelledby="t-lista">
       <div class="bloque-cabeza">
-        <h2 class="titulo-medio" id="t-lista">3 cuentas, una licencia cada una</h2>
+        <h2 class="titulo-medio" id="t-lista">4 cuentas, una licencia cada una</h2>
         <div class="acciones">
           <ul class="leyenda" aria-label="Cómo leer el calendario">
             <li><svg viewBox="0 0 10 9" aria-hidden="true"><path d="M5 1 9 8H1Z" fill="none" stroke="#9A9A9A" stroke-opacity=".45"/></svg>Día usado</li>
@@ -416,20 +464,43 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
           </div>
         </li>
 
+        <li class="cuenta" data-estado="prueba">
+          <div class="cuenta-id">
+            <span class="estado estado-conectada">En prueba, conectada</span>
+            <h3 class="cuenta-numero"><span class="oculto">Cuenta </span>50299031</h3>
+            <p class="cuenta-broker"><span translate="no">JustMarkets</span>, servidor JustMarkets-Live</p>
+            <dl class="cuenta-datos">
+              <dt>Licencia</dt><dd>Prueba de 15 días, del 3 al 18 oct 2026</dd>
+              <dt>Capital recomendado</dt><dd class="cifra">USD 500</dd>
+              <dt>Nivel de riesgo</dt><dd>Conservador</dd>
+            </dl>
+          </div>
+          <div class="cuenta-tiempo">
+            <p class="dias-cifra"><strong>8</strong><span>días restantes de 15</span></p>
+            <svg class="calendario" data-inicio="2026-10-03" data-dias="15" role="img" aria-label="Prueba de 15 días: van 7 y quedan 8"></svg>
+            <p class="cuenta-nota">Para seguir, paga solo la diferencia del plan que elijas antes del 18 de octubre. Tus 15&nbsp;días cuentan dentro del plan.</p>
+            <ul class="completar" aria-label="Completar la prueba">
+              <li><a class="enlace" href="#pagos" data-orden="completar-mensual">Mensual</a><span>USD&nbsp;70 más, hasta el 3 nov</span></li>
+              <li><a class="enlace" href="#pagos" data-orden="completar-trimestral">Trimestral</a><span>USD&nbsp;269 más, hasta el 3 ene</span></li>
+              <li><a class="enlace" href="#pagos" data-orden="completar-semestral">Semestral</a><span>USD&nbsp;449 más, hasta el 3 may, con el mes de obsequio</span></li>
+            </ul>
+          </div>
+        </li>
+
         <li class="cuenta" data-estado="activa">
           <div class="cuenta-id">
             <span class="estado estado-conectada">Conectada</span>
             <h3 class="cuenta-numero"><span class="oculto">Cuenta </span>50213847</h3>
             <p class="cuenta-broker"><span translate="no">JustMarkets</span>, servidor JustMarkets-Live</p>
             <dl class="cuenta-datos">
-              <dt>Licencia</dt><dd>Semestral, del 2 jul 2026 al 2 ene 2027</dd>
+              <dt>Licencia</dt><dd>Semestral, del 2 jul 2026 al 2 feb 2027</dd>
               <dt>Capital recomendado</dt><dd class="cifra">USD 2.000</dd>
               <dt>Nivel de riesgo</dt><dd>Moderado</dd>
             </dl>
           </div>
           <div class="cuenta-tiempo">
-            <p class="dias-cifra"><strong>84</strong><span>días restantes de 184</span></p>
-            <svg class="calendario" data-inicio="2026-07-02" data-meses="6" data-regalo="1" role="img" aria-label="Licencia de 6 meses: van 100 días y quedan 84; el sexto mes es de obsequio"></svg>
+            <p class="dias-cifra"><strong>115</strong><span>días restantes de 215</span></p>
+            <svg class="calendario" data-inicio="2026-07-02" data-meses="7" data-regalo="1" role="img" aria-label="Licencia semestral de 7 meses: van 100 días y quedan 115; el séptimo mes es de obsequio"></svg>
             <div class="acciones">
               <a class="enlace" href="#pagos" data-orden="renovar-semestral">Renovar</a>
             </div>
@@ -442,12 +513,12 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
             <h3 class="cuenta-numero"><span class="oculto">Cuenta </span>8812406</h3>
             <p class="cuenta-broker">IC Markets, servidor ICMarketsSC-Live07</p>
             <dl class="cuenta-datos">
-              <dt>Licencia</dt><dd>Semestral, del 9 oct 2026 al 9 abr 2027</dd>
+              <dt>Licencia</dt><dd>Semestral, del 9 oct 2026 al 9 may 2027</dd>
             </dl>
           </div>
           <div class="cuenta-tiempo">
-            <p class="dias-cifra"><strong>181</strong><span>días restantes de 182</span></p>
-            <svg class="calendario" data-inicio="2026-10-09" data-meses="6" data-regalo="1" role="img" aria-label="Licencia de 6 meses que acaba de empezar; el sexto mes es de obsequio"></svg>
+            <p class="dias-cifra"><strong>211</strong><span>días restantes de 212</span></p>
+            <svg class="calendario" data-inicio="2026-10-09" data-meses="7" data-regalo="1" role="img" aria-label="Licencia semestral de 7 meses que acaba de empezar; el séptimo mes es de obsequio"></svg>
             <p class="cuenta-nota">Recibimos tus datos. Argemiro conectará la cuenta y te avisaremos por correo.</p>
             <div class="acciones">
               <button class="enlace" type="button" data-abrir="agregar" data-editar="8812406">Editar datos</button>
@@ -458,19 +529,18 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
     </section>
 
     <div class="bloque dos">
-      <section aria-labelledby="t-prueba">
-        <h2 class="titulo-medio" id="t-prueba">¿Quieres probar con otra cuenta?</h2>
-        <p class="precio-linea"><strong class="cifra">50</strong><span>USD por 1&nbsp;mes de prueba</span></p>
-        <p class="texto">Puedes pedirla una sola vez. Si te gusta, la completas a semestral por USD&nbsp;450 antes de que termine.</p>
-        <button class="enlace" type="button" id="pedir-prueba">Solicitar prueba</button>
-        <p class="mensaje" id="prueba-enviada" role="status" hidden>Solicitud enviada. Te avisaremos por correo cuando Argemiro la apruebe.</p>
+      <section aria-labelledby="t-otra">
+        <h2 class="titulo-medio" id="t-otra">¿Quieres conectar otra cuenta?</h2>
+        <p class="texto">Cada cuenta de trading lleva su propia licencia: mensual por USD&nbsp;120, trimestral por USD&nbsp;319 o semestral por USD&nbsp;499, que trae 6&nbsp;meses más 1 de obsequio.</p>
+        <p class="nota">Ya usaste tu prueba de 15&nbsp;días, con la cuenta 50299031. La prueba es una sola vez por persona y por cuenta.</p>
+        <button class="enlace" type="button" data-abrir="agregar">Agregar cuenta</button>
       </section>
-      <section aria-labelledby="t-soporte">
-        <h2 class="titulo-medio" id="t-soporte">¿Necesitas ayuda?</h2>
-        <p class="texto">Te respondemos por <span translate="no">Telegram</span>. Ten a mano el número de tu cuenta de trading.</p>
+      <section aria-labelledby="t-ayuda">
+        <h2 class="titulo-medio" id="t-ayuda">¿Necesitas ayuda?</h2>
+        <p class="texto">Abre un ticket y te respondemos aquí y por correo. Para dudas rápidas, escríbenos por <span translate="no">Telegram</span>.</p>
         <div class="acciones">
-          <a class="enlace" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener">Escribir por&nbsp;<span translate="no">Telegram</span></a>
-          <a class="enlace enlace-gris" href="https://www.instagram.com/doctraderproiasystem/" target="_blank" rel="noopener">Ver&nbsp;<span translate="no">Instagram</span></a>
+          <a class="enlace" href="#soporte">Ir a soporte</a>
+          <a class="enlace enlace-gris" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener">Escribir por&nbsp;<span translate="no">Telegram</span></a>
         </div>
       </section>
     </div>
@@ -569,6 +639,45 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
     </section>
   </section>
 
+  <!-- ================= SOPORTE ================= -->
+  <section class="vista contenedor" id="vista-soporte" aria-labelledby="t-soporte" hidden>
+    <div class="cabeza-vista">
+      <h1 class="titulo-grande vista-titulo" id="t-soporte">Argemiro respondió tu ticket.</h1>
+      <p class="texto">Sobre el pago de la cuenta 50277120. También te llegó por correo.</p>
+      <div class="acciones">
+        <button class="pildora" type="button" data-ticket="1042">Ver la respuesta</button>
+        <button class="enlace" type="button" data-abrir="nuevo-ticket">Abrir un ticket nuevo</button>
+      </div>
+    </div>
+
+    <section class="bloque" aria-labelledby="t-tickets">
+      <div class="bloque-cabeza">
+        <h2 class="titulo-medio" id="t-tickets">Tus tickets</h2>
+        <p class="nota">Para dudas rápidas: <a class="enlace enlace-gris" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener" style="min-height: 0;" translate="no">Telegram</a> o <span translate="no">doctraderpro@gmail.com</span></p>
+      </div>
+      <ol class="tickets" id="lista-tickets">
+        <li><button class="ticket" type="button" data-ticket="1042">
+          <span class="estado estado-vence">Te respondimos</span>
+          <span class="ticket-asunto">Reporté el pago y sigue esperando confirmaciones</span>
+          <span class="ticket-meta">Ticket 1042, pagos, cuenta 50277120</span>
+          <span class="ticket-cuando">Hoy, 09:40</span>
+        </button></li>
+        <li><button class="ticket" type="button" data-ticket="1031">
+          <span class="estado estado-por-conectar">Abierto</span>
+          <span class="ticket-asunto">¿Puedo cambiar el servidor de la cuenta 8812406?</span>
+          <span class="ticket-meta">Ticket 1031, conexión de la cuenta</span>
+          <span class="ticket-cuando">Ayer, 18:12</span>
+        </button></li>
+        <li><button class="ticket" type="button" data-ticket="1007">
+          <span class="estado estado-expirada">Resuelto</span>
+          <span class="ticket-asunto">No veía el capital recomendado de mi cuenta</span>
+          <span class="ticket-meta">Ticket 1007, licencia, cuenta 50213847</span>
+          <span class="ticket-cuando">2 sep</span>
+        </button></li>
+      </ol>
+    </section>
+  </section>
+
   <!-- ================= PERFIL ================= -->
   <section class="vista contenedor" id="vista-perfil" aria-labelledby="t-perfil" hidden>
     <div class="cabeza-vista">
@@ -579,14 +688,14 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
       <div class="dato"><dt>Cédula</dt><dd class="cifra">•••• 4521</dd></div>
       <div class="dato"><dt>Correo</dt><dd>laura.gomez@ejemplo.com</dd></div>
       <div class="dato"><dt>Teléfono</dt><dd class="cifra">+57 300 000 0000</dd></div>
-      <div class="dato"><dt>Mes de prueba</dt><dd>Disponible, una sola vez</dd></div>
+      <div class="dato"><dt>Prueba de 15 días</dt><dd>Usada en la cuenta 50299031</dd></div>
     </dl>
     <div class="perfil-pie">
       <div class="acciones">
         <a class="enlace" href="/perfil/editar">Editar datos</a>
         <a class="enlace" href="/perfil/contrasena">Cambiar contraseña</a>
       </div>
-      <p class="texto">Tu cédula se guarda cifrada y solo la ve el administrador. La usamos para que cada persona tenga una sola prueba. Para cambiarla, escríbenos por <a class="enlace" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener" style="font-size: inherit; min-height: 0;" translate="no">Telegram</a>.</p>
+      <p class="texto">Tu cédula se guarda cifrada y solo la ve el administrador. La usamos, junto con el número de cada cuenta de trading, para que haya una sola prueba por persona y por cuenta. Para cambiarla, escríbenos por <a class="enlace" href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener" style="font-size: inherit; min-height: 0;" translate="no">Telegram</a>.</p>
     </div>
   </section>
 </main>
@@ -653,13 +762,92 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
       </div>
       <fieldset class="opciones campo">
         <legend>Licencia para esta cuenta</legend>
+        <label class="opcion"><input type="radio" name="licencia" value="mensual"><span>Mensual<small>1&nbsp;mes</small></span><strong>120</strong></label>
         <label class="opcion"><input type="radio" name="licencia" value="trimestral"><span>Trimestral<small>3&nbsp;meses</small></span><strong>319</strong></label>
-        <label class="opcion"><input type="radio" name="licencia" value="semestral" checked><span>Semestral<small>5&nbsp;meses + 1 de obsequio</small></span><strong>499</strong></label>
+        <label class="opcion"><input type="radio" name="licencia" value="semestral" checked><span>Semestral<small>6&nbsp;meses + 1 de obsequio</small></span><strong>499</strong></label>
       </fieldset>
     </div>
     <div class="lateral-pie">
       <button class="enlace" type="button" data-cerrar>Cancelar</button>
       <button class="pildora" type="submit" value="guardar">Guardar e ir a pagar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Soporte: hilo de un ticket -->
+<dialog class="lateral" id="ticket" aria-labelledby="t-ticket">
+  <div class="lateral-interior">
+    <div class="lateral-cabeza">
+      <div><h2 id="t-ticket">Ticket</h2><p class="nota" id="ticket-meta"></p></div>
+      <button class="cerrar" type="button" data-cerrar aria-label="Cerrar">
+        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+    <div class="lateral-cuerpo">
+      <ol class="hilo" id="hilo" aria-label="Mensajes"></ol>
+      <form class="responder" id="form-respuesta" novalidate>
+        <div class="campo">
+          <label for="respuesta">Tu respuesta</label>
+          <textarea id="respuesta" rows="4" aria-describedby="e-respuesta"></textarea>
+          <span class="error" id="e-respuesta" hidden>Escribe tu respuesta antes de enviarla.</span>
+        </div>
+        <div class="campo">
+          <label for="adj-respuesta">Adjuntar capturas o PDF <span class="ayuda">(opcional, hasta 5 de 10&nbsp;MB)</span></label>
+          <input id="adj-respuesta" type="file" accept="image/*,application/pdf" multiple aria-describedby="e-adj-respuesta">
+          <span class="error" id="e-adj-respuesta" hidden></span>
+        </div>
+        <div class="acciones">
+          <button class="pildora" type="submit">Enviar respuesta</button>
+          <button class="enlace enlace-gris" type="button" id="marcar-resuelto">Mi problema ya se resolvió</button>
+        </div>
+      </form>
+      <div class="resuelto-nota" id="ticket-resuelto" hidden>
+        <p class="texto">Este ticket está resuelto. Si el problema volvió, ábrelo de nuevo: se cierra solo 7&nbsp;días después de resuelto.</p>
+        <button class="enlace" type="button" id="reabrir">Abrir de nuevo</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Soporte: ticket nuevo -->
+<dialog class="lateral" id="nuevo-ticket" aria-labelledby="t-nuevo-ticket">
+  <form class="lateral-interior" id="form-nuevo-ticket" novalidate>
+    <div class="lateral-cabeza">
+      <h2 id="t-nuevo-ticket">Abrir un ticket</h2>
+      <button class="cerrar" type="button" data-cerrar aria-label="Cerrar">
+        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+    <div class="lateral-cuerpo">
+      <p class="nota-cifrado">Te respondemos en este panel y te avisamos al correo de tu cuenta. Nunca te pediremos tus contraseñas por aquí.</p>
+      <div class="campo">
+        <label for="nt-tema">Tema</label>
+        <select id="nt-tema"><option>Pagos</option><option>Conexión de la cuenta</option><option>Licencia</option><option>Problema técnico</option><option>Otro</option></select>
+      </div>
+      <div class="campo">
+        <label for="nt-relacion">Cuenta relacionada <span class="ayuda">(opcional)</span></label>
+        <select id="nt-relacion"><option value="">Ninguna en particular</option><option value="cuenta 50277120">Cuenta 50277120</option><option value="cuenta 50299031">Cuenta 50299031</option><option value="cuenta 50213847">Cuenta 50213847</option><option value="cuenta 8812406">Cuenta 8812406</option></select>
+      </div>
+      <div class="campo">
+        <label for="nt-asunto">Asunto</label>
+        <input id="nt-asunto" type="text" autocomplete="off" placeholder="Ej.: Mi cuenta sigue por conectar" aria-describedby="e-nt-asunto">
+        <span class="error" id="e-nt-asunto" hidden>Escribe un asunto corto que resuma tu caso.</span>
+      </div>
+      <div class="campo">
+        <label for="nt-mensaje">Cuéntanos qué pasa</label>
+        <textarea id="nt-mensaje" rows="5" aria-describedby="a-nt-mensaje e-nt-mensaje"></textarea>
+        <span class="ayuda" id="a-nt-mensaje">Si es un pago, incluye la red y el código de la transacción.</span>
+        <span class="error" id="e-nt-mensaje" hidden>Cuéntanos un poco más (al menos 10 caracteres).</span>
+      </div>
+      <div class="campo">
+        <label for="nt-adjuntos">Adjuntar capturas o PDF <span class="ayuda">(opcional, hasta 5 de 10&nbsp;MB)</span></label>
+        <input id="nt-adjuntos" type="file" accept="image/*,application/pdf" multiple aria-describedby="e-nt-adjuntos">
+        <span class="error" id="e-nt-adjuntos" hidden></span>
+      </div>
+    </div>
+    <div class="lateral-pie">
+      <button class="enlace" type="button" data-cerrar>Cancelar</button>
+      <button class="pildora" type="submit">Enviar ticket</button>
     </div>
   </form>
 </dialog>
@@ -678,6 +866,7 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
   // ---------- Calendario de la licencia: una fila por mes real, un triángulo por día ----------
   function dibujarCalendario(svg) {
     var p = svg.dataset.inicio.split('-'), inicio = new Date(+p[0], +p[1] - 1, +p[2]);
+    if (svg.dataset.dias) { dibujarPrueba(svg, inicio, +svg.dataset.dias); return; }
     var meses = +svg.dataset.meses, regalo = svg.dataset.regalo === '1';
     var celda = 10, tam = 7, etiqueta = 30, fila = 15;
     svg.setAttribute('viewBox', '0 0 ' + (etiqueta + 31 * celda) + ' ' + (meses * fila - (fila - celda)));
@@ -704,17 +893,30 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
       if (hoyD) svg.appendChild(nodo('path', { d: hoyD, fill: color, stroke: color, 'stroke-width': '1' }));
     }
   }
+  // Prueba: una sola fila con un triángulo por día
+  function dibujarPrueba(svg, inicio, dias) {
+    var celda = 10, tam = 7, etiqueta = 30, usados = '', restantes = '', hoyD = '';
+    svg.setAttribute('viewBox', '0 0 ' + (etiqueta + 31 * celda) + ' ' + celda);
+    var rotulo = nodo('text', { x: 0, y: tam, 'aria-hidden': 'true' }); rotulo.textContent = MESES[inicio.getMonth()]; svg.appendChild(rotulo);
+    for (var d = 0; d < dias; d++) {
+      var dia = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + d), ruta = triangulo(etiqueta + d * celda, 0, tam);
+      if (dia < HOY) usados += ruta; else if (!hoyD) hoyD = ruta; else restantes += ruta;
+    }
+    if (usados) svg.appendChild(nodo('path', { d: usados, fill: 'none', stroke: '#9A9A9A', 'stroke-opacity': '0.4', 'stroke-width': '1' }));
+    if (restantes) svg.appendChild(nodo('path', { d: restantes, fill: 'none', stroke: '#FB9819', 'stroke-width': '1' }));
+    if (hoyD) svg.appendChild(nodo('path', { d: hoyD, fill: '#FB9819', stroke: '#FB9819', 'stroke-width': '1' }));
+  }
   document.querySelectorAll('.calendario').forEach(dibujarCalendario);
 
   // ---------- Vistas con enlace propio (#cuentas, #pagos, #perfil) ----------
-  var vistas = ['cuentas', 'pagos', 'perfil'];
+  var vistas = ['cuentas', 'pagos', 'soporte', 'perfil'];
   function mostrar(vista, enfocar) {
     if (vistas.indexOf(vista) < 0) vista = 'cuentas';
     vistas.forEach(function (v) { document.getElementById('vista-' + v).hidden = v !== vista; });
     document.querySelectorAll('.pestana').forEach(function (p) {
       if (p.dataset.vista === vista) p.setAttribute('aria-current', 'page'); else p.removeAttribute('aria-current');
     });
-    document.title = { cuentas: 'Mis cuentas', pagos: 'Pagos', perfil: 'Perfil' }[vista] + ' · Panel DocTraderPRO';
+    document.title = { cuentas: 'Mis cuentas', pagos: 'Pagos', soporte: 'Soporte', perfil: 'Perfil' }[vista] + ' · Panel DocTraderPRO';
     if (enfocar) { var t = document.querySelector('#vista-' + vista + ' h1'); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); window.scrollTo(0, 0); }
   }
   window.addEventListener('hashchange', function () { mostrar(location.hash.slice(1), true); });
@@ -729,9 +931,13 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
 
   // ---------- Orden de pago ----------
   var ORDENES = {
-    renovar:            { licencia: 'Trimestral, 3 meses', cuenta: '50277120', vence: '15 de enero de 2027', usd: 319 },
-    semestral:          { licencia: 'Semestral, 5 meses + 1 de obsequio', cuenta: '50277120', vence: '15 de abril de 2027', usd: 499 },
-    'renovar-semestral':{ licencia: 'Semestral, 5 meses + 1 de obsequio', cuenta: '50213847', vence: '2 de julio de 2027', usd: 499 }
+    renovar:                { licencia: 'Trimestral, 3 meses', cuenta: '50277120', vence: '15 de enero de 2027', usd: 319 },
+    semestral:              { licencia: 'Semestral, 6 meses + 1 de obsequio', cuenta: '50277120', vence: '15 de mayo de 2027', usd: 499 },
+    'renovar-semestral':    { licencia: 'Semestral, 6 meses + 1 de obsequio', cuenta: '50213847', vence: '2 de septiembre de 2027', usd: 499 },
+    // Completar la prueba: se paga la diferencia y la licencia cuenta desde el inicio de la prueba (3 oct)
+    'completar-mensual':    { licencia: 'Mensual, completa tu prueba (USD 120 menos los 50 pagados)', cuenta: '50299031', vence: '3 de noviembre de 2026', usd: 70 },
+    'completar-trimestral': { licencia: 'Trimestral, completa tu prueba (USD 319 menos los 50 pagados)', cuenta: '50299031', vence: '3 de enero de 2027', usd: 269 },
+    'completar-semestral':  { licencia: 'Semestral 6 + 1, completa tu prueba (USD 499 menos los 50 pagados)', cuenta: '50299031', vence: '3 de mayo de 2027', usd: 449 }
   };
   var REDES = {
     usdt: { moneda: 'USDT', red: 'Tron (TRC20)', dir: 'TXq7Ejemp1oDirecc1onTRC20xx9Rk3aZ', conf: 20, nota: 'Las comisiones de la red las pagas tú; el monto que llega debe ser este.' },
@@ -834,10 +1040,6 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
   });
 
   // ---------- Solicitar prueba ----------
-  document.getElementById('pedir-prueba').addEventListener('click', function () {
-    this.disabled = true; this.textContent = 'Solicitud enviada';
-    document.getElementById('prueba-enviada').hidden = false;
-  });
 
   // ---------- Panel lateral: agregar cuenta ----------
   var dlg = document.getElementById('agregar'), formCuenta = document.getElementById('form-cuenta'), origen = null;
@@ -888,11 +1090,128 @@ td small { display: block; color: var(--ceniza); font-size: 13px; }
     Object.keys(reglas).forEach(function (id) { if (!validar(id) && !primero) primero = id; });
     if (primero) { document.getElementById(primero).focus(); return; }
     var lic = formCuenta.querySelector('input[name="licencia"]:checked').value, num = document.getElementById('c-numero').value.trim();
-    orden = lic === 'trimestral'
-      ? { licencia: 'Trimestral, 3 meses', cuenta: num, vence: 'Tres meses desde el pago', usd: 319 }
-      : { licencia: 'Semestral, 5 meses + 1 de obsequio', cuenta: num, vence: 'Seis meses desde el pago', usd: 499 };
+    orden = {
+      mensual: { licencia: 'Mensual, 1 mes', cuenta: num, vence: 'Un mes desde el pago', usd: 120 },
+      trimestral: { licencia: 'Trimestral, 3 meses', cuenta: num, vence: 'Tres meses desde el pago', usd: 319 },
+      semestral: { licencia: 'Semestral, 6 meses + 1 de obsequio', cuenta: num, vence: 'Siete meses desde el pago', usd: 499 }
+    }[lic];
     origen = null; dlg.close(); fin = Date.now() + 60 * 60 * 1000; tic(); pintarOrden(); reiniciarReporte();
     location.hash = 'pagos'; avisar('Cuenta guardada. Ahora paga la licencia.');
+  });
+
+  // ---------- Soporte: tickets ----------
+  var TICKETS = {
+    1042: { asunto: 'Reporté el pago y sigue esperando confirmaciones', meta: 'Ticket 1042, sobre pagos de la cuenta 50277120', estado: 'respondido', mensajes: [
+      { yo: true, quien: 'Tú', cuando: 'Hoy, 08:55', texto: 'Hice el pago en BTC hace 20 minutos y sigue en 1 de 2 confirmaciones. ¿Está bien así?', adjuntos: ['captura-binance.png'] },
+      { yo: false, quien: 'Argemiro', cuando: 'Hoy, 09:40', texto: 'Hola, Laura. Sí, está bien: en Bitcoin cada confirmación tarda unos 10 minutos. Apenas llegue a 2 lo aprobamos y te llega el correo. No tienes que hacer nada más.' }
+    ] },
+    1031: { asunto: '¿Puedo cambiar el servidor de la cuenta 8812406?', meta: 'Ticket 1031, sobre la conexión de la cuenta 8812406', estado: 'abierto', mensajes: [
+      { yo: true, quien: 'Tú', cuando: 'Ayer, 18:12', texto: 'IC Markets me movió a otro servidor. ¿Lo cambio yo en mis datos o lo hacen ustedes?' }
+    ] },
+    1007: { asunto: 'No veía el capital recomendado de mi cuenta', meta: 'Ticket 1007, sobre la licencia de la cuenta 50213847', estado: 'resuelto', mensajes: [
+      { yo: true, quien: 'Tú', cuando: '1 sep, 10:02', texto: 'En el panel no me aparece el capital recomendado de la cuenta 50213847.' },
+      { yo: false, quien: 'Argemiro', cuando: '2 sep, 08:30', texto: 'Ya quedó: USD 2.000 con riesgo moderado. Gracias por avisar.' }
+    ] }
+  };
+  var siguienteTicket = 1043, ticketAbierto = null;
+  var dlgTicket = document.getElementById('ticket'), dlgNuevo = document.getElementById('nuevo-ticket'), origenDialogo = null;
+
+  function pintarHilo(id) {
+    var t = TICKETS[id], hilo = document.getElementById('hilo');
+    document.getElementById('t-ticket').textContent = t.asunto;
+    document.getElementById('ticket-meta').textContent = t.meta;
+    hilo.innerHTML = '';
+    t.mensajes.forEach(function (m) {
+      var li = document.createElement('li'); li.className = 'mensaje-hilo' + (m.yo ? '' : ' de-equipo');
+      var cabeza = document.createElement('p'); cabeza.className = 'mensaje-autor';
+      cabeza.innerHTML = '<b></b><span></span>'; cabeza.querySelector('b').textContent = m.quien + (m.yo ? '' : ', equipo DocTraderPRO'); cabeza.querySelector('span').textContent = m.cuando;
+      var cuerpo = document.createElement('p'); cuerpo.className = 'mensaje-texto'; cuerpo.textContent = m.texto;
+      li.appendChild(cabeza); li.appendChild(cuerpo);
+      if (m.adjuntos && m.adjuntos.length) {
+        var ul = document.createElement('ul'); ul.className = 'adjuntos';
+        m.adjuntos.forEach(function (a) { var x = document.createElement('li'); x.textContent = a; ul.appendChild(x); });
+        li.appendChild(ul);
+      }
+      hilo.appendChild(li);
+    });
+    var cerrado = t.estado === 'resuelto';
+    document.getElementById('form-respuesta').hidden = cerrado;
+    document.getElementById('ticket-resuelto').hidden = !cerrado;
+    document.getElementById('marcar-resuelto').hidden = cerrado;
+  }
+  function abrirDialogo(d, boton) { origenDialogo = boton; d.showModal(); }
+  [dlgTicket, dlgNuevo].forEach(function (d) {
+    d.addEventListener('close', function () { if (origenDialogo && origenDialogo.isConnected) origenDialogo.focus(); });
+    d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+    d.querySelectorAll('[data-cerrar]').forEach(function (b) { b.addEventListener('click', function () { d.close(); }); });
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ticket]');
+    if (b) {
+      ticketAbierto = b.dataset.ticket; pintarHilo(ticketAbierto); abrirDialogo(dlgTicket, b);
+      if (ticketAbierto === '1042') { document.getElementById('soporte-nuevo').hidden = true; document.getElementById('soporte-nuevo-texto').hidden = true; }
+    }
+    var n = e.target.closest('[data-abrir="nuevo-ticket"]');
+    if (n) { abrirDialogo(dlgNuevo, n); }
+  });
+
+  function validarAdjuntos(input, error) {
+    var archivos = Array.prototype.slice.call(input.files || []), malo = null;
+    if (archivos.length > 5) malo = 'Puedes adjuntar hasta 5 archivos por mensaje.';
+    archivos.forEach(function (f) {
+      if (!/^image\/|^application\/pdf$/.test(f.type)) malo = f.name + ' no es una imagen ni un PDF.';
+      else if (f.size > 10 * 1024 * 1024) malo = f.name + ' pesa más de 10 MB.';
+    });
+    error.textContent = malo || ''; error.hidden = !malo;
+    return malo ? null : archivos.map(function (f) { return f.name; });
+  }
+
+  document.getElementById('form-respuesta').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var txt = document.getElementById('respuesta'), err = document.getElementById('e-respuesta');
+    var adj = validarAdjuntos(document.getElementById('adj-respuesta'), document.getElementById('e-adj-respuesta'));
+    if (!txt.value.trim()) { txt.setAttribute('aria-invalid', 'true'); err.hidden = false; txt.focus(); return; }
+    if (!adj) return;
+    txt.removeAttribute('aria-invalid'); err.hidden = true;
+    TICKETS[ticketAbierto].mensajes.push({ yo: true, quien: 'Tú', cuando: 'Ahora', texto: txt.value.trim(), adjuntos: adj });
+    TICKETS[ticketAbierto].estado = 'abierto';
+    txt.value = ''; document.getElementById('adj-respuesta').value = '';
+    pintarHilo(ticketAbierto); avisar('Respuesta enviada. Te avisamos por correo cuando te respondan.');
+  });
+  document.getElementById('marcar-resuelto').addEventListener('click', function () {
+    TICKETS[ticketAbierto].estado = 'resuelto'; pintarHilo(ticketAbierto);
+    var fila = document.querySelector('.ticket[data-ticket="' + ticketAbierto + '"] .estado');
+    if (fila) { fila.className = 'estado estado-expirada'; fila.textContent = 'Resuelto'; }
+    avisar('Ticket marcado como resuelto. Si el problema vuelve, ábrelo de nuevo.');
+  });
+  document.getElementById('reabrir').addEventListener('click', function () {
+    TICKETS[ticketAbierto].estado = 'abierto'; pintarHilo(ticketAbierto);
+    var fila = document.querySelector('.ticket[data-ticket="' + ticketAbierto + '"] .estado');
+    if (fila) { fila.className = 'estado estado-por-conectar'; fila.textContent = 'Abierto'; }
+    document.getElementById('respuesta').focus();
+  });
+
+  var formNuevo = document.getElementById('form-nuevo-ticket');
+  formNuevo.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var asunto = document.getElementById('nt-asunto'), mensaje = document.getElementById('nt-mensaje'), primero = null;
+    [[asunto, 'e-nt-asunto', 4], [mensaje, 'e-nt-mensaje', 10]].forEach(function (c) {
+      var ok = c[0].value.trim().length >= c[2]; document.getElementById(c[1]).hidden = ok;
+      if (ok) c[0].removeAttribute('aria-invalid'); else { c[0].setAttribute('aria-invalid', 'true'); if (!primero) primero = c[0]; }
+    });
+    var adj = validarAdjuntos(document.getElementById('nt-adjuntos'), document.getElementById('e-nt-adjuntos'));
+    if (primero) { primero.focus(); return; }
+    if (!adj) return;
+    var id = siguienteTicket++, tema = document.getElementById('nt-tema'), rel = document.getElementById('nt-relacion');
+    var meta = 'Ticket ' + id + ', ' + tema.options[tema.selectedIndex].text.toLowerCase() + (rel.value ? ', ' + rel.value : '');
+    TICKETS[id] = { asunto: asunto.value.trim(), meta: meta, estado: 'abierto', mensajes: [{ yo: true, quien: 'Tú', cuando: 'Ahora', texto: mensaje.value.trim(), adjuntos: adj }] };
+    var li = document.createElement('li');
+    li.innerHTML = '<button class="ticket" type="button"><span class="estado estado-por-conectar">Abierto</span><span class="ticket-asunto"></span><span class="ticket-meta"></span><span class="ticket-cuando">Ahora</span></button>';
+    li.querySelector('button').dataset.ticket = id; li.querySelector('.ticket-asunto').textContent = asunto.value.trim(); li.querySelector('.ticket-meta').textContent = meta;
+    var lista = document.getElementById('lista-tickets'); lista.insertBefore(li, lista.firstChild);
+    formNuevo.reset(); dlgNuevo.close();
+    if (location.hash !== '#soporte') location.hash = 'soporte';
+    avisar('Ticket ' + id + ' enviado. Te respondemos aquí y por correo.');
   });
 
   pintarOrden();

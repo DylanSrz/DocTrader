@@ -85,3 +85,17 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
   Myfxbook bloquea las visitas automáticas (verificación de Cloudflare), así que sus cifras no se pudieron leer.
 - Textos definitivos del hero y del problema, que son propuestos.
 - Rutas reales: `/registro`, `/ingresar` y `/legal/...`.
+
+## Cambios del 2026-10-12 (reunión con Argemiro)
+
+- **Precios en tres columnas:**
+  - Mensual USD 120.
+  - Trimestral USD 319 (equivale a USD 106 al mes).
+  - Semestral USD 499 por **7 meses**, 6 + 1 de obsequio (equivale a USD 71 al mes). Sigue siendo la única
+    píldora de la sección.
+- **Prueba:** 15 días por USD 50. Si el cliente sigue, paga solo la diferencia del plan que elija y sus 15 días
+  cuentan dentro del plan. Es una sola vez por persona y por cuenta de trading.
+- **Preguntas frecuentes:** pregunta nueva "¿Cómo pido ayuda?" (tickets en el panel, Telegram y correo). La de
+  devoluciones ahora remite a la prueba de 15 días.
+- **Pie:** el correo oficial `doctraderpro@gmail.com` como texto seleccionable, con botón de copiar. No es un
+  enlace `mailto:`, porque esos enlaces no siempre funcionan.

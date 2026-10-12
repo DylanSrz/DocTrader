@@ -157,13 +157,13 @@ a, button, summary { touch-action: manipulation; -webkit-tap-highlight-color: tr
 .funciona li { font-size: clamp(22px, 2.4vw, 32px); letter-spacing: -0.03em; font-weight: 500; color: var(--ceniza); }
 
 /* Precios */
-.planes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(48px, 7vw, 112px); margin-top: clamp(56px, 7vw, 96px); }
+.planes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(40px, 5vw, 80px); margin-top: clamp(56px, 7vw, 96px); }
 .plan { display: grid; gap: 22px; align-content: start; justify-items: start; }
 .plan-nombre { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; min-height: 32px; }
 .plan-nombre h3 { font-size: 24px; letter-spacing: -0.02em; }
 .etiqueta-pildora { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 9999px; background: rgb(221 219 101 / 0.12); color: var(--senal); font-size: 13px; font-weight: 500; }
 .precio { display: flex; align-items: baseline; gap: 14px; }
-.precio strong { font-size: var(--t-display); font-weight: 400; line-height: 0.9; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.precio strong { font-size: clamp(56px, 6.4vw, 96px); font-weight: 400; line-height: 0.9; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
 .precio span { font-size: 18px; color: var(--ceniza); }
 .plan-incluye { list-style: none; padding: 0; display: grid; gap: 8px; color: var(--niebla); }
 .plan-incluye li { display: flex; gap: 12px; align-items: baseline; }
@@ -206,6 +206,9 @@ a, button, summary { touch-action: manipulation; -webkit-tap-highlight-color: tr
 .pie-redes, .pie-legal { display: flex; flex-wrap: wrap; gap: 4px 28px; list-style: none; padding: 0; }
 .pie a { color: var(--ceniza); text-decoration: none; display: inline-flex; min-height: 44px; align-items: center; transition: color 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pie a:hover { color: var(--blanco); } }
+.pie-correo { display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pie-correo .enlace { min-height: 44px; font-size: 14px; }
+.correo { color: var(--blanco); }
 .pie-riesgo { margin-top: 28px; max-width: 64em; font-size: 13px; line-height: 1.6; }
 
 .pildora-menu { gap: 0; }
@@ -369,13 +372,25 @@ a, button, summary { touch-action: manipulation; -webkit-tap-highlight-color: tr
     </div>
 
     <div class="planes">
+      <article class="plan" aria-labelledby="t-mensual">
+        <div class="plan-nombre"><h3 id="t-mensual">Mensual</h3></div>
+        <p class="precio"><strong class="cifra">120</strong><span>USD por 1&nbsp;mes</span></p>
+        <ul class="plan-incluye">
+          <li><span>Para empezar sin comprometerte</span></li>
+          <li><span>Una cuenta de trading conectada</span></li>
+          <li><span>Soporte con tickets y por <span translate="no">Telegram</span></span></li>
+          <li><span>Puedes pasarla a trimestral o semestral antes de que venza</span></li>
+        </ul>
+        <a class="enlace" href="/registro?plan=mensual">Comprar mensual</a>
+      </article>
+
       <article class="plan" aria-labelledby="t-trimestral">
         <div class="plan-nombre"><h3 id="t-trimestral">Trimestral</h3></div>
         <p class="precio"><strong class="cifra">319</strong><span>USD por 3&nbsp;meses</span></p>
         <ul class="plan-incluye">
           <li><span>Equivale a USD&nbsp;106 al mes</span></li>
           <li><span>Una cuenta de trading conectada</span></li>
-          <li><span>Soporte por <span translate="no">Telegram</span></span></li>
+          <li><span>Soporte con tickets y por <span translate="no">Telegram</span></span></li>
           <li><span>Puedes pasarla a semestral antes de que venza</span></li>
         </ul>
         <a class="enlace" href="/registro?plan=trimestral">Comprar trimestral</a>
@@ -383,19 +398,19 @@ a, button, summary { touch-action: manipulation; -webkit-tap-highlight-color: tr
 
       <article class="plan" aria-labelledby="t-semestral">
         <div class="plan-nombre"><h3 id="t-semestral">Semestral</h3><span class="etiqueta-pildora">1 mes de obsequio</span></div>
-        <p class="precio"><strong class="cifra">499</strong><span>USD por 6&nbsp;meses</span></p>
+        <p class="precio"><strong class="cifra">499</strong><span>USD por 7&nbsp;meses</span></p>
         <ul class="plan-incluye">
-          <li><span>Pagas 5&nbsp;meses: equivale a USD&nbsp;83 al mes</span></li>
+          <li><span>6&nbsp;meses pagados + 1 de obsequio</span></li>
+          <li><span>Equivale a USD&nbsp;71 al mes</span></li>
           <li><span>Una cuenta de trading conectada</span></li>
-          <li><span>Soporte por <span translate="no">Telegram</span></span></li>
-          <li><span>El sexto mes se suma solo, como cupón</span></li>
+          <li><span>Soporte con tickets y por <span translate="no">Telegram</span></span></li>
         </ul>
         <a class="pildora" href="/registro?plan=semestral">Comprar semestral</a>
       </article>
     </div>
 
     <div class="prueba">
-      <p><strong>¿Quieres probar primero?</strong> Pide un mes de prueba por USD&nbsp;50. Es una sola vez por persona y, si te gusta, la completas a semestral por USD&nbsp;450.</p>
+      <p><strong>¿Quieres probar primero?</strong> Pide 15&nbsp;días de prueba por USD&nbsp;50. Si te gusta, pagas solo la diferencia del plan que elijas y tus 15&nbsp;días cuentan dentro de él. La prueba es una sola vez por persona y por cuenta de trading.</p>
       <a class="enlace" href="/registro?plan=prueba">Solicitar prueba</a>
     </div>
     <p class="nota pago-nota">Pagas con USDT (Tron), USDC (BNB Smart Chain) o Bitcoin. Sin devoluciones.</p>
@@ -433,8 +448,12 @@ a, button, summary { touch-action: manipulation; -webkit-tap-highlight-color: tr
         <div class="respuesta"><p>Te avisamos antes. Si no renuevas, tienes 3&nbsp;días de gracia con la cuenta conectada; después se desconecta del copiado.</p></div>
       </details>
       <details class="pregunta" name="faq">
+        <summary>¿Cómo pido ayuda?<span class="cruz" aria-hidden="true"></span></summary>
+        <div class="respuesta"><p>Desde tu panel abres un ticket de soporte: queda registrado y te avisamos por correo cuando respondemos. Para dudas rápidas, escríbenos por <a href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener" translate="no">Telegram</a> o a <span class="correo" translate="no">doctraderpro@gmail.com</span>.</p></div>
+      </details>
+      <details class="pregunta" name="faq">
         <summary>¿Hay devoluciones?<span class="cruz" aria-hidden="true"></span></summary>
-        <div class="respuesta"><p>No. Por eso existe el mes de prueba: puedes probar por USD&nbsp;50 antes de comprar el semestral.</p></div>
+        <div class="respuesta"><p>No. Por eso existe la prueba: 15&nbsp;días por USD&nbsp;50. Si sigues, pagas solo la diferencia del plan que elijas.</p></div>
       </details>
     </div>
   </section>
@@ -457,6 +476,7 @@ a, button, summary { touch-action: manipulation; -webkit-tap-highlight-color: tr
         <li><a href="https://t.me/+cdmWH_xLubdhMDhh" target="_blank" rel="noopener" translate="no">Telegram</a></li>
         <li><a href="https://www.instagram.com/doctraderproiasystem/" target="_blank" rel="noopener" translate="no">Instagram</a></li>
         <li><a href="/ingresar">Ingresar</a></li>
+        <li class="pie-correo"><span translate="no">doctraderpro@gmail.com</span><button class="enlace enlace-gris" type="button" data-copiar="doctraderpro@gmail.com">Copiar correo</button></li>
       </ul>
       <ul class="pie-legal">
         <li><a href="/legal/terminos">Términos</a></li>
@@ -588,6 +608,15 @@ function iniciar() {
   escena(document.getElementById('cerebro'), { logo: true, sueltas: 70, puntero: true });
   escena(document.getElementById('ambiente'), { sueltas: window.innerWidth < 700 ? 60 : 140 });
 }
+// Copiar el correo oficial (los enlaces mailto no siempre funcionan)
+document.querySelectorAll('[data-copiar]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var t = b.dataset.copiar, original = b.textContent;
+    function hecho(txt) { b.textContent = txt; setTimeout(function () { b.textContent = original; }, 1800); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { hecho('Copiado'); }, function () { hecho('Selecciónalo y cópialo'); });
+    else hecho('Selecciónalo y cópialo');
+  });
+});
 // El ensamblaje arranca cuando la fuente está lista, para que el titular no salte mientras se mueve
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(iniciar); else window.addEventListener('load', iniciar);
 </script>

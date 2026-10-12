@@ -68,3 +68,26 @@ aparece solo con opacidad y nada más se mueve.
 
 - Direcciones de depósito reales y precio de BTC en vivo.
 - Rutas reales: `/salir`, `/perfil/...` y `/legal/...`.
+
+## Cambios del 2026-10-12 (reunión con Argemiro)
+
+- **Semestral de 7 meses:** el calendario de triángulos muestra 7 filas y la última es el mes de obsequio. Las
+  cuentas de ejemplo se recalcularon: 115 de 215 días y 211 de 212.
+- **Cuenta en prueba (50299031):** es una fila de 15 triángulos. Muestra las tres formas de completarla pagando la
+  diferencia, y cada una crea su orden con el vencimiento contado desde el inicio de la prueba:
+
+  | Plan | Diferencia | Vence |
+  |---|---|---|
+  | Mensual | USD 70 | 3 nov |
+  | Trimestral | USD 269 | 3 ene |
+  | Semestral | USD 449 | 3 may, con el mes de obsequio |
+
+- **Agregar cuenta:** se suma la opción mensual (USD 120).
+- **Vista nueva "Soporte":**
+  - El titular dice si hay una respuesta nueva, y un punto naranja en la pestaña la anuncia.
+  - Lista de tickets con estado, asunto, tema y fecha.
+  - Panel lateral con el hilo, respuesta con adjuntos (imágenes o PDF, hasta 5 de 10 MB, validados en el
+    navegador) y "Mi problema ya se resolvió". Un ticket resuelto se puede abrir de nuevo.
+  - Panel lateral para abrir un ticket: tema, cuenta relacionada, asunto, mensaje y adjuntos.
+  - Telegram sigue para dudas rápidas.
+- **Perfil:** la prueba aparece como usada y se explica que se controla por persona y por cuenta.
