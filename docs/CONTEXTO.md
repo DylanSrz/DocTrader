@@ -135,9 +135,11 @@ debe informar esta finalidad (prevención de fraude en la prueba).
   como dato personal protegido (Ley 1581 de 2012).
 - **Correo oficial:** doctraderpro@gmail.com (decisión del 2026-10-12). Es el correo de contacto público y la
   dirección de respuesta (Reply-To) de todos los correos que envía la plataforma.
-  - Los correos automáticos (bienvenida, órdenes, recordatorios) deben salir desde un **dominio propio** verificado
-    en Resend (por ejemplo `avisos@dominio.com`), porque Resend no permite enviar como `@gmail.com`. Mientras no haya
-    dominio, se puede enviar por el SMTP de Gmail, con límite de unos 500 correos al día y más riesgo de caer en spam.
+  - **Dominio propio: doctraderpro.com** (comprado en Hostinger, 2026-10-13).
+  - **Buzón del dominio: soporte@doctraderpro.com** (correo de Hostinger, 2026-10-13). Otras direcciones
+    (`contacto@`, `pagos@`) se crean como alias o reenvíos hacia ese buzón, sin pagar buzones extra.
+  - Los correos automáticos (bienvenida, órdenes, recordatorios) salen por Resend desde el dominio verificado, con una
+    dirección sin buzón como `notificaciones@doctraderpro.com`. Resend no permite enviar como `@gmail.com`.
 - **Soporte con tickets dentro de la plataforma** (decisión del 2026-10-12), que **convive con Telegram**: el ticket
   es el canal formal y queda registrado; Telegram sigue para dudas rápidas y comunidad.
   - El cliente abre un ticket desde su panel: tema (pagos, conexión de la cuenta, licencia, técnico, otro), cuenta
@@ -169,6 +171,15 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 - **Frontend: Next.js (React)** + Tailwind.
 - Base de datos: **PostgreSQL** con **TypeORM**.
 - Correos: Resend (o similar).
+- **Dominio doctraderpro.com** (DNS en Hostinger), repartido así:
+
+  | Registro | Apunta a |
+  |---|---|
+  | `doctraderpro.com` y `www` | La web en Vercel |
+  | `api.doctraderpro.com` | La API en Railway o Render |
+  | MX del dominio raíz | Correo de Hostinger (`soporte@`) |
+  | `send.doctraderpro.com` (MX y SPF) + DKIM | Resend, para los correos automáticos; convive con el correo de Hostinger |
+  | DMARC (`_dmarc`) | Política del dominio, empezando en `p=none` |
 - **Tareas en segundo plano en un proceso aparte (worker)**: recordatorios, gracia, expiración de
   órdenes, verificación en blockchain y cortes de comisión, con **BullMQ + Redis** (reintentos y sin
   ejecuciones duplicadas). Misma base de código que la API, distinto comando de arranque.

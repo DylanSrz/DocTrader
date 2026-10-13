@@ -31,6 +31,8 @@ Reglas clave:
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
 - Registro con nombre, **cédula**, correo y teléfono. Correo oficial: **doctraderpro@gmail.com** (contacto y Reply-To).
+  Dominio propio: **doctraderpro.com** (DNS en Hostinger), con el buzón **soporte@doctraderpro.com**; los correos automáticos
+  salen por Resend desde el dominio.
   Soporte con **tickets dentro de la plataforma** (convive con Telegram https://t.me/+cdmWH_xLubdhMDhh).
   Instagram: https://www.instagram.com/doctraderproiasystem/. Broker sugerido: JustMarkets
   (https://one.justmarkets.link/a/5vmbn05zda).

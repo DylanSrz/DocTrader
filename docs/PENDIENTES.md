@@ -1,6 +1,6 @@
 # Pendientes — información por recibir
 
-> Actualizado: 2026-10-12. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
+> Actualizado: 2026-10-13. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
 
 ## ⏳ En espera
 
@@ -16,9 +16,10 @@
 - [x] **Correo oficial:** doctraderpro@gmail.com (2026-10-12).
 - [ ] **Enlace de Myfxbook de Argemiro:** la landing de la propuesta 2 enlaza por ahora una cuenta de referencia de terceros.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
-- [ ] **Dominio:** ¿ya está comprado? ¿Cuál? ¿Quién tiene acceso a la configuración DNS?
-- [ ] **Dominio para enviar correos automáticos** (Resend no envía como `@gmail.com`). Mientras tanto, SMTP de Gmail
-      con límite de unos 500 correos al día.
+- [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
+- [x] **Buzón del dominio:** soporte@doctraderpro.com (2026-10-13).
+- [ ] **¿Correo oficial o Reply-To pasa a soporte@doctraderpro.com?** Hoy el oficial es doctraderpro@gmail.com
+      (decisión de Argemiro). Opciones: cambiarlo al del dominio, o dejar el Gmail y reenviar entre los dos.
 - [ ] Textos: descripción del software, cómo funciona, perfil de Argemiro.
 - [ ] **Preguntas frecuentes** con sus respuestas (depósitos, retiros, brokers, riesgo, capital mínimo…).
 - [ ] **Código del widget de Myfxbook** de la cuenta auditada.
@@ -34,7 +35,8 @@
 ## 🔧 Accesos técnicos (cuando empecemos)
 
 - [ ] Cuentas de hosting: Vercel (web) y Railway o Render (API, worker, PostgreSQL y Redis).
-- [ ] Cuenta de Resend (u otro) para correos, verificada con el dominio.
+- [ ] Cuenta de Resend (u otro) para correos, verificada con doctraderpro.com (registros DNS en Hostinger).
+- [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [ ] Direcciones de depósito iniciales: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20) y BTC (Bitcoin).
 - [ ] Correos de las 2 cuentas de administrador (Argemiro y desarrollador).
 
@@ -48,4 +50,4 @@ TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase
 direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
 una prueba por cliente y por cuenta de trading, con control antiabuso · tickets de soporte en la plataforma ·
-verificación automática de pagos en blockchain · soporte por tickets y Telegram · correo oficial doctraderpro@gmail.com · propuesta de diseño 2 · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.
+verificación automática de pagos en blockchain · soporte por tickets y Telegram · correo oficial doctraderpro@gmail.com · dominio doctraderpro.com con buzón soporte@doctraderpro.com · propuesta de diseño 2 · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.
