@@ -64,5 +64,5 @@ Se configura cuando estén creadas las cuentas (ver `docs/PENDIENTES.md`). No ha
   de la API. Variables: las de `apps/api/.env.example` con valores de producción (`NODE_ENV=production`,
   `WEB_ORIGIN=https://doctraderpro.com`, `DATABASE_URL` y `REDIS_URL` de Railway, y una `AUDIT_HMAC_KEY` nueva guardada
   en el gestor de contraseñas). La semilla se corre una vez: `node apps/api/dist/database/semilla.js`.
-- **Integración continua:** GitHub Actions corre formato, lint, tipos, pruebas unitarias, pruebas de punta a punta,
+- **Integración continua:** (los flujos están en `docs/ci/` hasta que se copien a `.github/workflows/`; ver ese README) GitHub Actions corre formato, lint, tipos, pruebas unitarias, pruebas de punta a punta,
   build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabot propone actualizaciones cada semana.
