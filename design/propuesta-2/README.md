@@ -90,7 +90,7 @@ Reunión del 2026-10-12: eligió esta propuesta y pidió estos cambios de negoci
 - La **prueba** pasa a 15 días por USD 50. Se completa a cualquier plan pagando la diferencia, y se da una sola vez
   por cliente y por cuenta de trading, con control antiabuso.
 - **Tickets de soporte** dentro de la plataforma, que conviven con Telegram.
-- Correo oficial: **doctraderpro@gmail.com**, cambiado el 2026-10-13 por **support@doctraderpro.com** (dominio propio).
+- Correo oficial: **support@doctraderpro.com** (dominio propio, 2026-10-13).
 
 Confirmado después de la reunión:
 - Completar la prueba a semestral lleva el mes de obsequio; la licencia cuenta desde el inicio de la prueba.

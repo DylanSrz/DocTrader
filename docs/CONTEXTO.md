@@ -133,15 +133,13 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 - Registro con **nombre completo, cédula (documento de identidad nacional), correo y teléfono**.
   La cédula es única por cliente y sirve para controlar que haya una sola prueba por persona. Se trata
   como dato personal protegido (Ley 1581 de 2012).
-- **Correo oficial: support@doctraderpro.com** (decisión del 2026-10-13; antes era doctraderpro@gmail.com). Es el
+- **Correo oficial: support@doctraderpro.com** (decisión del 2026-10-13). Es el
   correo de contacto público y la dirección de respuesta (Reply-To) de todos los correos que envía la plataforma.
   - **Dominio propio: doctraderpro.com** (comprado en Hostinger, 2026-10-13).
   - **Buzón del dominio: support@doctraderpro.com** (correo de Hostinger). Otras direcciones
     (`contacto@`, `pagos@`) se crean como alias o reenvíos hacia ese buzón, sin pagar buzones extra.
-  - El Gmail anterior (doctraderpro@gmail.com) conviene dejarlo reenviando a support@ para no perder mensajes de
-    quien ya lo tenga.
   - Los correos automáticos (bienvenida, órdenes, recordatorios) salen por Resend desde el dominio verificado, con una
-    dirección sin buzón como `notificaciones@doctraderpro.com`. Resend no permite enviar como `@gmail.com`.
+    dirección sin buzón como `notificaciones@doctraderpro.com`.
 - **Soporte con tickets dentro de la plataforma** (decisión del 2026-10-12), que **convive con Telegram**: el ticket
   es el canal formal y queda registrado; Telegram sigue para dudas rápidas y comunidad.
   - El cliente abre un ticket desde su panel: tema (pagos, conexión de la cuenta, licencia, técnico, otro), cuenta

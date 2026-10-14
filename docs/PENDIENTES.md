@@ -13,12 +13,11 @@
 - [x] **Logo** recibido (`design/marca/logo-original.png`).
 - [x] **Página de referencia:** https://denmu.com/
 - [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
-- [x] **Correo oficial:** support@doctraderpro.com (2026-10-13; reemplaza a doctraderpro@gmail.com).
+- [x] **Correo oficial:** support@doctraderpro.com (2026-10-13).
 - [ ] **Enlace de Myfxbook de Argemiro:** la landing de la propuesta 2 enlaza por ahora una cuenta de referencia de terceros.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
-- [ ] Reenvío del Gmail anterior (doctraderpro@gmail.com) hacia support@doctraderpro.com.
 - [ ] Textos: descripción del software, cómo funciona, perfil de Argemiro.
 - [ ] **Preguntas frecuentes** con sus respuestas (depósitos, retiros, brokers, riesgo, capital mínimo…).
 - [ ] **Código del widget de Myfxbook** de la cuenta auditada.
