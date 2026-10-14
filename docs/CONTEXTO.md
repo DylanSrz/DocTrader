@@ -3,7 +3,7 @@
 > Última actualización: 2026-10-14 (titular, textos legales, seguridad, cuentas de servicio y decisiones técnicas).
 > Antes: 2026-10-12 (reunión con Argemiro: propuesta 2 elegida, licencia mensual, semestral 6 + 1, prueba de 15 días
 > con control antiabuso, tickets de soporte, correo oficial)
-> Estado: **Planeación** (aún no hay código)
+> Estado: **Planeación cerrada** (2026-10-14; aún no hay código). Plan de construcción en `docs/PLAN-TRABAJO.md`.
 
 ## 1. Resumen
 
@@ -273,6 +273,9 @@ Alertas a admins: nueva venta, pago por aprobar, solicitud de prueba, cuenta por
 conectar, cuenta por desconectar, cambio de % de comisión, ticket nuevo o reabierto.
 
 ## 6. Modelo de datos (borrador, entidades TypeORM)
+
+> **Reemplazado por `docs/MODELO-DATOS.md`** (2026-10-14), con campos, estados y trabajos del worker. Se deja este
+> borrador como referencia.
 
 `User` (rol ADMIN | CLIENT, nombre, cédula única, correo, teléfono, prueba usada) ·
 `PartnerProfile` (usuario socio, % de comisión) · `CommissionRateChange` (anterior, nuevo, fecha) ·
