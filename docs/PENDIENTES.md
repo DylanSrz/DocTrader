@@ -17,11 +17,19 @@
 - [x] **Myfxbook de Argemiro** (2026-10-14): https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459
       (cuenta 12253459, JustMarkets, real en centavos USC, MT4). Pública, con historial público y transacciones abiertas,
       órdenes y SL/TP privados. Ya está en la landing.
-- [ ] **Fecha de inicio de la cuenta en Myfxbook:** la gráfica de Myfxbook arranca el 01/01/2000 y sube en línea recta
-      hasta 2026. Eso hace que Myfxbook calcule la cuenta como si tuviera 26 años (por eso muestra 0,38 % mensual y
-      0,01 % diario) y que el tiempo auditado no se pueda publicar. Seguramente hay un movimiento del historial con
-      fecha del año 2000. Argemiro debe revisarlo en el historial de la cuenta y, si es así, escribir al soporte de
-      Myfxbook para corregirlo. Mientras tanto no se usa el widget de la gráfica.
+- [ ] **Historial archivado en Myfxbook** (2026-10-14). La cuenta empezó en **febrero de 2025**, pero JustMarkets archivó
+      el historial viejo ("PnL.Arch") para ahorrar espacio. Por eso Myfxbook muestra:
+      - un depósito con fecha 01/02/2000, que hace que la gráfica arranque en el año 2000 y que los promedios salgan
+        diminutos (0,38 % mensual, 0,01 % diario);
+      - operaciones resumen con precio 0 entre abril y septiembre de 2026, en lugar de las operaciones reales;
+      - operaciones verificables una por una solo desde el 2 de octubre de 2026.
+      Consecuencias: el tiempo auditado no se puede publicar y la **caída máxima (11,59 %) probablemente se queda corta**,
+      porque los resúmenes esconden las caídas dentro de cada periodo. La ganancia (+246,68 %) también sale de esos
+      resúmenes.
+      Qué hacer (Argemiro): pedir a JustMarkets el estado de cuenta completo desde febrero de 2025 y si pueden
+      restaurar el historial; preguntar al soporte de Myfxbook si pueden recalcular la cuenta o fijar su fecha de inicio.
+      Mientras tanto, la landing no muestra el tiempo auditado ni usa el widget de la gráfica, y conviene decidir con
+      Argemiro si se publica la caída máxima.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
