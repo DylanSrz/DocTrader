@@ -15,7 +15,12 @@ import { ProgramarTrabajos } from './worker/programar-trabajos.js';
       inject: [ConfigService],
       useFactory: (config: ConfigService<Entorno, true>) => ({
         // BullMQ necesita reintentos ilimitados en la conexión para no perder trabajos si Redis parpadea.
-        connection: { url: config.get('REDIS_URL', { infer: true }), maxRetriesPerRequest: null },
+        connection: {
+          url: config.get('REDIS_URL', { infer: true }),
+          maxRetriesPerRequest: null,
+          // Red privada de Railway en IPv6 (ver redis.module.ts).
+          family: 0,
+        },
         prefix: 'doctrader',
       }),
     }),

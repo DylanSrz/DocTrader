@@ -22,7 +22,10 @@ class CerrarRedis implements OnApplicationShutdown {
       provide: REDIS,
       inject: [ConfigService],
       useFactory: (config: ConfigService<Entorno, true>) =>
-        new Redis(config.get('REDIS_URL', { infer: true }), { lazyConnect: false }),
+        new Redis(config.get('REDIS_URL', { infer: true }), {
+          // La red privada de Railway usa IPv6: `family: 0` deja que ioredis resuelva IPv4 o IPv6.
+          family: 0,
+        }),
     },
     CerrarRedis,
   ],
