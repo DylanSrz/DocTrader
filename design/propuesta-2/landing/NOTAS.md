@@ -78,11 +78,11 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
 
 ## Pendiente de contenido real
 
-- **Cifras de Myfxbook:** ganancia total, caída máxima y tiempo auditado. Están como "— %" con un aviso
-  en verde limón.
-- **Enlace a Myfxbook:** mientras Argemiro pasa el suyo, apunta a una cuenta de referencia de terceros
-  (https://www.myfxbook.com/es/members/BonusMAXI/aurum-2/12250704). Hay que cambiarlo antes de publicar.
-  Myfxbook bloquea las visitas automáticas (verificación de Cloudflare), así que sus cifras no se pudieron leer.
+- **Myfxbook (2026-10-14):** el enlace ya es el de la cuenta de Argemiro
+  (https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459). Ganancia total +246,68 % y caída
+  máxima 11,59 %, tomadas de su captura del 14 de octubre. El **tiempo auditado** sigue pendiente porque Myfxbook
+  toma como inicio de la cuenta el 01/01/2000 (ver `docs/PENDIENTES.md`). En la plataforma, las cifras se cargan desde
+  el panel de admin.
 - Rutas reales: `/registro`, `/ingresar` y `/legal/...`.
 
 ## Cambios del 2026-10-12 (reunión con Argemiro)

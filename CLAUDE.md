@@ -70,7 +70,8 @@ Reglas clave:
   - **Propuesta 2** (`design/propuesta-2/`, **elegida**): sistema de diseño =
     `contexto/diseno/DESIGN.md` de Refero (Dala) con los colores del logo (naranja como único color de acción) e Inter.
     Piezas: landing, panel del cliente y panel de administración (`landing/`, `panel-cliente/`, `panel-admin/`, notas en cada `NOTAS.md`).
-    Cifras de Myfxbook pendientes; el enlace actual es una cuenta de referencia de terceros que hay que reemplazar.
+    Myfxbook de Argemiro: https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459 (falta corregir la
+    fecha de inicio de la cuenta, que Myfxbook toma como 01/01/2000).
   - No mezclar estilos: todo lo nuevo se diseña con el sistema de la propuesta 2.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render

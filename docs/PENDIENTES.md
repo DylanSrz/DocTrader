@@ -14,11 +14,14 @@
 - [x] **Página de referencia:** https://denmu.com/
 - [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
 - [x] **Correo oficial:** support@doctraderpro.com (2026-10-13).
-- [ ] **Enlace público de Myfxbook de Argemiro.** Llegó el de su vista privada (2026-10-14):
-      https://www.myfxbook.com/portfolio/doctrader-pro-ia-system/12253459 (cuenta **12253459**). Ese enlace es el que
-      ve el dueño con su sesión iniciada; falta poner la cuenta en **pública** y copiar el enlace que ven los
-      visitantes (`/members/<usuario>/doctrader-pro-ia-system/12253459`). El widget de esa cuenta todavía sale vacío,
-      señal de que no es pública. La landing enlaza por ahora una cuenta de referencia de terceros.
+- [x] **Myfxbook de Argemiro** (2026-10-14): https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459
+      (cuenta 12253459, JustMarkets, real en centavos USC, MT4). Pública, con historial público y transacciones abiertas,
+      órdenes y SL/TP privados. Ya está en la landing.
+- [ ] **Fecha de inicio de la cuenta en Myfxbook:** la gráfica de Myfxbook arranca el 01/01/2000 y sube en línea recta
+      hasta 2026. Eso hace que Myfxbook calcule la cuenta como si tuviera 26 años (por eso muestra 0,38 % mensual y
+      0,01 % diario) y que el tiempo auditado no se pueda publicar. Seguramente hay un movimiento del historial con
+      fecha del año 2000. Argemiro debe revisarlo en el historial de la cuenta y, si es así, escribir al soporte de
+      Myfxbook para corregirlo. Mientras tanto no se usa el widget de la gráfica.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
