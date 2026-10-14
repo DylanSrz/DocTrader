@@ -55,14 +55,42 @@ pnpm --filter @doctrader/api dev:worker  # el worker, en otra terminal
 
 ## Despliegue
 
-Se configura cuando estén creadas las cuentas (ver `docs/PENDIENTES.md`). No hay Docker en producción.
+No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de Dylan (2026-10-14).
 
-- **Web — Vercel:** proyecto con raíz `apps/web` (Vercel detecta pnpm y el monorepo). Variables:
-  `NEXT_PUBLIC_API_URL=https://api.doctraderpro.com`. Dominio `doctraderpro.com` y `www`.
-- **API y worker — Railway:** dos servicios del mismo repositorio, con los archivos de configuración
-  `apps/api/railway/api.json` y `apps/api/railway/worker.json`. Las migraciones corren solas antes de cada despliegue
-  de la API. Variables: las de `apps/api/.env.example` con valores de producción (`NODE_ENV=production`,
-  `WEB_ORIGIN=https://doctraderpro.com`, `DATABASE_URL` y `REDIS_URL` de Railway, y una `AUDIT_HMAC_KEY` nueva guardada
-  en el gestor de contraseñas). La semilla se corre una vez: `node apps/api/dist/database/semilla.js`.
-- **Integración continua:** (los flujos están en `docs/ci/` hasta que se copien a `.github/workflows/`; ver ese README) GitHub Actions corre formato, lint, tipos, pruebas unitarias, pruebas de punta a punta,
-  build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabot propone actualizaciones cada semana.
+### Web — Vercel
+
+1. **Add New → Project** → importar `DylanSrz/DocTrader`.
+2. **Root Directory:** `apps/web`. Vercel detecta Next.js y pnpm; el comando de build está en `apps/web/vercel.json`
+   (compila primero `packages/shared`).
+3. Variables: `NEXT_PUBLIC_API_URL` = el dominio de la API en Railway (y más adelante `https://api.doctraderpro.com`).
+   En el entorno *Preview*, `MOSTRAR_SISTEMA=true` para ver `/sistema`.
+4. El dominio `doctraderpro.com` se conecta cuando la landing esté lista (etapa 2), no antes.
+
+### API y worker — Railway
+
+1. **New Project → Deploy from GitHub repo** → `DylanSrz/DocTrader`. Ese primer servicio es la **API**:
+   - Settings → **Config-as-code**: `apps/api/railway/api.json` (build, arranque, `/salud` y, antes de cada
+     despliegue, migraciones y semilla; la semilla no repite ni pisa nada).
+   - Settings → Networking → **Generate Domain** (después, `api.doctraderpro.com`).
+2. En el mismo proyecto: **New → Database → PostgreSQL** y **New → Database → Redis**.
+3. **New → GitHub repo** otra vez, mismo repositorio: es el **worker**. Config-as-code:
+   `apps/api/railway/worker.json`. No necesita dominio.
+4. Variables, en la API y en el worker (iguales en los dos):
+
+   | Variable | Valor |
+   |---|---|
+   | `NODE_ENV` | `production` |
+   | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (red privada de Railway) |
+   | `DATABASE_SSL` | `false` (la red privada no usa SSL) |
+   | `REDIS_URL` | `${{Redis.REDIS_URL}}` |
+   | `WEB_ORIGIN` | El dominio de Vercel (después, `https://doctraderpro.com`) |
+   | `AUDIT_HMAC_KEY` | Una llave nueva: `openssl rand -base64 32`. Guárdala en el gestor de contraseñas: si se pierde, la auditoría vieja ya no se puede verificar |
+
+5. Revisar `https://<dominio-de-la-api>/salud`: debe responder `"estado":"ok"` y, al minuto, mostrar el latido del
+   worker.
+
+### Integración continua
+
+Los flujos están en `docs/ci/` hasta que se copien a `.github/workflows/` (ver ese README). Corren formato, lint,
+tipos, pruebas unitarias, pruebas de punta a punta, build, búsqueda de secretos (gitleaks) y CodeQL en cada pull
+request. Dependabot propone actualizaciones cada semana.
