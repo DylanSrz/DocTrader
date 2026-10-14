@@ -5,7 +5,7 @@
 
 ## 1. Convenciones
 
-- **Ids:** UUID v7 (ordenables por fecha) en todas las tablas, salvo la auditoría (número consecutivo). Los números
+- **Ids:** UUID v7 (ordenables por fecha; los genera la función `uuid_generate_v7()` de la base de datos) en todas las tablas, salvo la auditoría (número consecutivo). Los números
   que ve la gente (orden `DTP-000123`, ticket `1042`) son una columna aparte con su propia secuencia.
 - **Fechas:** `timestamptz` en UTC. Se muestran en hora de Colombia (`America/Bogota`). Las duraciones de licencia se
   suman en **meses de calendario** en hora de Colombia: del 3 de octubre, un mes llega al 3 de noviembre; si el día no
@@ -420,7 +420,7 @@ stateDiagram-v2
 | Borrar datos vencidos | Diario | Contraseñas de trading, fotos, tickets y registros según la política de datos |
 | Copia de seguridad extra | Semanal | Copia cifrada de la base de datos en R2 |
 
-## 6. Reglas que asumí (por confirmar con Argemiro)
+## 6. Reglas confirmadas (2026-10-14)
 
 1. **Renovar durante la gracia:** los días se suman desde el vencimiento anterior, así que los días de gracia
    cuentan como usados. Si se suman desde el día del pago, la gracia sería tiempo gratis.

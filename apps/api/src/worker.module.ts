@@ -1,0 +1,26 @@
+import { BullModule } from '@nestjs/bullmq';
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { BaseModule } from './base.module.js';
+import type { Entorno } from './config/entorno.js';
+import { COLA_MANTENIMIENTO } from './worker/latido.js';
+import { MantenimientoProcessor } from './worker/mantenimiento.processor.js';
+import { ProgramarTrabajos } from './worker/programar-trabajos.js';
+
+/** Proceso aparte para los trabajos en segundo plano (ver `docs/MODELO-DATOS.md` §5). */
+@Module({
+  imports: [
+    BaseModule,
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<Entorno, true>) => ({
+        // BullMQ necesita reintentos ilimitados en la conexión para no perder trabajos si Redis parpadea.
+        connection: { url: config.get('REDIS_URL', { infer: true }), maxRetriesPerRequest: null },
+        prefix: 'doctrader',
+      }),
+    }),
+    BullModule.registerQueue({ name: COLA_MANTENIMIENTO }),
+  ],
+  providers: [MantenimientoProcessor, ProgramarTrabajos],
+})
+export class WorkerModule {}

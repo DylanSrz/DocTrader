@@ -30,8 +30,8 @@
 | Tipo | Qué cubre | Herramienta |
 |---|---|---|
 | **Reglas de negocio** | Fechas de licencia (meses de calendario, obsequio, completar la prueba, renovar en gracia), precios y diferencias, comisión, normalización de correo, teléfono y cuenta, huellas HMAC | Vitest en `packages/shared` |
-| **API** | Permisos (un cliente no ve lo de otro; un cliente no entra a rutas de admin), registro e ingreso, pagos (hash repetido, aprobar dos veces al mismo tiempo, monto incompleto), control de la prueba, cifrado | Jest + Supertest contra una base de datos de prueba |
-| **Verificadores de blockchain** | Respuestas grabadas de TronGrid y mempool.space (pago correcto, monto incompleto, otra dirección, sin confirmaciones, proveedor caído) | Jest con respuestas grabadas |
+| **API** | Permisos (un cliente no ve lo de otro; un cliente no entra a rutas de admin), registro e ingreso, pagos (hash repetido, aprobar dos veces al mismo tiempo, monto incompleto), control de la prueba, cifrado | Vitest + Supertest contra una base de datos de prueba (NestJS 12 trae Vitest) |
+| **Verificadores de blockchain** | Respuestas grabadas de TronGrid y mempool.space (pago correcto, monto incompleto, otra dirección, sin confirmaciones, proveedor caído) | Vitest con respuestas grabadas |
 | **De punta a punta** | Registro → agregar cuenta → orden → reportar hash → aprobar → por conectar → conectada; solicitud de prueba → aprobación → completarla; ticket de ida y vuelta | Playwright |
 | **Accesibilidad y diseño** | Sin desbordes a 320, 390, 768, 1024 y 1440 px; foco visible; contraste | Playwright + axe |
 
@@ -43,11 +43,16 @@ secretos (gitleaks), análisis de código (CodeQL) y revisión de dependencias (
 Cada etapa deja algo que se puede usar y probar. El orden respeta las dependencias: no hay pagos sin cuentas, ni
 prueba sin pagos.
 
-### Etapa 0 — Base del proyecto
+### Etapa 0 — Base del proyecto ✅ (2026-10-14)
 - Monorepo, Docker Compose de desarrollo, integración continua y despliegue a pruebas.
 - Sistema de diseño de la propuesta 2 en Tailwind: colores, Inter, píldoras, triángulos y componentes base.
 - Migraciones de TypeORM, datos iniciales (planes, ajustes, direcciones de depósito, los dos admins) y auditoría.
 - **Hecho cuando:** la web y la API vacías se despliegan solas en pruebas y las pruebas corren en cada pull request.
+- **Resultado:** monorepo con NestJS 12, Next.js 16, Tailwind 4 y TypeORM; Docker Compose; migración inicial (usuarios,
+  socio, planes, ajustes, direcciones y auditoría encadenada que la base de datos no deja cambiar); semilla; worker con
+  latido; `/salud`; sistema de diseño (`/sistema`) y página temporal; GitHub Actions, CodeQL, gitleaks y Dependabot.
+  28 pruebas unitarias y 14 de punta a punta. **Falta el despliegue automático a pruebas**, que necesita las cuentas
+  de Vercel y Railway (configuración lista en el `README.md`).
 
 ### Etapa 1 — Cuentas y acceso
 - Registro con nombre, cédula, correo y teléfono, casillas de términos, datos y riesgo, y Turnstile.

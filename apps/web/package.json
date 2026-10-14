@@ -1,0 +1,31 @@
+{
+  "name": "@doctrader/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Página pública y paneles de DocTraderPRO (Next.js)",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "echo \"La web se prueba con Playwright desde la etapa 2\""
+  },
+  "dependencies": {
+    "@doctrader/shared": "workspace:*",
+    "next": "16.4.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.4.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  }
+}

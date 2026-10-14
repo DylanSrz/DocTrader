@@ -3,7 +3,7 @@
 > Última actualización: 2026-10-14 (titular, textos legales, seguridad, cuentas de servicio y decisiones técnicas).
 > Antes: 2026-10-12 (reunión con Argemiro: propuesta 2 elegida, licencia mensual, semestral 6 + 1, prueba de 15 días
 > con control antiabuso, tickets de soporte, correo oficial)
-> Estado: **Planeación cerrada** (2026-10-14; aún no hay código). Plan de construcción en `docs/PLAN-TRABAJO.md`.
+> Estado: **construcción** (2026-10-14). Etapa 0 hecha; plan en `docs/PLAN-TRABAJO.md`.
 
 ## 1. Resumen
 
