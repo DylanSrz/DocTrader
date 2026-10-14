@@ -18,7 +18,8 @@ Reglas clave:
   **diferencia** (USD 70, 269 o 449) hasta el último día de la prueba; la licencia cuenta desde el inicio de la prueba.
   **Una prueba por cliente y por cuenta de trading**, con control antiabuso (ver `docs/CONTEXTO.md`, "Control de la prueba"); para pedirla, correo y teléfono verificados (**SMS**).
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
-- **Solo cripto** por ahora: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20), BTC (Bitcoin).
+- **Solo cripto** por ahora y **solo dos redes**: USDT (Tron TRC20) y BTC (Bitcoin). USDC (BNB Smart Chain) se quitó el
+  2026-10-14; el diseño permite agregar redes después.
   Al lanzar: **depósito directo con aprobación manual** (direcciones que el admin agrega en el panel).
   Cada hash reportado se **verifica automáticamente en la blockchain** (destino, moneda, monto, fecha,
   confirmaciones, hash no repetido) antes de que el admin apruebe; aprobación automática opcional (apagada).
@@ -32,7 +33,7 @@ Reglas clave:
   liquidada los 15 y 30 de cada mes).
 - Titular: **DocTraderPRO, Barranquilla, Colombia**. Textos legales (borradores) en `docs/legal/`; plan de seguridad en
   `docs/SEGURIDAD.md`; decisiones técnicas (SMS, blockchain, archivos, cuentas) en `docs/DECISIONES-TECNICAS.md`.
-  Admins: Dylan (dylansrz96@gmail.com) y Argemiro. Cuentas de servicio a nombre de Dylan; las paga Argemiro.
+  Admins: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderpro@gmail.com). Cuentas de servicio a nombre de Dylan; las paga Argemiro.
 - Registro con nombre, **cédula**, correo y teléfono. Correo oficial: **support@doctraderpro.com** (contacto y Reply-To).
   Dominio propio: **doctraderpro.com** (DNS en Hostinger); los correos automáticos
   salen por Resend desde el dominio.

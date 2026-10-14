@@ -104,8 +104,8 @@ duplicados o cuentas de terceros), puede rechazar la solicitud o cancelar la pru
 
 ## 7. Pagos
 
-7.1. Por ahora, los pagos se reciben **solo en criptomonedas**: USDT en la red Tron (TRC20), USDC en la red BNB Smart
-Chain (BEP20) y BTC en la red Bitcoin. Las direcciones de pago se muestran **únicamente dentro del panel del Cliente**.
+7.1. Por ahora, los pagos se reciben **solo en criptomonedas**: USDT en la red Tron (TRC20) y BTC en la red
+Bitcoin. Las direcciones de pago se muestran **únicamente dentro del panel del Cliente**.
 DocTraderPRO nunca pide pagos por chat, redes sociales o correo, ni a direcciones distintas a las del panel.
 
 7.2. Cada compra genera una **orden de pago válida por 1 hora**. En pagos con BTC, el monto en BTC se fija al crear la

@@ -43,9 +43,9 @@
       Twilio (SMS), Cloudflare (archivos y Turnstile), Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
 - [ ] Verificar doctraderpro.com en Resend (registros DNS en Hostinger).
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
-- [ ] Direcciones de depósito iniciales: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20) y BTC (Bitcoin).
+- [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
-- [ ] **Correo de admin de Argemiro.**
+- [x] Correo de admin de Argemiro: doctraderpro@gmail.com.
 - [ ] Segundo factor y gestor de contraseñas compartido para las cuentas de servicio (ver `docs/SEGURIDAD.md`).
 
 ## ✅ Resuelto (resumen)
@@ -55,7 +55,7 @@ socio, liquidada los 15 y 30 de cada mes ·
 licencias mensual USD 120, trimestral USD 319, semestral USD 499 (6 + 1), prueba de 15 días USD 50 que se completa pagando la diferencia (a semestral, con el mes de obsequio; la licencia cuenta desde el inicio de la prueba) ·
 la landing invita a solicitar la prueba · teléfono verificado por SMS para pedir la prueba ·
 TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase 2 · Binance Pay +
-direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
+direcciones de depósito configurables · solo cripto: USDT TRC20 y BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
 una prueba por cliente y por cuenta de trading, con control antiabuso · tickets de soporte en la plataforma ·
 verificación automática de pagos en blockchain · soporte por tickets y Telegram · dominio doctraderpro.com · correo oficial support@doctraderpro.com · propuesta de diseño 2 · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.

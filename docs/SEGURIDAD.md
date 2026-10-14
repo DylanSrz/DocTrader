@@ -88,7 +88,7 @@ Con **AES-256-GCM** en la API (cifrado autenticado: si alguien altera el dato, n
 Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 
 - Agregar o cambiar una dirección exige **segundo factor confirmado**.
-- Se valida el formato de la dirección según la red (Tron, BNB Smart Chain con checksum, Bitcoin).
+- Se valida el formato de la dirección según la red (Tron y Bitcoin, con su checksum).
 - **Aviso inmediato por correo a los dos admins** con la dirección nueva completa.
 - La dirección nueva queda **"en espera" 24 horas** antes de mostrarse a los clientes. En ese tiempo, cualquiera de
   los dos admins puede cancelarla.
@@ -99,8 +99,7 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 ## 6. Pagos
 
 - La verificación en blockchain la hace **el servidor**: lo que reporta el cliente es solo el hash.
-- Montos en unidades enteras de cada moneda (sin decimales flotantes). USDC en BNB Smart Chain usa 18 decimales;
-  USDT en Tron, 6; BTC, 8.
+- Montos en unidades enteras de cada moneda (sin decimales flotantes): USDT en Tron usa 6 decimales y BTC 8.
 - Índice único por red y hash en la base de datos: un hash no se puede usar en dos órdenes, ni siquiera con dos
   peticiones al mismo tiempo.
 - Aprobar un pago bloquea la fila de la orden en una transacción, para que no se apruebe dos veces.

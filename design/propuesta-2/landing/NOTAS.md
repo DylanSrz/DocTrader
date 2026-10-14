@@ -105,3 +105,7 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
   operación del sistema, en el broker que tú elijas. Tu dinero nunca sale de tu cuenta y el historial del sistema lo
   audita Myfxbook." Son los textos de lanzamiento; Argemiro puede pedir cambios.
 - **Legal:** los enlaces del pie van a los textos de `docs/legal/` (términos, política de datos y aviso de riesgo).
+
+## Cambio del 2026-10-14: solo USDT (Tron) y BTC
+
+Se quitó USDC en BNB Smart Chain de los textos, el selector de red, los ajustes y los datos de ejemplo. Las direcciones del prototipo siguen siendo de ejemplo; las reales están en `docs/CONTEXTO.md`.

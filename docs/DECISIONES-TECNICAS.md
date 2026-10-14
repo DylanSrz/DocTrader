@@ -50,28 +50,23 @@ reintenta. Nunca se aprueba sin verificar.
 | Red | Principal | Respaldo | Cómo se verifica |
 |---|---|---|---|
 | **Tron** (USDT TRC20) | TronGrid, con llave gratis | Tronscan API, con llave | `walletsolidity/gettransactioninfobyid`: devuelve el resultado ya consolidado (irreversible) con el evento de transferencia del contrato de USDT |
-| **BNB Smart Chain** (USDC BEP20) | NodeReal MegaNode, plan gratis | Nodos públicos de BNB Chain (`bsc-dataseed`) | `eth_getTransactionReceipt` con la librería viem: se lee el evento `Transfer` del contrato de USDC; confirmaciones = bloque actual − bloque de la transacción + 1 |
 | **Bitcoin** | mempool.space | Blockstream Esplora (misma API) | `/tx/:txid` para las salidas y `/tx/:txid/status` + altura actual para las confirmaciones |
 
-**Datos de los contratos:**
-- USDT en Tron: `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`, 6 decimales.
-- USDC en BNB Smart Chain: `0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d` ("Binance-Peg USD Coin"), **18 decimales**,
-  no 6 como en Ethereum. Comprobado en la red el 2026-10-14.
+**Datos:** USDT en Tron es el contrato `TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t`, con 6 decimales. BTC usa 8 decimales
+(satoshis). La dirección BTC de Argemiro es del formato antiguo (empieza por 1); se acepta igual que las nuevas.
 
-**Por qué no BscScan:** desde 2025 la API de Etherscan (que absorbió a BscScan) ya no tiene plan gratis para BNB
-Smart Chain; el más barato cuesta USD 49 al mes. Leer el recibo de la transacción directamente del nodo da la misma
-información gratis.
+**Si algún día vuelve USDC en BNB Smart Chain** (se quitó el 2026-10-14): leer el recibo de la transacción con
+NodeReal (plan gratis) y los nodos públicos de BNB Chain de respaldo, no con BscScan, que ya no tiene plan gratis para
+esa red. El contrato es `0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d` y usa **18 decimales**.
 
 **Precio de BTC** (para fijar el monto de la orden): API pública de Binance (`data-api.binance.vision`, par BTCUSDT)
 como principal y CoinGecko (plan Demo gratis, 10.000 consultas al mes) como respaldo. Si los dos difieren en más de
 1 %, no se crea la orden y se avisa a los admins. Hay que probar desde el servidor que Binance no bloquee la región.
 
-**Detectar pagos sin hash** (si el cliente no lo reporta): TronGrid lista las transferencias TRC20 de una dirección,
-NodeReal permite buscar eventos (`eth_getLogs`, que los nodos públicos no permiten) y mempool.space lista las
-transacciones de una dirección.
+**Detectar pagos sin hash** (si el cliente no lo reporta): TronGrid lista las transferencias TRC20 de una dirección y
+mempool.space lista las transacciones de una dirección.
 
-**Billetera de origen** (señal del control de la prueba): en Tron y BNB Smart Chain es el remitente del evento de
-transferencia. En Bitcoin una transacción puede tener varias entradas; se guardan todas.
+**Billetera de origen** (señal del control de la prueba): en Tron es el remitente del evento de transferencia. En Bitcoin una transacción puede tener varias entradas; se guardan todas.
 
 ## 3. Archivos: Cloudflare R2
 

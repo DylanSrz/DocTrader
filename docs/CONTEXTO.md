@@ -91,17 +91,23 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 ### Pagos
 - **Manuales y no recurrentes.** El cliente recibe recordatorios y entra a pagar.
 - Modelo de **periodos prepagados**: si renueva antes de vencer, los días se suman desde el vencimiento actual.
-- **Solo cripto por ahora** (sin transferencias ni pesos). Monedas y redes:
-  **USDT en Tron (TRC20)**, **USDC en BNB Smart Chain (BEP20)** y **BTC en la red Bitcoin**.
+- **Solo cripto por ahora** (sin transferencias ni pesos) y **solo dos monedas** (decisión del 2026-10-14):
+  **USDT en Tron (TRC20)** y **BTC en la red Bitcoin**. USDC en BNB Smart Chain se quitó; el sistema queda preparado
+  para agregar redes después sin rehacer nada.
+  - **Direcciones iniciales** (de Argemiro, checksum comprobado el 2026-10-14):
+    - USDT TRC20: `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x`
+    - BTC: `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`
+    Se cargan en la base de datos con la primera instalación; los cambios posteriores pasan por las reglas de
+    `docs/SEGURIDAD.md` (segundo factor, aviso a los dos admins y 24 horas de espera).
   - **Depósito directo (método principal al lanzar):** el admin **agrega desde el panel todas las direcciones de depósito** que
     quiera (moneda + red + dirección, activables). El cliente envía, reporta el hash y el admin aprueba.
   - **Verificación automática en blockchain:** cuando el cliente reporta el hash, la plataforma consulta
-    la blockchain pública (Tron para USDT TRC20, BNB Smart Chain para USDC BEP20, Bitcoin para BTC) y revisa:
+    la blockchain pública (Tron para USDT TRC20 y Bitcoin para BTC) y revisa:
     1. que el hash no se haya usado antes en otra orden;
     2. que el destino sea la dirección de depósito de la orden y la moneda/contrato sea el correcto;
     3. que el monto sea **igual o mayor** al de la orden (si es menor, se marca "monto incompleto");
     4. que la transacción sea posterior a la creación de la orden;
-    5. que tenga las confirmaciones mínimas (propuesto: Tron 20, BNB Smart Chain 15, Bitcoin 2; editables).
+    5. que tenga las confirmaciones mínimas (propuesto: Tron 20, Bitcoin 2; editables).
     El resultado (Verificado / No coincide / Esperando confirmaciones) se muestra al admin junto a la orden,
     que la aprueba con un clic. Opción en el panel, **apagada por defecto**: aprobar sola las órdenes verificadas.
     Si el cliente no reporta el hash, el sistema puede detectar el depósito buscando el monto exacto en la dirección.
@@ -166,7 +172,7 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 
 ### Cuentas de servicio
 - Se crean con el correo de **Dylan (dylansrz96@gmail.com)**; los pagos los cubre Argemiro.
-- Admins de la plataforma: Dylan (dylansrz96@gmail.com) y Argemiro (correo pendiente).
+- Admins de la plataforma: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderpro@gmail.com).
 
 ### Seguridad
 Plan completo en `docs/SEGURIDAD.md`. Lo principal: segundo factor obligatorio para admins, sesiones en el servidor,
@@ -192,7 +198,7 @@ a los dos admins, auditoría que no se puede editar y copias de seguridad probad
 - **Frontend: Next.js (React)** + Tailwind.
 - Base de datos: **PostgreSQL** con **TypeORM**.
 - Correos: Resend. SMS: **Twilio Verify**. Archivos: **Cloudflare R2** (privado). Anti-bots: Cloudflare Turnstile.
-  Errores: Sentry. Lectura de blockchain: TronGrid, NodeReal (BNB Smart Chain) y mempool.space, cada uno con respaldo.
+  Errores: Sentry. Lectura de blockchain: TronGrid y mempool.space, cada uno con respaldo.
   Detalle, costos y motivos en `docs/DECISIONES-TECNICAS.md`.
 - **Dominio doctraderpro.com** (DNS en Hostinger), repartido así:
 
