@@ -83,7 +83,6 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
 - **Enlace a Myfxbook:** mientras Argemiro pasa el suyo, apunta a una cuenta de referencia de terceros
   (https://www.myfxbook.com/es/members/BonusMAXI/aurum-2/12250704). Hay que cambiarlo antes de publicar.
   Myfxbook bloquea las visitas automáticas (verificación de Cloudflare), así que sus cifras no se pudieron leer.
-- Textos definitivos del hero y del problema, que son propuestos.
 - Rutas reales: `/registro`, `/ingresar` y `/legal/...`.
 
 ## Cambios del 2026-10-12 (reunión con Argemiro)
@@ -99,3 +98,10 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
   devoluciones ahora remite a la prueba de 15 días.
 - **Pie:** el correo oficial `support@doctraderpro.com` como texto seleccionable, con botón de copiar. No es un
   enlace `mailto:`, porque esos enlaces no siempre funcionan.
+
+## Cambios del 2026-10-14
+
+- **Hero:** titular "Tu cuenta, conectada al sistema de Argemiro." y texto "Doc Trader Pro AI replica en tu cuenta cada
+  operación del sistema, en el broker que tú elijas. Tu dinero nunca sale de tu cuenta y el historial del sistema lo
+  audita Myfxbook." Son los textos de lanzamiento; Argemiro puede pedir cambios.
+- **Legal:** los enlaces del pie van a los textos de `docs/legal/` (términos, política de datos y aviso de riesgo).

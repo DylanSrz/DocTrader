@@ -1,7 +1,8 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-12 (reunión con Argemiro: propuesta 2 elegida, licencia mensual, semestral 6 + 1,
-> prueba de 15 días con control antiabuso, tickets de soporte, correo oficial)
+> Última actualización: 2026-10-14 (titular, textos legales, seguridad, cuentas de servicio y decisiones técnicas).
+> Antes: 2026-10-12 (reunión con Argemiro: propuesta 2 elegida, licencia mensual, semestral 6 + 1, prueba de 15 días
+> con control antiabuso, tickets de soporte, correo oficial)
 > Estado: **Planeación** (aún no hay código)
 
 ## 1. Resumen
@@ -19,7 +20,7 @@ deben reflejar esto (nunca prometer rentabilidad).
 | Persona | Rol en el proyecto | Rol en la plataforma |
 |---|---|---|
 | **Argemiro** | Dueño del software y del negocio | Administrador — todos los permisos |
-| **Desarrollador** (socio) | Desarrolla la plataforma y gana un % de las ventas | Administrador — todos los permisos + su perfil de socio con su comisión |
+| **Dylan** (desarrollador y socio) | Desarrolla la plataforma y gana un % de las ventas | Administrador — todos los permisos + su perfil de socio con su comisión |
 | **Cliente** | Compra licencias | Cliente |
 
 ## 3. Decisiones tomadas
@@ -151,6 +152,26 @@ debe informar esta finalidad (prevención de fraude en la prueba).
   - Correos: al cliente con cada respuesta (con Reply-To al correo oficial); alerta a los admins con cada ticket nuevo.
 - **Telegram:** https://t.me/+cdmWH_xLubdhMDhh
 - **Instagram:** https://www.instagram.com/doctraderproiasystem/
+
+### Titular y textos legales
+- **Titular:** DocTraderPRO, Barranquilla, Colombia. Faltan su identificación (NIT o cédula), dirección y teléfono para
+  la política de datos.
+- Borradores en `docs/legal/` (2026-10-14), para revisar con un abogado antes de publicar:
+  - `terminos-licencia.md`: licencia de uso, planes, prueba, pagos, sin devoluciones, gracia, responsabilidad.
+  - `politica-datos.md`: Ley 1581, finalidades, huellas de la prueba, plazos de borrado, derechos y autorización.
+  - `aviso-riesgo.md`: riesgo de pérdida, resultados pasados, enlace de referido; incluye una versión corta.
+- **Plazos de borrado** que salen de la política: contraseñas de trading 90 días después de desconectar una cuenta que
+  no renovó; foto del documento 30 días después de decidir la prueba; tickets 2 años; registros técnicos 12 meses;
+  auditoría de admins 5 años.
+
+### Cuentas de servicio
+- Se crean con el correo de **Dylan (dylansrz96@gmail.com)**; los pagos los cubre Argemiro.
+- Admins de la plataforma: Dylan (dylansrz96@gmail.com) y Argemiro (correo pendiente).
+
+### Seguridad
+Plan completo en `docs/SEGURIDAD.md`. Lo principal: segundo factor obligatorio para admins, sesiones en el servidor,
+cifrado por campo de contraseñas de trading y cédula, cambio de direcciones de depósito con 24 horas de espera y aviso
+a los dos admins, auditoría que no se puede editar y copias de seguridad probadas.
 
 ### Contenido y marca
 - Widget de **Myfxbook** de la cuenta auditada (~2 años).
