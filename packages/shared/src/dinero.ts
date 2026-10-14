@@ -41,8 +41,15 @@ export function deUnidadesBase(unidades: bigint, moneda: Moneda): string {
   const decimales = DECIMALES[moneda];
   const texto = unidades.toString().padStart(decimales + 1, '0');
   const entero = texto.slice(0, -decimales);
-  const fraccion = texto.slice(-decimales).replace(/0+$/, '');
+  const fraccion = quitarCerosFinales(texto.slice(-decimales));
   return fraccion ? `${entero}.${fraccion}` : entero;
+}
+
+/** Quita los ceros del final sin expresión regular (CodeQL marca `/0+$/` como lenta con entradas largas). */
+function quitarCerosFinales(texto: string): string {
+  let fin = texto.length;
+  while (fin > 0 && texto[fin - 1] === '0') fin--;
+  return texto.slice(0, fin);
 }
 
 function assertEntero(valor: number, nombre: string): void {

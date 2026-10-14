@@ -37,6 +37,9 @@ describe('unidades base', () => {
     expect(aUnidadesBase('0.00398', 'BTC')).toBe(398_000n);
     expect(deUnidadesBase(398_000n, 'BTC')).toBe('0.00398');
     expect(deUnidadesBase(1n, 'BTC')).toBe('0.00000001');
+    expect(deUnidadesBase(100_000_000n, 'BTC')).toBe('1');
+    expect(deUnidadesBase(0n, 'USDT')).toBe('0');
+    expect(deUnidadesBase(300_500_000n, 'USDT')).toBe('300.5');
   });
 
   it('rechaza más decimales de los que admite la moneda', () => {

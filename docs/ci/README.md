@@ -1,16 +1,13 @@
-# Flujos de GitHub Actions por instalar
+# Flujo de CI por instalar
 
 Desde la sesión de desarrollo no se pueden subir archivos a `.github/workflows/` (la conexión con GitHub no tiene el
-permiso `workflow`). Estos dos flujos están listos; hay que copiarlos una vez a mano:
+permiso `workflow`). CodeQL ya está instalado en `.github/workflows/codeql.yml`; falta el de CI:
 
-1. En GitHub, abrir el repositorio en la rama donde se quieran activar.
-2. **Add file → Create new file**, con el nombre `.github/workflows/ci.yml`, y pegar el contenido de `ci.yml`.
-3. Repetir con `.github/workflows/codeql.yml`.
-4. Borrar esta carpeta (`docs/ci/`) en el siguiente cambio.
+1. En GitHub, en la rama `claude/contexto-proyecto`: **Add file → Create new file**.
+2. En el nombre escribe exactamente `.github/workflows/ci.yml` (con el punto inicial: así GitHub crea las carpetas
+   `.github` y `workflows`).
+3. Pega el contenido de `docs/ci/ci.yml` y guarda.
+4. Borra esta carpeta (`docs/ci/`) en el siguiente cambio.
 
-| Archivo | Qué hace |
-|---|---|
-| `ci.yml` | En cada pull request y en cada cambio a `main`: formato, lint, tipos, pruebas unitarias, pruebas de punta a punta de la API con Postgres y Redis reales, build y búsqueda de secretos (gitleaks) |
-| `codeql.yml` | Análisis de seguridad del código (CodeQL) en cada pull request y cada lunes |
-
-Dependabot (`.github/dependabot.yml`) ya está activo: no es un flujo de Actions.
+`ci.yml` corre en cada pull request y en cada cambio a `main`: formato, lint, tipos, pruebas unitarias, pruebas de
+punta a punta de la API con Postgres y Redis reales, build y búsqueda de secretos (gitleaks).
