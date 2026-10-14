@@ -6,7 +6,8 @@ Plataforma web para vender licencias del software de copy trading **Doc Trader P
 - Información pendiente por recibir: `docs/PENDIENTES.md`
 - Documento de requerimientos formal (RN, RF, RNF, HU, alcance): https://claude.ai/code/artifact/12e017f5-308d-45a5-bf40-89b2d4b6f121
 
-Estado: **modo plan**. No escribir código de la aplicación hasta que el usuario lo pida.
+Estado: **construcción** (desde el 2026-10-14). Etapa 0 (base del proyecto) hecha; sigue la etapa 1 de
+`docs/PLAN-TRABAJO.md`. Cómo correr el proyecto y convenciones de código: `README.md`.
 
 Reglas clave:
 - Se vende una **licencia de uso de software**, nunca "servicio de trading" ni rentabilidad garantizada.
@@ -18,7 +19,8 @@ Reglas clave:
   **diferencia** (USD 70, 269 o 449) hasta el último día de la prueba; la licencia cuenta desde el inicio de la prueba.
   **Una prueba por cliente y por cuenta de trading**, con control antiabuso (ver `docs/CONTEXTO.md`, "Control de la prueba"); para pedirla, correo y teléfono verificados (**SMS**).
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
-- **Solo cripto** por ahora: USDT (Tron TRC20), USDC (BNB Smart Chain BEP20), BTC (Bitcoin).
+- **Solo cripto** por ahora y **solo dos redes**: USDT (Tron TRC20) y BTC (Bitcoin). USDC (BNB Smart Chain) se quitó el
+  2026-10-14; el diseño permite agregar redes después.
   Al lanzar: **depósito directo con aprobación manual** (direcciones que el admin agrega en el panel).
   Cada hash reportado se **verifica automáticamente en la blockchain** (destino, moneda, monto, fecha,
   confirmaciones, hash no repetido) antes de que el admin apruebe; aprobación automática opcional (apagada).
@@ -30,7 +32,14 @@ Reglas clave:
   licencias, datos de cuenta (contraseñas cifradas) y listas "por conectar" / "por desconectar".
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
-- Registro con nombre, **cédula**, correo y teléfono. Correo oficial: **doctraderpro@gmail.com** (contacto y Reply-To).
+- Titular: **DocTraderPRO, Barranquilla, Colombia**. Textos legales (borradores) en `docs/legal/`; plan de seguridad en
+  `docs/SEGURIDAD.md`; decisiones técnicas (SMS, blockchain, archivos, cuentas) en `docs/DECISIONES-TECNICAS.md`;
+  modelo de datos y estados en `docs/MODELO-DATOS.md`; etapas, entornos, pruebas y lista de lanzamiento en
+  `docs/PLAN-TRABAJO.md`.
+  Admins: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderpro@gmail.com). Cuentas de servicio a nombre de Dylan; las paga Argemiro.
+- Registro con nombre, **cédula**, correo y teléfono. Correo oficial: **support@doctraderpro.com** (contacto y Reply-To).
+  Dominio propio: **doctraderpro.com** (DNS en Hostinger); los correos automáticos
+  salen por Resend desde el dominio.
   Soporte con **tickets dentro de la plataforma** (convive con Telegram https://t.me/+cdmWH_xLubdhMDhh).
   Instagram: https://www.instagram.com/doctraderproiasystem/. Broker sugerido: JustMarkets
   (https://one.justmarkets.link/a/5vmbn05zda).
@@ -64,7 +73,8 @@ Reglas clave:
   - **Propuesta 2** (`design/propuesta-2/`, **elegida**): sistema de diseño =
     `contexto/diseno/DESIGN.md` de Refero (Dala) con los colores del logo (naranja como único color de acción) e Inter.
     Piezas: landing, panel del cliente y panel de administración (`landing/`, `panel-cliente/`, `panel-admin/`, notas en cada `NOTAS.md`).
-    Cifras de Myfxbook pendientes; el enlace actual es una cuenta de referencia de terceros que hay que reemplazar.
+    Myfxbook de Argemiro: https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459 (el broker archivó el
+    historial anterior, así que Myfxbook toma como inicio el año 2000; ver `docs/PENDIENTES.md`).
   - No mezclar estilos: todo lo nuevo se diseña con el sistema de la propuesta 2.
 - Stack: NestJS (API + worker con BullMQ/Redis) + Next.js (web) + PostgreSQL con **TypeORM**, en un monorepo pnpm
   (`apps/api`, `apps/web`, `packages/shared`). **Docker solo para desarrollo**; producción en Vercel + Railway/Render

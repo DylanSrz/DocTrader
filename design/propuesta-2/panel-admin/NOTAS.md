@@ -113,3 +113,7 @@ Con `prefers-reduced-motion` solo quedan cambios de opacidad.
     sobre negro, con ΔE 11 en el par más cercano.
   - Ventas de octubre: USD 3.802 y 10 licencias. La comisión del socio pasa a USD 380,20.
 - **Licencias:** las pruebas duran 15 días. Se suma la cuenta en prueba de Laura (50299031).
+
+## Cambio del 2026-10-14: solo USDT (Tron) y BTC
+
+Se quitó USDC en BNB Smart Chain de los textos, el selector de red, los ajustes y los datos de ejemplo. Las direcciones del prototipo siguen siendo de ejemplo; las reales están en `docs/CONTEXTO.md`.

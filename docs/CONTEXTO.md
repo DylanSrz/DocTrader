@@ -1,8 +1,9 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-12 (reunión con Argemiro: propuesta 2 elegida, licencia mensual, semestral 6 + 1,
-> prueba de 15 días con control antiabuso, tickets de soporte, correo oficial)
-> Estado: **Planeación** (aún no hay código)
+> Última actualización: 2026-10-14 (titular, textos legales, seguridad, cuentas de servicio y decisiones técnicas).
+> Antes: 2026-10-12 (reunión con Argemiro: propuesta 2 elegida, licencia mensual, semestral 6 + 1, prueba de 15 días
+> con control antiabuso, tickets de soporte, correo oficial)
+> Estado: **construcción** (2026-10-14). Etapa 0 hecha; plan en `docs/PLAN-TRABAJO.md`.
 
 ## 1. Resumen
 
@@ -19,7 +20,7 @@ deben reflejar esto (nunca prometer rentabilidad).
 | Persona | Rol en el proyecto | Rol en la plataforma |
 |---|---|---|
 | **Argemiro** | Dueño del software y del negocio | Administrador — todos los permisos |
-| **Desarrollador** (socio) | Desarrolla la plataforma y gana un % de las ventas | Administrador — todos los permisos + su perfil de socio con su comisión |
+| **Dylan** (desarrollador y socio) | Desarrolla la plataforma y gana un % de las ventas | Administrador — todos los permisos + su perfil de socio con su comisión |
 | **Cliente** | Compra licencias | Cliente |
 
 ## 3. Decisiones tomadas
@@ -90,17 +91,24 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 ### Pagos
 - **Manuales y no recurrentes.** El cliente recibe recordatorios y entra a pagar.
 - Modelo de **periodos prepagados**: si renueva antes de vencer, los días se suman desde el vencimiento actual.
-- **Solo cripto por ahora** (sin transferencias ni pesos). Monedas y redes:
-  **USDT en Tron (TRC20)**, **USDC en BNB Smart Chain (BEP20)** y **BTC en la red Bitcoin**.
+- **Solo cripto por ahora** (sin transferencias ni pesos) y **solo dos monedas** (decisión del 2026-10-14):
+  **USDT en Tron (TRC20)** y **BTC en la red Bitcoin**. USDC en BNB Smart Chain se quitó; el sistema queda preparado
+  para agregar redes después sin rehacer nada.
+  - **Direcciones iniciales** (de la cuenta de **Binance** de Argemiro, checksum comprobado el 2026-10-14):
+    - USDT TRC20: `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x`
+    - BTC: `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`
+    Se cargan en la base de datos con la primera instalación; los cambios posteriores pasan por las reglas de
+    `docs/SEGURIDAD.md` (segundo factor, aviso a los dos admins y 24 horas de espera).
+    Por ser de Binance, la protección de esa cuenta es parte de la seguridad de la plataforma (ver `docs/SEGURIDAD.md`, §5).
   - **Depósito directo (método principal al lanzar):** el admin **agrega desde el panel todas las direcciones de depósito** que
     quiera (moneda + red + dirección, activables). El cliente envía, reporta el hash y el admin aprueba.
   - **Verificación automática en blockchain:** cuando el cliente reporta el hash, la plataforma consulta
-    la blockchain pública (Tron para USDT TRC20, BNB Smart Chain para USDC BEP20, Bitcoin para BTC) y revisa:
+    la blockchain pública (Tron para USDT TRC20 y Bitcoin para BTC) y revisa:
     1. que el hash no se haya usado antes en otra orden;
     2. que el destino sea la dirección de depósito de la orden y la moneda/contrato sea el correcto;
     3. que el monto sea **igual o mayor** al de la orden (si es menor, se marca "monto incompleto");
     4. que la transacción sea posterior a la creación de la orden;
-    5. que tenga las confirmaciones mínimas (propuesto: Tron 20, BNB Smart Chain 15, Bitcoin 2; editables).
+    5. que tenga las confirmaciones mínimas (propuesto: Tron 20, Bitcoin 2; editables).
     El resultado (Verificado / No coincide / Esperando confirmaciones) se muestra al admin junto a la orden,
     que la aprueba con un clic. Opción en el panel, **apagada por defecto**: aprobar sola las órdenes verificadas.
     Si el cliente no reporta el hash, el sistema puede detectar el depósito buscando el monto exacto en la dirección.
@@ -133,11 +141,13 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 - Registro con **nombre completo, cédula (documento de identidad nacional), correo y teléfono**.
   La cédula es única por cliente y sirve para controlar que haya una sola prueba por persona. Se trata
   como dato personal protegido (Ley 1581 de 2012).
-- **Correo oficial:** doctraderpro@gmail.com (decisión del 2026-10-12). Es el correo de contacto público y la
-  dirección de respuesta (Reply-To) de todos los correos que envía la plataforma.
-  - Los correos automáticos (bienvenida, órdenes, recordatorios) deben salir desde un **dominio propio** verificado
-    en Resend (por ejemplo `avisos@dominio.com`), porque Resend no permite enviar como `@gmail.com`. Mientras no haya
-    dominio, se puede enviar por el SMTP de Gmail, con límite de unos 500 correos al día y más riesgo de caer en spam.
+- **Correo oficial: support@doctraderpro.com** (decisión del 2026-10-13). Es el
+  correo de contacto público y la dirección de respuesta (Reply-To) de todos los correos que envía la plataforma.
+  - **Dominio propio: doctraderpro.com** (comprado en Hostinger, 2026-10-13).
+  - **Buzón del dominio: support@doctraderpro.com** (correo de Hostinger). Otras direcciones
+    (`contacto@`, `pagos@`) se crean como alias o reenvíos hacia ese buzón, sin pagar buzones extra.
+  - Los correos automáticos (bienvenida, órdenes, recordatorios) salen por Resend desde el dominio verificado, con una
+    dirección sin buzón como `notificaciones@doctraderpro.com`.
 - **Soporte con tickets dentro de la plataforma** (decisión del 2026-10-12), que **convive con Telegram**: el ticket
   es el canal formal y queda registrado; Telegram sigue para dudas rápidas y comunidad.
   - El cliente abre un ticket desde su panel: tema (pagos, conexión de la cuenta, licencia, técnico, otro), cuenta
@@ -149,6 +159,26 @@ debe informar esta finalidad (prevención de fraude en la prueba).
   - Correos: al cliente con cada respuesta (con Reply-To al correo oficial); alerta a los admins con cada ticket nuevo.
 - **Telegram:** https://t.me/+cdmWH_xLubdhMDhh
 - **Instagram:** https://www.instagram.com/doctraderproiasystem/
+
+### Titular y textos legales
+- **Titular:** DocTraderPRO, Barranquilla, Colombia. Faltan su identificación (NIT o cédula), dirección y teléfono para
+  la política de datos.
+- Borradores en `docs/legal/` (2026-10-14), para revisar con un abogado antes de publicar:
+  - `terminos-licencia.md`: licencia de uso, planes, prueba, pagos, sin devoluciones, gracia, responsabilidad.
+  - `politica-datos.md`: Ley 1581, finalidades, huellas de la prueba, plazos de borrado, derechos y autorización.
+  - `aviso-riesgo.md`: riesgo de pérdida, resultados pasados, enlace de referido; incluye una versión corta.
+- **Plazos de borrado** que salen de la política: contraseñas de trading 90 días después de desconectar una cuenta que
+  no renovó; foto del documento 30 días después de decidir la prueba; tickets 2 años; registros técnicos 12 meses;
+  auditoría de admins 5 años.
+
+### Cuentas de servicio
+- Se crean con el correo de **Dylan (dylansrz96@gmail.com)**; los pagos los cubre Argemiro.
+- Admins de la plataforma: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderpro@gmail.com).
+
+### Seguridad
+Plan completo en `docs/SEGURIDAD.md`. Lo principal: segundo factor obligatorio para admins, sesiones en el servidor,
+cifrado por campo de contraseñas de trading y cédula, cambio de direcciones de depósito con 24 horas de espera y aviso
+a los dos admins, auditoría que no se puede editar y copias de seguridad probadas.
 
 ### Contenido y marca
 - Widget de **Myfxbook** de la cuenta auditada (~2 años).
@@ -168,7 +198,18 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 - **Backend: NestJS** + TypeScript.
 - **Frontend: Next.js (React)** + Tailwind.
 - Base de datos: **PostgreSQL** con **TypeORM**.
-- Correos: Resend (o similar).
+- Correos: Resend. SMS: **Twilio Verify**. Archivos: **Cloudflare R2** (privado). Anti-bots: Cloudflare Turnstile.
+  Errores: Sentry. Lectura de blockchain: TronGrid y mempool.space, cada uno con respaldo.
+  Detalle, costos y motivos en `docs/DECISIONES-TECNICAS.md`.
+- **Dominio doctraderpro.com** (DNS en Hostinger), repartido así:
+
+  | Registro | Apunta a |
+  |---|---|
+  | `doctraderpro.com` y `www` | La web en Vercel |
+  | `api.doctraderpro.com` | La API en Railway o Render |
+  | MX del dominio raíz | Correo de Hostinger (`support@`) |
+  | `send.doctraderpro.com` (MX y SPF) + DKIM | Resend, para los correos automáticos; convive con el correo de Hostinger |
+  | DMARC (`_dmarc`) | Política del dominio, empezando en `p=none` |
 - **Tareas en segundo plano en un proceso aparte (worker)**: recordatorios, gracia, expiración de
   órdenes, verificación en blockchain y cortes de comisión, con **BullMQ + Redis** (reintentos y sin
   ejecuciones duplicadas). Misma base de código que la API, distinto comando de arranque.
@@ -227,11 +268,14 @@ adjuntar, reabrir) y enlace a Telegram.
 ### Automatizaciones
 Correos: bienvenida, orden creada, pago confirmado/rechazado, prueba aprobada,
 cuenta conectada, recordatorios de vencimiento y de completar prueba, licencia vencida, fin de gracia,
-respuesta a un ticket, ticket resuelto. Todos con Reply-To a doctraderpro@gmail.com.
+respuesta a un ticket, ticket resuelto. Todos con Reply-To a support@doctraderpro.com.
 Alertas a admins: nueva venta, pago por aprobar, solicitud de prueba, cuenta por
 conectar, cuenta por desconectar, cambio de % de comisión, ticket nuevo o reabierto.
 
 ## 6. Modelo de datos (borrador, entidades TypeORM)
+
+> **Reemplazado por `docs/MODELO-DATOS.md`** (2026-10-14), con campos, estados y trabajos del worker. Se deja este
+> borrador como referencia.
 
 `User` (rol ADMIN | CLIENT, nombre, cédula única, correo, teléfono, prueba usada) ·
 `PartnerProfile` (usuario socio, % de comisión) · `CommissionRateChange` (anterior, nuevo, fecha) ·

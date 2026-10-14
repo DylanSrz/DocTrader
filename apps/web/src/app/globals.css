@@ -1,0 +1,109 @@
+@import 'tailwindcss';
+
+/*
+  Sistema de diseño de la propuesta 2 (design/propuesta-2/): el DESIGN.md de Refero (Dala) con los colores del logo.
+  Negro puro, sin tarjetas ni bordes; la jerarquía la dan el tamaño y el espacio. El naranja es el único color de
+  acción; el verde limón es la chispa (etiquetas, foco del teclado, resaltes).
+*/
+@theme {
+  --color-*: initial;
+  --color-vacio: #000000;
+  --color-blanco: #ffffff;
+  --color-niebla: #bdbdbd;
+  --color-ceniza: #9a9a9a;
+  --color-llama: #fb9819;
+  --color-llama-viva: #ffad3d;
+  --color-senal: #dddb65;
+  --color-brasa: #e2531f;
+  --color-error: #ff7a59;
+  --color-campo: rgb(255 255 255 / 0.07);
+  --color-campo-foco: rgb(255 255 255 / 0.11);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --text-display: clamp(48px, 7.6vw, 113px);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.04em;
+  --text-grande: clamp(40px, 5.4vw, 78px);
+  --text-grande--line-height: 1.04;
+  --text-grande--letter-spacing: -0.04em;
+  --text-medio: clamp(26px, 2.6vw, 36px);
+  --text-medio--line-height: 1.2;
+  --text-medio--letter-spacing: -0.02em;
+  --text-cuerpo: 18px;
+  --text-cuerpo--line-height: 1.5;
+
+  --radius-pildora: 24px;
+  --spacing-margen: clamp(20px, 5vw, 64px);
+  --spacing-seccion: clamp(88px, 12vw, 168px);
+  --container-sitio: 1280px;
+
+  --ease-salida: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-cajon: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-vacio);
+    color: var(--color-blanco);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+    font-feature-settings:
+      'ss01' on,
+      'cv11' on;
+    font-size: var(--text-cuerpo);
+    font-weight: 300;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 400;
+    text-wrap: balance;
+  }
+  a,
+  button,
+  summary {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-senal);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: var(--color-llama);
+    color: var(--color-vacio);
+  }
+}
+
+/* Contenedor del sitio: ancho máximo de 1280 px con el margen lateral fluido. */
+@utility contenedor {
+  width: min(100% - 2 * var(--spacing-margen), var(--container-sitio));
+  margin-inline: auto;
+}
+
+/* Texto de menú y botones: 14 px, peso 600, mayúsculas. */
+@utility texto-menu {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+@utility cifra {
+  font-variant-numeric: tabular-nums;
+}

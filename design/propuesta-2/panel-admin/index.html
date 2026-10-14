@@ -485,8 +485,7 @@ tr[hidden] { display: none; }
             <div><dt>En 2026</dt><dd>USD 41.870</dd></div>
           </dl>
           <dl class="por-moneda" aria-label="Octubre por moneda">
-            <div><dt>USDT</dt><dd>2.305</dd></div>
-            <div><dt>USDC</dt><dd>998</dd></div>
+            <div><dt>USDT</dt><dd>3.303</dd></div>
             <div><dt>BTC</dt><dd>499</dd></div>
           </dl>
         </div>
@@ -583,20 +582,20 @@ tr[hidden] { display: none; }
             <dl class="ficha-datos">
               <dt>Licencia</dt><dd>Trimestral, nueva</dd>
               <dt>Orden</dt><dd>Hoy 08:12, venció 09:12</dd>
-              <dt>Debía enviar</dt><dd class="cifra">319.00 USDC</dd>
+              <dt>Debía enviar</dt><dd class="cifra">319.00 USDT</dd>
             </dl>
           </div>
           <div class="item-detalle">
-            <p class="recibido"><strong>300.00 USDC</strong><span>Recibido por BNB Smart Chain (BEP20). Faltan 19.00 USDC</span></p>
-            <p class="hash"><span>Hash</span><code>0x8d21e4…77a0f913</code><a class="enlace enlace-gris" href="https://bscscan.com/" target="_blank" rel="noopener">Ver en el explorador</a></p>
+            <p class="recibido"><strong>300.00 USDT</strong><span>Recibido por Tron (TRC20). Faltan 19.00 USDT</span></p>
+            <p class="hash"><span>Hash</span><code>8d21e4…77a0f913</code><a class="enlace enlace-gris" href="https://tronscan.org/" target="_blank" rel="noopener">Ver en el explorador</a></p>
             <ul class="chequeos" aria-label="Verificación">
               <li>El hash no se había usado</li>
-              <li>Llegó a la dirección de la orden, en USDC por BNB Smart Chain</li>
+              <li>Llegó a la dirección de la orden, en USDT por Tron</li>
               <li data-ok="no">El monto es menor al de la orden <small>(300.00 de 319.00)</small></li>
               <li>Se envió después de crear la orden</li>
-              <li>15 de 15 confirmaciones</li>
+              <li>20 de 20 confirmaciones</li>
             </ul>
-            <p class="nota">Lo usual es pedirle al cliente que envíe los 19.00 USDC que faltan y luego aprobar.</p>
+            <p class="nota">Lo usual es pedirle al cliente que envíe los 19.00 USDT que faltan y luego aprobar.</p>
             <div class="acciones">
               <button class="enlace" type="button" data-rechazar="María Fernanda Ortiz">Rechazar</button>
               <button class="enlace enlace-gris" type="button" data-aprobar="María Fernanda Ortiz" data-cuenta="7710352">Aprobar de todos modos</button>
@@ -698,7 +697,7 @@ tr[hidden] { display: none; }
           <thead><tr><th scope="col">Creada</th><th scope="col">Cliente</th><th scope="col">Licencia</th><th scope="col" class="num">Monto</th><th scope="col">Qué pasó</th></tr></thead>
           <tbody>
             <tr><td>9 oct, 22:14</td><td>Valentina Cruz<small>Cuenta 50293340</small></td><td>Semestral</td><td class="num">499.00 USDT</td><td>No llegó ningún depósito en la hora</td></tr>
-            <tr><td>7 oct, 15:40</td><td>Laura Gómez Restrepo<small>Cuenta 50213847</small></td><td>Semestral</td><td class="num">499.00 USDT</td><td>Creó otra orden y pagó con USDC</td></tr>
+            <tr><td>7 oct, 15:40</td><td>Laura Gómez Restrepo<small>Cuenta 50213847</small></td><td>Semestral</td><td class="num">499.00 USDT</td><td>Creó otra orden y pagó con BTC</td></tr>
           </tbody>
         </table>
       </div>
@@ -946,7 +945,7 @@ tr[hidden] { display: none; }
         <div class="grupo-cuerpo">
           <div class="rejilla">
             <div class="campo"><label for="t-cierre">Cerrar tickets resueltos después de</label><div class="con-unidad"><input id="t-cierre" inputmode="numeric" value="7"><span>días</span></div></div>
-            <div class="campo"><label for="t-correo">Correo oficial (respuesta de los correos)</label><input id="t-correo" type="email" value="doctraderpro@gmail.com" spellcheck="false"></div>
+            <div class="campo"><label for="t-correo">Correo oficial (respuesta de los correos)</label><input id="t-correo" type="email" value="support@doctraderpro.com" spellcheck="false"></div>
           </div>
           <a class="enlace" href="/admin/respuestas">Editar respuestas guardadas (4)</a>
         </div>
@@ -957,7 +956,6 @@ tr[hidden] { display: none; }
         <div class="grupo-cuerpo">
           <div class="rejilla">
             <div class="campo"><label for="c-tron">Tron (USDT)</label><input id="c-tron" inputmode="numeric" value="20"></div>
-            <div class="campo"><label for="c-bsc">BNB Smart Chain (USDC)</label><input id="c-bsc" inputmode="numeric" value="15"></div>
             <div class="campo"><label for="c-btc">Bitcoin</label><input id="c-btc" inputmode="numeric" value="2"></div>
           </div>
           <label class="interruptor"><input type="checkbox" data-sincronizar="auto"><span>Aprobar solos los pagos verificados<small>Apagado: un administrador aprueba cada pago</small></span></label>
@@ -969,13 +967,12 @@ tr[hidden] { display: none; }
         <div class="grupo-cuerpo">
           <ul class="direcciones" id="direcciones">
             <li class="direccion"><b>USDT por Tron (TRC20)</b><code>TXq7Ejemp1oDirecc1onTRC20xx9Rk3aZ</code><label class="interruptor"><input type="checkbox" checked aria-label="USDT por Tron activa"></label></li>
-            <li class="direccion"><b>USDC por BNB Smart Chain (BEP20)</b><code>0x9eE1Ejemplo0000Direcc1on0BEP20aa77c41D2</code><label class="interruptor"><input type="checkbox" checked aria-label="USDC por BNB Smart Chain activa"></label></li>
             <li class="direccion"><b>BTC por la red Bitcoin</b><code>bc1qejemplod1recc1onb1tc0in7h4m9x2l0p3s</code><label class="interruptor"><input type="checkbox" checked aria-label="BTC activa"></label></li>
             <li class="direccion"><b>USDT por Tron, dirección anterior</b><code>TLm2Ejemp1oAnter1orTRC20aa41Pq8wX</code><label class="interruptor"><input type="checkbox" aria-label="USDT por Tron, dirección anterior, activa"></label></li>
           </ul>
           <div class="nueva-direccion" id="nueva-direccion" hidden>
             <div class="rejilla">
-              <div class="campo"><label for="nd-red">Moneda y red</label><select id="nd-red"><option>USDT por Tron (TRC20)</option><option>USDC por BNB Smart Chain (BEP20)</option><option>BTC por la red Bitcoin</option></select></div>
+              <div class="campo"><label for="nd-red">Moneda y red</label><select id="nd-red"><option>USDT por Tron (TRC20)</option><option>BTC por la red Bitcoin</option></select></div>
               <div class="campo"><label for="nd-dir">Dirección</label><input id="nd-dir" autocomplete="off" spellcheck="false" placeholder="Pega la dirección completa" aria-describedby="nd-error"><span class="error" id="nd-error" hidden>Pega una dirección completa (al menos 26 caracteres).</span></div>
             </div>
             <div class="acciones"><button class="pildora pildora-clara" type="button" id="nd-guardar">Agregar esta dirección</button><button class="enlace enlace-gris" type="button" id="nd-cancelar">Cancelar</button></div>
@@ -1425,7 +1422,7 @@ tr[hidden] { display: none; }
     pintarHiloAdmin(taAbierto);
     if (interna) { avisar('Nota interna guardada. El cliente no la ve.'); return; }
     ponerEstado(taAbierto, 'respondido', 'Respondido', 'estado-alerta', 'Espera al cliente');
-    avisar('Respuesta enviada. El cliente recibe un correo con respuesta a doctraderpro@gmail.com.');
+    avisar('Respuesta enviada. El cliente recibe un correo con respuesta a support@doctraderpro.com.');
     registrar('<b>Tú</b> respondiste el ticket ' + taAbierto + '.');
   });
   document.getElementById('ta-resolver').addEventListener('click', function () {

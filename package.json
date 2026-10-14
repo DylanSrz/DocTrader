@@ -1,0 +1,25 @@
+{
+  "name": "doctrader",
+  "private": true,
+  "description": "Plataforma de licencias de Doc Trader Pro AI",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @doctrader/shared build && pnpm -r --parallel --filter \"./apps/*\" --filter @doctrader/shared dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "servicios": "docker compose -f docker/compose.yml up -d",
+    "servicios:parar": "docker compose -f docker/compose.yml down",
+    "db:migrar": "pnpm --filter @doctrader/api migracion:aplicar",
+    "db:semilla": "pnpm --filter @doctrader/api semilla"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
+  }
+}

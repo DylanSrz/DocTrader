@@ -78,12 +78,12 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
 
 ## Pendiente de contenido real
 
-- **Cifras de Myfxbook:** ganancia total, caída máxima y tiempo auditado. Están como "— %" con un aviso
-  en verde limón.
-- **Enlace a Myfxbook:** mientras Argemiro pasa el suyo, apunta a una cuenta de referencia de terceros
-  (https://www.myfxbook.com/es/members/BonusMAXI/aurum-2/12250704). Hay que cambiarlo antes de publicar.
-  Myfxbook bloquea las visitas automáticas (verificación de Cloudflare), así que sus cifras no se pudieron leer.
-- Textos definitivos del hero y del problema, que son propuestos.
+- **Myfxbook (2026-10-14):** el enlace ya es el de la cuenta de Argemiro
+  (https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459). Ganancia total +246,68 %, tomada de su captura del 14 de
+  octubre. La caída máxima (11,59 %) se quitó por ahora (decisión del 2026-10-14) porque puede quedarse corta. El **tiempo auditado** sigue pendiente porque Myfxbook
+  toma como inicio de la cuenta el año 2000: JustMarkets archivó el historial anterior a octubre de 2026 (la cuenta
+  empezó en febrero de 2025). La caída máxima puede quedarse corta por lo mismo (ver `docs/PENDIENTES.md`). En la plataforma, las cifras se cargan desde
+  el panel de admin.
 - Rutas reales: `/registro`, `/ingresar` y `/legal/...`.
 
 ## Cambios del 2026-10-12 (reunión con Argemiro)
@@ -97,5 +97,16 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
   cuentan dentro del plan. Es una sola vez por persona y por cuenta de trading.
 - **Preguntas frecuentes:** pregunta nueva "¿Cómo pido ayuda?" (tickets en el panel, Telegram y correo). La de
   devoluciones ahora remite a la prueba de 15 días.
-- **Pie:** el correo oficial `doctraderpro@gmail.com` como texto seleccionable, con botón de copiar. No es un
+- **Pie:** el correo oficial `support@doctraderpro.com` como texto seleccionable, con botón de copiar. No es un
   enlace `mailto:`, porque esos enlaces no siempre funcionan.
+
+## Cambios del 2026-10-14
+
+- **Hero:** titular "Tu cuenta, conectada al sistema de Argemiro." y texto "Doc Trader Pro AI replica en tu cuenta cada
+  operación del sistema, en el broker que tú elijas. Tu dinero nunca sale de tu cuenta y el historial del sistema lo
+  audita Myfxbook." Son los textos de lanzamiento; Argemiro puede pedir cambios.
+- **Legal:** los enlaces del pie van a los textos de `docs/legal/` (términos, política de datos y aviso de riesgo).
+
+## Cambio del 2026-10-14: solo USDT (Tron) y BTC
+
+Se quitó USDC en BNB Smart Chain de los textos, el selector de red, los ajustes y los datos de ejemplo. Las direcciones del prototipo siguen siendo de ejemplo; las reales están en `docs/CONTEXTO.md`.

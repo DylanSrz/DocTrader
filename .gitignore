@@ -1,0 +1,24 @@
+# Dependencias y compilados
+node_modules/
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Variables de entorno: solo se versionan los .env.example
+.env
+.env.*
+!.env.example
+
+# Pruebas
+playwright-report/
+test-results/
+
+# Sistema y editores
+.DS_Store
+*.log
+.vscode/*
+!.vscode/extensions.json
+.idea/

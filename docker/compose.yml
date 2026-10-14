@@ -1,0 +1,48 @@
+# Servicios para desarrollo. Producción no usa Docker (Vercel + Railway).
+# Arrancar: `pnpm servicios`   Parar: `pnpm servicios:parar`
+name: doctrader
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: doctrader
+      POSTGRES_PASSWORD: doctrader
+      POSTGRES_DB: doctrader
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      # Crea también la base de datos de las pruebas automáticas.
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U doctrader']
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 10
+
+  # Bandeja de correos de prueba: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+  # Ver la base de datos: http://localhost:8080 (servidor: postgres, usuario y clave: doctrader)
+  adminer:
+    image: adminer:5
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+
+volumes:
+  postgres:

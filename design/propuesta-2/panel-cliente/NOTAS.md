@@ -19,7 +19,7 @@ colores del logo e Inter. Tiene las mismas funciones que el panel de la propuest
    - Lo dibuja JS a partir de la fecha de inicio y los meses, con los días reales de cada mes. Los ejemplos dan
      84, 5 y 181 días restantes, igual que las cifras escritas.
 3. **Las confirmaciones de la blockchain también son triángulos.** Al reportar el pago aparece una fila de 20
-   (Tron), 15 (BNB Smart Chain) o 2 (Bitcoin) triángulos, y se van llenando en verde limón a medida que llegan.
+   (Tron) o 2 (Bitcoin) triángulos, y se van llenando en verde limón a medida que llegan.
 
 ## Cómo se aplicó el DESIGN.md a un panel
 
@@ -91,3 +91,7 @@ aparece solo con opacidad y nada más se mueve.
   - Panel lateral para abrir un ticket: tema, cuenta relacionada, asunto, mensaje y adjuntos.
   - Telegram sigue para dudas rápidas.
 - **Perfil:** la prueba aparece como usada y se explica que se controla por persona y por cuenta.
+
+## Cambio del 2026-10-14: solo USDT (Tron) y BTC
+
+Se quitó USDC en BNB Smart Chain de los textos, el selector de red, los ajustes y los datos de ejemplo. Las direcciones del prototipo siguen siendo de ejemplo; las reales están en `docs/CONTEXTO.md`.

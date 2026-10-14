@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Valores de ejemplo y de prueba que no son secretos"
+paths = [
+  '''\.env\.example$''',
+  '''apps/api/vitest\.config\.e2e\.ts$''',
+  '''docker/compose\.yml$''',
+]
