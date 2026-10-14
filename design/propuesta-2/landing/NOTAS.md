@@ -97,5 +97,5 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
   cuentan dentro del plan. Es una sola vez por persona y por cuenta de trading.
 - **Preguntas frecuentes:** pregunta nueva "¿Cómo pido ayuda?" (tickets en el panel, Telegram y correo). La de
   devoluciones ahora remite a la prueba de 15 días.
-- **Pie:** el correo oficial `doctraderpro@gmail.com` como texto seleccionable, con botón de copiar. No es un
+- **Pie:** el correo oficial `support@doctraderpro.com` como texto seleccionable, con botón de copiar. No es un
   enlace `mailto:`, porque esos enlaces no siempre funcionan.

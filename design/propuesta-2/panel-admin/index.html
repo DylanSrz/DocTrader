@@ -946,7 +946,7 @@ tr[hidden] { display: none; }
         <div class="grupo-cuerpo">
           <div class="rejilla">
             <div class="campo"><label for="t-cierre">Cerrar tickets resueltos después de</label><div class="con-unidad"><input id="t-cierre" inputmode="numeric" value="7"><span>días</span></div></div>
-            <div class="campo"><label for="t-correo">Correo oficial (respuesta de los correos)</label><input id="t-correo" type="email" value="doctraderpro@gmail.com" spellcheck="false"></div>
+            <div class="campo"><label for="t-correo">Correo oficial (respuesta de los correos)</label><input id="t-correo" type="email" value="support@doctraderpro.com" spellcheck="false"></div>
           </div>
           <a class="enlace" href="/admin/respuestas">Editar respuestas guardadas (4)</a>
         </div>
@@ -1425,7 +1425,7 @@ tr[hidden] { display: none; }
     pintarHiloAdmin(taAbierto);
     if (interna) { avisar('Nota interna guardada. El cliente no la ve.'); return; }
     ponerEstado(taAbierto, 'respondido', 'Respondido', 'estado-alerta', 'Espera al cliente');
-    avisar('Respuesta enviada. El cliente recibe un correo con respuesta a doctraderpro@gmail.com.');
+    avisar('Respuesta enviada. El cliente recibe un correo con respuesta a support@doctraderpro.com.');
     registrar('<b>Tú</b> respondiste el ticket ' + taAbierto + '.');
   });
   document.getElementById('ta-resolver').addEventListener('click', function () {

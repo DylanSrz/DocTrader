@@ -1,6 +1,6 @@
 # Pendientes — información por recibir
 
-> Actualizado: 2026-10-13. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
+> Actualizado: 2026-10-14. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
 
 ## ⏳ En espera
 
@@ -13,13 +13,12 @@
 - [x] **Logo** recibido (`design/marca/logo-original.png`).
 - [x] **Página de referencia:** https://denmu.com/
 - [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
-- [x] **Correo oficial:** doctraderpro@gmail.com (2026-10-12).
+- [x] **Correo oficial:** support@doctraderpro.com (2026-10-13; reemplaza a doctraderpro@gmail.com).
 - [ ] **Enlace de Myfxbook de Argemiro:** la landing de la propuesta 2 enlaza por ahora una cuenta de referencia de terceros.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
-- [x] **Buzón del dominio:** soporte@doctraderpro.com (2026-10-13).
-- [ ] **¿Correo oficial o Reply-To pasa a soporte@doctraderpro.com?** Hoy el oficial es doctraderpro@gmail.com
-      (decisión de Argemiro). Opciones: cambiarlo al del dominio, o dejar el Gmail y reenviar entre los dos.
+- [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
+- [ ] Reenvío del Gmail anterior (doctraderpro@gmail.com) hacia support@doctraderpro.com.
 - [ ] Textos: descripción del software, cómo funciona, perfil de Argemiro.
 - [ ] **Preguntas frecuentes** con sus respuestas (depósitos, retiros, brokers, riesgo, capital mínimo…).
 - [ ] **Código del widget de Myfxbook** de la cuenta auditada.
@@ -50,4 +49,4 @@ TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase
 direcciones de depósito configurables · solo cripto: USDT TRC20, USDC BEP20, BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
 una prueba por cliente y por cuenta de trading, con control antiabuso · tickets de soporte en la plataforma ·
-verificación automática de pagos en blockchain · soporte por tickets y Telegram · correo oficial doctraderpro@gmail.com · dominio doctraderpro.com con buzón soporte@doctraderpro.com · propuesta de diseño 2 · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.
+verificación automática de pagos en blockchain · soporte por tickets y Telegram · dominio doctraderpro.com · correo oficial support@doctraderpro.com · propuesta de diseño 2 · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.
