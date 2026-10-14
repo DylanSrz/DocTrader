@@ -14,9 +14,11 @@
 - [x] **Página de referencia:** https://denmu.com/
 - [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
 - [x] **Correo oficial:** support@doctraderpro.com (2026-10-13).
-- [ ] **Enlace de Myfxbook de Argemiro:** el de la página pública de su cuenta
-      (`https://www.myfxbook.com/members/<usuario>/<sistema>/<número>`), pública y con "Track record verified" y
-      "Trading privileges verified". La landing enlaza por ahora una cuenta de referencia de terceros.
+- [ ] **Enlace público de Myfxbook de Argemiro.** Llegó el de su vista privada (2026-10-14):
+      https://www.myfxbook.com/portfolio/doctrader-pro-ia-system/12253459 (cuenta **12253459**). Ese enlace es el que
+      ve el dueño con su sesión iniciada; falta poner la cuenta en **pública** y copiar el enlace que ven los
+      visitantes (`/members/<usuario>/doctrader-pro-ia-system/12253459`). El widget de esa cuenta todavía sale vacío,
+      señal de que no es pública. La landing enlaza por ahora una cuenta de referencia de terceros.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
