@@ -191,7 +191,9 @@ a los dos admins, auditoría que no se puede editar y copias de seguridad probad
 - **Backend: NestJS** + TypeScript.
 - **Frontend: Next.js (React)** + Tailwind.
 - Base de datos: **PostgreSQL** con **TypeORM**.
-- Correos: Resend (o similar).
+- Correos: Resend. SMS: **Twilio Verify**. Archivos: **Cloudflare R2** (privado). Anti-bots: Cloudflare Turnstile.
+  Errores: Sentry. Lectura de blockchain: TronGrid, NodeReal (BNB Smart Chain) y mempool.space, cada uno con respaldo.
+  Detalle, costos y motivos en `docs/DECISIONES-TECNICAS.md`.
 - **Dominio doctraderpro.com** (DNS en Hostinger), repartido así:
 
   | Registro | Apunta a |

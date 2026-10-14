@@ -156,8 +156,8 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 ## 11. Encabezados y configuración web
 
 - `Strict-Transport-Security` (HSTS) con un año de duración.
-- `Content-Security-Policy` estricta con nonces en Next.js; sin scripts de terceros salvo Turnstile y el widget de
-  Myfxbook, en su propio iframe.
+- `Content-Security-Policy` estricta con nonces en Next.js; el único script de terceros es Turnstile. El widget de
+  Myfxbook es una imagen: se permiten sus dominios de imágenes (`widgets.myfxbook.com` y `widget.mfbcdn.net`).
 - `frame-ancestors 'none'` (nadie puede meter la plataforma en un iframe), `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` sin cámara, micrófono ni ubicación.
 - CORS de la API abierto solo para `https://doctraderpro.com`.

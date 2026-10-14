@@ -14,14 +14,17 @@
 - [x] **Página de referencia:** https://denmu.com/
 - [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
 - [x] **Correo oficial:** support@doctraderpro.com (2026-10-13).
-- [ ] **Enlace de Myfxbook de Argemiro:** la landing de la propuesta 2 enlaza por ahora una cuenta de referencia de terceros.
+- [ ] **Enlace de Myfxbook de Argemiro:** el de la página pública de su cuenta
+      (`https://www.myfxbook.com/members/<usuario>/<sistema>/<número>`), pública y con "Track record verified" y
+      "Trading privileges verified". La landing enlaza por ahora una cuenta de referencia de terceros.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
 - [x] **Textos del hero:** escritos por el desarrollo (2026-10-14); se ajustan si Argemiro pide cambios.
 - [ ] Perfil de Argemiro (opcional para el lanzamiento).
 - [x] **Preguntas frecuentes:** se lanzan con las de la landing; Argemiro las edita desde su panel.
-- [ ] **Código del widget de Myfxbook** de la cuenta auditada.
+- [x] **Widget de Myfxbook:** no hace falta enviarlo; la plataforma arma la gráfica con el número de la cuenta del
+      enlace (ver `docs/DECISIONES-TECNICAS.md`, §5).
 - [x] **Redes:** Telegram https://t.me/+cdmWH_xLubdhMDhh · Instagram https://www.instagram.com/doctraderproiasystem/
 
 ## ⚖️ Legal
