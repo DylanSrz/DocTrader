@@ -28,8 +28,8 @@
       resúmenes.
       Qué hacer (Argemiro): pedir a JustMarkets el estado de cuenta completo desde febrero de 2025 y si pueden
       restaurar el historial; preguntar al soporte de Myfxbook si pueden recalcular la cuenta o fijar su fecha de inicio.
-      Mientras tanto, la landing no muestra el tiempo auditado ni usa el widget de la gráfica, y conviene decidir con
-      Argemiro si se publica la caída máxima.
+      Mientras tanto, la landing solo muestra la ganancia: la caída máxima se quitó (2026-10-14) y el tiempo auditado y
+      el widget de la gráfica esperan a que el historial esté completo.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).

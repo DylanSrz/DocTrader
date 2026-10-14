@@ -79,8 +79,8 @@ Refero (estilo de Dala, "constellation floating on black velvet"), en `../contex
 ## Pendiente de contenido real
 
 - **Myfxbook (2026-10-14):** el enlace ya es el de la cuenta de Argemiro
-  (https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459). Ganancia total +246,68 % y caída
-  máxima 11,59 %, tomadas de su captura del 14 de octubre. El **tiempo auditado** sigue pendiente porque Myfxbook
+  (https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459). Ganancia total +246,68 %, tomada de su captura del 14 de
+  octubre. La caída máxima (11,59 %) se quitó por ahora (decisión del 2026-10-14) porque puede quedarse corta. El **tiempo auditado** sigue pendiente porque Myfxbook
   toma como inicio de la cuenta el año 2000: JustMarkets archivó el historial anterior a octubre de 2026 (la cuenta
   empezó en febrero de 2025). La caída máxima puede quedarse corta por lo mismo (ver `docs/PENDIENTES.md`). En la plataforma, las cifras se cargan desde
   el panel de admin.
