@@ -66,6 +66,11 @@ como principal y CoinGecko (plan Demo gratis, 10.000 consultas al mes) como resp
 **Detectar pagos sin hash** (si el cliente no lo reporta): TronGrid lista las transferencias TRC20 de una dirección y
 mempool.space lista las transacciones de una dirección.
 
+**Direcciones de Binance:** las de cobro son de la cuenta de Binance de Argemiro. La verificación sigue siendo en la
+blockchain pública. Más adelante, como segunda confirmación opcional, se puede consultar el historial de depósitos de
+Binance con una llave de API **solo de lectura**, limitada a la IP del servidor: confirma que el dinero quedó
+acreditado en la cuenta. No es necesario para lanzar.
+
 **Billetera de origen** (señal del control de la prueba): en Tron es el remitente del evento de transferencia. En Bitcoin una transacción puede tener varias entradas; se guardan todas.
 
 ## 3. Archivos: Cloudflare R2

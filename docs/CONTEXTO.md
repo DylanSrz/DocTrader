@@ -94,11 +94,12 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 - **Solo cripto por ahora** (sin transferencias ni pesos) y **solo dos monedas** (decisión del 2026-10-14):
   **USDT en Tron (TRC20)** y **BTC en la red Bitcoin**. USDC en BNB Smart Chain se quitó; el sistema queda preparado
   para agregar redes después sin rehacer nada.
-  - **Direcciones iniciales** (de Argemiro, checksum comprobado el 2026-10-14):
+  - **Direcciones iniciales** (de la cuenta de **Binance** de Argemiro, checksum comprobado el 2026-10-14):
     - USDT TRC20: `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x`
     - BTC: `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`
     Se cargan en la base de datos con la primera instalación; los cambios posteriores pasan por las reglas de
     `docs/SEGURIDAD.md` (segundo factor, aviso a los dos admins y 24 horas de espera).
+    Por ser de Binance, la protección de esa cuenta es parte de la seguridad de la plataforma (ver `docs/SEGURIDAD.md`, §5).
   - **Depósito directo (método principal al lanzar):** el admin **agrega desde el panel todas las direcciones de depósito** que
     quiera (moneda + red + dirección, activables). El cliente envía, reporta el hash y el admin aprueba.
   - **Verificación automática en blockchain:** cuando el cliente reporta el hash, la plataforma consulta

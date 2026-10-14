@@ -93,8 +93,21 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 - La dirección nueva queda **"en espera" 24 horas** antes de mostrarse a los clientes. En ese tiempo, cualquiera de
   los dos admins puede cancelarla.
 - Cada orden guarda la dirección con la que se creó y no cambia después.
-- Recomendación (**operación**): usar direcciones de billeteras propias (de autocustodia o de hardware), no de
-  exchanges, que pueden cambiar o pedir memo.
+- **Las direcciones iniciales son de la cuenta de Binance de Argemiro** (2026-10-14). Funcionan: USDT por Tron y BTC
+  no piden memo, y la verificación en la blockchain es la misma. Como el dinero queda en Binance, esa cuenta es
+  ahora el activo más valioso (**operación**):
+  - Segundo factor fuerte en Binance (llave de seguridad o passkey, mejor que SMS) y código antiphishing activado.
+  - **Lista blanca de retiros** activada: el dinero solo puede salir a direcciones aprobadas antes.
+  - No crear llaves de API con permiso de retiro. Si algún día se usa la API de Binance, solo de lectura y limitada a
+    la IP del servidor.
+  - Revisar en la app de Binance, de vez en cuando, que la dirección de depósito de USDT (Tron) y la de BTC sigan
+    siendo las mismas que muestra la plataforma.
+- **Riesgos de usar una cuenta personal de exchange para cobrar:**
+  - Binance puede pedir información sobre el origen de depósitos frecuentes de terceros, o retener alguno mientras
+    Argemiro confirma quién lo envió (regla de viaje). La plataforma guarda cada orden con su cliente, monto y hash,
+    lo que sirve para responder esas preguntas.
+  - Si Binance congela la cuenta, los pagos que lleguen mientras tanto quedan retenidos. Por eso conviene pasar el
+    dinero a una billetera propia de forma periódica y migrar a Binance Pay Merchant cuando lo aprueben.
 
 ## 6. Pagos
 
