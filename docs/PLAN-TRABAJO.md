@@ -50,9 +50,9 @@ prueba sin pagos.
 - **Hecho cuando:** la web y la API vacías se despliegan solas en pruebas y las pruebas corren en cada pull request.
 - **Resultado:** monorepo con NestJS 12, Next.js 16, Tailwind 4 y TypeORM; Docker Compose; migración inicial (usuarios,
   socio, planes, ajustes, direcciones y auditoría encadenada que la base de datos no deja cambiar); semilla; worker con
-  latido; `/salud`; sistema de diseño (`/sistema`) y página temporal; Dependabot; GitHub Actions, CodeQL y gitleaks listos en `docs/ci/` (falta copiarlos a `.github/workflows/`).
-  28 pruebas unitarias y 14 de punta a punta. **Falta el despliegue automático a pruebas**, que necesita las cuentas
-  de Vercel y Railway (configuración lista en el `README.md`).
+  latido; `/salud`; sistema de diseño (`/sistema`) y página temporal; GitHub Actions, CodeQL, gitleaks y Dependabot.
+  28 pruebas unitarias y 14 de punta a punta. **Desplegado** (2026-10-14): web en Vercel, API y worker en Railway, cada
+  uno se actualiza solo al fusionar en `main` (direcciones en el `README.md`).
 
 ### Etapa 1 — Cuentas y acceso
 - Registro con nombre, cédula, correo y teléfono, casillas de términos, datos y riesgo, y Turnstile.

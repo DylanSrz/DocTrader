@@ -91,6 +91,19 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
 
 ### Integración continua
 
-Los flujos están en `docs/ci/` hasta que se copien a `.github/workflows/` (ver ese README). Corren formato, lint,
-tipos, pruebas unitarias, pruebas de punta a punta, build, búsqueda de secretos (gitleaks) y CodeQL en cada pull
-request. Dependabot propone actualizaciones cada semana.
+GitHub Actions (`.github/workflows/`) corre formato, lint, tipos, pruebas unitarias, pruebas de punta a punta,
+build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabot propone actualizaciones cada semana.
+
+### Dónde está corriendo (2026-10-14)
+
+| Pieza | Dirección |
+|---|---|
+| Web (Vercel, proyecto `doc_trader_pro`) | https://doctraderpro-khaki.vercel.app |
+| API (Railway, proyecto `happy-adventure`) | https://doctraderapi-production.up.railway.app (`/salud`) |
+| Worker (Railway) | Sin dominio; su latido se ve en `/salud` de la API |
+
+**Lo que aprendimos al configurar Railway:**
+- Al importar el repositorio, Railway crea un servicio por paquete del monorepo. Solo se dejan la API y el worker.
+- **Root Directory vacío** en los dos servicios.
+- La ruta del archivo de configuración **lleva barra inicial** (`/apps/api/railway/api.json`); los comandos **no**
+  (`node apps/api/dist/worker.js`): el código vive en la carpeta de trabajo del contenedor, no en la raíz.

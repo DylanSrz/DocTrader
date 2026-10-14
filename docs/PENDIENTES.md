@@ -52,8 +52,9 @@
 ## 🔧 Accesos técnicos (cuando empecemos)
 
 - [x] **Titular de las cuentas de servicio:** se crean con el correo de Dylan; los pagos los cubre Argemiro.
-- [ ] Crear las cuentas: Vercel (web), Railway o Render (API, worker, PostgreSQL y Redis), Resend (correos),
-      Twilio (SMS), Cloudflare (archivos y Turnstile), Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
+- [x] Vercel (web) y Railway (API, worker, PostgreSQL y Redis) creados y funcionando (2026-10-14).
+- [ ] Crear cuando se necesiten: Resend (correos, etapa 1), Twilio (SMS, etapa 6), Cloudflare (archivos y Turnstile),
+      Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
 - [ ] Verificar doctraderpro.com en Resend (registros DNS en Hostinger).
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
