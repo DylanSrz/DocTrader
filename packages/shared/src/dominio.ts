@@ -103,3 +103,33 @@ export const ESTADO_TICKET = {
   CERRADO: 'CERRADO',
 } as const;
 export type EstadoTicket = ValorDe<typeof ESTADO_TICKET>;
+
+/** Autorizaciones que se guardan en `consents` (Ley 1581). */
+export const TIPO_CONSENTIMIENTO = {
+  TERMINOS: 'TERMS',
+  DATOS: 'PRIVACY',
+  RIESGO: 'RISK',
+  MERCADEO: 'MARKETING',
+} as const;
+export type TipoConsentimiento = ValorDe<typeof TIPO_CONSENTIMIENTO>;
+
+/**
+ * Versión vigente de cada texto legal (`docs/legal/`). Cuando cambia un texto, cambia su versión y los clientes
+ * deben aceptarlo de nuevo. En la etapa 2 esto pasa a la tabla `legal_documents`.
+ */
+export const VERSION_LEGAL = {
+  TERMS: '2026-10-14',
+  PRIVACY: '2026-10-14',
+  RISK: '2026-10-14',
+} as const;
+
+/**
+ * En qué punto está una sesión: completa, esperando el código del segundo factor, o (solo admins) obligada a
+ * configurar el segundo factor antes de poder hacer cualquier otra cosa.
+ */
+export const ESTADO_SESION = {
+  COMPLETA: 'COMPLETA',
+  SEGUNDO_FACTOR_PENDIENTE: 'SEGUNDO_FACTOR_PENDIENTE',
+  SEGUNDO_FACTOR_POR_CONFIGURAR: 'SEGUNDO_FACTOR_POR_CONFIGURAR',
+} as const;
+export type EstadoSesion = ValorDe<typeof ESTADO_SESION>;

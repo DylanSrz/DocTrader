@@ -81,8 +81,9 @@ erDiagram
 **`legal_documents`**: `type` (`TERMS`, `PRIVACY`, `RISK`), `version`, `content_md`, `published_at`. Las páginas
 legales se muestran desde aquí.
 
-**`consents`**: `user_id`, `type` (`TERMS`, `PRIVACY`, `RISK`, `MARKETING`), `legal_document_id`, `accepted_at`, `ip`,
-`revoked_at`. Es la prueba de la autorización que pide la Ley 1581.
+**`consents`**: `user_id`, `type` (`TERMS`, `PRIVACY`, `RISK`, `MARKETING`), `legal_document_id` (en la etapa 1 es
+`document_version`, texto con la fecha de la versión; se enlaza con `legal_documents` en la etapa 2), `accepted_at`, `ip`,
+`user_agent`, `revoked_at`. Es la prueba de la autorización que pide la Ley 1581.
 
 ### 3.2. Planes y ajustes
 
@@ -276,11 +277,13 @@ aprobadas después del cambio y avisa a Argemiro.
 |---|---|---|
 | `user_id` | uuid, nulo en avisos a admins | |
 | `channel` | enum `EMAIL`, `SMS` | |
+| `recipient` | text | Correo o teléfono al que va |
 | `template` | text | `orden-creada`, `vence-7-dias`, … |
 | `payload` | jsonb | Datos para la plantilla; nunca contraseñas |
+| `secret_enc` | bytea | Enlace de un solo uso del correo, cifrado; se borra al enviarlo |
 | `dedupe_key` | text, **único** | Evita duplicados: `vence-7d:{license_id}:{ends_at}` |
 | `status` | enum `PENDIENTE`, `ENVIADA`, `FALLIDA` | |
-| `attempts`, `provider_message_id`, `sent_at`, `last_error` | | |
+| `attempts`, `next_attempt_at`, `provider_message_id`, `sent_at`, `last_error` | | Hasta 8 intentos con espera creciente |
 
 **`audit_log`**: `id` (bigserial), `actor_id`, `actor_role`, `action` (`payment.approve`, `account.view_passwords`,
 `deposit_address.create`, …), `target_type`, `target_id`, `metadata` (jsonb), `ip`, `user_agent`, `created_at`,

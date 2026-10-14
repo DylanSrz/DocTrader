@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { Redis } from 'ioredis';
 import { DataSource } from 'typeorm';
 import { opcionesBaseDeDatos } from '../src/database/data-source.js';
 import { aplicarSemilla } from '../src/database/semilla-datos.js';
@@ -23,4 +24,8 @@ export async function setup(): Promise<void> {
   } finally {
     await fuente.destroy();
   }
+  // Redis de pruebas (base 1) vacío: sin sesiones ni límites de corridas anteriores.
+  const redis = new Redis(process.env.TEST_REDIS_URL ?? 'redis://localhost:6379/1');
+  await redis.flushdb();
+  await redis.quit();
 }

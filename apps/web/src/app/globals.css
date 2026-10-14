@@ -107,3 +107,80 @@
 @utility cifra {
   font-variant-numeric: tabular-nums;
 }
+
+/* Textos largos (páginas legales): cuerpo gris claro, títulos blancos, listas con triángulo. */
+@utility prosa {
+  color: var(--color-niebla);
+  font-size: 17px;
+  line-height: 1.65;
+  & h2 {
+    margin: 2.4em 0 0.6em;
+    color: var(--color-blanco);
+    font-size: var(--text-medio);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  & h3 {
+    margin: 1.8em 0 0.4em;
+    color: var(--color-blanco);
+    font-size: 20px;
+  }
+  & p,
+  & ul,
+  & ol,
+  & table {
+    margin: 0 0 1em;
+  }
+  & ul {
+    padding-left: 1.2em;
+    list-style: none;
+  }
+  & ul > li {
+    position: relative;
+    margin-bottom: 0.4em;
+  }
+  & ul > li::before {
+    content: '';
+    position: absolute;
+    left: -1.2em;
+    top: 0.62em;
+    border-inline: 4px solid transparent;
+    border-bottom: 7px solid var(--color-llama);
+  }
+  & ol {
+    padding-left: 1.4em;
+    list-style: decimal;
+  }
+  & strong {
+    color: var(--color-blanco);
+    font-weight: 500;
+  }
+  & a {
+    color: var(--color-blanco);
+    text-decoration: underline;
+    text-decoration-color: rgb(255 255 255 / 0.35);
+    text-underline-offset: 4px;
+  }
+  & blockquote {
+    margin: 0 0 1em;
+    padding: 14px 20px;
+    border-radius: var(--radius-pildora);
+    background: var(--color-campo);
+  }
+  & table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  & th,
+  & td {
+    padding: 8px 16px 8px 0;
+    text-align: left;
+    vertical-align: top;
+  }
+  & th {
+    color: var(--color-blanco);
+    font-weight: 500;
+  }
+}

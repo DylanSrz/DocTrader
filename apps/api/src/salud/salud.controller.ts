@@ -4,11 +4,13 @@ import type { Response } from 'express';
 import type { Redis } from 'ioredis';
 import type { DataSource } from 'typeorm';
 import { REDIS } from '../redis/redis.module.js';
+import { Publica } from '../sesiones/decoradores.js';
 import { CLAVE_LATIDO_WORKER } from '../worker/latido.js';
 
 type Estado = 'ok' | 'falla';
 
 /** Para el monitor de disponibilidad y el despliegue: responde 503 si la base de datos o Redis fallan. */
+@Publica()
 @Controller('salud')
 export class SaludController {
   constructor(
