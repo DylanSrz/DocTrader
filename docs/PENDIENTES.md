@@ -102,11 +102,15 @@
       API **y** en el worker de Railway (el worker borra los adjuntos sin usar). No hace falta CORS en R2: el
       navegador sube a la API y descarga con un enlace firmado. Sin estas variables, los tickets funcionan sin
       adjuntos. `WEB_ORIGIN` de la API debe ser la dirección exacta de la web (la subida es directa a la API).
-- [ ] **Sentry (etapa 9):** crear un proyecto (plan gratis) y poner su DSN en `SENTRY_DSN` de la API y el worker de
-      Railway y de Vercel. El código ya está listo y no envía datos personales; sin la variable no hace nada.
-- [ ] **Monitor de disponibilidad (etapa 9):** por ejemplo UptimeRobot o Better Stack (gratis), revisando cada 5
-      minutos `https://<api>/salud` (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo
-      a los dos admins.
+- [x] **Sentry (etapa 9, 2026-10-15):** organización `dylansrz`, proyectos `doctrader-api` (API y worker) y
+      `doctrader-web`. `SENTRY_DSN` ya está en la API y el worker de Railway (empieza a reportar con el próximo
+      despliegue que traiga el código de la etapa 9).
+  - [ ] Falta `SENTRY_DSN` en Vercel (proyecto `doc_trader_pro`, Production y Preview) con el DSN de
+        `doctrader-web` (Sentry → Settings → Projects → doctrader-web → Client Keys). El conector no tuvo permiso.
+- [ ] **Monitor de disponibilidad (etapa 9):** Sentry no acepta monitores en `*.railway.app` (límite del dominio
+      compartido): crearlo cuando la API tenga su dominio propio (por ejemplo `api.doctraderpro.com`), en Sentry
+      (Uptime, proyecto `doctrader-api`) o en UptimeRobot/Better Stack, revisando cada 5 minutos `https://<api>/salud`
+      (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo a los dos admins.
 - [ ] **Copias de seguridad (etapa 9):** activar las copias programadas del volumen de Postgres en Railway (pestaña
       Backups) y crear el depósito de R2 `doctrader-copias` con su token y los 6 secretos del flujo semanal (ver
       README, "Copias de seguridad"). Después, correr el flujo a mano una vez y revisar que la restauración pase.
