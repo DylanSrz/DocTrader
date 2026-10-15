@@ -1,0 +1,126 @@
+name: Copia de seguridad
+
+# Copia semanal de la base de datos de producción en un almacenamiento distinto de Railway (Cloudflare R2), cifrada
+# y guardada 30 días (`docs/SEGURIDAD.md` §12). Antes de guardarla se restaura en un Postgres vacío y se revisa: una
+# copia que nunca se restauró no es una copia. Se complementa con las copias diarias de Railway.
+#
+# Secretos del repositorio (Settings → Secrets and variables → Actions). Si falta alguno, el flujo avisa y no hace
+# nada:
+#   BACKUP_DATABASE_URL   URL pública de Postgres en Railway (DATABASE_PUBLIC_URL), idealmente de un usuario de solo lectura
+#   BACKUP_PASSPHRASE     Frase larga para cifrar las copias. Guárdala en el gestor de contraseñas: sin ella no se abren
+#   BACKUP_R2_ACCOUNT_ID, BACKUP_R2_ACCESS_KEY_ID, BACKUP_R2_SECRET_ACCESS_KEY, BACKUP_R2_BUCKET
+#                         Depósito privado de R2 solo para copias, con un token de lectura y escritura solo en él
+
+on:
+  schedule:
+    # Lunes a las 3:17 a. m. de Colombia (08:17 UTC).
+    - cron: '17 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: copia-de-seguridad
+  cancel-in-progress: false
+
+jobs:
+  copia:
+    name: Copia cifrada y restauración de prueba
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DB_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+      CLAVE: ${{ secrets.BACKUP_PASSPHRASE }}
+      R2_CUENTA: ${{ secrets.BACKUP_R2_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
+      R2_DEPOSITO: ${{ secrets.BACKUP_R2_BUCKET }}
+      AWS_DEFAULT_REGION: auto
+      # La misma versión mayor (o mayor) que la de Railway: pg_dump no copia servidores más nuevos que él.
+      IMAGEN_PG: postgres:18-alpine
+
+    services:
+      restaurada:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: prueba
+          POSTGRES_PASSWORD: prueba
+          POSTGRES_DB: restaurada
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd "pg_isready -U prueba"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+
+    steps:
+      - name: Revisar los secretos
+        id: secretos
+        run: |
+          faltan=""
+          for nombre in DB_URL CLAVE R2_CUENTA AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY R2_DEPOSITO; do
+            if [ -z "${!nombre}" ]; then faltan="$faltan $nombre"; fi
+          done
+          if [ -n "$faltan" ]; then
+            echo "::warning::Faltan secretos para la copia de seguridad:$faltan. No se hizo nada."
+            echo "listo=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "listo=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Copiar la base de datos
+        if: steps.secretos.outputs.listo == 'si'
+        run: |
+          mkdir -p copia
+          docker run --rm --network host -v "$PWD/copia:/copia" "$IMAGEN_PG" \
+            pg_dump --format=custom --no-owner --no-privileges --file=/copia/doctrader.dump "$DB_URL"
+          echo "Tamaño: $(du -h copia/doctrader.dump | cut -f1)"
+
+      - name: Restaurar en un Postgres vacío y revisarla
+        if: steps.secretos.outputs.listo == 'si'
+        env:
+          PGPASSWORD: prueba
+        run: |
+          docker run --rm --network host -v "$PWD/copia:/copia" -e PGPASSWORD "$IMAGEN_PG" \
+            pg_restore --no-owner --no-privileges --exit-on-error \
+              -h localhost -p 5433 -U prueba -d restaurada /copia/doctrader.dump
+          consulta() {
+            docker run --rm --network host -e PGPASSWORD "$IMAGEN_PG" \
+              psql -h localhost -p 5433 -U prueba -d restaurada -tAc "$1"
+          }
+          migraciones=$(consulta "SELECT count(*) FROM migraciones")
+          admins=$(consulta "SELECT count(*) FROM users WHERE role = 'ADMIN' AND status = 'ACTIVE'")
+          textos=$(consulta "SELECT count(DISTINCT type) FROM legal_documents")
+          echo "Restaurada: $migraciones migraciones, $admins admins activos, $textos textos legales."
+          if [ "$migraciones" -lt 1 ] || [ "$admins" -lt 1 ] || [ "$textos" -lt 3 ]; then
+            echo "::error::La copia restaurada no tiene lo que debería."
+            exit 1
+          fi
+
+      - name: Cifrar
+        if: steps.secretos.outputs.listo == 'si'
+        run: |
+          nombre="doctrader-$(date -u +%Y-%m-%d).dump.gpg"
+          printf '%s' "$CLAVE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+            --symmetric --cipher-algo AES256 --output "copia/$nombre" copia/doctrader.dump
+          shred -u copia/doctrader.dump
+          echo "ARCHIVO=$nombre" >> "$GITHUB_ENV"
+
+      - name: Guardar en R2 y borrar las de más de 30 días
+        if: steps.secretos.outputs.listo == 'si'
+        run: |
+          destino="https://$R2_CUENTA.r2.cloudflarestorage.com"
+          aws s3 cp "copia/$ARCHIVO" "s3://$R2_DEPOSITO/$ARCHIVO" --endpoint-url "$destino" --only-show-errors
+          limite=$(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          viejas=$(aws s3api list-objects-v2 --bucket "$R2_DEPOSITO" --endpoint-url "$destino" \
+            --query "Contents[?LastModified<'$limite'].Key" --output text)
+          for clave in $viejas; do
+            if [ "$clave" != "None" ]; then
+              aws s3 rm "s3://$R2_DEPOSITO/$clave" --endpoint-url "$destino" --only-show-errors
+              echo "Borrada: $clave"
+            fi
+          done
+          echo "Guardada: $ARCHIVO"
+
+      - name: Limpiar
+        if: always()
+        run: rm -rf copia
