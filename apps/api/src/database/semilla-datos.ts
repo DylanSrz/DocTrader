@@ -8,6 +8,7 @@ import {
   MONEDA,
   PLANES_INICIALES,
   PREGUNTAS_INICIALES,
+  textoPublicoDeBorrador,
   TIPO_DOCUMENTO_LEGAL,
   type TipoDocumentoLegal,
   RED,
@@ -72,18 +73,11 @@ const ARCHIVOS_LEGALES: Record<TipoDocumentoLegal, string> = {
   [TIPO_DOCUMENTO_LEGAL.RIESGO]: 'aviso-riesgo.md',
 };
 
-/**
- * El texto de un borrador sin su título (la página lo pone aparte) ni la nota interna que abre cada archivo
- * ("Borrador del…, conviene que lo revise un abogado"). `null` si el archivo no está (por ejemplo, en una imagen
- * que no copió `docs/`).
- */
+/** El texto público de un borrador (ver `textoPublicoDeBorrador`). `null` si el archivo no está en la imagen. */
 export function textoLegalInicial(tipo: TipoDocumentoLegal): string | null {
   const ruta = new URL(`../../../../docs/legal/${ARCHIVOS_LEGALES[tipo]}`, import.meta.url);
   if (!existsSync(ruta)) return null;
-  return readFileSync(ruta, 'utf8')
-    .replace(/^# .*\n+/, '')
-    .replace(/^(>.*\n)+\n*/, '')
-    .trim();
+  return textoPublicoDeBorrador(readFileSync(ruta, 'utf8'));
 }
 
 /** Aplica la semilla y devuelve lo que creó (vacío si ya estaba todo). */

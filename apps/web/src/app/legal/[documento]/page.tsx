@@ -1,55 +1,50 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { DOCUMENTOS_LEGALES, type TipoDocumentoLegal } from '@doctrader/shared';
 import type { Metadata } from 'next';
-import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { marked } from 'marked';
 import { Etiqueta } from '@/components/ui';
+import { markdownAHtml } from '@/lib/markdown';
+import { obtenerTextoLegal } from '@/lib/publico';
 
 /**
- * Textos legales. Por ahora salen de `docs/legal/` al compilar; en la etapa 2 pasan a la tabla `legal_documents`
- * para que Argemiro los actualice sin tocar código.
+ * Textos legales: la versión vigente que se publicó desde el panel (`legal_documents`). Quedan en caché y se
+ * vuelven a armar cuando el admin publica una versión nueva.
  */
-const DOCUMENTOS = {
-  terminos: { archivo: 'terminos-licencia.md', titulo: 'Términos de la licencia' },
-  datos: { archivo: 'politica-datos.md', titulo: 'Tratamiento de datos personales' },
-  riesgo: { archivo: 'aviso-riesgo.md', titulo: 'Aviso de riesgo' },
-} as const;
-type Documento = keyof typeof DOCUMENTOS;
+const TIPOS = Object.keys(DOCUMENTOS_LEGALES) as TipoDocumentoLegal[];
+const tipoDeRuta = (ruta: string) => TIPOS.find((t) => DOCUMENTOS_LEGALES[t].ruta === ruta);
+
+const fecha = new Intl.DateTimeFormat('es-CO', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'America/Bogota',
+});
 
 export function generateStaticParams() {
-  return Object.keys(DOCUMENTOS).map((documento) => ({ documento }));
+  return TIPOS.map((t) => ({ documento: DOCUMENTOS_LEGALES[t].ruta }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<'/legal/[documento]'>): Promise<Metadata> {
-  const { documento } = await params;
-  return { title: DOCUMENTOS[documento as Documento]?.titulo };
-}
-
-/** El HTML del documento, sin el título (va aparte) ni la nota interna del borrador que abre cada archivo. */
-async function contenido(documento: Documento): Promise<string> {
-  'use cache';
-  cacheLife('max');
-  const ruta = path.join(process.cwd(), '..', '..', 'docs', 'legal', DOCUMENTOS[documento].archivo);
-  const markdown = await readFile(ruta, 'utf8');
-  const sinTitulo = markdown.replace(/^# .*\n+/, '').replace(/^(>.*\n)+\n*/, '');
-  return marked.parse(sinTitulo, { async: false });
+  const tipo = tipoDeRuta((await params).documento);
+  return { title: tipo ? DOCUMENTOS_LEGALES[tipo].titulo : undefined };
 }
 
 export default async function DocumentoLegal({ params }: PageProps<'/legal/[documento]'>) {
-  const { documento } = await params;
-  if (!(documento in DOCUMENTOS)) notFound();
-  const html = await contenido(documento as Documento);
+  const tipo = tipoDeRuta((await params).documento);
+  if (!tipo) notFound();
+  const texto = await obtenerTextoLegal(tipo);
   return (
     <article className="grid max-w-[46rem] gap-10">
       <div className="grid gap-6">
-        <Etiqueta>Borrador · versión del 14 de octubre de 2026</Etiqueta>
-        <h1 className="text-grande">{DOCUMENTOS[documento as Documento].titulo}</h1>
+        <Etiqueta>
+          Versión {texto.version}
+          {texto.publicadoEn ? ` · publicada el ${fecha.format(new Date(texto.publicadoEn))}` : ''}
+        </Etiqueta>
+        <h1 className="text-grande">{DOCUMENTOS_LEGALES[tipo].titulo}</h1>
       </div>
-      {/* Texto nuestro (docs/legal), no del usuario. */}
-      <div className="prosa" dangerouslySetInnerHTML={{ __html: html }} />
+      {/* Markdown del panel de admin, convertido sin HTML (ver lib/markdown.ts). */}
+      <div className="prosa" dangerouslySetInnerHTML={{ __html: markdownAHtml(texto.contenido) }} />
     </article>
   );
 }

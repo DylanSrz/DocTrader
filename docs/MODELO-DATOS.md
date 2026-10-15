@@ -78,11 +78,12 @@ erDiagram
 **`user_devices`**: `user_id`, `device_hash` (identificador del navegador), `user_agent`, `last_ip`, `first_seen_at`,
 `last_seen_at`. Sirve para avisar de ingresos desde un dispositivo nuevo. Las sesiones viven en Redis.
 
-**`legal_documents`**: `type` (`TERMS`, `PRIVACY`, `RISK`), `version`, `content_md`, `published_at`. Las páginas
-legales se muestran desde aquí.
+**`legal_documents`**: `type` (`TERMS`, `PRIVACY`, `RISK`), `version`, `content_md`, `published_at`, `published_by`.
+Las páginas legales se muestran desde aquí. La base de datos no deja cambiar ni borrar una versión publicada: un
+cambio es siempre una versión nueva.
 
 **`consents`**: `user_id`, `type` (`TERMS`, `PRIVACY`, `RISK`, `MARKETING`), `legal_document_id` (en la etapa 1 es
-`document_version`, texto con la fecha de la versión; se enlaza con `legal_documents` en la etapa 2), `accepted_at`, `ip`,
+`document_version`, el número de versión aceptado, además de `legal_document_id`), `accepted_at`, `ip`,
 `user_agent`, `revoked_at`. Es la prueba de la autorización que pide la Ley 1581.
 
 ### 3.2. Planes y ajustes

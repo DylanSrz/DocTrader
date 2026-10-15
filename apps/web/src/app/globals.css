@@ -184,3 +184,96 @@
     font-weight: 500;
   }
 }
+
+/* Preguntas frecuentes: acordeón sin cajas, una abierta a la vez (details name="faq"), con la cruz que gira. */
+@layer components {
+  .pregunta summary {
+    list-style: none;
+  }
+  .pregunta summary::-webkit-details-marker {
+    display: none;
+  }
+  .pregunta .cruz {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    transition: transform 240ms var(--ease-salida);
+  }
+  .pregunta .cruz::before,
+  .pregunta .cruz::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 16px;
+    height: 1.5px;
+    background: var(--color-ceniza);
+    transform: translate(-50%, -50%);
+    transition: background-color 200ms ease;
+  }
+  .pregunta .cruz::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .pregunta[open] .cruz {
+    transform: rotate(45deg);
+  }
+  .pregunta[open] .cruz::before,
+  .pregunta[open] .cruz::after {
+    background: var(--color-llama);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pregunta summary:hover .cruz::before,
+    .pregunta summary:hover .cruz::after {
+      background: var(--color-blanco);
+    }
+  }
+  .pregunta::details-content {
+    block-size: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      block-size 260ms var(--ease-salida),
+      opacity 200ms ease,
+      content-visibility 260ms allow-discrete;
+  }
+  .pregunta[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pregunta::details-content,
+    .pregunta .cruz {
+      transition: none;
+    }
+  }
+  .respuesta a {
+    color: var(--color-blanco);
+    text-decoration: underline;
+    text-decoration-color: rgb(255 255 255 / 0.35);
+    text-underline-offset: 4px;
+  }
+  /* Viñeta de los planes: un rombo naranja de 6 px. */
+  .vineta-rombo::before {
+    content: '';
+    flex: none;
+    width: 6px;
+    height: 6px;
+    transform: translateY(-3px) rotate(45deg);
+    border: 1px solid var(--color-llama);
+  }
+}
+
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

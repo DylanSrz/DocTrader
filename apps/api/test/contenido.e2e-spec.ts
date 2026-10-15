@@ -92,6 +92,8 @@ describe('página pública', () => {
     expect(respuesta.body.contenido).not.toMatch(/^# /);
     expect(respuesta.body.contenido).not.toContain('conviene que lo revise un abogado');
     expect(respuesta.body.contenido).toContain('Puedes perder dinero');
+    // Lo que va después de la línea final del borrador es interno (la versión corta del aviso).
+    expect(respuesta.body.contenido).not.toContain('Versión corta');
     await comoLaWeb(app).get('/publico/legal/otra-cosa').expect(404);
   });
 });
