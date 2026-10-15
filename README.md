@@ -107,6 +107,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `LOOKUP_HMAC_KEY` | Otra llave nueva (`openssl rand -base64 32`). Para buscar cédulas repetidas sin descifrarlas |
    | `TRIAL_HMAC_KEY` | Otra llave nueva (`openssl rand -base64 32`), solo para las huellas de la prueba. Guárdala: **si se cambia, las pruebas anteriores dejan de bloquear**. Sin ella, las solicitudes de prueba quedan cerradas |
    | `RESEND_API_KEY` | La llave de Resend (cuando el dominio esté verificado). Sin ella, los correos esperan en cola |
+   | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | Cloudflare R2 privado para los adjuntos de soporte (token de R2 con lectura y escritura solo en ese depósito). Sin ellas, los tickets funcionan sin adjuntos |
 
    Solo en la API, además:
 
@@ -119,7 +120,9 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_VERIFY_SERVICE_SID` | SMS para verificar el teléfono antes de pedir la prueba (Twilio Verify). Sin ellas no se envían SMS y la prueba queda cerrada |
 
 5. Revisar `https://<dominio-de-la-api>/salud`: debe responder `"estado":"ok"` y, al minuto, mostrar el latido del
-   worker. Sin el secreto de la web, cualquier otra ruta responde 404.
+   worker. Sin el secreto de la web, cualquier otra ruta responde 404, salvo `/archivos/subir`: la subida de
+   adjuntos que hace el navegador directo, con una ficha firmada de 30 minutos (por eso `WEB_ORIGIN` debe ser la
+   dirección exacta de la web: es el origen que la API acepta).
 
 ### Integración continua
 

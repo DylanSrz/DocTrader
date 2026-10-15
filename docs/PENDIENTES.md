@@ -56,6 +56,10 @@
 
 - [ ] **La prueba con un SMS real** (etapa 6), cuando Twilio esté listo: con un cliente nuevo, pedir la prueba
       desde "Mis cuentas", verificar el teléfono con el SMS, aprobar la solicitud en Pagos y pagar los USD 50.
+- [ ] **Un ticket de ida y vuelta** (etapa 7): con un cliente, abrir un ticket en "Soporte" con una captura; en el
+      admin, dejar una nota interna, responder con una respuesta guardada y asignarlo. Al cliente le debe llegar el
+      correo con la respuesta; después, marcarlo resuelto y escribir otra vez para reabrirlo (llega el correo a los
+      admins). Con R2 listo, descargar la captura desde los dos lados.
 
 ## ❓ Por confirmar con Argemiro
 
@@ -87,8 +91,13 @@
 - [ ] **`TRIAL_HMAC_KEY`** (etapa 6): una llave nueva (`openssl rand -base64 32`) en la API y en el worker de
       Railway, guardada en el gestor de contraseñas. Si se pierde o se cambia, las pruebas anteriores dejan de
       bloquear.
-- [ ] Crear cuando se necesiten: Cloudflare R2 (archivos, etapa 7), Sentry (errores).
-      Ver `docs/DECISIONES-TECNICAS.md`.
+- [ ] **Cloudflare R2 (adjuntos de soporte, etapa 7):** en Cloudflare → R2, crear un depósito privado
+      `doctrader-adjuntos` (sin acceso público ni dominio) y un token de API de R2 con permiso "Object Read & Write"
+      solo para ese depósito. Poner `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` en la
+      API **y** en el worker de Railway (el worker borra los adjuntos sin usar). No hace falta CORS en R2: el
+      navegador sube a la API y descarga con un enlace firmado. Sin estas variables, los tickets funcionan sin
+      adjuntos. `WEB_ORIGIN` de la API debe ser la dirección exacta de la web (la subida es directa a la API).
+- [ ] Crear cuando se necesite: Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.

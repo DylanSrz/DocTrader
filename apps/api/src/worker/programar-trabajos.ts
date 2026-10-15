@@ -4,6 +4,8 @@ import type { Queue } from 'bullmq';
 import {
   COLA_MANTENIMIENTO,
   TRABAJO_ACTIVAR_DIRECCIONES,
+  TRABAJO_BORRAR_ARCHIVOS,
+  TRABAJO_CERRAR_TICKETS,
   TRABAJO_ENVIAR_AVISOS,
   TRABAJO_ESTADOS_LICENCIA,
   TRABAJO_EXPIRAR_ORDENES,
@@ -50,6 +52,17 @@ export class ProgramarTrabajos implements OnApplicationBootstrap {
       TRABAJO_ACTIVAR_DIRECCIONES,
       { every: 60_000 },
       { name: TRABAJO_ACTIVAR_DIRECCIONES, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // Soporte: cada hora se cierran los tickets resueltos que pasaron sus días y se borran los adjuntos sin usar.
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_CERRAR_TICKETS,
+      { every: 60 * 60_000 },
+      { name: TRABAJO_CERRAR_TICKETS, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_BORRAR_ARCHIVOS,
+      { every: 60 * 60_000 },
+      { name: TRABAJO_BORRAR_ARCHIVOS, opts: { removeOnComplete: true, removeOnFail: 100 } },
     );
   }
 }

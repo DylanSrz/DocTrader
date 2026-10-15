@@ -2,6 +2,7 @@ import { timingSafeEqual } from 'node:crypto';
 import { Injectable, type NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { NextFunction, Response } from 'express';
+import { PREFIJO_DESCARGA_LOCAL, RUTA_SUBIDA } from '../archivos/rutas.js';
 import type { Entorno } from '../config/entorno.js';
 import { ENCABEZADO_AGENTE, ENCABEZADO_IP, ENCABEZADO_SECRETO, type Peticion } from './contexto.js';
 
@@ -14,7 +15,8 @@ function iguales(a: string, b: string): boolean {
 /**
  * La API solo atiende al servidor de la web (que guarda la sesión en una cookie de su propio dominio). La web
  * firma cada petición con `PROXY_SECRET` y reenvía la IP y el navegador del cliente. Sin el secreto, la API
- * responde 404, como si no existiera. `/salud` queda abierta para el monitor.
+ * responde 404, como si no existiera. `/salud` queda abierta para el monitor, y la subida de adjuntos (y su descarga
+ * en desarrollo) la usa el navegador directo, con una ficha firmada de corta vida en lugar del secreto.
  */
 @Injectable()
 export class WebMiddleware implements NestMiddleware {
@@ -29,7 +31,11 @@ export class WebMiddleware implements NestMiddleware {
     const deLaWeb =
       this.secreto !== undefined && typeof recibido === 'string' && iguales(recibido, this.secreto);
 
-    if (this.secreto !== undefined && !deLaWeb && peticion.path !== '/salud') {
+    const abierta =
+      peticion.path === '/salud' ||
+      peticion.path === RUTA_SUBIDA ||
+      peticion.path.startsWith(PREFIJO_DESCARGA_LOCAL);
+    if (this.secreto !== undefined && !deLaWeb && !abierta) {
       respuesta.status(404).json({ codigo: 'NO_ENCONTRADO', mensaje: 'No encontrado.' });
       return;
     }

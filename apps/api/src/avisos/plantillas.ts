@@ -22,6 +22,10 @@ export const PLANTILLA = {
   PRUEBA_SOLICITADA: 'prueba-solicitada',
   PRUEBA_APROBADA: 'prueba-aprobada',
   PRUEBA_RECHAZADA: 'prueba-rechazada',
+  TICKET_NUEVO: 'ticket-nuevo',
+  TICKET_REABIERTO: 'ticket-reabierto',
+  TICKET_RESPONDIDO: 'ticket-respondido',
+  TICKET_RESUELTO: 'ticket-resuelto',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -287,6 +291,44 @@ export function renderizar(
           'Puedes comprar una licencia mensual o semestral desde tu panel. Si crees que es un error, responde este correo.',
         ],
         boton: { texto: 'Ir a mi panel', url: `${web}/panel` },
+      });
+    case PLANTILLA.TICKET_NUEVO:
+    case PLANTILLA.TICKET_REABIERTO: {
+      const nuevo = plantilla === PLANTILLA.TICKET_NUEVO;
+      return armar({
+        asunto: `${nuevo ? 'Ticket nuevo' : 'Ticket reabierto'} ${datos.numero}: ${datos.asunto}`,
+        saludo,
+        parrafos: [
+          nuevo
+            ? `${datos.cliente} abrió el ticket ${datos.numero} (${datos.tema}): "${datos.asunto}".`
+            : `${datos.cliente} volvió a abrir el ticket ${datos.numero} (${datos.tema}): "${datos.asunto}". Dice que el problema sigue.`,
+          'Respóndelo desde Soporte en el panel: al cliente le llega tu respuesta por correo.',
+        ],
+        boton: { texto: 'Ver el ticket', url: `${web}/admin/soporte?ticket=${datos.numero}` },
+      });
+    }
+    case PLANTILLA.TICKET_RESPONDIDO:
+      return armar({
+        asunto: `Te respondimos: ${datos.asunto} (ticket ${datos.numero})`,
+        saludo,
+        parrafos: [
+          `Respondimos tu ticket ${datos.numero}, "${datos.asunto}":`,
+          ...(datos.mensaje ?? '').split(/\n{2,}/).filter((p) => p.trim()),
+        ],
+        boton: { texto: 'Ver y responder', url: `${web}/panel/soporte?ticket=${datos.numero}` },
+        despues: [
+          'Para que tu respuesta quede en el ticket, escríbela desde tu panel. Si ya se resolvió, puedes marcarlo como resuelto allí mismo.',
+        ],
+      });
+    case PLANTILLA.TICKET_RESUELTO:
+      return armar({
+        asunto: `Resolvimos tu ticket ${datos.numero}`,
+        saludo,
+        parrafos: [
+          `Marcamos como resuelto tu ticket ${datos.numero}, "${datos.asunto}".`,
+          `Si el problema sigue, escríbenos en el mismo ticket desde tu panel antes del ${datos.cierre} y lo abrimos de nuevo. Después de esa fecha se cierra solo.`,
+        ],
+        boton: { texto: 'Ver el ticket', url: `${web}/panel/soporte?ticket=${datos.numero}` },
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);

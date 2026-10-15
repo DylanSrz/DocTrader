@@ -210,10 +210,36 @@ prueba sin pagos.
   - **Falta:** crear la cuenta de Twilio y probar un SMS real (ver `PENDIENTES.md`). La foto de la cédula
     (opcional, apagada) llega con los archivos de la etapa 7.
 
-### Etapa 7 — Soporte
+### Etapa 7 — Soporte ✅ (2026-10-15)
 - Tickets del cliente con adjuntos en R2, bandeja del admin con filtros, asignación, prioridad, notas internas y
   respuestas guardadas; cierre automático.
 - **Hecho cuando:** un ticket va y vuelve entre cliente y admin con adjuntos y correos.
+- **Resultado:**
+  - **Panel del cliente, "Soporte"** (`/panel/soporte`): el titular dice si hay respuesta nueva ("Respondimos tu
+    ticket.") y la pestaña lleva un punto naranja. Lista de tickets con estado, asunto, tema y fecha; panel lateral
+    con el hilo, la respuesta con adjuntos y "Mi problema ya se resolvió". En uno resuelto, escribir lo abre de
+    nuevo; uno cerrado ya no recibe mensajes. Abrir un ticket: tema, cuenta u orden relacionada, asunto, mensaje y
+    adjuntos (`?nuevo=1&tema=…&cuenta=…` lo abre desde otras vistas). El equipo firma siempre "DocTrader Pro".
+  - **Admin, "Soporte"** (`/admin/soporte`): cuántos esperan respuesta, cuánto lleva el más antiguo y el promedio de
+    la primera respuesta de la semana; filtros (sin responder, abiertos, resueltos, todos) y por tema; cada ticket
+    con su espera (en naranja pasadas 4 horas) y a quién está asignado. Panel lateral con el cliente, la cuenta u
+    orden, asignación y prioridad (se guardan al elegir), el hilo con las **notas internas** en verde limón,
+    respuestas guardadas (se agregan al texto) y "Marcar como resuelto". La pestaña y "Hoy" cuentan los sin
+    responder. **Respuestas guardadas** en `/admin/respuestas` (4 iniciales) y, en Ajustes, los días de cierre.
+  - **Correos:** a los admins con cada ticket nuevo o reabierto; al cliente con cada respuesta (con el texto) y al
+    resolverlo (con la fecha de cierre). Las notas internas no envían nada.
+  - **Adjuntos:** imágenes (JPG, PNG, WEBP) o PDF, hasta 5 por mensaje y 10 MB cada uno. El navegador los sube
+    **directo a la API** con una ficha firmada de 30 minutos (las funciones de Vercel no aceptan más de 4,5 MB);
+    la API revisa el tipo por el contenido, vuelve a codificar las imágenes (sin metadatos ni ubicación) y los
+    guarda con nombre aleatorio en R2. La descarga pasa por la web, que revisa el permiso y redirige a un enlace
+    firmado de 5 minutos, siempre como descarga. Sin R2 en producción, los tickets funcionan solo con texto.
+  - **Worker:** cada hora cierra los resueltos que pasaron sus días (7, editable) y borra los adjuntos que nadie
+    usó en 24 horas.
+  - 113 pruebas de punta a punta (4 nuevas: el ticket de ida y vuelta con adjuntos, notas y correos; los adjuntos
+    falsos, rotos, grandes o con metadatos; los permisos entre clientes; asignar, prioridad, respuestas y ajustes) y
+    recorrido en el navegador a 1440 y 390 px.
+  - **Falta:** crear el depósito de R2 y sus llaves, y probar un adjunto real en producción (ver `PENDIENTES.md`).
+    Revisión antivirus de los PDF: pendiente (`SEGURIDAD.md` §7). La foto de la cédula sigue apagada.
 
 ### Etapa 8 — Automatizaciones y socio
 - Correos con Resend (plantillas con la marca), recordatorios, gracia, vencimiento y alertas a los admins.

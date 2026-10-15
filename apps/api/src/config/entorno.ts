@@ -67,6 +67,27 @@ const esquema = z.object({
     .string()
     .regex(/^VA[0-9a-f]{32}$/, 'empieza por VA')
     .optional(),
+  /**
+   * Adjuntos de soporte en Cloudflare R2, privado (`docs/DECISIONES-TECNICAS.md` §3). Sin estas variables: en
+   * desarrollo y en pruebas se guardan en una carpeta local (`ARCHIVOS_DIR`); en producción no se pueden adjuntar.
+   */
+  R2_ACCOUNT_ID: z
+    .string()
+    .regex(/^[0-9a-f]{32}$/, 'es el identificador de la cuenta de Cloudflare (32 caracteres)')
+    .optional(),
+  R2_ACCESS_KEY_ID: z.string().min(16).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(32).optional(),
+  R2_BUCKET: z
+    .string()
+    .regex(
+      /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/,
+      'nombre de depósito de R2 (minúsculas, números y guiones)',
+    )
+    .optional(),
+  /** Carpeta de los adjuntos en desarrollo (sin R2). */
+  ARCHIVOS_DIR: z.string().min(1).optional(),
+  /** Dirección pública de la API: los enlaces de descarga locales (desarrollo, sin R2) apuntan aquí. */
+  API_PUBLIC_URL: z.url().default('http://localhost:4000'),
 });
 
 export type Entorno = z.infer<typeof esquema>;

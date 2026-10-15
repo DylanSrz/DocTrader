@@ -7,6 +7,8 @@ import { llamarApi } from './api';
 import { COOKIE_SESION } from './cookies';
 
 export interface Sesion {
+  /** Cliente: tickets con respuesta nueva. Admin: tickets sin responder. */
+  soporte: number;
   estado: EstadoSesion;
   expiraEn: number;
   confirmadaHasta: number;

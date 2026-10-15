@@ -24,6 +24,9 @@ export const LIMITES = {
   cuentasPorUsuario: { nombre: 'cuentas', maximo: 30, ventana: 3_600 },
   ordenesPorUsuario: { nombre: 'ordenes', maximo: 30, ventana: 3_600 },
   reportesPorUsuario: { nombre: 'reportes', maximo: 10, ventana: 3_600 },
+  subidasPorUsuario: { nombre: 'subidas', maximo: 40, ventana: 3_600 },
+  ticketsPorUsuario: { nombre: 'tickets', maximo: 10, ventana: 3_600 },
+  mensajesPorUsuario: { nombre: 'mensajes-ticket', maximo: 60, ventana: 3_600 },
 } satisfies Record<string, Regla>;
 
 @Injectable()

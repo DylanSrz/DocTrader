@@ -11,6 +11,16 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
           { href: '/admin', texto: 'Hoy' },
           { href: '/admin/pagos', texto: 'Pagos' },
           { href: '/admin/cuentas', texto: 'Cuentas' },
+          {
+            href: '/admin/soporte',
+            texto: 'Soporte',
+            tambien: ['/admin/respuestas'],
+            aviso: {
+              tipo: 'numero',
+              uno: '1 ticket sin responder',
+              varios: '# tickets sin responder',
+            },
+          },
           { href: '/admin/licencias', texto: 'Licencias' },
           {
             href: '/admin/ajustes',

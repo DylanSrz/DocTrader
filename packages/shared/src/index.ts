@@ -8,3 +8,4 @@ export * from './legal.js';
 export * from './cuentas.js';
 export * from './licencias.js';
 export * from './prueba.js';
+export * from './soporte.js';

@@ -54,6 +54,9 @@ const ACCIONES_VISIBLES = [
   'prueba.bloqueada',
   'prueba.aprobada',
   'prueba.rechazada',
+  'ticket.respondido',
+  'ticket.resuelto',
+  'ajustes.soporte',
 ];
 
 /** Una frase por evento de la auditoría, en el tono del panel. */
@@ -121,6 +124,12 @@ export function fraseActividad(f: FilaActividad): string {
       return `${quien} aprobó una solicitud de prueba.`;
     case 'prueba.rechazada':
       return `${quien} rechazó una solicitud de prueba.`;
+    case 'ticket.respondido':
+      return `${quien} respondió el ticket ${numero}.`;
+    case 'ticket.resuelto':
+      return `${quien} marcó como resuelto el ticket ${numero}.`;
+    case 'ajustes.soporte':
+      return `${quien} cambió los días para cerrar los tickets resueltos.`;
     case 'contenido.legal_publicado':
       return `${quien} publicó una versión nueva de un texto legal.`;
     default:
@@ -141,6 +150,7 @@ export class ResumenAdminService {
           `SELECT
              (SELECT count(*)::int FROM payment_orders WHERE status = 'REPORTADA') AS pagos,
              (SELECT count(*)::int FROM trial_requests WHERE status = 'PENDIENTE') AS pruebas,
+             (SELECT count(*)::int FROM tickets WHERE status = 'ABIERTO') AS tickets,
              (SELECT count(*)::int FROM trading_accounts
                WHERE connection_status = 'POR_CONECTAR' AND deleted_at IS NULL) AS por_conectar,
              (SELECT count(*)::int FROM trading_accounts
@@ -152,6 +162,7 @@ export class ResumenAdminService {
           {
             pagos: number;
             pruebas: number;
+            tickets: number;
             por_conectar: number;
             por_desconectar: number;
             vencen: number;
@@ -225,6 +236,7 @@ export class ResumenAdminService {
       pendientes: {
         pagos: pendientes!.pagos,
         pruebas: pendientes!.pruebas,
+        tickets: pendientes!.tickets,
         porConectar: pendientes!.por_conectar,
         porDesconectar: pendientes!.por_desconectar,
         vencenEn7Dias: pendientes!.vencen,

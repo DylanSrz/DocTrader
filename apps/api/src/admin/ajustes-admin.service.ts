@@ -74,7 +74,9 @@ export class AjustesAdminService {
       m.getRepository(Plan).find({ order: { rank: 'ASC' } }),
       leerAjustes(m),
       m.query(
-        `SELECT key, value FROM settings WHERE key IN ('links', 'myfxbook', 'support_email', 'faq')`,
+        `SELECT key, value FROM settings
+          WHERE key IN ('links', 'myfxbook', 'support_email', 'faq', 'tickets.auto_close_days')
+         UNION ALL SELECT 'respuestas', to_jsonb(count(*)) FROM saved_replies`,
       ) as Promise<{ key: string; value: unknown }[]>,
       m.query(
         `SELECT d.id, d.currency, d.network, d.address, d.status, d.activates_at, d.created_at,
@@ -123,6 +125,11 @@ export class AjustesAdminService {
       myfxbook: (valor.get('myfxbook') as CifrasMyfxbook | undefined) ?? null,
       correoSoporte: (valor.get('support_email') as string | undefined) ?? null,
       preguntas: Array.isArray(valor.get('faq')) ? (valor.get('faq') as unknown[]).length : 0,
+      diasCierreTickets:
+        typeof valor.get('tickets.auto_close_days') === 'number'
+          ? (valor.get('tickets.auto_close_days') as number)
+          : 7,
+      respuestasGuardadas: Number(valor.get('respuestas') ?? 0),
       direcciones: direcciones.map((d) => ({
         id: d.id,
         moneda: d.currency,

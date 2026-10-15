@@ -147,6 +147,14 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
     5 minutos, como descarga (`Content-Disposition: attachment`).
   - Revisión antivirus de los PDF antes de mostrarlos a los admins (fase 1 si el costo lo permite; si no, al poco
     tiempo de lanzar).
+  - Construido en la etapa 7 (2026-10-15): la subida va directo a la API (`/archivos/subir`) con una ficha HMAC de
+    30 minutos ligada al usuario (llave derivada de `LOOKUP_HMAC_KEY`), sin el secreto de la web; el cuerpo se
+    corta a los 10 MB, el tipo se lee de los primeros bytes (un SVG o un ejecutable con nombre `.png` se rechazan)
+    y `sharp` vuelve a codificar las imágenes con un tope de 50 megapíxeles. El nombre que se muestra se limpia
+    (sin rutas, caracteres de control ni de dirección) y lleva la extensión del tipo real. Un archivo solo se
+    adjunta a un mensaje de quien lo subió; el cliente nunca descarga adjuntos de notas internas ni de tickets
+    ajenos. Límites: 40 subidas por hora y 20 archivos sin usar por usuario; los que nadie adjunta se borran a las
+    24 horas. La revisión antivirus de los PDF sigue pendiente.
 
 ## 8. Datos personales (Ley 1581)
 

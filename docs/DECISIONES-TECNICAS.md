@@ -90,7 +90,14 @@ la misma cuenta de Cloudflare que Turnstile.
 **Cómo se usa:**
 - El archivo pasa primero por la API: se valida, las imágenes se vuelven a codificar y la foto del documento se
   **cifra** antes de subirla. Luego se guarda con un nombre aleatorio.
-- Para verlo, la API entrega un enlace firmado que vence en 5 minutos, solo si el usuario tiene permiso.
+  - El navegador lo sube **directo a la API**, no por la web: las funciones de Vercel no aceptan cuerpos de más de
+    4,5 MB. La web pide un permiso con la sesión (una ficha firmada de 30 minutos) y el navegador la manda con el
+    archivo a `/archivos/subir`, la única ruta de la API (con la descarga local de desarrollo) que no exige el
+    secreto de la web. (2026-10-15, etapa 7.)
+  - Con R2 se habla por su API compatible con S3, firmada con `aws4fetch` (unos KB) en vez del SDK de AWS. Las
+    imágenes se limpian con `sharp`.
+- Para verlo, la API entrega un enlace firmado que vence en 5 minutos, solo si el usuario tiene permiso. La web
+  redirige a él (tampoco puede responder más de 4,5 MB).
 - Un segundo depósito, separado, guarda la copia semanal cifrada de la base de datos (ver `SEGURIDAD.md`).
 
 ## 4. Servicios y costo mensual estimado

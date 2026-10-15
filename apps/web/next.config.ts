@@ -2,9 +2,18 @@ import type { NextConfig } from 'next';
 
 const desarrollo = process.env.NODE_ENV === 'development';
 
+/** La API, para la subida de adjuntos: el navegador los manda directo (no caben por las funciones de Vercel). */
+const api = (() => {
+  try {
+    return process.env.API_URL ? new URL(process.env.API_URL).origin : '';
+  } catch {
+    return '';
+  }
+})();
+
 /**
  * Política de contenido (`docs/SEGURIDAD.md` §11). Solo se carga lo propio, Turnstile de Cloudflare y las
- * imágenes del widget de Myfxbook. Va sin nonces: con nonces todas las páginas serían dinámicas y se perdería el
+ * imágenes del widget de Myfxbook; el navegador solo se conecta con la web, Turnstile y la API (adjuntos). Va sin nonces: con nonces todas las páginas serían dinámicas y se perdería el
  * prerenderizado; React ya escapa todo lo que muestra y la web no inserta HTML de usuarios. Cuando la
  * integridad de subrecursos (SRI) de Next deje de ser experimental, se cambia `'unsafe-inline'` por ella.
  */
@@ -14,7 +23,7 @@ const politicaDeContenido = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://widgets.myfxbook.com https://widget.mfbcdn.net",
   "font-src 'self'",
-  "connect-src 'self' https://challenges.cloudflare.com",
+  `connect-src 'self' https://challenges.cloudflare.com${api ? ` ${api}` : ''}`,
   'frame-src https://challenges.cloudflare.com',
   "object-src 'none'",
   "base-uri 'self'",

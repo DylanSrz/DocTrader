@@ -371,7 +371,7 @@ function TarjetaCuenta({
   } else if (licencia.estado === 'EN_GRACIA') {
     nota = `Venció el ${fechaLarga(licencia.fin!)}. Renuévala antes del ${fechaLarga(licencia.finGracia!)} para que no la desconectemos.`;
   } else if (licencia.estado === 'SUSPENDIDA') {
-    nota = 'La licencia está suspendida. Escríbenos a soporte si tienes dudas.';
+    nota = 'La licencia está suspendida. Abre un ticket en Soporte si tienes dudas.';
   } else if (cuenta.conexion === 'POR_CONECTAR') {
     nota = 'Recibimos tus datos. Conectaremos la cuenta y te avisaremos por correo.';
   } else if (licencia.estado === 'ACTIVA' && t && t.quedan <= DIAS_VENCE_PRONTO) {
@@ -612,15 +612,13 @@ async function Contenido() {
             ¿Necesitas ayuda?
           </h2>
           <p className="max-w-[36em] text-niebla">
-            Escríbenos por <span translate="no">Telegram</span> o a {landing.correoSoporte}. Muy
-            pronto también podrás abrir tickets desde aquí.
+            Abre un ticket y te respondemos aquí y por correo. Para dudas rápidas, escríbenos por{' '}
+            <span translate="no">Telegram</span>.
           </p>
           <div className="flex flex-wrap items-center gap-x-6">
-            <Enlace href={landing.enlaces.telegram} target="_blank" rel="noopener">
+            <Enlace href="/panel/soporte?nuevo=1">Abrir un ticket</Enlace>
+            <Enlace href={landing.enlaces.telegram} target="_blank" rel="noopener" gris>
               Escribir por&nbsp;<span translate="no">Telegram</span>
-            </Enlace>
-            <Enlace href={`mailto:${landing.correoSoporte}`} gris>
-              Escribir un correo
             </Enlace>
           </div>
         </section>

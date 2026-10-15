@@ -20,6 +20,7 @@ export interface Resumen {
   pendientes: {
     pagos: number;
     pruebas: number;
+    tickets: number;
     porConectar: number;
     porDesconectar: number;
     vencenEn7Dias: number;
@@ -178,6 +179,8 @@ export interface Ajustes {
   } | null;
   correoSoporte: string | null;
   preguntas: number;
+  diasCierreTickets: number;
+  respuestasGuardadas: number;
   direcciones: {
     id: string;
     moneda: Moneda;

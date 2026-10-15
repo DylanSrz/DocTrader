@@ -14,6 +14,7 @@ import {
   guardarOperacion,
   guardarPrecios,
 } from '../acciones-operacion';
+import { guardarSoporte } from '../soporte/acciones';
 
 const guardarPreciosConAviso = conAviso(guardarPrecios);
 const guardarOperacionConAviso = conAviso(guardarOperacion);
@@ -21,6 +22,7 @@ const guardarMyfxbookConAviso = conAviso(guardarMyfxbook);
 const guardarEnlacesConAviso = conAviso(guardarEnlaces);
 const cambiarDireccionConAviso = conAviso(cambiarDireccion);
 const agregarDireccionConAviso = conAviso(agregarDireccion);
+const guardarSoporteConAviso = conAviso(guardarSoporte);
 const dolares = (centavos: number) =>
   (centavos / 100).toLocaleString('es-CO', { maximumFractionDigits: 2 });
 
@@ -412,5 +414,24 @@ export function Direcciones({ ajustes }: { ajustes: Ajustes }) {
         </button>
       )}
     </div>
+  );
+}
+
+/** Cierre automático de los tickets resueltos. */
+export function Soporte({ ajustes }: { ajustes: Ajustes }) {
+  const [estado, accion] = useActionState(guardarSoporteConAviso, {} as EstadoOperacion);
+  return (
+    <form action={accion} className="grid gap-6" noValidate>
+      <Campo
+        etiqueta="Cerrar los tickets resueltos después de (días)"
+        name="diasCierre"
+        inputMode="numeric"
+        defaultValue={String(ajustes.diasCierreTickets)}
+        ayuda="Mientras tanto, el cliente puede escribir en el ticket y se abre de nuevo."
+        error={estado.campos?.diasCierre}
+        className="max-w-[26rem]"
+      />
+      <Pie estado={estado} enviando="Guardando…" texto="Guardar" />
+    </form>
   );
 }

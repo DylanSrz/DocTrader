@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AccesoModule } from './acceso/acceso.module.js';
 import { AdminModule } from './admin/admin.module.js';
+import { ArchivosModule } from './archivos/archivos.module.js';
 import { AvisosModule } from './avisos/avisos.module.js';
 import { BaseModule } from './base.module.js';
 import { ContenidoModule } from './contenido/contenido.module.js';
@@ -9,6 +10,7 @@ import { PagosModule } from './pagos/pagos.module.js';
 import { PruebaModule } from './prueba/prueba.module.js';
 import { SaludModule } from './salud/salud.module.js';
 import { SesionesModule } from './sesiones/sesiones.module.js';
+import { SoporteModule } from './soporte/soporte.module.js';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { SesionesModule } from './sesiones/sesiones.module.js';
     LicenciasModule,
     PagosModule,
     PruebaModule,
+    ArchivosModule,
+    SoporteModule,
   ],
 })
 export class AppModule {}

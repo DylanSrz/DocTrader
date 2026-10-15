@@ -419,6 +419,7 @@ stateDiagram-v2
 | Recordatorios | Cada hora | 7, 3 y 1 día antes, el día del vencimiento y para completar la prueba; `dedupe_key` evita repetir |
 | Activar direcciones | Cada minuto | EN_ESPERA → ACTIVA al pasar `activates_at` |
 | Cerrar tickets | Cada hora | RESUELTO → CERRADO a los 7 días |
+| Borrar adjuntos sin usar | Cada hora | Archivos subidos que ningún mensaje adjuntó en 24 horas |
 | Liquidar comisión | Días 15 y último del mes | Cierra el periodo y suma las órdenes aprobadas |
 | Enviar avisos | Continuo | Envía `notifications` pendientes con reintentos |
 | Borrar datos vencidos | Diario | Contraseñas de trading, fotos, tickets y registros según la política de datos |
@@ -524,3 +525,22 @@ stateDiagram-v2
   regla de §4.4. Vencida, el siguiente pago es una licencia NUEVA al precio completo.
 - **Borrado de clientes (etapa 8):** la restricción de `users` exige cédula y teléfono a los clientes; el borrado
   tendrá que anonimizarlos (o relajar esa regla para `DELETED`). Las huellas del registro quedan.
+
+## 11. Cómo quedó construido (etapa 7, 2026-10-15)
+
+- **`tickets`:** como en §3.6, más `last_message_at` (orden de la lista del cliente; las notas internas no lo
+  mueven). `number` sale de una secuencia que empieza en 1000. `last_client_message_at` es "esperando desde": se
+  pone al pasar a ABIERTO y no se mueve si el cliente escribe otra vez antes de que le respondan. Restricciones:
+  `resolved_at` existe solo en RESUELTO y CERRADO; `closed_at`, solo en CERRADO.
+- **Estados (§4.5):** responder un admin → RESPONDIDO (y `first_response_at` la primera vez); escribir el cliente →
+  ABIERTO (reabre uno RESUELTO y avisa a los admins); cualquiera de los dos lo marca RESUELTO; el worker lo cierra a
+  los `tickets.auto_close_days` (7) de resuelto. Un CERRADO no recibe mensajes. Una admin puede responder uno
+  resuelto: vuelve a RESPONDIDO.
+- **`ticket_messages`:** sin cambios. El cliente nunca recibe las notas internas (ni sus adjuntos).
+- **`files`:** más `original_name` (el nombre limpio, con la extensión de su tipo real, para mostrar y descargar).
+  Un archivo subido queda suelto (`ticket_message_id` NULL, `delete_after` = 24 horas) hasta que un mensaje lo
+  adjunta, en la misma transacción del mensaje; solo se adjuntan los archivos sueltos del mismo usuario. Clave en
+  R2: `adjuntos/AAAA/MM/<uuid>`.
+- **`saved_replies`:** título único sin importar mayúsculas, hasta 40. Se crearon 4 iniciales.
+- **Límites:** 10 tickets nuevos por hora y 60 mensajes por hora por cliente, 10 tickets abiertos a la vez, 40
+  subidas por hora y 20 archivos sueltos por usuario.

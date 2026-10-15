@@ -5,7 +5,7 @@ import type { Ajustes } from '@/lib/admin';
 import { llamarApi } from '@/lib/api';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
 import { AprobacionAutomatica } from '../pagos/acciones-pago';
-import { Direcciones, Enlaces, Myfxbook, Operacion, Precios } from './formularios';
+import { Direcciones, Enlaces, Myfxbook, Operacion, Precios, Soporte } from './formularios';
 
 export const metadata: Metadata = { title: 'Ajustes' };
 
@@ -77,6 +77,16 @@ async function Contenido() {
           nota="Las órdenes nuevas usan la dirección activa más reciente de cada red. Cada orden guarda la suya."
         >
           <Direcciones ajustes={ajustes} />
+        </Grupo>
+        <Grupo
+          id="soporte"
+          titulo="Soporte"
+          nota="Los tickets resueltos se cierran solos si el cliente no vuelve a escribir."
+        >
+          <Soporte ajustes={ajustes} />
+          <Enlace href="/admin/respuestas" className="justify-self-start">
+            Editar respuestas guardadas ({ajustes.respuestasGuardadas})
+          </Enlace>
         </Grupo>
         <Grupo id="enlaces" titulo="Enlaces de la página">
           <Enlaces ajustes={ajustes} />

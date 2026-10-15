@@ -10,6 +10,11 @@ export default function LayoutPanel({ children }: { children: ReactNode }) {
         pestanas={[
           { href: '/panel', texto: 'Mis cuentas' },
           { href: '/panel/pagos', texto: 'Pagos' },
+          {
+            href: '/panel/soporte',
+            texto: 'Soporte',
+            aviso: { tipo: 'punto', uno: '1 respuesta nueva', varios: '# respuestas nuevas' },
+          },
           { href: '/panel/perfil', texto: 'Perfil' },
         ]}
       />
