@@ -28,6 +28,7 @@ import {
   TRABAJO_LATIDO,
   TRABAJO_LIQUIDAR_COMISION,
   TRABAJO_RECORDATORIOS,
+  TRABAJO_VERIFICAR_AUDITORIA,
   TRABAJO_VERIFICAR_PAGOS,
 } from './latido.js';
 
@@ -95,6 +96,9 @@ export class MantenimientoProcessor extends WorkerHost {
         return;
       case TRABAJO_ALERTAS:
         await this.alertas.revisar();
+        return;
+      case TRABAJO_VERIFICAR_AUDITORIA:
+        await this.alertas.verificarAuditoria();
         return;
       default:
         this.logger.warn(`Trabajo desconocido en ${COLA_MANTENIMIENTO}: ${job.name}`);

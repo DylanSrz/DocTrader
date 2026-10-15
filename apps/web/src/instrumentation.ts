@@ -29,6 +29,7 @@ export async function register() {
         }
       }
       delete evento.user;
+      delete evento.breadcrumbs;
       return evento;
     },
   });

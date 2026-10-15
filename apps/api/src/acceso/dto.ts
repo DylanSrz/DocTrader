@@ -15,6 +15,11 @@ const contrasena = `La contraseña debe tener entre ${CONTRASENA_MINIMO} y ${CON
 export class RegistroDto {
   @IsString()
   @Length(3, 120, { message: 'Escribe tu nombre completo.' })
+  // Solo letras y signos de nombres: el nombre aparece en los correos, y un "nombre" con un dominio o un enlace
+  // serviría para suplantar a la marca.
+  @Matches(/^\p{L}[\p{L}\p{M}' -]*$/u, {
+    message: 'Escribe tu nombre solo con letras, sin números ni símbolos.',
+  })
   nombre: string;
 
   @IsString()

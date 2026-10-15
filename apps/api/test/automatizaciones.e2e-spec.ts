@@ -2,6 +2,7 @@ import { aUnidadesBase } from '@doctrader/shared';
 import type { INestApplication } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
+import { AuditoriaService } from '../src/auditoria/auditoria.service.js';
 import { AvisosService } from '../src/avisos/avisos.service.js';
 import { PrecioBtcService } from '../src/licencias/precio-btc.service.js';
 import { VencimientoLicencias } from '../src/licencias/vencimiento-licencias.js';
@@ -450,7 +451,14 @@ describe('borrado de datos vencidos', () => {
 describe('alertas a los admins', () => {
   it('avisan una vez de un pago sin verificar hace más de una hora, de un pico de ingresos fallidos y de un trabajo que falla', async () => {
     const admin = await adminConSesion(app);
-    const alertas = new Alertas(fuente, app.get(REDIS), app.get(AvisosService));
+    const alertas = new Alertas(
+      fuente,
+      app.get(REDIS),
+      app.get(AvisosService),
+      app.get(AuditoriaService),
+    );
+    // La cadena de la auditoría cuadra.
+    expect(await alertas.verificarAuditoria()).toBe(true);
     const cliente = await clienteConSesion(app);
     const cuenta = await cliente.web.post('/cuentas', datosCuenta()).expect(201);
     const orden = await cliente.web

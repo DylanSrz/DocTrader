@@ -37,6 +37,7 @@ export const PLANTILLA = {
   PAGO_ATASCADO: 'pago-atascado',
   TRABAJO_FALLIDO: 'trabajo-fallido',
   INGRESOS_FALLIDOS: 'ingresos-fallidos',
+  AUDITORIA_ALTERADA: 'auditoria-alterada',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -472,6 +473,15 @@ export function renderizar(
         parrafos: [
           `Entre las ${datos.desde} y las ${datos.hasta} hubo ${datos.total} intentos de ingreso con una contraseña equivocada. Puede ser alguien probando contraseñas.`,
           'La plataforma ya frena los intentos por IP y por cuenta, y pide el desafío anti-bots. Si se repite, revisa los registros en Railway y, si hace falta, activa el modo de ataque de Cloudflare.',
+        ],
+      });
+    case PLANTILLA.AUDITORIA_ALTERADA:
+      return armar({
+        asunto: 'La auditoría no cuadra: revisa la base de datos',
+        saludo,
+        parrafos: [
+          `La revisión diaria encontró que el registro de auditoría número ${datos.fila} no coincide con su huella. Puede ser que alguien con acceso a la base de datos lo haya cambiado o borrado.`,
+          'Sigue el plan de incidentes de docs/SEGURIDAD.md §14: revisa quién tiene acceso a la base de datos, cambia las llaves y contraseñas y compara con la última copia de seguridad.',
         ],
       });
     default:

@@ -51,7 +51,7 @@ async function Contenido() {
         <h1 className="text-grande">Ajustes</h1>
         <p className="max-w-[36em] text-blanco">
           Los cambios de precio y de días aplican a las órdenes nuevas; las licencias ya pagadas no
-          cambian. Precios, plazos y direcciones piden el código de tu app.
+          cambian. Precios, plazos, direcciones y enlaces piden el código de tu app.
         </p>
       </div>
 

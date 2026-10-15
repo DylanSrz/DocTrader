@@ -173,7 +173,7 @@ export function EliminarCliente({ cliente }: { cliente: string }) {
       <input type="hidden" name="cliente" value={cliente} />
       <div className="grid w-full gap-2">
         <label htmlFor={`motivo-eli-${cliente}`} className="text-[15px] text-blanco">
-          Cómo lo pidió (por ejemplo, el número del ticket)
+          Cómo lo pidió (por ejemplo, el número del ticket; sin datos personales)
         </label>
         <textarea
           id={`motivo-eli-${cliente}`}

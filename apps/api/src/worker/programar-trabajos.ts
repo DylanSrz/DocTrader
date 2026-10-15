@@ -15,6 +15,7 @@ import {
   TRABAJO_LATIDO,
   TRABAJO_LIQUIDAR_COMISION,
   TRABAJO_RECORDATORIOS,
+  TRABAJO_VERIFICAR_AUDITORIA,
   TRABAJO_VERIFICAR_PAGOS,
 } from './latido.js';
 
@@ -92,6 +93,12 @@ export class ProgramarTrabajos implements OnApplicationBootstrap {
       TRABAJO_ALERTAS,
       { every: 15 * 60_000 },
       { name: TRABAJO_ALERTAS, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // La cadena de huellas de la auditoría se recalcula cada día, después del borrado.
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_VERIFICAR_AUDITORIA,
+      { pattern: '30 3 * * *', tz: ZONA_HORARIA },
+      { name: TRABAJO_VERIFICAR_AUDITORIA, opts: { removeOnComplete: true, removeOnFail: 100 } },
     );
   }
 }

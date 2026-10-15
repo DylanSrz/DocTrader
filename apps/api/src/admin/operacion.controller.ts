@@ -217,7 +217,9 @@ export class AdminAjustesController {
     return { ok: true };
   }
 
+  /** Los enlaces que ven los clientes (Telegram, broker, correo): un cambio falso serviría para estafarlos. */
   @Put('ajustes/enlaces')
+  @ConfirmacionReciente()
   async enlaces(
     @Body() dto: EnlacesDto,
     @SesionActual() sesion: SesionActiva,

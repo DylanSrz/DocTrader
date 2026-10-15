@@ -21,6 +21,8 @@ export function limpiarEvento<E extends Sentry.ErrorEvent>(evento: E): E {
     }
   }
   delete evento.user;
+  // Las migas (consola y peticiones HTTP) pueden llevar textos con datos: no se envían.
+  delete evento.breadcrumbs;
   return evento;
 }
 

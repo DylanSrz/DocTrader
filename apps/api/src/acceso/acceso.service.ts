@@ -368,7 +368,9 @@ export class AccesoService {
     }
 
     const claveFallos = `ingreso:fallos:${canonico}`;
-    const claveEspera = `ingreso:espera:${canonico}`;
+    // La espera es por correo e IP: quien adivina desde otra IP no deja al dueño fuera de su cuenta. Los fallos sí
+    // se cuentan por correo, para pedir el desafío y avisar al dueño sin importar desde dónde vengan.
+    const claveEspera = `ingreso:espera:${canonico}:${cliente.ip}`;
     const espera = await this.redis.ttl(claveEspera);
     if (espera > 0) throw demasiadosIntentos(espera);
 
@@ -548,7 +550,33 @@ export class AccesoService {
    * Revisa un código del segundo factor. Un código de la app no se acepta dos veces; un código de recuperación
    * se gasta y se avisa por correo. Devuelve cómo se verificó, o `null` si no vale.
    */
+  /**
+   * Revisa un código con un límite por usuario, compartido por todas sus sesiones y atómico: cada intento se reserva
+   * en Redis antes de comparar, así ni muchas peticiones al mismo tiempo ni varias sesiones pasan de
+   * `MAXIMO_CODIGOS_POR_HORA` intentos. Un código correcto reinicia la cuenta.
+   */
   private async revisarCodigo(
+    usuario: User,
+    codigo: string,
+    permitirRecuperacion: boolean,
+    cliente: ContextoCliente,
+  ): Promise<'app' | 'recuperacion' | null> {
+    const clave = `codigo:intentos:${usuario.id}`;
+    const intentos = await this.redis.incr(clave);
+    if (intentos === 1) await this.redis.expire(clave, 3_600);
+    if (intentos > MAXIMO_CODIGOS_POR_HORA) {
+      throw errorApi(
+        HttpStatus.TOO_MANY_REQUESTS,
+        'DEMASIADOS_CODIGOS',
+        'Demasiados códigos incorrectos. Espera una hora e intenta de nuevo.',
+      );
+    }
+    const metodo = await this.compararCodigo(usuario, codigo, permitirRecuperacion, cliente);
+    if (metodo) await this.redis.del(clave);
+    return metodo;
+  }
+
+  private async compararCodigo(
     usuario: User,
     codigo: string,
     permitirRecuperacion: boolean,
@@ -902,13 +930,14 @@ export class AccesoService {
       return cuenta;
     });
 
-    await this.redis.del(
-      `ingreso:fallos:${usuario.emailCanonical}`,
-      `ingreso:espera:${usuario.emailCanonical}`,
-    );
+    const esperas = await this.redis.keys(`ingreso:espera:${usuario.emailCanonical}:*`);
+    await this.redis.del(`ingreso:fallos:${usuario.emailCanonical}`, ...esperas);
     await this.sesiones.cerrarTodas(usuario.id);
   }
 }
+
+/** Códigos del segundo factor por usuario y por hora, sumando todas sus sesiones (`docs/SEGURIDAD.md` §3). */
+const MAXIMO_CODIGOS_POR_HORA = 10;
 
 function resultado(token: string, sesion: SesionActiva): ResultadoIngreso {
   return { token, estado: sesion.estado, rol: sesion.rol, expiraEn: sesion.expiraEn };

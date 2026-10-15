@@ -438,6 +438,10 @@ describe('operación del admin', () => {
         brokerUrl: 'https://one.justmarkets.link/a/5vmbn05zda',
         correoSoporte: 'support@doctraderpro.com',
       };
+      const otro = await adminConSesion(app);
+      const sinCodigo = await otro.web.put('/admin/ajustes/enlaces', enlaces).expect(403);
+      expect(sinCodigo.body.codigo).toBe('CONFIRMACION_REQUERIDA');
+      await admin.confirmar();
       const malo = await admin.web
         .put('/admin/ajustes/enlaces', { ...enlaces, telegram: 'http://t.me/x' })
         .expect(400);

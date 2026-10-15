@@ -3,6 +3,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { Redis } from 'ioredis';
 import type { DataSource } from 'typeorm';
+import { AuditoriaService } from '../auditoria/auditoria.service.js';
 import { AvisosService } from '../avisos/avisos.service.js';
 import { fechaLegible } from '../avisos/fecha.js';
 import { PLANTILLA } from '../avisos/plantillas.js';
@@ -30,6 +31,7 @@ export class Alertas {
     @InjectDataSource() private readonly fuente: DataSource,
     @Inject(REDIS) private readonly redis: Redis,
     private readonly avisos: AvisosService,
+    private readonly auditoria: AuditoriaService,
   ) {}
 
   /** Trabajo del worker, cada 15 minutos. */
@@ -97,6 +99,23 @@ export class Alertas {
       );
     }
     return { pagos: atascados.length, ingresos: pico };
+  }
+
+  /**
+   * Trabajo diario: recalcula la cadena de huellas de la auditoría (`docs/SEGURIDAD.md` §12). Si un registro no
+   * cuadra, alguien la cambió por fuera de la app: aviso a los dos admins (una vez por registro roto).
+   */
+  async verificarAuditoria(): Promise<boolean> {
+    const { valida, filaRota } = await this.auditoria.verificar();
+    if (valida) return true;
+    this.logger.error(`La auditoría no cuadra desde el registro ${filaRota}`);
+    await this.fuente.transaction((m) =>
+      this.avisos.avisarAdmins(m, PLANTILLA.AUDITORIA_ALTERADA, {
+        clave: `auditoria-alterada:${filaRota}`,
+        datos: { fila: filaRota ?? '?' },
+      }),
+    );
+    return false;
   }
 
   /** Un trabajo del worker falló: aviso a los admins, como máximo uno al día por trabajo. */
