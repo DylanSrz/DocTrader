@@ -1,13 +1,15 @@
-import { ESTADO_ORDEN, ESTADO_VERIFICACION, type Moneda } from '@doctrader/shared';
+import { ESTADO_ORDEN, ESTADO_VERIFICACION, formatearUsd, type Moneda } from '@doctrader/shared';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { type DataSource, In } from 'typeorm';
-import { PaymentOrder } from '../database/entidades/index.js';
+import { AvisosService } from '../avisos/avisos.service.js';
+import { PLANTILLA } from '../avisos/plantillas.js';
+import { PaymentOrder, Plan, User } from '../database/entidades/index.js';
 import { leerAjustes } from '../licencias/ajustes.js';
 import { AprobacionPagos } from './aprobacion.service.js';
 import { LectorBlockchain } from './lector-blockchain.service.js';
 import { ErrorProveedor } from './lectura.js';
-import { evaluar } from './verificacion.js';
+import { evaluar, type ResultadoVerificacion } from './verificacion.js';
 
 /** Estados en los que la verificación vuelve a mirar la blockchain. Los demás ya no cambian con el tiempo. */
 const POR_REVISAR = [
@@ -28,6 +30,7 @@ export class VerificacionPagos {
     @InjectDataSource() private readonly fuente: DataSource,
     private readonly lector: LectorBlockchain,
     private readonly aprobacion: AprobacionPagos,
+    private readonly avisos: AvisosService,
   ) {}
 
   /** Todas las órdenes reportadas que esperan algo de la blockchain (y las verificadas, si se aprueban solas). */
@@ -111,6 +114,11 @@ export class VerificacionPagos {
           }),
         ],
       );
+      const terminal =
+        resultado.estado === ESTADO_VERIFICACION.MONTO_INCOMPLETO ||
+        resultado.estado === ESTADO_VERIFICACION.NO_COINCIDE ||
+        (resultado.estado === ESTADO_VERIFICACION.VERIFICADA && !ajustes.aprobacionAutomatica);
+      if (terminal) await this.avisarRevision(orden, resultado);
       if (resultado.estado !== ESTADO_VERIFICACION.VERIFICADA) return;
     }
 
@@ -119,5 +127,27 @@ export class VerificacionPagos {
         this.logger.error(`No se pudo aprobar solo ${orden.number}: ${(error as Error).message}`);
       });
     }
+  }
+
+  /** Avisa a los admins que un pago espera su decisión: verificado, o con un problema que hay que mirar a mano. */
+  private async avisarRevision(orden: PaymentOrder, resultado: ResultadoVerificacion) {
+    await this.fuente.transaction(async (m) => {
+      const [cliente, plan] = await Promise.all([
+        m.getRepository(User).findOneByOrFail({ id: orden.userId }),
+        m.getRepository(Plan).findOneByOrFail({ id: orden.planId }),
+      ]);
+      const fallas = resultado.chequeos.filter((c) => c.estado === 'FALLA').map((c) => c.texto);
+      await this.avisos.avisarAdmins(m, PLANTILLA.PAGO_POR_REVISAR, {
+        clave: `pago-por-revisar:${orden.id}:${resultado.estado}`,
+        datos: {
+          estado: resultado.estado,
+          orden: orden.number,
+          cliente: cliente.fullName,
+          plan: plan.name.toLowerCase(),
+          monto: `${formatearUsd(orden.amountUsdCents)} en ${orden.currency}`,
+          motivo: (resultado.nota ?? fallas.join('; ')) || 'no coincide con la orden',
+        },
+      });
+    });
   }
 }

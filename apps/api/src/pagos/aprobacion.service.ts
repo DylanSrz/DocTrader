@@ -5,6 +5,7 @@ import {
   ESTADO_ORDEN,
   ESTADO_VERIFICACION,
   finDePeriodo,
+  formatearUsd,
   sumarDias,
   TIPO_ORDEN,
   type TipoOrden,
@@ -13,7 +14,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import type { DataSource, EntityManager } from 'typeorm';
 import { AuditoriaService } from '../auditoria/auditoria.service.js';
-import { AvisosService } from '../avisos/avisos.service.js';
+import { AvisosService, primerNombre } from '../avisos/avisos.service.js';
 import { fechaSinHora } from '../avisos/fecha.js';
 import { PLANTILLA } from '../avisos/plantillas.js';
 import {
@@ -168,6 +169,22 @@ export class AprobacionPagos {
           conectar: conexion === ESTADO_CONEXION.CONECTADA ? 'no' : 'si',
         },
         clave: `pago-aprobado:${orden.id}`,
+      });
+      const quien =
+        decisor.tipo === 'ADMIN'
+          ? `${primerNombre((await m.getRepository(User).findOneByOrFail({ id: decisor.id })).fullName)} aprobó`
+          : 'La aprobación automática aprobó';
+      await this.avisos.avisarAdmins(m, PLANTILLA.VENTA_APROBADA, {
+        clave: `venta:${orden.id}`,
+        datos: {
+          quien,
+          orden: orden.number,
+          plan: plan.name.toLowerCase(),
+          cliente: cliente.fullName,
+          cuenta: cuenta.accountNumber,
+          monto: formatearUsd(orden.amountUsdCents),
+          conectar: conexion === ESTADO_CONEXION.POR_CONECTAR ? 'si' : 'no',
+        },
       });
       await this.registrar(m, decisor, 'pago.aprobado', orden, {
         modo: decisor.tipo === 'ADMIN' ? 'MANUAL' : 'AUTO',

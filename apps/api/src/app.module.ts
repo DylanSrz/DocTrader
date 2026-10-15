@@ -10,6 +10,7 @@ import { PagosModule } from './pagos/pagos.module.js';
 import { SaludModule } from './salud/salud.module.js';
 import { SesionesModule } from './sesiones/sesiones.module.js';
 import { SoporteModule } from './soporte/soporte.module.js';
+import { SocioModule } from './socio/socio.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SoporteModule } from './soporte/soporte.module.js';
     PagosModule,
     ArchivosModule,
     SoporteModule,
+    SocioModule,
   ],
 })
 export class AppModule {}

@@ -3,6 +3,7 @@ import { getDataSourceToken } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
 import { AuditLog, Notification } from '../src/database/entidades/index.js';
 import { PrecioBtcService } from '../src/licencias/precio-btc.service.js';
+import { AvisosService } from '../src/avisos/avisos.service.js';
 import { VencimientoLicencias } from '../src/licencias/vencimiento-licencias.js';
 import { LectorBlockchain } from '../src/pagos/lector-blockchain.service.js';
 import { ErrorProveedor, type Lectura } from '../src/pagos/lectura.js';
@@ -304,7 +305,7 @@ describe('vencimiento de las licencias', () => {
       `UPDATE trading_accounts SET connection_status = 'CONECTADA' WHERE id = $1`,
       [cuenta.body.id],
     );
-    const tareas = new VencimientoLicencias(fuente);
+    const tareas = new VencimientoLicencias(fuente, app.get(AvisosService));
 
     await fuente.query(
       `UPDATE licenses SET ends_at = now() - interval '1 hour', grace_ends_at = now() + interval '2 days',

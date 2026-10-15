@@ -4,6 +4,7 @@ import type { DataSource } from 'typeorm';
 import { AjustesAdminService } from '../src/admin/ajustes-admin.service.js';
 import { AuditLog, Notification } from '../src/database/entidades/index.js';
 import { PrecioBtcService } from '../src/licencias/precio-btc.service.js';
+import { AvisosService } from '../src/avisos/avisos.service.js';
 import { VencimientoLicencias } from '../src/licencias/vencimiento-licencias.js';
 import { LectorBlockchain } from '../src/pagos/lector-blockchain.service.js';
 import type { Lectura } from '../src/pagos/lectura.js';
@@ -92,7 +93,7 @@ async function vencer(cuentaId: string, dias = 10) {
       WHERE trading_account_id = $1`,
     [cuentaId, dias],
   );
-  await new VencimientoLicencias(fuente).actualizar();
+  await new VencimientoLicencias(fuente, app.get(AvisosService)).actualizar();
 }
 
 describe('operación del admin', () => {
@@ -384,9 +385,11 @@ describe('operación del admin', () => {
       ).toBe(13_000);
 
       await otro.web.put('/admin/ajustes/precios', precios).expect(200);
-      const auditoria = await fuente
-        .getRepository(AuditLog)
-        .findOneByOrFail({ action: 'ajustes.precios', actorId: otro.usuario.id });
+      // El primer cambio (el segundo los devuelve a como estaban).
+      const auditoria = await fuente.getRepository(AuditLog).findOneOrFail({
+        where: { action: 'ajustes.precios', actorId: otro.usuario.id },
+        order: { id: 'ASC' },
+      });
       expect(auditoria.metadata).toMatchObject({
         antes: { MENSUAL: 12_000 },
         despues: { MENSUAL: 13_000 },

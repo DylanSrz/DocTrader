@@ -58,9 +58,21 @@
       admin, dejar una nota interna, responder con una respuesta guardada y asignarlo. Al cliente le debe llegar el
       correo con la respuesta; después, marcarlo resuelto y escribir otra vez para reabrirlo (llega el correo a los
       admins). Con R2 listo, descargar la captura desde los dos lados.
+- [ ] **Los correos del ciclo de la licencia** (etapa 8): con el pago real de arriba, revisar que llegue la
+      bienvenida al confirmar el correo y, a los admins, "pago verificado por aprobar" y "venta". Los recordatorios
+      (7, 3 y 1 día), "tu licencia venció" y "desconectaremos la cuenta" llegan solos con las fechas reales; se
+      probaron con fechas aceleradas.
+- [ ] **Socio** (etapa 8): entrar a "Socio" con la cuenta de Dylan, revisar el porcentaje (10 %) y, el 16 de
+      octubre, que aparezca la quincena del 1 al 15 liquidada (con su correo a los dos admins).
 
 ## ❓ Por confirmar con Argemiro
 
+- [x] **Aceptar de nuevo los textos legales** (2026-10-15): no hace falta. Los clientes de hoy son de prueba y, antes
+      de salir a producción, se limpia la base de datos (todo menos los admins): todos los clientes se registran de
+      nuevo con los textos vigentes.
+- [x] **Eliminar la cuenta de un cliente que lo pida** (2026-10-15): sí, y lo hace un admin desde el panel. Falta
+      construirlo: anonimizar nombre, cédula, correo y teléfono, borrar sus contraseñas de trading y sus tickets, y
+      conservar órdenes y pagos (los exige la ley).
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
       (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
       prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.
@@ -82,7 +94,7 @@
 - [x] **Cloudflare Turnstile** (2026-10-15): llaves en Vercel y en la API.
 - [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
       una llave gratis del plan Demo (`COINGECKO_API_KEY` en la API de Railway) hay más consultas al mes.
-- [ ] **Cloudflare R2 (adjuntos de soporte, etapa 7):** en Cloudflare → R2, crear un depósito privado
+- [x] **Cloudflare R2 (adjuntos de soporte, etapa 7, 2026-10-15):** en Cloudflare → R2, crear un depósito privado
       `doctrader-adjuntos` (sin acceso público ni dominio) y un token de API de R2 con permiso "Object Read & Write"
       solo para ese depósito. Poner `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` en la
       API **y** en el worker de Railway (el worker borra los adjuntos sin usar). No hace falta CORS en R2: el

@@ -237,12 +237,13 @@ ve).
 
 **`partner_profiles`**: `user_id` (único), `commission_bp` (inicial 1000).
 
-**`commission_rate_changes`**: `partner_id`, `old_bp`, `new_bp`, `changed_by`, `created_at`. Aplica a órdenes
-aprobadas después del cambio y avisa a Argemiro.
+**`commission_rate_changes`**: `partner_id`, `old_bp` (nulo en el porcentaje inicial), `new_bp`, `changed_by`,
+`created_at`. Aplica a órdenes aprobadas después del cambio y avisa a los dos admins.
 
-**`commission_payouts`**: `partner_id`, `period_start`, `period_end` (del 1 al 15, y del 16 al último día del mes),
-`gross_usd_cents`, `commission_usd_cents`, `status` (`ABIERTA`, `CERRADA`, `PAGADA`), `paid_at`, `paid_by`,
-`payment_reference`.
+**`commission_payouts`**: `partner_id`, `period_start`, `period_end` (del 1 al 15, y del 16 al último día del mes,
+en hora de Colombia), `sales_count`, `gross_usd_cents`, `commission_usd_cents`, `status` (`CERRADA`, `PAGADA`),
+`paid_at`, `paid_by`, `payment_reference`. Una fila por quincena cerrada; la quincena en curso se calcula al vuelo.
+Las órdenes quedan ligadas por `payment_orders.commission_payout_id`.
 
 **`notifications`**: bandeja de salida de correos.
 
@@ -372,13 +373,13 @@ stateDiagram-v2
 | Expirar órdenes | Cada minuto | PENDIENTE → EXPIRADA al pasar `expires_at` |
 | Verificar pagos | Al reportar el hash y cada 2 minutos mientras esté REPORTADA | Consulta la blockchain y actualiza `verification_status`; aprueba sola si está encendido |
 | Estados de licencia | Cada 5 minutos | ACTIVA → EN_GRACIA → VENCIDA y mueve la conexión a POR_DESCONECTAR |
-| Recordatorios | Cada hora | 7, 3 y 1 día antes y el día del vencimiento; `dedupe_key` evita repetir |
+| Recordatorios | Cada hora | 7, 3 y 1 día antes (el del vencimiento sale con el paso a gracia); `dedupe_key` evita repetir |
 | Activar direcciones | Cada minuto | EN_ESPERA → ACTIVA al pasar `activates_at` |
 | Cerrar tickets | Cada hora | RESUELTO → CERRADO a los 7 días |
 | Borrar adjuntos sin usar | Cada hora | Archivos subidos que ningún mensaje adjuntó en 24 horas |
-| Liquidar comisión | Días 15 y último del mes | Cierra el periodo y suma las órdenes aprobadas |
+| Liquidar comisión | Cada hora | Cierra las quincenas terminadas (1–15 y 16–fin de mes) con sus órdenes aprobadas |
 | Enviar avisos | Continuo | Envía `notifications` pendientes con reintentos |
-| Borrar datos vencidos | Diario | Contraseñas de trading, fotos, tickets y registros según la política de datos |
+| Borrar datos vencidos | Diario, 3 a. m. | Contraseñas de trading, tickets y registros según la política de datos |
 | Copia de seguridad extra | Semanal | Copia cifrada de la base de datos en R2 |
 
 ## 6. Reglas confirmadas (2026-10-14)
@@ -481,3 +482,24 @@ stateDiagram-v2
 - **`saved_replies`:** título único sin importar mayúsculas, hasta 40. Se crearon 4 iniciales.
 - **Límites:** 10 tickets nuevos por hora y 60 mensajes por hora por cliente, 10 tickets abiertos a la vez, 40
   subidas por hora y 20 archivos sueltos por usuario.
+
+## 12. Cómo quedó construido (etapa 8, 2026-10-15)
+
+- **Correos (`notifications`):** las plantillas nuevas son `bienvenida`, `licencia-por-vencer` (con `dias` 7, 3 o 1),
+  `licencia-en-gracia`, `licencia-vencida`, y para los admins `pago-por-revisar`, `venta-aprobada`,
+  `cuenta-por-conectar`, `cuenta-por-desconectar`, `comision-cambiada` y `comision-liquidada`. Claves (`dedupe_key`):
+  `vence-{7,3,1}d:{licencia}:{ends_at}`, `en-gracia:{licencia}:{ends_at}`, `vencida:{licencia}:{grace_ends_at}`,
+  `por-desconectar:{licencia}:{grace_ends_at}:{admin}`, `venta:{orden}:{admin}`,
+  `pago-por-revisar:{orden}:{estado}:{admin}`, `bienvenida:{usuario}`, `liquidacion:{liquidación}:{ventas}:{admin}`.
+- **Recordatorios:** a las licencias ACTIVA que vencen en 7 días o menos, sin una orden REPORTADA. Solo el tramo en
+  que está (si el worker estuvo apagado, no llegan tres juntos).
+- **Socio:** el porcentaje lo cambia solo el usuario de `partner_profiles` (403 `SOLO_EL_SOCIO` para el otro admin),
+  de 0 a 50 %, con confirmación reciente; queda en `commission_rate_changes` y en la auditoría
+  (`socio.comision_cambiada`). Marcar una quincena como pagada también pide confirmación
+  (`socio.liquidacion_pagada`). La migración `1792900000000-socio` crea las dos tablas, el porcentaje inicial y la
+  llave foránea de `payment_orders.commission_payout_id`.
+- **Borrado (`BorradoDatos`):** contraseñas de cuentas DESCONECTADA o SIN_LICENCIA desde hace 90 días sin licencia
+  vigente, o borradas (`passwords_purged_at`); tickets CERRADO hace 24 meses (los adjuntos quedan con
+  `delete_after` y los borra el trabajo de adjuntos); `user_devices` sin verse en 12 meses; `auth_tokens` vencidos
+  hace 12 meses; `notifications` ENVIADA o FALLIDA de más de 12 meses. La auditoría (5 años) no se borra todavía: la
+  tabla no acepta borrados y su primer registro es de 2026.

@@ -216,12 +216,42 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
   - **Falta:** crear el depósito de R2 y sus llaves, y probar un adjunto real en producción (ver `PENDIENTES.md`).
     Revisión antivirus de los PDF: pendiente (`SEGURIDAD.md` §7).
 
-### Etapa 8 — Automatizaciones y socio
+### Etapa 8 — Automatizaciones y socio ✅ (2026-10-15)
 - Correos con Resend (plantillas con la marca), recordatorios, gracia, vencimiento y alertas a los admins.
 - Perfil del socio: % de comisión, liquidaciones del 15 y fin de mes e historial.
 - Trabajos de borrado según la política de datos.
 - **Hecho cuando:** una licencia mensual recorre todo su ciclo en pruebas (con fechas aceleradas: recordatorios,
   gracia, vencimiento y renovación) y llegan todos los correos, una sola vez cada uno.
+- **Resultado:**
+  - **Correos al cliente:** bienvenida (al confirmar el correo, una vez), recordatorios 7, 3 y 1 día antes del
+    vencimiento (solo el del tramo en que está la licencia, y ninguno si ya reportó el pago de la renovación),
+    "tu licencia venció" el día del vencimiento con la fecha de fin de la gracia, y "desconectaremos la cuenta" al
+    terminar la gracia. Cada correo lleva una clave con la fecha de vencimiento: no se repite aunque el trabajo
+    corra muchas veces, y una renovación empieza un ciclo nuevo.
+  - **Avisos a los admins:** pago verificado por aprobar (o con un problema para revisar a mano; no llega si la
+    aprobación automática está encendida), venta aprobada (quién, plan, monto y si la cuenta quedó por conectar),
+    cuenta por actualizar cuando un cliente cambia los datos de una cuenta conectada, cuenta por desconectar al
+    terminar la gracia, cambio del porcentaje del socio y quincena liquidada. Se sumaron a los de tickets y
+    direcciones de depósito.
+  - **No se hizo** el correo de "orden creada": la orden vale una hora, el cliente la ve en pantalla y se reemplaza
+    cada vez que cambia de plan o de moneda (serían correos de más).
+  - **Socio** (`/admin/socio`): la comisión de la quincena en curso, el porcentaje (solo el socio lo cambia, con el
+    código de la app; aplica a las ventas siguientes y avisa al otro admin), las liquidaciones con su estado y el
+    historial de cambios. El worker cierra cada hora las quincenas terminadas (1 al 15 y 16 al último día, en hora
+    de Colombia) con sus ventas y su comisión, y avisa a los admins; cualquiera de los dos la marca como pagada con
+    la referencia del pago (también con el código).
+  - **Borrado diario** (3 a. m. de Colombia): contraseñas de trading de cuentas sin licencia vigente desde hace 90
+    días (o borradas), tickets cerrados hace más de 2 años (con sus adjuntos), y dispositivos, enlaces de un solo
+    uso y correos enviados de más de 12 meses. Las órdenes, las autorizaciones y la auditoría no se tocan.
+  - **Arreglo en los formularios con código:** cuando la API pedía el código de la app, el formulario volvía a los
+    valores de antes y el segundo envío no cambiaba nada (precios, días de gracia, dirección nueva). Ahora conserva
+    lo escrito.
+  - 113 pruebas de punta a punta (6 nuevas: el ciclo completo de una licencia mensual con todos sus correos una
+    vez, sin recordatorio con el pago en revisión, cuenta por actualizar, porcentaje del socio, liquidación y pago
+    de quincenas, borrado de datos) y recorrido en el navegador de "Socio" a 1440 y 390 px.
+  - **Queda para después:** eliminar desde el panel la cuenta de un cliente que lo pida (anonimizar sus datos y
+    conservar órdenes y pagos). No hace falta pedir que acepten de nuevo los textos legales: los clientes de hoy son
+    de prueba y la base de datos se limpia antes de salir (ver §5).
 
 ### Etapa 9 — Endurecimiento y lanzamiento
 - Revisión de seguridad completa contra `SEGURIDAD.md`, Sentry, monitor de disponibilidad, copias de seguridad y una
@@ -248,6 +278,8 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 - [ ] Copia de seguridad restaurada con éxito al menos una vez.
 
 **Funcionamiento**
+- [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
+      correos; quedan solo los dos admins, los ajustes y los textos legales vigentes.
 - [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.
 - [ ] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook.
 - [ ] Monitor de disponibilidad y alertas activos.

@@ -27,6 +27,7 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
             texto: 'Ajustes',
             tambien: ['/admin/preguntas', '/admin/legal'],
           },
+          { href: '/admin/socio', texto: 'Socio' },
         ]}
       />
       <main id="contenido" className="contenedor flex-1 py-16 lg:py-24">

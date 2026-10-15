@@ -62,7 +62,7 @@ export function Precios({ ajustes }: { ajustes: Ajustes }) {
             etiqueta={`${p.nombre}, ${p.meses === 1 ? '1 mes' : `${p.meses} meses`} (USD)`}
             name={p.codigo}
             inputMode="decimal"
-            defaultValue={dolares(p.precioUsdCentavos)}
+            defaultValue={estado.valores?.[p.codigo] ?? dolares(p.precioUsdCentavos)}
             error={estado.campos?.[p.codigo]}
           />
         ))}
@@ -86,7 +86,7 @@ export function Operacion({ ajustes }: { ajustes: Ajustes }) {
           etiqueta="Días de gracia"
           name="diasGracia"
           inputMode="numeric"
-          defaultValue={String(ajustes.diasGracia)}
+          defaultValue={estado.valores?.diasGracia ?? String(ajustes.diasGracia)}
           ayuda="Después de vencer, la cuenta sigue conectada estos días. Aplica a los pagos que se aprueben desde ahora."
           error={estado.campos?.diasGracia}
         />
@@ -94,21 +94,23 @@ export function Operacion({ ajustes }: { ajustes: Ajustes }) {
           etiqueta="Vigencia de la orden de pago (minutos)"
           name="minutosOrden"
           inputMode="numeric"
-          defaultValue={String(ajustes.minutosOrden)}
+          defaultValue={estado.valores?.minutosOrden ?? String(ajustes.minutosOrden)}
           error={estado.campos?.minutosOrden}
         />
         <Campo
           etiqueta="Confirmaciones en Tron (USDT)"
           name="confirmacionesTron"
           inputMode="numeric"
-          defaultValue={String(ajustes.confirmaciones.TRON)}
+          defaultValue={estado.valores?.confirmacionesTron ?? String(ajustes.confirmaciones.TRON)}
           error={estado.campos?.confirmacionesTron}
         />
         <Campo
           etiqueta="Confirmaciones en Bitcoin"
           name="confirmacionesBitcoin"
           inputMode="numeric"
-          defaultValue={String(ajustes.confirmaciones.BITCOIN)}
+          defaultValue={
+            estado.valores?.confirmacionesBitcoin ?? String(ajustes.confirmaciones.BITCOIN)
+          }
           error={estado.campos?.confirmacionesBitcoin}
         />
       </div>
@@ -339,7 +341,11 @@ export function Direcciones({ ajustes }: { ajustes: Ajustes }) {
       {abierto ? (
         <form ref={formulario} action={accion} className="grid gap-6" noValidate>
           <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-5 max-sm:grid-cols-1">
-            <Selector etiqueta="Moneda y red" name="moneda" defaultValue={MONEDA.USDT}>
+            <Selector
+              etiqueta="Moneda y red"
+              name="moneda"
+              defaultValue={estado.valores?.moneda ?? MONEDA.USDT}
+            >
               {Object.values(MONEDA).map((m: Moneda) => (
                 <option key={m} value={m}>
                   {m} por {NOMBRE_RED[RED_DE_MONEDA[m]]}
@@ -352,6 +358,7 @@ export function Direcciones({ ajustes }: { ajustes: Ajustes }) {
               autoComplete="off"
               spellCheck={false}
               placeholder="Pega la dirección completa"
+              defaultValue={estado.valores?.direccion}
               error={estado.campos?.direccion}
             />
           </div>
