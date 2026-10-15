@@ -19,9 +19,6 @@ export const PLANTILLA = {
   CUENTA_CONECTADA: 'cuenta-conectada',
   LICENCIA_EXTENDIDA: 'licencia-extendida',
   DIRECCION_DEPOSITO: 'direccion-deposito',
-  PRUEBA_SOLICITADA: 'prueba-solicitada',
-  PRUEBA_APROBADA: 'prueba-aprobada',
-  PRUEBA_RECHAZADA: 'prueba-rechazada',
   TICKET_NUEVO: 'ticket-nuevo',
   TICKET_REABIERTO: 'ticket-reabierto',
   TICKET_RESPONDIDO: 'ticket-respondido',
@@ -261,36 +258,6 @@ export function renderizar(
         ],
         boton: { texto: 'Ver las direcciones', url: `${web}/admin/ajustes#direcciones` },
         despues: ['Este aviso les llega a los dos administradores.'],
-      });
-    case PLANTILLA.PRUEBA_SOLICITADA:
-      return armar({
-        asunto: `Solicitud de prueba: ${datos.cliente}`,
-        saludo,
-        parrafos: [
-          `${datos.cliente} pidió la prueba para la cuenta ${datos.cuenta}. ${datos.senales}`,
-          'Revísala en Pagos, en "Solicitudes de prueba", y apruébala o recházala.',
-        ],
-        boton: { texto: 'Revisar la solicitud', url: `${web}/admin/pagos#pruebas` },
-      });
-    case PLANTILLA.PRUEBA_APROBADA:
-      return armar({
-        asunto: 'Aprobamos tu prueba de DocTraderPRO',
-        saludo,
-        parrafos: [
-          `Aprobamos tu prueba de ${datos.dias} días para la cuenta de trading ${datos.cuenta}. Para empezar, paga la orden de USD ${datos.precio} desde tu panel, en USDT o BTC.`,
-          'Apenas verifiquemos el pago, conectamos la cuenta y te avisamos. Los días de la prueba cuentan desde que aprobamos el pago.',
-        ],
-        boton: { texto: 'Pagar la prueba', url: `${web}/panel/prueba` },
-      });
-    case PLANTILLA.PRUEBA_RECHAZADA:
-      return armar({
-        asunto: 'No pudimos aprobar tu prueba',
-        saludo,
-        parrafos: [
-          `Revisamos tu solicitud de prueba y no la pudimos aprobar. Motivo: ${datos.motivo}`,
-          'Puedes comprar una licencia mensual o semestral desde tu panel. Si crees que es un error, responde este correo.',
-        ],
-        boton: { texto: 'Ir a mi panel', url: `${web}/panel` },
       });
     case PLANTILLA.TICKET_NUEVO:
     case PLANTILLA.TICKET_REABIERTO: {

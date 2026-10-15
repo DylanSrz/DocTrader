@@ -11,8 +11,7 @@
 | **Contraseñas de las cuentas de trading** | Robo de la base de datos o de un admin | Cifrado por campo, vista solo con segundo factor y auditoría (§4) |
 | **Aprobación de pagos** | Pagos falsos o un mismo hash usado dos veces | Verificación en blockchain del lado del servidor, hash único (§6) |
 | **Cuentas de admin** | Robo de contraseña o phishing | Segundo factor obligatorio, sesiones cortas, avisos de ingreso (§3) |
-| **Datos personales** (cédula, teléfono, foto) | Filtración | Cifrado, mínimo acceso, plazos de borrado (§4, §8) |
-| **Regla de una prueba** | Abuso con datos de otros | Control de la prueba de `CONTEXTO.md` y huellas HMAC (§4.4) |
+| **Datos personales** (cédula, teléfono) | Filtración | Cifrado, mínimo acceso, plazos de borrado (§4, §8) |
 | **Dominio y correo** | Suplantación (phishing con el nombre de la marca) | SPF, DKIM, DMARC, bloqueo del dominio (§10) |
 
 La plataforma **nunca guarda llaves privadas de billeteras**: solo direcciones públicas. Aunque alguien tomara el
@@ -28,7 +27,8 @@ control total del servidor, no podría mover el dinero de Argemiro.
 - Mensajes de error genéricos ("correo o contraseña incorrectos"), para no revelar qué correos están registrados.
 - **Recuperar contraseña:** enlace de un solo uso, válido 30 minutos, guardado como hash. Al cambiarla se cierran
   todas las sesiones.
-- **Verificación del correo** al registrarse y **del teléfono por SMS** (Twilio Verify) para pedir la prueba.
+- **Verificación del correo** al registrarse. El teléfono no se verifica por SMS desde el 2026-10-15 (se quitó la
+  licencia de prueba, que era lo único que lo exigía).
 
 ## 3. Sesiones, segundo factor y permisos
 
@@ -72,7 +72,6 @@ Con **AES-256-GCM** en la API (cifrado autenticado: si alguien altera el dato, n
 - Contraseña de operación y contraseña de inversor de cada cuenta de trading.
 - Número de cédula (se guarda también su HMAC para buscar duplicados sin descifrar).
 - Secreto del segundo factor (TOTP) de cada usuario.
-- Foto del documento, antes de subirla al almacenamiento.
 
 ### 4.2. Llaves
 - La llave de cifrado vive en una **variable de entorno del servidor** (`DATA_ENCRYPTION_KEY`), nunca en el código ni
@@ -86,10 +85,9 @@ Con **AES-256-GCM** en la API (cifrado autenticado: si alguien altera el dato, n
   auditoría (quién, cuándo, qué cuenta) y se ocultan solas a los 60 segundos.
 - Se borran 90 días después de desconectar una cuenta que no renovó (ver la política de datos).
 
-### 4.4. Huellas del control de la prueba
-- HMAC-SHA256 con una llave propia (`TRIAL_HMAC_KEY`), distinta de la de cifrado.
-- Esta llave **no se puede rotar borrando la anterior**, porque las huellas viejas dejarían de coincidir: se agrega
-  una versión nueva y se comparan las dos.
+### 4.4. Huellas del control de la prueba (retirado)
+- Se quitó con la licencia de prueba el 2026-10-15: ya no hay registro de huellas ni `TRIAL_HMAC_KEY`. El número se
+  conserva para no romper referencias.
 
 ### 4.5. En tránsito y en reposo
 - HTTPS en todo (Vercel y Railway o Render lo dan). Conexión a PostgreSQL y Redis con TLS.
@@ -139,7 +137,7 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
   `packages/shared`). Los campos que no están en el esquema se rechazan.
 - Consultas a la base de datos siempre parametrizadas con TypeORM; nunca SQL armado con texto del usuario.
 - Los mensajes de soporte se muestran como texto plano, sin HTML.
-- **Archivos adjuntos y foto del documento:**
+- **Archivos adjuntos:**
   - Imágenes (JPG, PNG, WEBP) o PDF, hasta 10 MB, máximo 5 por mensaje. El tipo se comprueba por el contenido del
     archivo, no por su extensión.
   - Las imágenes se vuelven a codificar en el servidor, lo que borra metadatos como la ubicación GPS.
@@ -166,19 +164,16 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 
 ## 9. Abuso y bots
 
-- **Cloudflare Turnstile** (gratis, sin imágenes molestas) en registro, recuperar contraseña, solicitud de prueba,
-  envío de SMS y en el ingreso después de varios fallos.
+- **Cloudflare Turnstile** (gratis, sin imágenes molestas) en registro, recuperar contraseña y en el ingreso después
+  de varios fallos.
 - **Límites de velocidad** con Redis en toda la API (600 peticiones cada 5 minutos por IP), más estrictos en ingreso
-  (30 cada 15 minutos por IP), registro (5 por hora por IP), correos (10 por hora por IP y 3 por hora por cuenta) y
-  SMS. Se hizo un limitador propio de ventana fija en vez de `@nestjs/throttler`, porque las reglas por cuenta
-  (correo) no son por ruta.
-- **SMS:** máximo 3 códigos por teléfono por hora y 5 por día, y límite por IP. En Twilio, permisos geográficos solo
-  para los países donde se vende (al inicio, Colombia) y protección contra fraude de SMS activada, para evitar que
-  bots generen mensajes que cobran a la cuenta.
+  (30 cada 15 minutos por IP), registro (5 por hora por IP) y correos (10 por hora por IP y 3 por hora por cuenta).
+  Se hizo un limitador propio de ventana fija en vez de `@nestjs/throttler`, porque las reglas por cuenta (correo)
+  no son por ruta.
 
 ## 10. Dominio, correo y cuentas de servicio (operación)
 
-- **Segundo factor en todas las cuentas:** GitHub, Vercel, Railway o Render, Resend, Twilio, Cloudflare, Hostinger,
+- **Segundo factor en todas las cuentas:** GitHub, Vercel, Railway o Render, Resend, Cloudflare, Hostinger,
   Binance y los correos de Google de Argemiro y Dylan. Códigos de recuperación en el gestor de contraseñas.
 - **Gestor de contraseñas compartido** (Bitwarden o 1Password) para las credenciales de la plataforma. Nada de
   contraseñas por chat.
@@ -215,8 +210,7 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 ## 13. Código, dependencias y despliegue
 
 - Rama principal protegida: todo entra por pull request con revisión y pruebas en verde.
-- Pruebas automáticas de lo crítico: permisos (que un cliente no vea lo de otro), pagos, licencias y días, control de
-  la prueba, cifrado.
+- Pruebas automáticas de lo crítico: permisos (que un cliente no vea lo de otro), pagos, licencias y días, cifrado.
 - Revisión automática de dependencias (Dependabot), análisis de código (CodeQL) y búsqueda de secretos filtrados
   (gitleaks) en cada pull request.
 - `pnpm-lock.yaml` versionado; nada de instalar paquetes sin revisar.
@@ -229,8 +223,8 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 - Errores en Sentry, con los datos personales y secretos filtrados antes de enviarse.
 - Registros sin datos sensibles (ni contraseñas, ni cédulas completas, ni tokens).
 - Monitor de disponibilidad de la web y la API con alerta a los dos admins.
-- Alertas por: muchos ingresos fallidos, picos de SMS, trabajos del worker que fallan, pagos sin verificar por más de
-  una hora y cambios de direcciones de depósito.
+- Alertas por: muchos ingresos fallidos, trabajos del worker que fallan, pagos sin verificar por más de una hora y
+  cambios de direcciones de depósito.
 - **Si pasa algo** (operación):
   1. Contener: cerrar sesiones, desactivar la cuenta afectada y, si hace falta, poner la plataforma en mantenimiento.
   2. Rotar las llaves y contraseñas comprometidas.

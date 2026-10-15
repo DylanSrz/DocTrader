@@ -38,7 +38,6 @@ const CONDICION: Record<FiltroLicencias, string> = {
   gracia: `l.status = 'EN_GRACIA'`,
   vencidas: `l.status = 'VENCIDA'`,
   pendientes: `l.status = 'PENDIENTE_PAGO'`,
-  prueba: `l.status = 'PRUEBA'`,
   suspendidas: `l.status = 'SUSPENDIDA'`,
 };
 
@@ -441,16 +440,12 @@ export class LicenciasAdminService {
   async suspender(id: string, motivo: string, sesion: SesionActiva, cliente: ContextoCliente) {
     await this.fuente.transaction(async (m) => {
       const licencia = await this.bloquear(m, id);
-      const suspendible: EstadoLicencia[] = [
-        ESTADO_LICENCIA.ACTIVA,
-        ESTADO_LICENCIA.EN_GRACIA,
-        ESTADO_LICENCIA.PRUEBA,
-      ];
+      const suspendible: EstadoLicencia[] = [ESTADO_LICENCIA.ACTIVA, ESTADO_LICENCIA.EN_GRACIA];
       if (!suspendible.includes(licencia.status)) {
         throw errorApi(
           HttpStatus.CONFLICT,
           'NO_SUSPENDIBLE',
-          'Solo se suspende una licencia vigente (activa, en gracia o en prueba).',
+          'Solo se suspende una licencia vigente (activa o en gracia).',
         );
       }
       await m.getRepository(License).update(
@@ -478,11 +473,8 @@ export class LicenciasAdminService {
         throw errorApi(HttpStatus.CONFLICT, 'NO_SUSPENDIDA', 'Esta licencia no está suspendida.');
       }
       const ahora = new Date();
-      const estado: EstadoLicencia = licencia.isTrial
-        ? licencia.endsAt && licencia.endsAt > ahora
-          ? ESTADO_LICENCIA.PRUEBA
-          : ESTADO_LICENCIA.VENCIDA
-        : licencia.endsAt && licencia.endsAt > ahora
+      const estado: EstadoLicencia =
+        licencia.endsAt && licencia.endsAt > ahora
           ? ESTADO_LICENCIA.ACTIVA
           : licencia.graceEndsAt && licencia.graceEndsAt > ahora
             ? ESTADO_LICENCIA.EN_GRACIA

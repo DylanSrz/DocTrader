@@ -26,12 +26,6 @@ export class License {
   @Column({ type: 'varchar', length: 16, default: 'PENDIENTE_PAGO' })
   status: EstadoLicencia;
 
-  @Column({ name: 'is_trial', type: 'boolean', default: false })
-  isTrial: boolean;
-
-  @Column({ name: 'trial_started_at', type: 'timestamptz', nullable: true })
-  trialStartedAt: Date | null;
-
   @Column({ name: 'starts_at', type: 'timestamptz', nullable: true })
   startsAt: Date | null;
 

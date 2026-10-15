@@ -64,11 +64,7 @@ describe('página pública', () => {
   it('da los planes y precios de la base de datos, las preguntas, las cifras y los enlaces', async () => {
     const respuesta = await comoLaWeb(app).get('/publico/landing').expect(200);
     const { planes, preguntas, myfxbook, enlaces, correoSoporte } = respuesta.body;
-    expect(planes.map((p: { codigo: string }) => p.codigo)).toEqual([
-      'PRUEBA',
-      'MENSUAL',
-      'SEMESTRAL',
-    ]);
+    expect(planes.map((p: { codigo: string }) => p.codigo)).toEqual(['MENSUAL', 'SEMESTRAL']);
     expect(planes.find((p: { codigo: string }) => p.codigo === 'SEMESTRAL')).toMatchObject({
       precioUsdCentavos: 49_900,
       meses: 6,

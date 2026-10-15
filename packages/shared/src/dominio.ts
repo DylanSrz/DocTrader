@@ -15,17 +15,16 @@ export const ESTADO_USUARIO = {
 } as const;
 export type EstadoUsuario = ValorDe<typeof ESTADO_USUARIO>;
 
+/** La trimestral ya no se vende (2026-10-15); la licencia de prueba se quitó el mismo día. */
 export const CODIGO_PLAN = {
   MENSUAL: 'MENSUAL',
   TRIMESTRAL: 'TRIMESTRAL',
   SEMESTRAL: 'SEMESTRAL',
-  PRUEBA: 'PRUEBA',
 } as const;
 export type CodigoPlan = ValorDe<typeof CODIGO_PLAN>;
 
 export const ESTADO_LICENCIA = {
   PENDIENTE_PAGO: 'PENDIENTE_PAGO',
-  PRUEBA: 'PRUEBA',
   ACTIVA: 'ACTIVA',
   EN_GRACIA: 'EN_GRACIA',
   VENCIDA: 'VENCIDA',
@@ -37,8 +36,6 @@ export const TIPO_ORDEN = {
   NUEVA: 'NUEVA',
   RENOVACION: 'RENOVACION',
   CAMBIO_DE_PLAN: 'CAMBIO_DE_PLAN',
-  PRUEBA: 'PRUEBA',
-  COMPLETAR_PRUEBA: 'COMPLETAR_PRUEBA',
 } as const;
 export type TipoOrden = ValorDe<typeof TIPO_ORDEN>;
 
@@ -87,14 +84,6 @@ export const ESTADO_CONEXION = {
   DESCONECTADA: 'DESCONECTADA',
 } as const;
 export type EstadoConexion = ValorDe<typeof ESTADO_CONEXION>;
-
-export const ESTADO_SOLICITUD_PRUEBA = {
-  BLOQUEADA: 'BLOQUEADA',
-  PENDIENTE: 'PENDIENTE',
-  APROBADA: 'APROBADA',
-  RECHAZADA: 'RECHAZADA',
-} as const;
-export type EstadoSolicitudPrueba = ValorDe<typeof ESTADO_SOLICITUD_PRUEBA>;
 
 export const ESTADO_TICKET = {
   ABIERTO: 'ABIERTO',
@@ -145,11 +134,9 @@ export type NivelRiesgo = ValorDe<typeof NIVEL_RIESGO>;
 
 /** De dónde salió cada periodo de una licencia (`license_periods.kind`). */
 export const TIPO_PERIODO = {
-  PRUEBA: 'PRUEBA',
   NUEVA: 'NUEVA',
   RENOVACION: 'RENOVACION',
   CAMBIO_DE_PLAN: 'CAMBIO_DE_PLAN',
-  COMPLETAR_PRUEBA: 'COMPLETAR_PRUEBA',
   EXTENSION_ADMIN: 'EXTENSION_ADMIN',
 } as const;
 export type TipoPeriodo = ValorDe<typeof TIPO_PERIODO>;

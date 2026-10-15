@@ -14,7 +14,6 @@ import { Setting } from './setting.entity.js';
 import { StoredFile } from './stored-file.entity.js';
 import { SavedReply, Ticket, TicketMessage } from './ticket.entity.js';
 import { TradingAccount } from './trading-account.entity.js';
-import { TrialRequest } from './trial-request.entity.js';
 import { UserDevice } from './user-device.entity.js';
 import { User } from './user.entity.js';
 
@@ -37,11 +36,9 @@ export {
   Ticket,
   TicketMessage,
   TradingAccount,
-  TrialRequest,
   User,
   UserDevice,
 };
-export type { Coincidencia } from './trial-request.entity.js';
 export { PROPOSITO_ENLACE, type PropositoEnlace } from './auth-token.entity.js';
 export { ESTADO_AVISO, type EstadoAviso } from './notification.entity.js';
 export { PROPOSITO_ARCHIVO, type PropositoArchivo } from './stored-file.entity.js';
@@ -65,7 +62,6 @@ export const ENTIDADES = [
   Ticket,
   TicketMessage,
   TradingAccount,
-  TrialRequest,
   User,
   UserDevice,
 ];

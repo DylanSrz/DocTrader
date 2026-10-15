@@ -7,7 +7,7 @@ Plataforma web para vender licencias del software de copy trading **Doc Trader P
 - Documento de requerimientos formal (RN, RF, RNF, HU, alcance): https://claude.ai/code/artifact/12e017f5-308d-45a5-bf40-89b2d4b6f121
 
 Estado: **construcción** (desde el 2026-10-14). Etapas 0 a 7 hechas (base, cuentas y acceso, página pública, cuentas de trading con licencias y órdenes,
-verificación y aprobación de pagos, operación del admin, licencia de prueba, soporte por tickets); sigue la etapa 8 de
+verificación y aprobación de pagos, operación del admin, licencia de prueba —retirada el 2026-10-15—, soporte por tickets); sigue la etapa 8 de
 `docs/PLAN-TRABAJO.md`. Cómo correr el proyecto y convenciones de código: `README.md`.
 
 Reglas clave:
@@ -16,9 +16,8 @@ Reglas clave:
 - Precios en USD, editables desde el admin. Sin devoluciones.
   Mensual: 1 mes, USD 120. Semestral: **6 meses**, USD 499 (desde el 2026-10-15 no hay trimestral ni mes de obsequio).
   Mensual → semestral antes de vencer (se paga el plan nuevo; los días se suman).
-  Prueba de **15 días** (USD 50), solo bajo solicitud aprobada por el admin; se completa a cualquier plan pagando la
-  **diferencia** (USD 70 o 449) hasta el último día de la prueba; la licencia cuenta desde el inicio de la prueba.
-  **Una prueba por cliente y por cuenta de trading**, con control antiabuso (ver `docs/CONTEXTO.md`, "Control de la prueba"); para pedirla, correo y teléfono verificados (**SMS**).
+  **No hay licencia de prueba** (se quitó el 2026-10-15): para conocer el software se empieza con el mensual.
+  Tampoco se verifica el teléfono por SMS (no se usa Twilio).
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
 - **Solo cripto** por ahora y **solo dos redes**: USDT (Tron TRC20) y BTC (Bitcoin). USDC (BNB Smart Chain) se quitó el
   2026-10-14; el diseño permite agregar redes después.
@@ -36,7 +35,7 @@ Reglas clave:
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
 - Titular: **DocTraderPRO, Barranquilla, Colombia**. Textos legales (borradores) en `docs/legal/`; plan de seguridad en
-  `docs/SEGURIDAD.md`; decisiones técnicas (SMS, blockchain, archivos, cuentas) en `docs/DECISIONES-TECNICAS.md`;
+  `docs/SEGURIDAD.md`; decisiones técnicas (blockchain, archivos, cuentas) en `docs/DECISIONES-TECNICAS.md`;
   modelo de datos y estados en `docs/MODELO-DATOS.md`; etapas, entornos, pruebas y lista de lanzamiento en
   `docs/PLAN-TRABAJO.md`.
   Admins: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderproiasystem@gmail.com). Cuentas de servicio a nombre de Dylan; las paga Argemiro.

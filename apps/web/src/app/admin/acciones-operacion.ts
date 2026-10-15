@@ -261,7 +261,6 @@ export async function guardarPrecios(
   const precios = {
     MENSUAL: centavos(texto(datos, 'MENSUAL')),
     SEMESTRAL: centavos(texto(datos, 'SEMESTRAL')),
-    PRUEBA: centavos(texto(datos, 'PRUEBA')),
   };
   const malos = Object.entries(precios).filter(([, v]) => v === null || Number.isNaN(v));
   if (malos.length > 0) {
@@ -273,7 +272,7 @@ export async function guardarPrecios(
   const r = await operar(datos, (t) =>
     llamarApi('/admin/ajustes/precios', {
       metodo: 'PUT',
-      cuerpo: { ...precios, diasPrueba: entero(texto(datos, 'diasPrueba')) },
+      cuerpo: precios,
       token: t,
     }),
   );

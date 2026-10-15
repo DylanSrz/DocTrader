@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { DataSource, IsNull } from 'typeorm';
 import { opcionesBaseDeDatos } from '../src/database/data-source.js';
 import { DepositAddress, PartnerProfile, Plan, User } from '../src/database/entidades/index.js';
+import { quitarPruebaDeTextosLegales } from '../src/database/migraciones/1792800000000-quitar-prueba.js';
 import { PlanesYMarca1792400000000 } from '../src/database/migraciones/1792400000000-planes-y-marca.js';
 import { aplicarSemilla } from '../src/database/semilla-datos.js';
 import { registrarEnCadena, verificarCadena } from '../src/auditoria/cadena.js';
@@ -22,7 +23,6 @@ describe('semilla', () => {
   it('carga los planes con sus precios: sin trimestral y la semestral de 6 meses', async () => {
     const planes = await fuente.getRepository(Plan).find({ order: { rank: 'ASC' } });
     expect(planes.map((p) => [p.code, p.priceUsdCents, p.bonusMonths])).toEqual([
-      ['PRUEBA', 5_000, 0],
       ['MENSUAL', 12_000, 0],
       ['SEMESTRAL', 49_900, 0],
     ]);
@@ -113,6 +113,80 @@ describe('semilla', () => {
     await fuente.query(`UPDATE settings SET value = $1::jsonb WHERE key = 'faq'`, [
       JSON.stringify(faqAntes!.value),
     ]);
+  });
+
+  it('publica los términos y la política de datos sin la licencia de prueba, una sola vez', async () => {
+    const terminos = [
+      '## 5. Planes y precios',
+      '',
+      '5.1. Planes.',
+      '',
+      '## 6. Licencia de prueba',
+      '',
+      '6.1. La licencia de prueba dura **15 días** y cuesta **USD 50**.',
+      '',
+      '6.2. Para solicitarla, el Cliente debe tener su correo y su teléfono verificados.',
+      '',
+      '## 7. Pagos',
+      '',
+      '7.1. Solo cripto.',
+      '',
+      '8.3. La licencia de prueba existe para que el Cliente conozca el Software antes de comprar un periodo más largo.',
+      '',
+      '13.1. Si da datos falsos, intenta abusar de la prueba, comparte su licencia, o algo más.',
+    ].join('\n');
+    const datos = [
+      '1. Crear y administrar la cuenta del cliente y verificar su correo y su teléfono.',
+      '',
+      '## 6. Registro para el control de la licencia de prueba',
+      '',
+      'Huellas de la prueba.',
+      '',
+      '## 7. Autorización',
+      '',
+      'Texto.',
+      '',
+      '| Huellas del control de la prueba | Mientras exista el programa de pruebas (numeral 6) |',
+      '',
+    ].join('\n');
+    const version = async (tipo: string) =>
+      (
+        (await fuente.query(`SELECT max(version)::int AS v FROM legal_documents WHERE type = $1`, [
+          tipo,
+        ])) as { v: number }[]
+      )[0]!.v;
+    const [t0, d0] = [await version('TERMS'), await version('PRIVACY')];
+    await fuente.query(
+      `INSERT INTO legal_documents (type, version, content_md) VALUES ('TERMS', $1, $2), ('PRIVACY', $3, $4)`,
+      [t0 + 1, terminos, d0 + 1, datos],
+    );
+
+    for (let i = 0; i < 2; i++) {
+      const corredor = fuente.createQueryRunner();
+      try {
+        await quitarPruebaDeTextosLegales(corredor);
+      } finally {
+        await corredor.release();
+      }
+    }
+
+    const ultimo = async (tipo: string) =>
+      (
+        (await fuente.query(
+          `SELECT version, content_md FROM legal_documents WHERE type = $1 ORDER BY version DESC LIMIT 1`,
+          [tipo],
+        )) as { version: number; content_md: string }[]
+      )[0]!;
+    const t = await ultimo('TERMS');
+    expect(t.version).toBe(t0 + 2);
+    expect(t.content_md).toContain('## 6. Sin licencia de prueba');
+    expect(t.content_md).toContain('## 7. Pagos');
+    expect(t.content_md).not.toMatch(/USD 50|abusar de la prueba|La licencia de prueba existe/);
+    const d = await ultimo('PRIVACY');
+    expect(d.version).toBe(d0 + 2);
+    expect(d.content_md).toContain('## 6. Datos cifrados para prevenir el fraude');
+    expect(d.content_md).toContain('verificar su correo.');
+    expect(d.content_md).not.toMatch(/programa de pruebas|control de la licencia de prueba/);
   });
 
   it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 10 %', async () => {

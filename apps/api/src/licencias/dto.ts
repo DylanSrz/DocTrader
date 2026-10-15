@@ -63,9 +63,8 @@ export class NuevaOrdenDto {
   @IsUUID('all', { message: 'Elige una cuenta de trading.' })
   cuentaId: string;
 
-  // La trimestral ya no se vende (2026-10-15); la API además revisa que el plan esté activo. La prueba solo se paga
-  // con una solicitud aprobada.
-  @IsIn([CODIGO_PLAN.MENSUAL, CODIGO_PLAN.SEMESTRAL, CODIGO_PLAN.PRUEBA], {
+  // La trimestral ya no se vende (2026-10-15); la API además revisa que el plan esté activo.
+  @IsIn([CODIGO_PLAN.MENSUAL, CODIGO_PLAN.SEMESTRAL], {
     message: 'Elige una licencia.',
   })
   plan: CodigoPlan;

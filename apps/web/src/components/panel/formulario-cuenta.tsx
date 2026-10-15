@@ -42,14 +42,11 @@ export function FormularioCuenta({
   cuenta,
   planes,
   titularSugerido,
-  bloqueada = false,
   sePuedeQuitar = false,
 }: {
   cuenta?: { id: string; titular: string; broker: string; servidor: string; numero: string };
   planes?: PlanOpcion[];
   titularSugerido?: string;
-  /** En prueba: broker, servidor y número no se pueden cambiar. */
-  bloqueada?: boolean;
   sePuedeQuitar?: boolean;
 }) {
   const editar = Boolean(cuenta);
@@ -97,7 +94,6 @@ export function FormularioCuenta({
             placeholder="Ej.: JustMarkets"
             required
             maxLength={80}
-            readOnly={bloqueada}
             defaultValue={valor('broker')}
             error={e.broker}
           />
@@ -112,7 +108,6 @@ export function FormularioCuenta({
             placeholder="Ej.: JustMarkets-Live"
             required
             maxLength={80}
-            readOnly={bloqueada}
             ayuda="Aparece en el correo que te envió el broker al abrir la cuenta."
             defaultValue={valor('servidor')}
             error={e.servidor}
@@ -126,12 +121,6 @@ export function FormularioCuenta({
             placeholder="Ej.: 50213847"
             required
             maxLength={16}
-            readOnly={bloqueada}
-            ayuda={
-              bloqueada
-                ? 'Durante la prueba no se pueden cambiar el broker, el servidor ni el número.'
-                : undefined
-            }
             defaultValue={valor('numero')}
             error={e.numero}
           />

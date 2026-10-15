@@ -46,7 +46,7 @@ export const PREGUNTAS_INICIALES: readonly PreguntaFrecuente[] = [
   {
     pregunta: '¿Hay devoluciones?',
     respuesta:
-      'No. Por eso existe la prueba: 15 días por USD 50. Si sigues, pagas solo la diferencia del plan que elijas.',
+      'No. Por eso puedes empezar con el plan mensual y, si te gusta, pasar al semestral antes de que venza: pagas el plan nuevo y los días se suman.',
   },
 ];
 

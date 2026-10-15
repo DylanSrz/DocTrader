@@ -23,7 +23,6 @@ export default defineConfig({
       AUDIT_HMAC_KEY: Buffer.alloc(32, 42).toString('base64'),
       DATA_ENCRYPTION_KEY: Buffer.alloc(32, 43).toString('base64'),
       LOOKUP_HMAC_KEY: Buffer.alloc(32, 44).toString('base64'),
-      TRIAL_HMAC_KEY: Buffer.alloc(32, 45).toString('base64'),
       PROXY_SECRET: 'secreto-de-pruebas-de-la-web-0123456789',
       HIBP_ACTIVO: 'false',
     },

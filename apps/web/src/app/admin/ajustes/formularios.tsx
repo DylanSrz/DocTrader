@@ -53,48 +53,20 @@ const rejilla = 'grid grid-cols-2 items-start gap-x-5 gap-y-6 max-sm:grid-cols-1
 
 export function Precios({ ajustes }: { ajustes: Ajustes }) {
   const [estado, accion] = useActionState(guardarPreciosConAviso, {} as EstadoOperacion);
-  const precio = (codigo: string) =>
-    ajustes.planes.find((p) => p.codigo === codigo)?.precioUsdCentavos ?? 0;
-  const prueba = precio('PRUEBA');
   return (
     <form action={accion} className="grid gap-6" noValidate>
       <div className={rejilla}>
-        {ajustes.planes
-          .filter((p) => p.codigo !== 'PRUEBA')
-          .map((p) => (
-            <Campo
-              key={p.codigo}
-              etiqueta={`${p.nombre}, ${p.meses === 1 ? '1 mes' : `${p.meses} meses`} (USD)`}
-              name={p.codigo}
-              inputMode="decimal"
-              defaultValue={dolares(p.precioUsdCentavos)}
-              error={estado.campos?.[p.codigo]}
-            />
-          ))}
-        <Campo
-          etiqueta="Prueba (USD)"
-          name="PRUEBA"
-          inputMode="decimal"
-          defaultValue={dolares(prueba)}
-          error={estado.campos?.PRUEBA}
-        />
-        <Campo
-          etiqueta="Duración de la prueba (días)"
-          name="diasPrueba"
-          inputMode="numeric"
-          defaultValue={String(ajustes.diasPrueba)}
-          error={estado.campos?.diasPrueba}
-        />
+        {ajustes.planes.map((p) => (
+          <Campo
+            key={p.codigo}
+            etiqueta={`${p.nombre}, ${p.meses === 1 ? '1 mes' : `${p.meses} meses`} (USD)`}
+            name={p.codigo}
+            inputMode="decimal"
+            defaultValue={dolares(p.precioUsdCentavos)}
+            error={estado.campos?.[p.codigo]}
+          />
+        ))}
       </div>
-      <p className="text-sm text-ceniza">
-        Para completar la prueba, el cliente paga la diferencia con el plan que elija; se calcula
-        sola con estos precios. Hoy:{' '}
-        {ajustes.planes
-          .filter((p) => p.codigo !== 'PRUEBA')
-          .map((p) => `${p.nombre.toLowerCase()} USD ${dolares(p.precioUsdCentavos - prueba)}`)
-          .join(' y ')}
-        .
-      </p>
       <Pie
         estado={estado}
         enviando="Guardando…"

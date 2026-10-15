@@ -195,24 +195,6 @@ describe('cuentas de trading', () => {
     expect(JSON.stringify(aviso.payload)).not.toContain('otra-operativa');
   });
 
-  it('durante la prueba no se pueden cambiar broker, servidor ni número', async () => {
-    const { web } = await clienteConSesion();
-    const datos = datosCuenta();
-    const cuenta = await web.post('/cuentas', datos).expect(201);
-    await fuente.query(
-      `UPDATE trading_accounts SET locked_until = now() + interval '10 days' WHERE id = $1`,
-      [cuenta.body.id],
-    );
-    const bloqueada = await web
-      .put(`/cuentas/${cuenta.body.id}`, { ...datos, numero: '99887766' })
-      .expect(409);
-    expect(bloqueada.body.codigo).toBe('CUENTA_BLOQUEADA');
-    // El titular sí se puede corregir.
-    await web
-      .put(`/cuentas/${cuenta.body.id}`, { ...datos, titular: 'Laura Gómez R.' })
-      .expect(200);
-  });
-
   it('se puede quitar una cuenta sin pagar; una con licencia activa no', async () => {
     const { web } = await clienteConSesion();
     const sinPagar = await web.post('/cuentas', datosCuenta()).expect(201);
@@ -417,12 +399,10 @@ describe('órdenes de pago', () => {
   it('la prueba y la trimestral no se compran y sin dirección activa no se crea la orden', async () => {
     const { web } = await clienteConSesion();
     const cuenta = await web.post('/cuentas', datosCuenta()).expect(201);
-    // La prueba solo se paga con una solicitud aprobada.
-    const prueba = await web
+    // La prueba se quitó y la trimestral ya no se vende (2026-10-15).
+    await web
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'PRUEBA', moneda: 'USDT' })
-      .expect(409);
-    expect(prueba.body.codigo).toBe('PLAN_NO_DISPONIBLE');
-    // La trimestral ya no se vende (2026-10-15).
+      .expect(400);
     await web
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'TRIMESTRAL', moneda: 'USDT' })
       .expect(400);

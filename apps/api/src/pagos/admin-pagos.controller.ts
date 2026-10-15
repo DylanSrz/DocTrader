@@ -11,7 +11,6 @@ import { Type } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
 import type { DataSource } from 'typeorm';
 import { AuditoriaService } from '../auditoria/auditoria.service.js';
-import { datoBilletera, HuellasPrueba } from '../prueba/huellas.js';
 import { leerAjustes } from '../licencias/ajustes.js';
 import { errorApi } from '../seguridad/errores.js';
 import { Cliente, Roles, SesionActual } from '../sesiones/decoradores.js';
@@ -87,22 +86,7 @@ export class AdminPagosController {
     private readonly aprobacion: AprobacionPagos,
     private readonly verificacion: VerificacionPagos,
     private readonly auditoria: AuditoriaService,
-    private readonly huellas: HuellasPrueba,
   ) {}
-
-  /**
-   * Señal del control de la prueba: la billetera que paga una prueba ya pagó otra. No se ignoran las de exchanges
-   * (Binance y similares, que comparten muchos usuarios): por eso es una señal y no un bloqueo.
-   */
-  private async billeteraRepetida(o: FilaOrden): Promise<boolean> {
-    if (o.type !== 'PRUEBA' || !o.sender_addresses?.length || !this.huellas.disponible)
-      return false;
-    const halladas = await this.huellas.buscar(
-      this.fuente.manager,
-      o.sender_addresses.map((d) => datoBilletera(o.network, d)),
-    );
-    return halladas.length > 0;
-  }
 
   @Get()
   async listar() {
@@ -121,17 +105,9 @@ export class AdminPagosController {
           ORDER BY o.decided_at DESC LIMIT 50`,
       ) as Promise<FilaOrden[]>,
     ]);
-    const repetidas = new Set(
-      (
-        await Promise.all(
-          porRevisar.map(async (o) => ((await this.billeteraRepetida(o)) ? o.number : null)),
-        )
-      ).filter(Boolean),
-    );
     const vista = (o: FilaOrden) => {
       const detalle = o.verification_detail ?? {};
       return {
-        billeteraDeOtraPrueba: repetidas.has(o.number),
         numero: o.number,
         tipo: o.type,
         estado: o.status,

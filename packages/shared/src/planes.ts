@@ -3,10 +3,11 @@ import { CODIGO_PLAN, type CodigoPlan } from './dominio.js';
 export interface DefinicionPlan {
   code: CodigoPlan;
   name: string;
-  /** Meses que se pagan; nulo en la prueba, que se mide en días. */
+  /** Meses que se pagan. */
   durationMonths: number | null;
   /** Meses de obsequio que se suman (hoy ningún plan trae; el semestral traía 1 hasta el 2026-10-15). */
   bonusMonths: number;
+  /** Un plan medido en días y no en meses (la prueba lo usaba; hoy ninguno). */
   durationDays: number | null;
   priceUsdCents: number;
   /** Orden de "más corto" a "más largo", para los cambios de plan. */
@@ -15,8 +16,8 @@ export interface DefinicionPlan {
 }
 
 /**
- * Planes con los que arranca la plataforma (decisiones del 2026-10-12 y 2026-10-15: sin trimestral y la semestral sin
- * mes de obsequio). Los precios se editan desde el admin.
+ * Planes con los que arranca la plataforma (decisiones del 2026-10-12 y 2026-10-15: sin trimestral, la semestral sin
+ * mes de obsequio y sin licencia de prueba). Los precios se editan desde el admin.
  */
 export const PLANES_INICIALES: readonly DefinicionPlan[] = [
   {
@@ -39,30 +40,9 @@ export const PLANES_INICIALES: readonly DefinicionPlan[] = [
     rank: 3,
     isPublic: true,
   },
-  {
-    code: CODIGO_PLAN.PRUEBA,
-    name: 'Prueba',
-    durationMonths: null,
-    bonusMonths: 0,
-    durationDays: 15,
-    priceUsdCents: 5_000,
-    rank: 0,
-    isPublic: false,
-  },
 ];
 
-/** Lo que paga quien completa la prueba: el precio del plan menos lo que ya pagó por la prueba. */
-export function diferenciaParaCompletar(
-  precioPlanCentavos: number,
-  precioPruebaCentavos: number,
-): number {
-  if (precioPlanCentavos <= precioPruebaCentavos) {
-    throw new Error('El plan debe costar más que la prueba para completarla');
-  }
-  return precioPlanCentavos - precioPruebaCentavos;
-}
-
-/** Meses que dura un plan, contando el obsequio si lo tiene. Nulo en la prueba. */
+/** Meses que dura un plan, contando el obsequio si lo tiene. Nulo si se mide en días. */
 export function mesesTotales(plan: Pick<DefinicionPlan, 'durationMonths' | 'bonusMonths'>) {
   return plan.durationMonths === null ? null : plan.durationMonths + plan.bonusMonths;
 }

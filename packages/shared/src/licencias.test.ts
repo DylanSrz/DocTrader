@@ -24,12 +24,6 @@ describe('finDePeriodo', () => {
       finDePeriodo(bogota('2026-10-09T10:00:00'), { ...plan('SEMESTRAL'), bonusMonths: 1 }),
     ).toEqual(bogota('2027-05-09T10:00:00'));
   });
-
-  it('la prueba dura 15 días', () => {
-    expect(finDePeriodo(bogota('2026-10-03T08:00:00'), plan('PRUEBA'))).toEqual(
-      bogota('2026-10-18T08:00:00'),
-    );
-  });
 });
 
 describe('diasRestantes', () => {
@@ -65,36 +59,17 @@ describe('tipoDeOrden', () => {
     });
   });
 
-  it('la prueba no se compra directo y una licencia suspendida no se paga', () => {
-    expect(tipoDeOrden({ estado: 'PENDIENTE_PAGO', rangoPlan: null }, plan('PRUEBA'))).toEqual({
-      error: 'PLAN_NO_DISPONIBLE',
-    });
+  it('un plan que no está a la venta no se compra y una licencia suspendida no se paga', () => {
+    expect(
+      tipoDeOrden({ estado: 'PENDIENTE_PAGO', rangoPlan: null }, { ...mensual, isPublic: false }),
+    ).toEqual({ error: 'PLAN_NO_DISPONIBLE' });
     expect(tipoDeOrden({ estado: 'SUSPENDIDA', rangoPlan: 1 }, mensual)).toEqual({
       error: 'LICENCIA_SUSPENDIDA',
-    });
-  });
-
-  it('en prueba, cualquier plan público la completa', () => {
-    expect(tipoDeOrden({ estado: 'PRUEBA', rangoPlan: 0 }, mensual)).toEqual({
-      tipo: 'COMPLETAR_PRUEBA',
     });
   });
 });
 
 describe('vencimientoSiSeAprueba', () => {
-  it('completar la prueba cuenta el plan desde el inicio de la prueba', () => {
-    expect(
-      vencimientoSiSeAprueba(
-        'COMPLETAR_PRUEBA',
-        {
-          finActual: new Date('2026-10-18T15:00:00Z'),
-          inicioPrueba: new Date('2026-10-03T15:00:00Z'),
-        },
-        { durationMonths: 6, bonusMonths: 0, durationDays: null },
-      )?.toISOString(),
-    ).toBe('2027-04-03T15:00:00.000Z');
-  });
-
   it('una renovación suma los meses al vencimiento actual', () => {
     expect(
       vencimientoSiSeAprueba(
@@ -151,7 +126,7 @@ describe('calendarioLicencia', () => {
     expect(filas[0]!.dias[0]).toBe('hoy');
   });
 
-  it('la prueba es una sola fila de 15 días', () => {
+  it('un periodo de menos de un mes es una sola fila', () => {
     const filas = calendarioLicencia(
       bogota('2026-10-03T09:00:00'),
       bogota('2026-10-18T09:00:00'),

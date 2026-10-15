@@ -28,7 +28,6 @@
 erDiagram
   users ||--o{ trading_accounts : "registra"
   users ||--o{ payment_orders : "paga"
-  users ||--o{ trial_requests : "solicita"
   users ||--o{ tickets : "abre"
   users ||--o{ consents : "acepta"
   users ||--o| partner_profiles : "socio"
@@ -38,7 +37,6 @@ erDiagram
   plans ||--o{ payment_orders : "precio"
   payment_orders ||--o| license_periods : "crea"
   deposit_addresses ||--o{ payment_orders : "recibe"
-  trial_requests ||--o| payment_orders : "orden de prueba"
   tickets ||--o{ ticket_messages : "hilo"
   ticket_messages ||--o{ files : "adjuntos"
   partner_profiles ||--o{ commission_payouts : "liquida"
@@ -63,7 +61,7 @@ erDiagram
 | `email_canonical` | citext, **único** | Minúsculas; en Gmail sin puntos ni lo que va después de "+". Evita dos cuentas con el mismo correo |
 | `email_verified_at` | timestamptz | |
 | `phone_e164` | text, **único** | Formato internacional (`+573001234567`) |
-| `phone_verified_at` | timestamptz | Por SMS (Twilio Verify) |
+| `phone_verified_at` | timestamptz | Sin uso desde el 2026-10-15: el teléfono ya no se verifica por SMS |
 | `password_hash` | text | Argon2id |
 | `totp_secret_enc` | bytea | Cifrado; obligatorio para admins |
 | `totp_enabled_at` | timestamptz | |
@@ -92,14 +90,13 @@ cambio es siempre una versión nueva.
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| `code` | enum `MENSUAL`, `TRIMESTRAL`, `SEMESTRAL`, `PRUEBA`, **único** | La trimestral está inactiva desde el 2026-10-15 (se conserva por las órdenes viejas) |
+| `code` | enum `MENSUAL`, `TRIMESTRAL`, `SEMESTRAL`, **único** | La trimestral está inactiva desde el 2026-10-15 (se conserva por las órdenes viejas). `PRUEBA` se borró el 2026-10-15 |
 | `name` | text | |
-| `duration_months` | integer, nulo en la prueba | 1, 3 o 6 |
-| `bonus_months` | integer | 1 en la semestral, 0 en las demás |
-| `duration_days` | integer, solo la prueba | 15 |
-| `price_usd_cents` | integer | 12000, 49900 y 5000 (la trimestral era 31900) |
+| `duration_months` | integer | 1, 3 o 6 |
+| `bonus_months` | integer | Meses de obsequio; hoy 0 en todos (la semestral lo trajo hasta el 2026-10-15) |
+| `price_usd_cents` | integer | 12000 y 49900 (la trimestral era 31900) |
 | `rank` | integer | Para saber qué plan es "más largo" (1, 2, 3) |
-| `is_public` | boolean | La prueba no se compra directo |
+| `is_public` | boolean | |
 | `is_active` | boolean | |
 
 Cambiar un precio no toca las órdenes ya creadas: cada orden copia el precio.
@@ -112,8 +109,6 @@ Cambiar un precio no toca las órdenes ya creadas: cada orden copia el precio.
 | `order_ttl_minutes` | 60 |
 | `min_confirmations` | `{ "TRON": 20, "BITCOIN": 2 }` |
 | `auto_approve_payments` | false |
-| `trial.require_verified_contact` | true (no se puede apagar) |
-| `trial.require_id_photo` | false |
 | `tickets.auto_close_days` | 7 |
 | `links` | Telegram, Instagram, broker sugerido |
 | `myfxbook` | enlace, número de cuenta y cifras que se muestran |
@@ -142,7 +137,6 @@ Cada cambio de ajustes queda en la auditoría con el valor anterior y el nuevo.
 | `connected_at`, `connected_by`, `disconnected_at`, `disconnected_by` | | Quién marcó cada cosa en Social Trader Tools |
 | `recommended_capital_usd_cents` | integer | Lo fija Argemiro |
 | `risk_level` | enum `BAJO`, `MEDIO`, `ALTO` | Lo fija Argemiro |
-| `locked_until` | timestamptz | Durante la prueba no se pueden cambiar broker, servidor ni número |
 | `internal_notes` | text | Solo admins |
 | `deleted_at` | timestamptz | |
 
@@ -154,8 +148,6 @@ Cada cambio de ajustes queda en la auditoría con el valor anterior y el nuevo.
 | `user_id` | uuid | |
 | `plan_id` | uuid | Plan del periodo vigente |
 | `status` | enum (ver §4.1) | |
-| `is_trial` | boolean | Mientras el periodo vigente sea de prueba |
-| `trial_started_at` | timestamptz | Para completar la prueba |
 | `starts_at` | timestamptz | Inicio del primer periodo pagado |
 | `ends_at` | timestamptz | Fin del periodo vigente |
 | `grace_ends_at` | timestamptz | `ends_at` + días de gracia |
@@ -166,7 +158,7 @@ Cada cambio de ajustes queda en la auditoría con el valor anterior y el nuevo.
 | Campo | Tipo | Notas |
 |---|---|---|
 | `license_id`, `payment_order_id`, `plan_id` | uuid | |
-| `kind` | enum `PRUEBA`, `NUEVA`, `RENOVACION`, `CAMBIO_DE_PLAN`, `COMPLETAR_PRUEBA`, `EXTENSION_ADMIN` | La extensión de días la hace un admin sin pago |
+| `kind` | enum `NUEVA`, `RENOVACION`, `CAMBIO_DE_PLAN`, `EXTENSION_ADMIN` | La extensión de días la hace un admin sin pago |
 | `period_start`, `period_end` | timestamptz | |
 | `bonus_months` | integer | El mes de obsequio, para mostrarlo en verde limón (hoy ningún plan lo trae) |
 
@@ -193,9 +185,9 @@ Datos iniciales (de la cuenta de Binance de Argemiro), cargados ya activos:
 |---|---|---|
 | `number` | text, **único** | `DTP-000123` |
 | `user_id`, `trading_account_id`, `license_id`, `plan_id` | uuid | |
-| `type` | enum `NUEVA`, `RENOVACION`, `CAMBIO_DE_PLAN`, `PRUEBA`, `COMPLETAR_PRUEBA` | |
+| `type` | enum `NUEVA`, `RENOVACION`, `CAMBIO_DE_PLAN` | |
 | `price_usd_cents` | integer | Precio del plan al crear la orden |
-| `credit_usd_cents` | integer | Lo ya pagado que se descuenta: 5000 al completar la prueba |
+| `credit_usd_cents` | integer | Lo ya pagado que se descuenta (hoy siempre 0; era para completar la prueba) |
 | `amount_usd_cents` | integer | Lo que se cobra: precio − crédito |
 | `currency`, `network` | enum | |
 | `deposit_address_id`, `deposit_address` | uuid, text | La dirección se copia: no cambia aunque cambien las del panel |
@@ -209,7 +201,7 @@ Datos iniciales (de la cuenta de Binance de Argemiro), cargados ya activos:
 | `received_base_units` | numeric(38,0) | Lo que llegó |
 | `confirmations` | integer | |
 | `tx_time`, `block_height` | | |
-| `sender_addresses` | jsonb | Billetera(s) de origen, para la señal de la prueba |
+| `sender_addresses` | jsonb | Billetera(s) de origen (eran una señal del control de la prueba; se siguen guardando) |
 | `verification_detail` | jsonb | Los cinco chequeos, con proveedor y fecha |
 | `decided_by`, `decided_at` | | Quién aprobó o rechazó |
 | `approval_mode` | enum `MANUAL`, `AUTO` | |
@@ -218,35 +210,14 @@ Datos iniciales (de la cuenta de Binance de Argemiro), cargados ya activos:
 | `commission_usd_cents` | integer | `amount_usd_cents × commission_bp / 10000`, redondeado al centavo |
 | `commission_payout_id` | uuid | La liquidación que la incluyó |
 
-Venta bruta = `amount_usd_cents` de las órdenes aprobadas (al completar la prueba se cuenta solo la diferencia, porque
-los USD 50 ya se contaron con la orden de prueba).
+Venta bruta = `amount_usd_cents` de las órdenes aprobadas.
 
-### 3.5. Licencia de prueba
+### 3.5. Licencia de prueba (retirada)
 
-**`trial_requests`**
-
-| Campo | Tipo | Notas |
-|---|---|---|
-| `user_id`, `trading_account_id` | uuid | |
-| `status` | enum (ver §4.3) | |
-| `block_reasons` | jsonb | Qué bloqueo saltó: cédula, cuenta, correo o teléfono |
-| `signals` | jsonb | Coincidencias encontradas, con la prueba anterior a la que se parecen |
-| `device_hash`, `ip` | | De quien envió la solicitud |
-| `id_photo_file_id` | uuid | Solo si se pidió la foto |
-| `decided_by`, `decided_at`, `decision_note` | | |
-| `payment_order_id` | uuid | La orden de USD 50 que se crea al aprobar |
-
-**`trial_registry`**: las huellas que no se borran (ver `CONTEXTO.md`, "Control de la prueba").
-
-| Campo | Tipo | Notas |
-|---|---|---|
-| `kind` | enum `CEDULA`, `CUENTA`, `CORREO`, `TELEFONO`, `NUMERO_CUENTA`, `DISPOSITIVO`, `BILLETERA` | Los cuatro primeros bloquean; los demás son señales |
-| `fingerprint` | bytea | HMAC con `TRIAL_HMAC_KEY` |
-| `key_version` | smallint | Para comparar con versiones anteriores de la llave |
-| `trial_request_id` | uuid, **sin llave foránea** | Para que sobreviva al borrado del cliente |
-
-Índice por (`kind`, `fingerprint`). Se escribe al **aprobar** una prueba (las de cédula, cuenta, correo y teléfono) y
-al verificar su pago (la billetera). La señal de titular parecido se calcula con las pruebas que todavía existen.
+Se quitó el 2026-10-15 (migración `1792800000000-quitar-prueba`): se borraron las tablas `trial_requests` y
+`trial_registry` (con su función `trial_registry_solo_agregar`), el plan `PRUEBA`, el estado de licencia `PRUEBA`,
+los tipos de orden y de periodo `PRUEBA` y `COMPLETAR_PRUEBA`, las columnas `licenses.is_trial`,
+`licenses.trial_started_at` y `trading_accounts.locked_until`, y los ajustes `trial.*`.
 
 ### 3.6. Soporte y archivos
 
@@ -258,8 +229,9 @@ al verificar su pago (la billetera). La señal de titular parecido se calcula co
 **`ticket_messages`**: `ticket_id`, `author_id`, `body` (texto plano), `is_internal` (nota interna que el cliente no
 ve).
 
-**`files`**: `owner_user_id`, `purpose` (`TICKET_ADJUNTO`, `FOTO_DOCUMENTO`), `ticket_message_id` (si es adjunto),
-`storage_key` (nombre aleatorio en R2), `mime`, `size_bytes`, `sha256`, `is_encrypted`, `delete_after`.
+**`files`**: `owner_user_id`, `purpose` (`TICKET_ADJUNTO`; `FOTO_DOCUMENTO` era para la prueba y no se usa),
+`ticket_message_id` (si es adjunto), `storage_key` (nombre aleatorio en R2), `mime`, `size_bytes`, `sha256`,
+`is_encrypted`, `delete_after`.
 
 ### 3.7. Socio, avisos y auditoría
 
@@ -272,12 +244,12 @@ aprobadas después del cambio y avisa a Argemiro.
 `gross_usd_cents`, `commission_usd_cents`, `status` (`ABIERTA`, `CERRADA`, `PAGADA`), `paid_at`, `paid_by`,
 `payment_reference`.
 
-**`notifications`**: bandeja de salida de correos y SMS.
+**`notifications`**: bandeja de salida de correos.
 
 | Campo | Tipo | Notas |
 |---|---|---|
 | `user_id` | uuid, nulo en avisos a admins | |
-| `channel` | enum `EMAIL`, `SMS` | |
+| `channel` | enum `EMAIL`, `SMS` | `SMS` sin uso desde el 2026-10-15 |
 | `recipient` | text | Correo o teléfono al que va |
 | `template` | text | `orden-creada`, `vence-7-dias`, … |
 | `payload` | jsonb | Datos para la plantilla; nunca contraseñas |
@@ -300,16 +272,12 @@ aprobadas después del cambio y avisa a Argemiro.
 stateDiagram-v2
   [*] --> PENDIENTE_PAGO: el cliente agrega una cuenta
   PENDIENTE_PAGO --> ACTIVA: se aprueba la orden NUEVA
-  PENDIENTE_PAGO --> PRUEBA: se aprueba la orden de PRUEBA
-  PRUEBA --> ACTIVA: se aprueba COMPLETAR_PRUEBA
-  PRUEBA --> VENCIDA: terminan los 15 días sin completar
   ACTIVA --> ACTIVA: RENOVACION o CAMBIO_DE_PLAN
   ACTIVA --> EN_GRACIA: llega ends_at
   EN_GRACIA --> ACTIVA: se aprueba una RENOVACION
   EN_GRACIA --> VENCIDA: llega grace_ends_at
   VENCIDA --> ACTIVA: se aprueba una orden NUEVA
   ACTIVA --> SUSPENDIDA: un admin la suspende
-  PRUEBA --> SUSPENDIDA: un admin la suspende
   SUSPENDIDA --> ACTIVA: un admin la reactiva
 ```
 
@@ -319,14 +287,11 @@ stateDiagram-v2
 | Orden | Inicio del periodo | Fin |
 |---|---|---|
 | NUEVA | Al aprobar | Inicio + meses del plan + mes de obsequio |
-| PRUEBA | Al aprobar | Inicio + 15 días |
-| COMPLETAR_PRUEBA | `trial_started_at` | Inicio + meses del plan + obsequio (prueba del 3 oct → semestral hasta el 3 abr) |
 | RENOVACION con la licencia activa | `ends_at` actual | Inicio + meses del plan + obsequio |
 | RENOVACION en gracia | `ends_at` anterior (los días de gracia cuentan como usados) | Igual |
 | CAMBIO_DE_PLAN (a uno más largo) | `ends_at` actual | Igual; la licencia pasa al plan nuevo |
 
-- Solo se pueden crear órdenes de COMPLETAR_PRUEBA mientras la licencia esté en PRUEBA, y de CAMBIO_DE_PLAN hacia un
-  plan de `rank` mayor.
+- Solo se pueden crear órdenes de CAMBIO_DE_PLAN hacia un plan de `rank` mayor.
 - El worker revisa cada 5 minutos las licencias que cambian de estado por fecha.
 
 ### 4.2. Orden de pago
@@ -358,25 +323,16 @@ stateDiagram-v2
 - Al aprobar, en una sola transacción: se bloquea la orden, se crea el periodo, se actualiza la licencia, se copia el
   % del socio y se encola el correo. Si algo falla, no se aplica nada.
 
-### 4.3. Solicitud de prueba
+### 4.3. Solicitud de prueba (retirada)
 
-```mermaid
-stateDiagram-v2
-  [*] --> BLOQUEADA: cédula, cuenta, correo o teléfono ya tuvieron prueba
-  [*] --> PENDIENTE: pasa los bloqueos; se calculan las señales
-  PENDIENTE --> APROBADA: un admin la aprueba; se crea la orden de USD 50
-  PENDIENTE --> RECHAZADA: un admin la rechaza con motivo
-  APROBADA --> [*]
-```
-
-Las bloqueadas se guardan para mostrarlas al admin ("bloqueadas este mes"), pero el cliente no puede enviarlas.
+Se quitó con la licencia de prueba el 2026-10-15 (§3.5). El número se conserva para no romper referencias.
 
 ### 4.4. Conexión de la cuenta de trading
 
 ```mermaid
 stateDiagram-v2
   [*] --> SIN_LICENCIA: el cliente agrega la cuenta
-  SIN_LICENCIA --> POR_CONECTAR: licencia ACTIVA o PRUEBA y datos completos
+  SIN_LICENCIA --> POR_CONECTAR: licencia ACTIVA y datos completos
   POR_CONECTAR --> CONECTADA: Argemiro la marca conectada
   CONECTADA --> POR_CONECTAR: el cliente cambia contraseñas o datos
   CONECTADA --> POR_DESCONECTAR: licencia VENCIDA o SUSPENDIDA
@@ -415,8 +371,8 @@ stateDiagram-v2
 |---|---|---|
 | Expirar órdenes | Cada minuto | PENDIENTE → EXPIRADA al pasar `expires_at` |
 | Verificar pagos | Al reportar el hash y cada 2 minutos mientras esté REPORTADA | Consulta la blockchain y actualiza `verification_status`; aprueba sola si está encendido |
-| Estados de licencia | Cada 5 minutos | ACTIVA → EN_GRACIA → VENCIDA, PRUEBA → VENCIDA, y mueve la conexión a POR_DESCONECTAR |
-| Recordatorios | Cada hora | 7, 3 y 1 día antes, el día del vencimiento y para completar la prueba; `dedupe_key` evita repetir |
+| Estados de licencia | Cada 5 minutos | ACTIVA → EN_GRACIA → VENCIDA y mueve la conexión a POR_DESCONECTAR |
+| Recordatorios | Cada hora | 7, 3 y 1 día antes y el día del vencimiento; `dedupe_key` evita repetir |
 | Activar direcciones | Cada minuto | EN_ESPERA → ACTIVA al pasar `activates_at` |
 | Cerrar tickets | Cada hora | RESUELTO → CERRADO a los 7 días |
 | Borrar adjuntos sin usar | Cada hora | Archivos subidos que ningún mensaje adjuntó en 24 horas |
@@ -429,7 +385,7 @@ stateDiagram-v2
 
 1. **Renovar durante la gracia:** los días se suman desde el vencimiento anterior, así que los días de gracia
    cuentan como usados. Si se suman desde el día del pago, la gracia sería tiempo gratis.
-2. **La prueba no tiene gracia:** al terminar los 15 días sin completarla, la cuenta pasa a "por desconectar".
+2. ~~**La prueba no tiene gracia.**~~ Retirada con la licencia de prueba el 2026-10-15.
 3. **Una cuenta de trading solo puede estar en un cliente a la vez.**
 4. **Si el cliente cambia la contraseña o los datos de una cuenta conectada**, vuelve a "por conectar" para que
    Argemiro la actualice en Social Trader Tools.
@@ -443,8 +399,7 @@ stateDiagram-v2
   - `payment_orders_hash_por_red`: índice único (`network`, `tx_hash`).
   - Una licencia PENDIENTE_PAGO no tiene fechas ni plan; con un periodo aprobado, siempre las tiene.
   - Todo periodo sale de una orden, salvo `EXTENSION_ADMIN`.
-- **Huellas:** `account_key_hmac` y `account_number_hmac` usan `LOOKUP_HMAC_KEY` (la de buscar sin descifrar). Las
-  huellas del registro de pruebas (`trial_registry`, etapa 6) usarán su propia `TRIAL_HMAC_KEY`.
+- **Huellas:** `account_key_hmac` y `account_number_hmac` usan `LOOKUP_HMAC_KEY` (la de buscar sin descifrar).
 - **Tipo de orden:** lo decide la API con el estado de la licencia (`tipoDeOrden` en `packages/shared`): sin pagar o
   vencida es NUEVA; activa o en gracia, a un plan de `rank` mayor es CAMBIO_DE_PLAN y al mismo o a uno menor,
   RENOVACION (renovar a un plan más corto queda por confirmar con Argemiro, ver `PENDIENTES.md`).
@@ -474,8 +429,8 @@ stateDiagram-v2
 - **Conexión al pagar:** `SIN_LICENCIA` y `DESCONECTADA` pasan a `POR_CONECTAR`; `POR_DESCONECTAR` vuelve a
   `CONECTADA` (renovó a tiempo); las demás se quedan como están.
 - **Vencimiento por fecha:** `ACTIVA` → `EN_GRACIA` al pasar `ends_at`; `EN_GRACIA` → `VENCIDA` al pasar
-  `grace_ends_at`. Al vencer: `CONECTADA` → `POR_DESCONECTAR` y `POR_CONECTAR` → `SIN_LICENCIA`. La licencia en
-  prueba y la suspendida se manejan en las etapas 5 y 6.
+  `grace_ends_at`. Al vencer: `CONECTADA` → `POR_DESCONECTAR` y `POR_CONECTAR` → `SIN_LICENCIA`. La suspendida se
+  maneja en la etapa 5.
 
 ## 9. Cómo quedó construido (etapa 5, 2026-10-15)
 
@@ -486,45 +441,27 @@ stateDiagram-v2
 - **Extender días:** se suman a `ends_at`; si ya terminó la gracia, desde hoy (no se gastan en un tiempo que pasó).
   La licencia queda en el estado de sus fechas (una suspendida sigue suspendida) y `grace_ends_at` se recalcula con
   los días de gracia vigentes. Si vuelve a estar vigente, la conexión sigue la misma regla que al pagar.
-- **Suspender:** solo una licencia activa, en gracia o en prueba. Conexión: `CONECTADA` → `POR_DESCONECTAR` y
+- **Suspender:** solo una licencia activa o en gracia. Conexión: `CONECTADA` → `POR_DESCONECTAR` y
   `POR_CONECTAR` → `SIN_LICENCIA`. **Quitar la suspensión** devuelve el estado de sus fechas (activa, en gracia o
-  vencida; en prueba si lo era) y, si sigue vigente, la conexión vuelve como al pagar. El worker no toca las
+  vencida) y, si sigue vigente, la conexión vuelve como al pagar. El worker no toca las
   suspendidas.
 - **Direcciones de depósito:** una nueva entra `EN_ESPERA` con `activates_at` = ahora + 24 horas; el trabajo
   `activar-direcciones` (cada minuto) la pasa a `ACTIVA`. Cancelar solo aplica a `EN_ESPERA`; desactivar, a `ACTIVA`;
   reactivar, a `INACTIVA` (sin nueva espera). Cada cambio avisa por correo a los admins activos.
 - **Ajustes:** `grace_days`, `order_ttl_minutes` y `min_confirmations` se editan juntos; `links` y `support_email`
-  juntos; `myfxbook` conserva lo que el panel no edita (el número de cuenta). Precios en `plans.price_usd_cents`;
-  la duración de la prueba en `plans.duration_days`. La prueba debe costar menos que el plan activo más barato.
+  juntos; `myfxbook` conserva lo que el panel no edita (el número de cuenta). Precios en `plans.price_usd_cents`.
 - **Auditoría nueva:** `cuenta.ver_contrasenas`, `cuenta.conectada`, `cuenta.desconectada`, `cuenta.asignacion` (sin
   el texto de las notas), `cliente.ver_cedula`, `licencia.extendida`, `licencia.suspendida`, `licencia.reactivada`,
   `licencias.exportadas`, `direccion.*` y `ajustes.*` (con el valor anterior y el nuevo).
 
-## 10. Cómo quedó construido (etapa 6, 2026-10-15)
+## 10. Cómo quedó construido (etapa 6, 2026-10-15) — retirada el 2026-10-15
 
-- **`trial_requests`:** como en §3.5, sin `id_photo_file_id` (la foto de la cédula llega con la tabla `files` en la
-  etapa 7). `block_reasons` y `signals` son listas `{ tipo, texto, solicitudId }`. `device_hash` ya es la huella HMAC
-  del dispositivo. Índice único: una solicitud PENDIENTE o APROBADA por persona.
-- **`trial_registry`:** sin llave foránea a la solicitud y con un disparador que impide cambiar filas (solo se
-  agregan). Las huellas son HMAC-SHA256 de `"<TIPO>:<valor normalizado>"` con `TRIAL_HMAC_KEY` (versión 1): cédula
-  sin puntos ni espacios, cuenta = broker + servidor + número normalizados, correo canónico, teléfono E.164, número
-  de cuenta normalizado, dispositivo y billetera (`TRON:<dirección>` o `BITCOIN:<dirección>`).
-- **Cuándo se escriben:** al **aprobar la solicitud**, las de cédula, cuenta, correo, teléfono, número de cuenta y
-  dispositivo (aunque el cliente no llegue a pagar, ya usó su prueba); al **aprobar el pago** de la prueba, la
-  billetera de origen.
-- **La orden de USD 50 la crea el cliente**, no el admin: una orden vale una hora y el admin aprueba cuando el
-  cliente quizá no está conectado. Al aprobar la solicitud, el cliente recibe un correo y paga desde su panel; la
-  solicitud apunta a su última orden (`payment_order_id`). Crear una orden de PRUEBA exige una solicitud APROBADA
-  para esa cuenta y la licencia sin ningún pago.
-- **Fechas al aprobar:** PRUEBA → licencia `PRUEBA`, `is_trial`, `trial_started_at` = hoy, fin = hoy + 15 días,
-  `grace_ends_at` = fin (sin gracia) y la cuenta con `locked_until` = fin. COMPLETAR_PRUEBA → crédito = lo pagado
-  por la prueba; el plan cuenta desde `trial_started_at`; `is_trial` = false; se quita el bloqueo de la cuenta.
-- **Bloqueo de la cuenta:** el broker, el servidor y el número no se cambian mientras haya una solicitud en
-  revisión o aprobada sin completar, ni durante la prueba (se revisó y se registra con esos datos).
-- **Vencimiento:** el worker pasa a `VENCIDA` una licencia `PRUEBA` al llegar `ends_at`; la conexión sigue la
-  regla de §4.4. Vencida, el siguiente pago es una licencia NUEVA al precio completo.
+- La etapa 6 construyó la licencia de prueba (solicitudes, huellas HMAC con `TRIAL_HMAC_KEY` en `trial_registry`,
+  órdenes PRUEBA y COMPLETAR_PRUEBA, bloqueo de la cuenta con `locked_until`). Se quitó completa el mismo día (§3.5);
+  la migración se niega a correr si encuentra licencias, órdenes o periodos de prueba.
+- Quedan en el esquema sin uso: `users.phone_verified_at` y el canal `SMS` de `notifications`.
 - **Borrado de clientes (etapa 8):** la restricción de `users` exige cédula y teléfono a los clientes; el borrado
-  tendrá que anonimizarlos (o relajar esa regla para `DELETED`). Las huellas del registro quedan.
+  tendrá que anonimizarlos (o relajar esa regla para `DELETED`).
 
 ## 11. Cómo quedó construido (etapa 7, 2026-10-15)
 

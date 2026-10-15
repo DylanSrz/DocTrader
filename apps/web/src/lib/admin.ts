@@ -19,7 +19,6 @@ import type {
 export interface Resumen {
   pendientes: {
     pagos: number;
-    pruebas: number;
     tickets: number;
     porConectar: number;
     porDesconectar: number;
@@ -162,7 +161,6 @@ export interface Ajustes {
     dias: number | null;
     precioUsdCentavos: number;
   }[];
-  diasPrueba: number;
   diasGracia: number;
   minutosOrden: number;
   confirmaciones: Record<Red, number>;
@@ -200,7 +198,6 @@ export const ESTADO_LICENCIA_ADMIN: Record<
   { texto: string; tono: 'senal' | 'llama' | 'neutro' | 'apagado' | 'error' }
 > = {
   PENDIENTE_PAGO: { texto: 'Pendiente de pago', tono: 'apagado' },
-  PRUEBA: { texto: 'En prueba', tono: 'senal' },
   ACTIVA: { texto: 'Activa', tono: 'senal' },
   EN_GRACIA: { texto: 'En gracia', tono: 'llama' },
   VENCIDA: { texto: 'Vencida', tono: 'error' },

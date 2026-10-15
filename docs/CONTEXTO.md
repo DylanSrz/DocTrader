@@ -1,9 +1,11 @@
 # Contexto del proyecto — Plataforma Doc Trader Pro AI
 
-> Última actualización: 2026-10-14 (titular, textos legales, seguridad, cuentas de servicio y decisiones técnicas).
+> Última actualización: 2026-10-15 (se quitan la licencia de prueba y la verificación por SMS; sin trimestral ni mes
+> de obsequio).
+> Antes: 2026-10-14 (titular, textos legales, seguridad, cuentas de servicio y decisiones técnicas).
 > Antes: 2026-10-12 (reunión con Argemiro: propuesta 2 elegida, licencia mensual, semestral 6 + 1, prueba de 15 días
 > con control antiabuso, tickets de soporte, correo oficial)
-> Estado: **construcción** (2026-10-14). Etapa 0 hecha; plan en `docs/PLAN-TRABAJO.md`.
+> Estado: **construcción** (2026-10-14). Etapas 0 a 7 hechas (la 6, la prueba, se retiró); plan en `docs/PLAN-TRABAJO.md`.
 
 ## 1. Resumen
 
@@ -35,53 +37,18 @@ deben reflejar esto (nunca prometer rentabilidad).
 |---|---|---|---|
 | **Mensual** | USD 120 | 1 mes | Sin obsequio. Se renueva al mismo precio (nueva el 2026-10-12) |
 | **Semestral** | USD 499 | **6 meses** | Sin obsequio desde el 2026-10-15 (antes: 7 meses = 6 + 1 de obsequio). Se renueva al mismo precio |
-| **Prueba** | USD 50 | **15 días** | No se compra directo: la landing invita a solicitarla y el admin la aprueba. **Una sola vez por cliente y por cuenta de trading** (ver "Control de la prueba") |
-| **Completar la prueba** | La diferencia: USD 70 (mensual) o USD 449 (semestral) | La del plan elegido | Hasta el último día de la prueba. Los USD 50 se abonan y los 15 días hacen parte del plan: la licencia cuenta desde el día en que empezó la prueba. A semestral son 6 meses en total desde el inicio de la prueba |
 
 - **2026-10-15:** la licencia **trimestral se retiró** y la semestral **ya no trae mes de obsequio** (dura 6 meses).
 - **Cambio de plan antes de vencer:** un mensual puede pasarse a semestral.
   Se paga el plan nuevo completo y los días se suman al vencimiento actual.
-- La diferencia para completar la prueba se calcula sola con los precios vigentes (precio del plan − precio de la prueba).
-- Si la prueba vence sin completarse, para continuar compra una licencia nueva al precio completo.
+- **2026-10-15: no hay licencia de prueba.** Se había definido el 2026-10-12 (15 días por USD 50, solo con solicitud
+  aprobada, completable pagando la diferencia, con control antiabuso y teléfono verificado por SMS) y se construyó en la
+  etapa 6, pero Argemiro decidió quitarla. Para conocer el software se empieza con el mensual. Sin prueba tampoco se
+  verifica el teléfono por SMS (no se usa Twilio).
 - **No hay devoluciones.**
 - Planes, precios, duración y el mes de obsequio son **editables desde el panel de administrador**.
 - **No se requiere facturación electrónica.**
 - Capital mínimo y nivel de riesgo: los define Argemiro **por cuenta**, después de montada la plataforma.
-
-### Control de la prueba (una sola vez por persona y por cuenta)
-Pedido de Argemiro: que nadie pueda saltarse la regla, ni registrándose con otro nombre ni con la misma cuenta de trading.
-Se combinan bloqueos automáticos, señales para el admin y reglas sobre la cuenta en prueba. Ninguna medida sola es
-infalible; juntas hacen que repetir la prueba exija otra persona, otra cuenta en el broker, otro teléfono, otro
-dispositivo y otra billetera, y aun así el admin ve las coincidencias antes de aprobar.
-
-**1. Bloqueos automáticos** (la plataforma no deja enviar la solicitud):
-- **Cédula** que ya tuvo prueba (se compara solo con dígitos, sin puntos ni espacios).
-- **Cuenta de trading** que ya tuvo prueba, sin importar qué cliente la registre: se compara el número de cuenta junto
-  con el broker y el servidor normalizados (minúsculas, sin espacios ni guiones).
-- **Correo o teléfono** ya ligados a una prueba. El correo se normaliza (minúsculas; en Gmail se ignoran los puntos y
-  lo que va después de "+") y el teléfono se guarda en formato internacional.
-- Una solicitud solo se puede hacer con el correo y el teléfono **verificados**: código al correo y **código por SMS**
-  al teléfono (confirmado el 2026-10-12; cada SMS tiene un costo).
-
-**2. Señales para el admin** (no bloquean, pero aparecen junto a la solicitud, que siempre requiere aprobación):
-- El mismo **número de cuenta** usado antes en otro broker.
-- **Titular** de la cuenta de trading parecido al de una prueba anterior.
-- Mismo **dispositivo** (identificador guardado en el navegador) o misma **IP** que una prueba anterior.
-- La **billetera de origen** del pago de USD 50 ya pagó otra prueba. La verificación en blockchain conoce la dirección
-  que envía; se ignoran las direcciones de exchanges (Binance y similares), que comparten muchos usuarios.
-
-**3. Reglas sobre la cuenta en prueba:**
-- El **titular** de la cuenta de trading debe ser el cliente registrado. Argemiro lo confirma al conectarla en
-  Social Trader Tools (el broker muestra el nombre del titular) y rechaza la prueba si no coincide.
-- Durante la prueba no se puede cambiar el número de cuenta, el broker ni el servidor de esa licencia.
-- La prueba se paga y se conecta como cualquier licencia: sin pago verificado no hay conexión.
-
-**4. Registro de pruebas que no se borra:** de cada prueba se guarda una huella (hash con clave secreta, HMAC) de la
-cédula, la cuenta de trading, el correo, el teléfono, el dispositivo y la billetera. Se conserva aunque el cliente
-elimine su cuenta, para que la regla no se pueda saltar borrando el registro. La política de tratamiento de datos
-debe informar esta finalidad (prevención de fraude en la prueba).
-
-**Opcional, apagado por defecto:** pedir foto de la cédula para aprobar la prueba si se detecta abuso.
 
 ### Vencimiento y gracia
 - Recordatorios: 7, 3 y 1 día antes y el día del vencimiento.
@@ -139,7 +106,7 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 
 ### Registro y soporte
 - Registro con **nombre completo, cédula (documento de identidad nacional), correo y teléfono**.
-  La cédula es única por cliente y sirve para controlar que haya una sola prueba por persona. Se trata
+  La cédula es única por cliente (una persona, una cuenta en la plataforma). Se trata
   como dato personal protegido (Ley 1581 de 2012).
 - **Correo oficial: support@doctraderpro.com** (decisión del 2026-10-13). Es el
   correo de contacto público y la dirección de respuesta (Reply-To) de todos los correos que envía la plataforma.
@@ -164,11 +131,11 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 - **Titular:** DocTraderPRO, Barranquilla, Colombia. Faltan su identificación (NIT o cédula), dirección y teléfono para
   la política de datos.
 - Borradores en `docs/legal/` (2026-10-14), para revisar con un abogado antes de publicar:
-  - `terminos-licencia.md`: licencia de uso, planes, prueba, pagos, sin devoluciones, gracia, responsabilidad.
-  - `politica-datos.md`: Ley 1581, finalidades, huellas de la prueba, plazos de borrado, derechos y autorización.
+  - `terminos-licencia.md`: licencia de uso, planes, pagos, sin devoluciones, gracia, responsabilidad.
+  - `politica-datos.md`: Ley 1581, finalidades, huellas cifradas, plazos de borrado, derechos y autorización.
   - `aviso-riesgo.md`: riesgo de pérdida, resultados pasados, enlace de referido; incluye una versión corta.
 - **Plazos de borrado** que salen de la política: contraseñas de trading 90 días después de desconectar una cuenta que
-  no renovó; foto del documento 30 días después de decidir la prueba; tickets 2 años; registros técnicos 12 meses;
+  no renovó; tickets 2 años; registros técnicos 12 meses;
   auditoría de admins 5 años.
 
 ### Cuentas de servicio
@@ -198,7 +165,7 @@ a los dos admins, auditoría que no se puede editar y copias de seguridad probad
 - **Backend: NestJS** + TypeScript.
 - **Frontend: Next.js (React)** + Tailwind.
 - Base de datos: **PostgreSQL** con **TypeORM**.
-- Correos: Resend. SMS: **Twilio Verify**. Archivos: **Cloudflare R2** (privado). Anti-bots: Cloudflare Turnstile.
+- Correos: Resend. Archivos: **Cloudflare R2** (privado). Anti-bots: Cloudflare Turnstile.
   Errores: Sentry. Lectura de blockchain: TronGrid y mempool.space, cada uno con respaldo.
   Detalle, costos y motivos en `docs/DECISIONES-TECNICAS.md`.
 - **Dominio doctraderpro.com** (DNS en Hostinger), repartido así:
@@ -223,14 +190,10 @@ a los dos admins, auditoría que no se puede editar y copias de seguridad probad
 
 ## 4. Flujo del cliente
 
-1. Visita la landing → ve licencias, la invitación a solicitar la prueba, cómo funciona, widget de Myfxbook, broker
-   sugerido y FAQ.
+1. Visita la landing → ve licencias, cómo funciona, widget de Myfxbook, broker sugerido y FAQ.
 2. Se registra con nombre, cédula, correo y teléfono (verifica correo, acepta términos y aviso de riesgo).
-3. Elige licencia (mensual, semestral, o prueba de 15 días si se la aprobaron) para una cuenta de
-   trading → orden de pago **pendiente** (válida 1 hora).
+3. Elige licencia (mensual o semestral) para una cuenta de trading → orden de pago **pendiente** (válida 1 hora).
 4. Pago confirmado (aprobación del admin; Binance Pay cuando esté aprobado) → licencia **activa**.
-   - En prueba: ve las dos opciones para completarla pagando la diferencia (USD 70 o 449) hasta el último
-     día de la prueba.
 5. Registra los datos de esa cuenta de trading → la cuenta entra a **"por conectar"**.
 6. Argemiro la conecta y la marca como **conectada** → el cliente recibe correo.
 7. Recordatorios 7, 3 y 1 día antes y el día del vencimiento.
@@ -246,30 +209,29 @@ Política de no devoluciones.
 
 ### Panel del cliente
 Mis cuentas de trading, cada una con su licencia, estado, vencimiento y días restantes ·
-Comprar / renovar / cambiar a un plan más largo · Solicitar prueba y completarla ·
+Comprar / renovar / cambiar a un plan más largo ·
 Historial de pagos · Capital y riesgo asignados (solo lectura) · **Soporte: mis tickets** (abrir, responder,
 adjuntar, reabrir) y enlace a Telegram.
 
 ### Panel de administración (Argemiro y socio desarrollador)
 - **Dashboard:** ventas del día/mes/año, por moneda, cuentas activas, nuevas, renovaciones, por vencer.
 - **Licencias:** cuenta, cliente, plan, inicio, vencimiento, días restantes, estado; filtros
-  (vence en 7 días, en gracia, vencidas, pendientes de pago, en prueba).
+  (vence en 7 días, en gracia, vencidas, pendientes de pago).
 - **Pagos:** aprobar/rechazar depósitos con hash, ver órdenes expiradas.
-- **Solicitudes de prueba** por aprobar, con los bloqueos y señales del control de la prueba.
 - **Soporte:** bandeja de tickets con filtros, asignación, prioridad, notas internas y respuestas guardadas.
 - **Listas de trabajo:** por conectar / por desconectar.
 - **Clientes y cuentas:** ficha, datos de la cuenta (contraseñas con acción explícita), capital y
   riesgo, notas, extender días, suspender.
-- **Configuración:** planes y precios (mensual, semestral, prueba), **días de gracia**, **direcciones de depósito**
+- **Configuración:** planes y precios (mensual, semestral), **días de gracia**, **direcciones de depósito**
   (moneda, red, dirección), FAQ, broker sugerido, enlace de Telegram, widget de Myfxbook.
 - **Mi perfil de socio** (desarrollador): % de comisión, comisión por periodo, pagos recibidos.
 - **Auditoría** y exportar a Excel/CSV.
 
 ### Automatizaciones
-Correos: bienvenida, orden creada, pago confirmado/rechazado, prueba aprobada,
-cuenta conectada, recordatorios de vencimiento y de completar prueba, licencia vencida, fin de gracia,
+Correos: bienvenida, orden creada, pago confirmado/rechazado,
+cuenta conectada, recordatorios de vencimiento, licencia vencida, fin de gracia,
 respuesta a un ticket, ticket resuelto. Todos con Reply-To a support@doctraderpro.com.
-Alertas a admins: nueva venta, pago por aprobar, solicitud de prueba, cuenta por
+Alertas a admins: nueva venta, pago por aprobar, cuenta por
 conectar, cuenta por desconectar, cambio de % de comisión, ticket nuevo o reabierto.
 
 ## 6. Modelo de datos (borrador, entidades TypeORM)
@@ -277,26 +239,24 @@ conectar, cuenta por desconectar, cambio de % de comisión, ticket nuevo o reabi
 > **Reemplazado por `docs/MODELO-DATOS.md`** (2026-10-14), con campos, estados y trabajos del worker. Se deja este
 > borrador como referencia.
 
-`User` (rol ADMIN | CLIENT, nombre, cédula única, correo, teléfono, prueba usada) ·
+`User` (rol ADMIN | CLIENT, nombre, cédula única, correo, teléfono) ·
 `PartnerProfile` (usuario socio, % de comisión) · `CommissionRateChange` (anterior, nuevo, fecha) ·
 `CommissionPayout` (periodo 1–15 o 16–fin de mes, ventas brutas, %, monto, pagado) ·
-`Plan` (tipo MENSUAL | TRIMESTRAL | SEMESTRAL | PRUEBA, duración en días o meses, meses de obsequio, precio USD, visible, activo) ·
+`Plan` (tipo MENSUAL | TRIMESTRAL | SEMESTRAL, duración en meses, meses de obsequio, precio USD, visible, activo) ·
 `ExchangeRate` (fecha, TRM COP/USD) ·
 `TradingAccount` (cliente, titular, broker, servidor, número, contraseña operativa cifrada,
 contraseña de inversor cifrada, estado de conexión, capital y riesgo) ·
-`License` (cuenta de trading, plan, inicio, fin, fin de gracia, estado, es_prueba) ·
-`PaymentOrder` (licencia, plan, tipo NUEVA | RENOVACION | CAMBIO_DE_PLAN | COMPLETAR_PRUEBA, moneda, red, dirección, monto, tasa BTC, expira en, hash único, estado de
+`License` (cuenta de trading, plan, inicio, fin, fin de gracia, estado) ·
+`PaymentOrder` (licencia, plan, tipo NUEVA | RENOVACION | CAMBIO_DE_PLAN, moneda, red, dirección, monto, tasa BTC, expira en, hash único, estado de
 verificación, confirmaciones, monto recibido, billetera de origen, aprobado por) · `ChainSetting` (red, confirmaciones mínimas, aprobación automática) ·
 `DepositAddress` (moneda, red, dirección, activa) ·
-`TrialRequest` (cliente, cuenta de trading, estado, bloqueos y señales encontrados) ·
-`TrialRegistry` (huellas HMAC de cédula, cuenta, correo, teléfono, dispositivo y billetera; no se borra) ·
 `SupportTicket` (cliente, tema, cuenta u orden relacionada, estado, prioridad, asignado a, primera respuesta) ·
 `TicketMessage` (autor, texto, interna sí/no) · `TicketAttachment` (archivo, tipo, tamaño) · `Faq` · `Setting` (días de gracia, Telegram, Myfxbook, broker) · `Notification` · `AuditLog`
 
 ## 7. Fases
 
 - **Fase 1 (lanzamiento):** landing + FAQ + Myfxbook + broker sugerido, registro/login, licencias
-  mensual/semestral/prueba (con control antiabuso), **tickets de soporte**, pagos cripto por depósito directo con aprobación (Binance Pay Merchant en cuanto Binance lo apruebe),
+  mensual/semestral, **tickets de soporte**, pagos cripto por depósito directo con aprobación (Binance Pay Merchant en cuanto Binance lo apruebe),
   panel del cliente, panel de admin, perfil de socio, recordatorios y gracia.
 - **Fase 2:** pasarela en pesos (COP), referidos, cupones adicionales, avisos por Telegram/WhatsApp,
   versión en inglés.

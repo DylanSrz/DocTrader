@@ -57,11 +57,7 @@ async function Contenido() {
   }
   const { pendientes, ventas, cuentas, actividad } = respuesta.datos;
   const total =
-    pendientes.pagos +
-    pendientes.pruebas +
-    pendientes.tickets +
-    pendientes.porConectar +
-    pendientes.porDesconectar;
+    pendientes.pagos + pendientes.tickets + pendientes.porConectar + pendientes.porDesconectar;
   const mes = MESES[ventas.calendario.mes - 1] ?? '';
   const anterior = MESES[(ventas.calendario.mes + 10) % 12] ?? '';
 
@@ -71,12 +67,6 @@ async function Contenido() {
       texto: pendientes.pagos === 1 ? 'pago por revisar' : 'pagos por revisar',
       href: '/admin/pagos',
       ir: 'Ir a pagos',
-    },
-    {
-      n: pendientes.pruebas,
-      texto: pendientes.pruebas === 1 ? 'prueba por aprobar' : 'pruebas por aprobar',
-      href: '/admin/pagos#pruebas',
-      ir: 'Ver solicitudes',
     },
     {
       n: pendientes.tickets,
@@ -139,7 +129,7 @@ async function Contenido() {
 
         <ul
           aria-label="Pendientes"
-          className="mt-[clamp(56px,7vw,96px)] grid grid-cols-6 gap-x-[clamp(24px,4vw,56px)] gap-y-10 max-xl:grid-cols-3 max-md:grid-cols-2"
+          className="mt-[clamp(56px,7vw,96px)] grid grid-cols-5 gap-x-[clamp(24px,4vw,56px)] gap-y-10 max-xl:grid-cols-3 max-md:grid-cols-2"
         >
           {montones.map((m) => (
             <li key={m.href}>

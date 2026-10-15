@@ -56,8 +56,6 @@ const NOMBRE_PERIODO: Record<Ficha['periodos'][number]['tipo'], string> = {
   NUEVA: 'Licencia',
   RENOVACION: 'Renovación',
   CAMBIO_DE_PLAN: 'Cambio a',
-  PRUEBA: 'Prueba',
-  COMPLETAR_PRUEBA: 'Prueba completada a',
   EXTENSION_ADMIN: 'Días extendidos',
 };
 
@@ -72,7 +70,7 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
 
 function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) => string }) {
   const estado = ESTADO_LICENCIA_ADMIN[ficha.estado];
-  const vigente = ['ACTIVA', 'EN_GRACIA', 'PRUEBA'].includes(ficha.estado);
+  const vigente = ['ACTIVA', 'EN_GRACIA'].includes(ficha.estado);
   return (
     <>
       <div className="grid justify-items-start gap-3">
