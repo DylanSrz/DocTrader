@@ -138,3 +138,21 @@ export const ESTADO_SESION = {
   SEGUNDO_FACTOR_POR_CONFIGURAR: 'SEGUNDO_FACTOR_POR_CONFIGURAR',
 } as const;
 export type EstadoSesion = ValorDe<typeof ESTADO_SESION>;
+
+/** Nivel de riesgo que Argemiro asigna a cada cuenta de trading. */
+export const NIVEL_RIESGO = { BAJO: 'BAJO', MEDIO: 'MEDIO', ALTO: 'ALTO' } as const;
+export type NivelRiesgo = ValorDe<typeof NIVEL_RIESGO>;
+
+/** De dónde salió cada periodo de una licencia (`license_periods.kind`). */
+export const TIPO_PERIODO = {
+  PRUEBA: 'PRUEBA',
+  NUEVA: 'NUEVA',
+  RENOVACION: 'RENOVACION',
+  CAMBIO_DE_PLAN: 'CAMBIO_DE_PLAN',
+  COMPLETAR_PRUEBA: 'COMPLETAR_PRUEBA',
+  EXTENSION_ADMIN: 'EXTENSION_ADMIN',
+} as const;
+export type TipoPeriodo = ValorDe<typeof TIPO_PERIODO>;
+
+/** La red de cada moneda: hoy USDT va por Tron y BTC por Bitcoin. */
+export const RED_DE_MONEDA: Record<Moneda, Red> = { USDT: 'TRON', BTC: 'BITCOIN' };

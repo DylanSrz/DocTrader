@@ -252,6 +252,106 @@
     text-decoration-color: rgb(255 255 255 / 0.35);
     text-underline-offset: 4px;
   }
+  /*
+    Panel lateral (propuesta 2): un <dialog> que entra desde la derecha con curva de cajón. Redondea solo su lado
+    izquierdo. Con "reducir movimiento" aparece solo con opacidad.
+  */
+  .lateral {
+    margin: 0 0 0 auto;
+    height: 100dvh;
+    max-height: none;
+    width: min(560px, 100vw);
+    max-width: 100vw;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-pildora) 0 0 var(--radius-pildora);
+    background: var(--color-vacio);
+    color: var(--color-blanco);
+    overscroll-behavior: contain;
+    transform: translateX(100%);
+    transition:
+      transform 320ms var(--ease-cajon),
+      overlay 320ms allow-discrete,
+      display 320ms allow-discrete;
+  }
+  .lateral[open] {
+    transform: translateX(0);
+  }
+  @starting-style {
+    .lateral[open] {
+      transform: translateX(100%);
+    }
+  }
+  .lateral::backdrop {
+    background: rgb(0 0 0 / 0.72);
+    opacity: 0;
+    transition:
+      opacity 320ms var(--ease-salida),
+      overlay 320ms allow-discrete,
+      display 320ms allow-discrete;
+  }
+  .lateral[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
+    .lateral[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lateral {
+      transform: none;
+      opacity: 0;
+      transition:
+        opacity 200ms ease,
+        overlay 200ms allow-discrete,
+        display 200ms allow-discrete;
+    }
+    .lateral[open] {
+      transform: none;
+      opacity: 1;
+    }
+    @starting-style {
+      .lateral[open] {
+        transform: none;
+        opacity: 0;
+      }
+    }
+  }
+  /* Opción de plan: un círculo que se llena de naranja. */
+  .opcion-plan input {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px var(--color-ceniza);
+    cursor: pointer;
+    transition: box-shadow 200ms var(--ease-salida);
+  }
+  .opcion-plan input:checked {
+    box-shadow: inset 0 0 0 6px var(--color-llama);
+  }
+  .opcion-plan:has(input:checked) {
+    color: var(--color-blanco);
+  }
+  /* Aviso breve: sube con opacidad. */
+  .aviso-breve {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+    transition:
+      opacity 260ms var(--ease-salida),
+      transform 260ms var(--ease-salida);
+  }
+  .aviso-breve[data-visible='true'] {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aviso-breve {
+      transform: translate(-50%, 0);
+    }
+  }
   /* Viñeta de los planes: un rombo naranja de 6 px. */
   .vineta-rombo::before {
     content: '';

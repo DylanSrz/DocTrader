@@ -626,6 +626,19 @@ export class AccesoService {
     };
   }
 
+  /** Los datos del perfil: la cédula solo con sus últimos 4 dígitos. */
+  async perfil(sesion: SesionActiva) {
+    const usuario = await this.fuente.getRepository(User).findOneByOrFail({ id: sesion.usuarioId });
+    return {
+      nombre: usuario.fullName,
+      correo: usuario.email,
+      telefono: usuario.phoneE164,
+      cedulaUltimos4: usuario.cedulaLast4,
+      clienteDesde: usuario.createdAt,
+      segundoFactor: usuario.totpEnabledAt !== null,
+    };
+  }
+
   // ── Segundo factor y confirmación reciente ───────────────────────────────────────────────────────────
 
   /** Genera un secreto nuevo (todavía sin activar) y su código QR. Vale 15 minutos. */

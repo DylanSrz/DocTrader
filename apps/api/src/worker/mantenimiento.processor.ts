@@ -3,15 +3,20 @@ import { Inject, Logger } from '@nestjs/common';
 import type { Job } from 'bullmq';
 import type { Redis } from 'ioredis';
 import { AvisosEnvio } from '../avisos/avisos-envio.js';
+import { VencimientoOrdenes } from '../licencias/vencimiento-ordenes.js';
 import { REDIS } from '../redis/redis.module.js';
 import {
   CLAVE_LATIDO_WORKER,
   COLA_MANTENIMIENTO,
   TRABAJO_ENVIAR_AVISOS,
+  TRABAJO_EXPIRAR_ORDENES,
   TRABAJO_LATIDO,
 } from './latido.js';
 
-/** Trabajos de mantenimiento: el latido (prueba que el worker está vivo) y el envío de correos pendientes. */
+/**
+ * Trabajos de mantenimiento: el latido (prueba que el worker está vivo), el envío de correos pendientes y el
+ * vencimiento de las órdenes de pago.
+ */
 @Processor(COLA_MANTENIMIENTO)
 export class MantenimientoProcessor extends WorkerHost {
   private readonly logger = new Logger(MantenimientoProcessor.name);
@@ -19,6 +24,7 @@ export class MantenimientoProcessor extends WorkerHost {
   constructor(
     @Inject(REDIS) private readonly redis: Redis,
     private readonly avisos: AvisosEnvio,
+    private readonly ordenes: VencimientoOrdenes,
   ) {
     super();
   }
@@ -30,6 +36,9 @@ export class MantenimientoProcessor extends WorkerHost {
         return;
       case TRABAJO_ENVIAR_AVISOS:
         await this.avisos.enviarPendientes();
+        return;
+      case TRABAJO_EXPIRAR_ORDENES:
+        await this.ordenes.expirar();
         return;
       default:
         this.logger.warn(`Trabajo desconocido en ${COLA_MANTENIMIENTO}: ${job.name}`);

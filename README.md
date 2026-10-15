@@ -113,6 +113,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    |---|---|
    | `PROXY_SECRET` | Otra llave nueva (`openssl rand -base64 32`), la misma de Vercel. Sin ella la API no arranca en producción |
    | `TURNSTILE_SECRET` | Clave secreta de Cloudflare Turnstile (cuando exista la cuenta) |
+   | `COINGECKO_API_KEY` | Opcional: llave gratis de CoinGecko (plan Demo) para comparar el precio de BTC con más consultas |
 
 5. Revisar `https://<dominio-de-la-api>/salud`: debe responder `"estado":"ok"` y, al minuto, mostrar el latido del
    worker. Sin el secreto de la web, cualquier otra ruta responde 404.

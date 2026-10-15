@@ -93,11 +93,29 @@ prueba sin pagos.
   - **Queda para después:** pedir que los clientes acepten de nuevo cuando cambie un texto legal (etapa 8, con
     los correos), y editar precios y cifras de Myfxbook desde el panel (etapa 5, ajustes).
 
-### Etapa 3 — Cuentas de trading, licencias y órdenes
+### Etapa 3 — Cuentas de trading, licencias y órdenes ✅ (2026-10-15)
 - Agregar cuentas con contraseñas cifradas y la regla de una cuenta por cliente.
 - Crear órdenes de compra, renovación y cambio de plan, con precio de BTC fijo por una hora y cuenta regresiva.
 - Panel del cliente: mis cuentas con el calendario de triángulos, pagos e historial.
 - **Hecho cuando:** un cliente crea una orden, ve la dirección y el monto exactos, y la orden expira sola a la hora.
+- **Resultado:**
+  - **Tablas:** `trading_accounts`, `licenses`, `license_periods` y `payment_orders` (número `DTP-000001`). La base
+    de datos impide una cuenta de trading en dos clientes, más de una orden abierta por licencia y un hash repetido
+    en la misma red.
+  - **Cuentas:** agregar (contraseñas cifradas, cada cuenta nace con su licencia por pagar), editar (si estaba
+    conectada vuelve a "por conectar" y se avisa por correo; en prueba no se cambian broker, servidor ni número) y
+    quitar (solo sin licencia en curso ni conexión; las contraseñas se borran).
+  - **Órdenes:** el tipo sale del estado de la licencia (nueva, renovación o cambio de plan); copian el precio del
+    plan y la dirección activa y valen una hora. En BTC el precio se fija con Binance y se compara con CoinGecko
+    (si difieren más de 1 %, no se crea la orden y se avisa a los admins). Una orden nueva reemplaza a la pendiente;
+    una con el pago reportado no. El cliente reporta el hash; el worker marca expiradas las órdenes cada minuto.
+  - **Panel del cliente:** "Mis cuentas" (titular con lo más urgente, calendario de triángulos, panel lateral para
+    agregar y editar), "Pagos" (cuenta regresiva, USDT o BTC, monto y dirección para copiar, reportar el hash,
+    confirmaciones en triángulos e historial) y "Perfil" (datos con la cédula enmascarada y la seguridad).
+  - 45 pruebas de `shared`, 34 unitarias de la API y 75 de punta a punta; recorrido en el navegador (registro,
+    cuenta, orden en USDT, cambio a BTC con el precio real, reporte del hash) sin desbordes a 320, 390 y 1440 px.
+  - **Queda para la etapa 4:** verificar el hash en la blockchain y aprobar o rechazar el pago (hasta entonces, una
+    orden reportada espera). La prueba de 15 días y completarla llegan en la etapa 6.
 
 ### Etapa 4 — Verificación y aprobación de pagos
 - Worker con BullMQ: verificadores de Tron y Bitcoin con proveedor de respaldo, confirmaciones y reintentos.

@@ -97,6 +97,11 @@ export class AccesoController {
     return this.acceso.datosDeSesion(sesion);
   }
 
+  @Get('perfil')
+  perfil(@SesionActual() sesion: SesionActiva) {
+    return this.acceso.perfil(sesion);
+  }
+
   @PermitirEstados(...TODOS_LOS_ESTADOS)
   @Post('salir')
   @HttpCode(HttpStatus.OK)

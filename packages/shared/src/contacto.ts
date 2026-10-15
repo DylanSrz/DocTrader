@@ -38,3 +38,8 @@ export function normalizarTelefono(telefono: string): string | null {
 /** Reglas de contraseña de `docs/SEGURIDAD.md` §2: largo mínimo, sin reglas raras de composición. */
 export const CONTRASENA_MINIMO = 10;
 export const CONTRASENA_MAXIMO = 128;
+
+/** Un teléfono guardado (`+573001234567`) como se lee: "+57 300 1234567". */
+export function formatearTelefono(e164: string): string {
+  return parsePhoneNumberFromString(e164)?.formatInternational() ?? e164;
+}

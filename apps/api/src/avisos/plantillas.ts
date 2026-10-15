@@ -12,6 +12,8 @@ export const PLANTILLA = {
   INTENTOS_FALLIDOS: 'intentos-fallidos',
   SEGUNDO_FACTOR_ACTIVADO: 'segundo-factor-activado',
   CODIGO_RECUPERACION_USADO: 'codigo-recuperacion-usado',
+  CUENTA_TRADING_CAMBIADA: 'cuenta-trading-cambiada',
+  PRECIO_BTC_DIFERENTE: 'precio-btc-diferente',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -166,6 +168,27 @@ export function renderizar(
         parrafos: [
           `El ${datos.fecha} se ingresó a tu cuenta con un código de recuperación. Te quedan ${datos.restantes}.`,
           'Si no fuiste tú, cambia tu contraseña y escríbenos de inmediato.',
+        ],
+      });
+    case PLANTILLA.CUENTA_TRADING_CAMBIADA:
+      return armar({
+        asunto: `Cambiaron los datos de tu cuenta de trading ${datos.numero}`,
+        saludo,
+        parrafos: [
+          `El ${datos.fecha} se cambiaron los datos de la cuenta de trading ${datos.numero} en tu panel (${datos.campos}).`,
+          datos.reconectar === 'si'
+            ? 'Como la cuenta ya estaba conectada, la actualizaremos en el copy trading. Te avisaremos cuando quede lista.'
+            : 'Si no fuiste tú, cambia tu contraseña de DocTraderPRO y escríbenos de inmediato.',
+        ],
+        boton: { texto: 'Ver mis cuentas', url: `${web}/panel` },
+      });
+    case PLANTILLA.PRECIO_BTC_DIFERENTE:
+      return armar({
+        asunto: 'No se pudo fijar el precio de BTC',
+        saludo,
+        parrafos: [
+          `Los proveedores del precio de BTC no coinciden: Binance dice USD ${datos.binance} y CoinGecko USD ${datos.coingecko} (más de 1 % de diferencia).`,
+          'Mientras no coincidan, los clientes no pueden crear órdenes en BTC; las de USDT siguen funcionando. Si se repite, revisa los proveedores.',
         ],
       });
     default:
