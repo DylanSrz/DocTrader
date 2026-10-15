@@ -265,6 +265,16 @@ export class CuentasService {
             reconectar: reconectar ? 'si' : 'no',
           },
         });
+        if (reconectar) {
+          await this.avisos.avisarAdmins(m, PLANTILLA.CUENTA_POR_CONECTAR, {
+            clave: `por-reconectar:${cuenta.id}:${Date.now()}`,
+            datos: {
+              cliente: usuario.fullName,
+              cuenta: datos.numero,
+              campos: cambios.map((c) => NOMBRES_CAMPOS[c]).join(', '),
+            },
+          });
+        }
         await this.auditoria.registrar(
           {
             actorId: sesion.usuarioId,

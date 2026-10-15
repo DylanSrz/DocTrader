@@ -1,3 +1,4 @@
+import { ZONA_HORARIA } from '@doctrader/shared';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import type { Queue } from 'bullmq';
@@ -5,11 +6,14 @@ import {
   COLA_MANTENIMIENTO,
   TRABAJO_ACTIVAR_DIRECCIONES,
   TRABAJO_BORRAR_ARCHIVOS,
+  TRABAJO_BORRAR_DATOS,
   TRABAJO_CERRAR_TICKETS,
   TRABAJO_ENVIAR_AVISOS,
   TRABAJO_ESTADOS_LICENCIA,
   TRABAJO_EXPIRAR_ORDENES,
   TRABAJO_LATIDO,
+  TRABAJO_LIQUIDAR_COMISION,
+  TRABAJO_RECORDATORIOS,
   TRABAJO_VERIFICAR_PAGOS,
 } from './latido.js';
 
@@ -63,6 +67,24 @@ export class ProgramarTrabajos implements OnApplicationBootstrap {
       TRABAJO_BORRAR_ARCHIVOS,
       { every: 60 * 60_000 },
       { name: TRABAJO_BORRAR_ARCHIVOS, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // Recordatorios de vencimiento (7, 3 y 1 día antes): cada hora; la clave de cada correo evita repetirlos.
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_RECORDATORIOS,
+      { every: 60 * 60_000 },
+      { name: TRABAJO_RECORDATORIOS, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // Comisión del socio: cada hora se cierran las quincenas terminadas (1 al 15 y 16 al fin de mes, hora de Colombia).
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_LIQUIDAR_COMISION,
+      { every: 60 * 60_000 },
+      { name: TRABAJO_LIQUIDAR_COMISION, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // Borrado de datos vencidos según la política de datos: cada día a las 3 a. m. de Colombia.
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_BORRAR_DATOS,
+      { pattern: '0 3 * * *', tz: ZONA_HORARIA },
+      { name: TRABAJO_BORRAR_DATOS, opts: { removeOnComplete: true, removeOnFail: 100 } },
     );
   }
 }

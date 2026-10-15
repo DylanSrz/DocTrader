@@ -233,6 +233,8 @@ cuenta conectada, recordatorios de vencimiento, licencia vencida, fin de gracia,
 respuesta a un ticket, ticket resuelto. Todos con Reply-To a support@doctraderpro.com.
 Alertas a admins: nueva venta, pago por aprobar, cuenta por
 conectar, cuenta por desconectar, cambio de % de comisión, ticket nuevo o reabierto.
+(Construido en la etapa 8, 2026-10-15, salvo "orden creada": la orden vale una hora y se ve en pantalla. Se sumó
+el aviso de la quincena liquidada del socio. Detalle en `PLAN-TRABAJO.md`, etapa 8.)
 
 ## 6. Modelo de datos (borrador, entidades TypeORM)
 

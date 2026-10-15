@@ -14,7 +14,7 @@ import type { Redis } from 'ioredis';
 import QRCode from 'qrcode';
 import { type DataSource, type EntityManager, IsNull, MoreThan } from 'typeorm';
 import { AuditoriaService } from '../auditoria/auditoria.service.js';
-import { AvisosService } from '../avisos/avisos.service.js';
+import { AvisosService, primerNombre } from '../avisos/avisos.service.js';
 import { ContenidoService } from '../contenido/contenido.service.js';
 import { fechaLegible } from '../avisos/fecha.js';
 import { PLANTILLA } from '../avisos/plantillas.js';
@@ -298,11 +298,24 @@ export class AccesoService {
       );
       const usado = usados[0];
       if (!usado) throw enlaceInvalido();
-      await m.query(
-        `UPDATE users SET email_verified_at = coalesce(email_verified_at, now()), updated_at = now()
-         WHERE id = $1`,
-        [usado.user_id],
-      );
+      const verificado = filas<{ email: string; full_name: string; role: string }>(
+        await m.query(
+          `UPDATE users SET email_verified_at = now(), updated_at = now()
+           WHERE id = $1 AND email_verified_at IS NULL
+           RETURNING email, full_name, role`,
+          [usado.user_id],
+        ),
+      )[0];
+      // La bienvenida va una sola vez, al confirmar el correo por primera vez.
+      if (verificado?.role === ROL.CLIENTE) {
+        await this.avisos.encolar(m, {
+          usuarioId: usado.user_id,
+          correo: verificado.email,
+          plantilla: PLANTILLA.BIENVENIDA,
+          datos: { nombre: primerNombre(verificado.full_name) },
+          clave: `bienvenida:${usado.user_id}`,
+        });
+      }
     });
   }
 
@@ -891,10 +904,6 @@ export class AccesoService {
     );
     await this.sesiones.cerrarTodas(usuario.id);
   }
-}
-
-function primerNombre(nombreCompleto: string): string {
-  return nombreCompleto.split(' ')[0] ?? nombreCompleto;
 }
 
 function resultado(token: string, sesion: SesionActiva): ResultadoIngreso {

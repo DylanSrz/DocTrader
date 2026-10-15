@@ -21,6 +21,11 @@ export interface EstadoOperacion {
   aviso?: string;
   /** La API pidió confirmar con el código de la app. */
   pideCodigo?: boolean;
+  /**
+   * Lo que se había escrito, cuando la acción no terminó: React limpia el formulario al responder, y sin esto el
+   * segundo envío (con el código) mandaría los valores de antes.
+   */
+  valores?: Record<string, string>;
 }
 
 async function token(): Promise<string> {
@@ -30,6 +35,17 @@ async function token(): Promise<string> {
 }
 
 type Resultado<T> = { ok: true; datos: T } | { ok: false; estado: EstadoOperacion };
+
+/** Los campos de texto del formulario, sin el código de la app ni los campos internos de React. */
+function valoresDe(datos: FormData): Record<string, string> {
+  const valores: Record<string, string> = {};
+  for (const [nombre, valor] of datos.entries()) {
+    if (typeof valor === 'string' && nombre !== 'codigo' && !nombre.startsWith('$')) {
+      valores[nombre] = valor;
+    }
+  }
+  return valores;
+}
 
 async function operar<T>(
   datos: FormData,
@@ -44,17 +60,24 @@ async function operar<T>(
       token: t,
     });
     if (!confirmacion.ok) {
-      return { ok: false, estado: { error: confirmacion.error.mensaje, pideCodigo: true } };
+      return {
+        ok: false,
+        estado: { error: confirmacion.error.mensaje, pideCodigo: true, valores: valoresDe(datos) },
+      };
     }
   }
   const respuesta = await llamada(t);
   if (respuesta.ok) return { ok: true, datos: respuesta.datos };
   if (respuesta.error.codigo === 'CONFIRMACION_REQUERIDA') {
-    return { ok: false, estado: { pideCodigo: true } };
+    return { ok: false, estado: { pideCodigo: true, valores: valoresDe(datos) } };
   }
   return {
     ok: false,
-    estado: { error: respuesta.error.mensaje, campos: respuesta.error.campos },
+    estado: {
+      error: respuesta.error.mensaje,
+      campos: respuesta.error.campos,
+      valores: valoresDe(datos),
+    },
   };
 }
 
@@ -267,6 +290,7 @@ export async function guardarPrecios(
     return {
       pideCodigo: Boolean(texto(datos, 'codigo')),
       campos: Object.fromEntries(malos.map(([k]) => [k, 'Escribe el precio en dólares.'])),
+      valores: valoresDe(datos),
     };
   }
   const r = await operar(datos, (t) =>
@@ -389,4 +413,51 @@ export async function cambiarDireccion(
     reactivar: 'Dirección reactivada.',
   }[accion as 'cancelar' | 'desactivar' | 'reactivar'];
   return listo(previo, aviso);
+}
+
+// ── Socio ─────────────────────────────────────────────────────────────────────────────────────────────
+
+/** "10", "12,5", "12.5 %" → puntos básicos (1250). `NaN` si no es un porcentaje. */
+function puntosBasicos(valor: string): number {
+  const limpio = valor.replace(/\s|%/g, '').replace(',', '.');
+  return /^\d{1,3}(\.\d{1,2})?$/.test(limpio) ? Math.round(Number(limpio) * 100) : Number.NaN;
+}
+
+export async function cambiarPorcentaje(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const porcentajeBp = puntosBasicos(texto(datos, 'porcentaje'));
+  if (Number.isNaN(porcentajeBp)) {
+    return {
+      campos: { porcentaje: 'Escribe un porcentaje, por ejemplo 10 o 12,5.' },
+      valores: valoresDe(datos),
+    };
+  }
+  const r = await operar(datos, (t) =>
+    llamarApi('/admin/socio/comision', { metodo: 'PUT', cuerpo: { porcentajeBp }, token: t }),
+  );
+  if (!r.ok) {
+    const campo = r.estado.campos?.porcentajeBp;
+    return campo ? { ...r.estado, campos: { porcentaje: campo } } : r.estado;
+  }
+  revalidatePath('/admin/socio');
+  return listo(previo, 'Porcentaje guardado. Aplica a las ventas que se aprueben desde ahora.');
+}
+
+export async function marcarComisionPagada(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const id = texto(datos, 'liquidacion');
+  const r = await operar(datos, (t) =>
+    llamarApi(`/admin/socio/liquidaciones/${encodeURIComponent(id)}/pagada`, {
+      metodo: 'POST',
+      cuerpo: { referencia: texto(datos, 'referencia') || undefined },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin/socio');
+  return listo(previo, `Quincena del ${texto(datos, 'periodo')} marcada como pagada.`);
 }

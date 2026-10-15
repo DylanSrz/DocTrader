@@ -9,6 +9,7 @@ import { OperacionAdmin1792500000000 } from './migraciones/1792500000000-operaci
 import { LicenciaDePrueba1792600000000 } from './migraciones/1792600000000-licencia-de-prueba.js';
 import { Soporte1792700000000 } from './migraciones/1792700000000-soporte.js';
 import { QuitarPrueba1792800000000 } from './migraciones/1792800000000-quitar-prueba.js';
+import { Socio1792900000000 } from './migraciones/1792900000000-socio.js';
 
 export const MIGRACIONES = [
   Inicial1792000000000,
@@ -20,6 +21,7 @@ export const MIGRACIONES = [
   LicenciaDePrueba1792600000000,
   Soporte1792700000000,
   QuitarPrueba1792800000000,
+  Socio1792900000000,
 ];
 
 /** Opciones de la base de datos, compartidas por la API, el worker y los scripts de migración y semilla. */

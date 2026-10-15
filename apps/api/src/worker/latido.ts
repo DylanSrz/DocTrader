@@ -9,3 +9,6 @@ export const TRABAJO_ESTADOS_LICENCIA = 'estados-licencia';
 export const TRABAJO_ACTIVAR_DIRECCIONES = 'activar-direcciones';
 export const TRABAJO_CERRAR_TICKETS = 'cerrar-tickets';
 export const TRABAJO_BORRAR_ARCHIVOS = 'borrar-archivos';
+export const TRABAJO_RECORDATORIOS = 'recordatorios';
+export const TRABAJO_LIQUIDAR_COMISION = 'liquidar-comision';
+export const TRABAJO_BORRAR_DATOS = 'borrar-datos';

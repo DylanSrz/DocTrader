@@ -13,9 +13,9 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { type DataSource, type EntityManager, QueryFailedError } from 'typeorm';
 import { type Adjunto, ArchivosService } from '../archivos/archivos.service.js';
 import { AuditoriaService } from '../auditoria/auditoria.service.js';
-import { AvisosService } from '../avisos/avisos.service.js';
+import { AvisosService, primerNombre } from '../avisos/avisos.service.js';
 import { fechaSinHora } from '../avisos/fecha.js';
-import { PLANTILLA, type Plantilla } from '../avisos/plantillas.js';
+import { PLANTILLA } from '../avisos/plantillas.js';
 import { Ticket, User } from '../database/entidades/index.js';
 import { errorApi } from '../seguridad/errores.js';
 import { LIMITES, LimitesService } from '../seguridad/limites.service.js';
@@ -60,8 +60,6 @@ const cerrado = () =>
     'TICKET_CERRADO',
     'Este ticket ya está cerrado. Si necesitas algo más, abre un ticket nuevo.',
   );
-
-const primerNombre = (nombre: string) => nombre.split(' ')[0] ?? nombre;
 
 function recortarParaCorreo(texto: string): string {
   return texto.length > LARGO_EN_CORREO ? `${texto.slice(0, LARGO_EN_CORREO).trimEnd()}…` : texto;
@@ -237,7 +235,7 @@ export class SoporteService {
       )) as { id: string; number: number }[];
       const mensajeId = await this.insertarMensaje(m, ticket!.id, usuarioId, dto.mensaje, false);
       await this.archivos.adjuntar(m, { usuarioId, mensajeId, ids: dto.adjuntos ?? [] });
-      await this.avisarAdmins(m, PLANTILLA.TICKET_NUEVO, {
+      await this.avisos.avisarAdmins(m, PLANTILLA.TICKET_NUEVO, {
         clave: `ticket:${ticket!.id}:nuevo`,
         datos: {
           cliente: cliente.fullName,
@@ -273,7 +271,7 @@ export class SoporteService {
       );
       if (ticket.status === ESTADO_TICKET.RESUELTO) {
         const cliente = await m.getRepository(User).findOneByOrFail({ id: usuarioId });
-        await this.avisarAdmins(m, PLANTILLA.TICKET_REABIERTO, {
+        await this.avisos.avisarAdmins(m, PLANTILLA.TICKET_REABIERTO, {
           clave: `ticket:${ticket.id}:reabierto:${mensajeId}`,
           datos: {
             cliente: cliente.fullName,
@@ -717,23 +715,6 @@ export class SoporteService {
       `SELECT id, title, body FROM saved_replies ORDER BY lower(title)`,
     )) as { id: string; title: string; body: string }[];
     return filas.map((r) => ({ id: r.id, titulo: r.title, cuerpo: r.body }));
-  }
-
-  private async avisarAdmins(
-    m: EntityManager,
-    plantilla: Plantilla,
-    aviso: { clave: string; datos: Record<string, string> },
-  ) {
-    const admins = await m.getRepository(User).findBy({ role: ROL.ADMIN, status: 'ACTIVE' });
-    for (const admin of admins) {
-      await this.avisos.encolar(m, {
-        usuarioId: admin.id,
-        correo: admin.email,
-        plantilla,
-        datos: { nombre: primerNombre(admin.fullName), ...aviso.datos },
-        clave: `${aviso.clave}:${admin.id}`,
-      });
-    }
   }
 
   private registrar(

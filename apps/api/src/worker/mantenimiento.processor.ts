@@ -8,18 +8,23 @@ import { AvisosEnvio } from '../avisos/avisos-envio.js';
 import { VencimientoLicencias } from '../licencias/vencimiento-licencias.js';
 import { VencimientoOrdenes } from '../licencias/vencimiento-ordenes.js';
 import { VerificacionPagos } from '../pagos/verificacion-pagos.service.js';
+import { BorradoDatos } from '../privacidad/borrado-datos.js';
 import { REDIS } from '../redis/redis.module.js';
+import { SocioService } from '../socio/socio.service.js';
 import { SoporteService } from '../soporte/soporte.service.js';
 import {
   CLAVE_LATIDO_WORKER,
   COLA_MANTENIMIENTO,
   TRABAJO_ACTIVAR_DIRECCIONES,
   TRABAJO_BORRAR_ARCHIVOS,
+  TRABAJO_BORRAR_DATOS,
   TRABAJO_CERRAR_TICKETS,
   TRABAJO_ENVIAR_AVISOS,
   TRABAJO_ESTADOS_LICENCIA,
   TRABAJO_EXPIRAR_ORDENES,
   TRABAJO_LATIDO,
+  TRABAJO_LIQUIDAR_COMISION,
+  TRABAJO_RECORDATORIOS,
   TRABAJO_VERIFICAR_PAGOS,
 } from './latido.js';
 
@@ -27,7 +32,8 @@ import {
  * Trabajos de mantenimiento: el latido (prueba que el worker está vivo), el envío de correos pendientes y el
  * vencimiento de las órdenes de pago, la verificación de los pagos en la blockchain, los estados de las licencias y
  * la activación de las direcciones de depósito que cumplieron sus 24 horas, el cierre de los tickets resueltos y el
- * borrado de los adjuntos que nadie usó.
+ * borrado de los adjuntos que nadie usó, los recordatorios de vencimiento y la liquidación de la comisión del socio
+ * y el borrado diario de los datos vencidos.
  */
 @Processor(COLA_MANTENIMIENTO)
 export class MantenimientoProcessor extends WorkerHost {
@@ -42,6 +48,8 @@ export class MantenimientoProcessor extends WorkerHost {
     private readonly ajustes: AjustesAdminService,
     private readonly soporte: SoporteService,
     private readonly archivos: ArchivosService,
+    private readonly socio: SocioService,
+    private readonly borrado: BorradoDatos,
   ) {
     super();
   }
@@ -71,6 +79,15 @@ export class MantenimientoProcessor extends WorkerHost {
         return;
       case TRABAJO_BORRAR_ARCHIVOS:
         await this.archivos.borrarVencidos();
+        return;
+      case TRABAJO_RECORDATORIOS:
+        await this.licencias.recordar();
+        return;
+      case TRABAJO_LIQUIDAR_COMISION:
+        await this.socio.liquidar();
+        return;
+      case TRABAJO_BORRAR_DATOS:
+        await this.borrado.ejecutar();
         return;
       default:
         this.logger.warn(`Trabajo desconocido en ${COLA_MANTENIMIENTO}: ${job.name}`);

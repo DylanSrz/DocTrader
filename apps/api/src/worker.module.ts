@@ -9,6 +9,8 @@ import { AvisosModule } from './avisos/avisos.module.js';
 import { VencimientoLicencias } from './licencias/vencimiento-licencias.js';
 import { VencimientoOrdenes } from './licencias/vencimiento-ordenes.js';
 import { PagosModule } from './pagos/pagos.module.js';
+import { BorradoDatos } from './privacidad/borrado-datos.js';
+import { SocioModule } from './socio/socio.module.js';
 import { SoporteModule } from './soporte/soporte.module.js';
 import { COLA_MANTENIMIENTO } from './worker/latido.js';
 import { MantenimientoProcessor } from './worker/mantenimiento.processor.js';
@@ -21,6 +23,7 @@ import { ProgramarTrabajos } from './worker/programar-trabajos.js';
     AvisosModule,
     PagosModule,
     SoporteModule,
+    SocioModule,
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService<Entorno, true>) => ({
@@ -43,6 +46,7 @@ import { ProgramarTrabajos } from './worker/programar-trabajos.js';
     VencimientoOrdenes,
     VencimientoLicencias,
     AjustesAdminService,
+    BorradoDatos,
   ],
 })
 export class WorkerModule {}

@@ -1,5 +1,5 @@
 /**
- * Correos de cuentas y acceso. Texto plano y HTML sencillo con la marca: fondo claro (muchos lectores de correo
+ * Correos de la plataforma. Texto plano y HTML sencillo con la marca: fondo claro (muchos lectores de correo
  * cambian los fondos oscuros), un solo botón naranja y el aviso antiphishing en el pie.
  */
 
@@ -23,6 +23,16 @@ export const PLANTILLA = {
   TICKET_REABIERTO: 'ticket-reabierto',
   TICKET_RESPONDIDO: 'ticket-respondido',
   TICKET_RESUELTO: 'ticket-resuelto',
+  BIENVENIDA: 'bienvenida',
+  LICENCIA_POR_VENCER: 'licencia-por-vencer',
+  LICENCIA_EN_GRACIA: 'licencia-en-gracia',
+  LICENCIA_VENCIDA: 'licencia-vencida',
+  PAGO_POR_REVISAR: 'pago-por-revisar',
+  VENTA_APROBADA: 'venta-aprobada',
+  CUENTA_POR_CONECTAR: 'cuenta-por-conectar',
+  CUENTA_POR_DESCONECTAR: 'cuenta-por-desconectar',
+  COMISION_CAMBIADA: 'comision-cambiada',
+  COMISION_LIQUIDADA: 'comision-liquidada',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -296,6 +306,131 @@ export function renderizar(
           `Si el problema sigue, escríbenos en el mismo ticket desde tu panel antes del ${datos.cierre} y lo abrimos de nuevo. Después de esa fecha se cierra solo.`,
         ],
         boton: { texto: 'Ver el ticket', url: `${web}/panel/soporte?ticket=${datos.numero}` },
+      });
+    case PLANTILLA.BIENVENIDA:
+      return armar({
+        asunto: 'Bienvenido a DocTraderPRO',
+        saludo,
+        parrafos: [
+          'Tu correo quedó confirmado. Así empiezas:',
+          '1. Agrega tu cuenta de trading en el panel (broker, servidor, número y contraseñas).',
+          '2. Elige tu licencia y paga en USDT (Tron) o BTC. Revisamos el pago en la blockchain.',
+          '3. Conectamos tu cuenta al copy trading y te avisamos por correo.',
+          'Una licencia sirve para una cuenta de trading. Antes de que venza te recordamos renovarla.',
+        ],
+        boton: { texto: 'Ir a mi panel', url: `${web}/panel` },
+      });
+    case PLANTILLA.LICENCIA_POR_VENCER: {
+      const cuando = datos.dias === '1' ? 'mañana' : `en ${datos.dias} días`;
+      return armar({
+        asunto: `Tu licencia de la cuenta ${datos.cuenta} vence ${cuando}`,
+        saludo,
+        parrafos: [
+          `La licencia ${datos.plan} de la cuenta de trading ${datos.cuenta} vence el ${datos.vence}.`,
+          'Renuévala antes para que la cuenta siga conectada sin cortes: los días nuevos se suman al vencimiento actual, así que no pierdes ninguno.',
+        ],
+        boton: { texto: 'Renovar mi licencia', url: `${web}/panel` },
+      });
+    }
+    case PLANTILLA.LICENCIA_EN_GRACIA:
+      return armar({
+        asunto: `Tu licencia de la cuenta ${datos.cuenta} venció`,
+        saludo,
+        parrafos: [
+          `La licencia de la cuenta de trading ${datos.cuenta} venció hoy. Por ahora la cuenta sigue conectada: tienes hasta el ${datos.gracia} para renovarla.`,
+          'Si no se renueva antes de esa fecha, desconectaremos la cuenta del copy trading. Al renovar, el periodo nuevo cuenta desde el vencimiento.',
+        ],
+        boton: { texto: 'Renovar mi licencia', url: `${web}/panel` },
+      });
+    case PLANTILLA.LICENCIA_VENCIDA:
+      return armar({
+        asunto: `Desconectaremos la cuenta ${datos.cuenta}`,
+        saludo,
+        parrafos: [
+          `Terminaron los días de gracia de la licencia de la cuenta de trading ${datos.cuenta} sin que se renovara. ${
+            datos.conectada === 'si'
+              ? 'Vamos a desconectarla del copy trading.'
+              : 'La cuenta queda sin licencia.'
+          }`,
+          'Si quieres volver, compra una licencia nueva desde tu panel y la conectamos otra vez.',
+        ],
+        boton: { texto: 'Ir a mi panel', url: `${web}/panel` },
+      });
+    case PLANTILLA.PAGO_POR_REVISAR: {
+      const verificado = datos.estado === 'VERIFICADA';
+      return armar({
+        asunto: verificado
+          ? `Pago verificado por aprobar: orden ${datos.orden}`
+          : `Pago por revisar a mano: orden ${datos.orden}`,
+        saludo,
+        parrafos: [
+          verificado
+            ? `El pago de la orden ${datos.orden} (${datos.cliente}, licencia ${datos.plan}, ${datos.monto}) pasó la verificación en la blockchain. Falta que lo apruebes.`
+            : `El pago de la orden ${datos.orden} (${datos.cliente}, licencia ${datos.plan}, ${datos.monto}) no pasó la verificación: ${datos.motivo}.`,
+          verificado
+            ? 'Al aprobarlo, la licencia se activa y al cliente le llega el correo.'
+            : 'Revísalo en el explorador antes de aprobarlo o rechazarlo.',
+        ],
+        boton: { texto: 'Ver el pago', url: `${web}/admin/pagos` },
+      });
+    }
+    case PLANTILLA.VENTA_APROBADA:
+      return armar({
+        asunto: `Venta: licencia ${datos.plan} por ${datos.monto}`,
+        saludo,
+        parrafos: [
+          `${datos.quien} el pago de la orden ${datos.orden}: licencia ${datos.plan} de ${datos.cliente} para la cuenta ${datos.cuenta}, por ${datos.monto}.`,
+          datos.conectar === 'si'
+            ? 'La cuenta quedó por conectar en Social Trader Tools.'
+            : 'La cuenta ya estaba conectada: no hay que hacer nada.',
+        ],
+        boton:
+          datos.conectar === 'si'
+            ? { texto: 'Ver las cuentas por conectar', url: `${web}/admin/cuentas` }
+            : { texto: 'Ver los pagos', url: `${web}/admin/pagos` },
+      });
+    case PLANTILLA.CUENTA_POR_CONECTAR:
+      return armar({
+        asunto: `Cuenta por actualizar: ${datos.cuenta}`,
+        saludo,
+        parrafos: [
+          `${datos.cliente} cambió los datos de la cuenta de trading ${datos.cuenta} (${datos.campos}). Como estaba conectada, quedó por conectar otra vez.`,
+          'Actualízala en Social Trader Tools y márcala como conectada: al cliente le llega el correo.',
+        ],
+        boton: { texto: 'Ver las cuentas por conectar', url: `${web}/admin/cuentas` },
+      });
+    case PLANTILLA.CUENTA_POR_DESCONECTAR:
+      return armar({
+        asunto: `Cuenta por desconectar: ${datos.cuenta}`,
+        saludo,
+        parrafos: [
+          `La licencia de la cuenta de trading ${datos.cuenta} (${datos.cliente}, ${datos.broker}) terminó su gracia sin renovarse.`,
+          'Desconéctala en Social Trader Tools y márcala como desconectada.',
+        ],
+        boton: { texto: 'Ver las cuentas por desconectar', url: `${web}/admin/cuentas` },
+      });
+    case PLANTILLA.COMISION_CAMBIADA:
+      return armar({
+        asunto: `La comisión del socio cambió a ${datos.nuevo}`,
+        saludo,
+        parrafos: [
+          `${datos.quien} cambió la comisión del socio de ${datos.anterior} a ${datos.nuevo} el ${datos.fecha}.`,
+          'Aplica a las ventas que se aprueben desde ahora; las anteriores conservan el porcentaje con el que se aprobaron.',
+        ],
+        boton: { texto: 'Ver el perfil del socio', url: `${web}/admin/socio` },
+        despues: ['Este aviso les llega a los dos administradores.'],
+      });
+    case PLANTILLA.COMISION_LIQUIDADA:
+      return armar({
+        asunto: `Comisión del ${datos.periodo}: ${datos.comision}`,
+        saludo,
+        parrafos: [
+          `Se cerró el periodo del ${datos.periodo}: ventas por ${datos.bruto} en ${datos.ventas}, comisión de ${datos.comision}.`,
+          datos.pagar === 'no'
+            ? 'No hay nada que pagar en este periodo.'
+            : 'Cuando se pague, márquenlo como pagado en el perfil del socio con la referencia del pago.',
+        ],
+        boton: { texto: 'Ver el perfil del socio', url: `${web}/admin/socio` },
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);
