@@ -142,7 +142,7 @@ describe('operación del admin', () => {
     });
 
     it('marcarla conectada la saca de la lista y le avisa al cliente', async () => {
-      const { cuentaId, cliente } = await cuentaPagada(admin);
+      const { cuentaId, cliente, numero } = await cuentaPagada(admin);
       await admin.web.post(`/admin/cuentas/${cuentaId}/conectada`).expect(200);
       expect((await conexion(cuentaId)).connection_status).toBe('CONECTADA');
       await admin.web.post(`/admin/cuentas/${cuentaId}/conectada`).expect(409);
@@ -154,7 +154,10 @@ describe('operación del admin', () => {
 
       // Si el cliente cambia la contraseña, vuelve a "por conectar" y se nota que ya estuvo conectada.
       await cliente.web
-        .put(`/cuentas/${cuentaId}`, { ...datosCuenta(), contrasenaOperativa: 'otra-operativa-1' })
+        .put(`/cuentas/${cuentaId}`, {
+          ...datosCuenta({ numero }),
+          contrasenaOperativa: 'otra-operativa-1',
+        })
         .expect(200);
       const listas = await admin.web.get('/admin/cuentas').expect(200);
       const item = listas.body.porConectar.find((c: { id: string }) => c.id === cuentaId);
@@ -174,6 +177,72 @@ describe('operación del admin', () => {
 
       await admin.web.post(`/admin/cuentas/${cuentaId}/desconectada`).expect(200);
       expect((await conexion(cuentaId)).connection_status).toBe('DESCONECTADA');
+    });
+
+    it('con la licencia vigente, el número de cuenta lo cambia un admin (el cliente abre un ticket)', async () => {
+      const { cuentaId, cliente, numero } = await cuentaPagada(admin);
+      await admin.web.post(`/admin/cuentas/${cuentaId}/conectada`).expect(200);
+
+      // El cliente no puede cambiar el número ni el broker; el titular y las contraseñas, sí.
+      const bloqueado = await cliente.web
+        .put(`/cuentas/${cuentaId}`, datosCuenta({ numero: '99887766' }))
+        .expect(409);
+      expect(bloqueado.body.codigo).toBe('CAMBIO_POR_TICKET');
+      await cliente.web
+        .put(`/cuentas/${cuentaId}`, datosCuenta({ numero, broker: 'Otro Broker' }))
+        .expect(409);
+      const {
+        contrasenaOperativa: _o,
+        contrasenaInversor: _i,
+        ...sinClaves
+      } = datosCuenta({
+        numero,
+        titular: 'Laura Gómez R.',
+      });
+      await cliente.web.put(`/cuentas/${cuentaId}`, sinClaves).expect(200);
+      expect((await conexion(cuentaId)).connection_status).toBe('CONECTADA');
+
+      // El admin lo cambia con su código; como estaba conectada, vuelve a por conectar.
+      const nuevo = { broker: 'JustMarkets', servidor: 'JustMarkets-Live2', numero: '99887766' };
+      const motivo = 'Lo pidió en el ticket 1012.';
+      await cliente.web.put(`/admin/cuentas/${cuentaId}/datos`, { ...nuevo, motivo }).expect(403);
+      const fresco = await adminConSesion(app);
+      const sinCodigo = await fresco.web
+        .put(`/admin/cuentas/${cuentaId}/datos`, { ...nuevo, motivo })
+        .expect(403);
+      expect(sinCodigo.body.codigo).toBe('CONFIRMACION_REQUERIDA');
+      await admin.confirmar();
+      const cambio = await admin.web
+        .put(`/admin/cuentas/${cuentaId}/datos`, { ...nuevo, motivo })
+        .expect(200);
+      expect(cambio.body).toEqual({ reconectar: true });
+      expect((await conexion(cuentaId)).connection_status).toBe('POR_CONECTAR');
+      const propia = await cliente.web.get(`/cuentas/${cuentaId}`).expect(200);
+      expect(propia.body).toMatchObject({ numero: '99887766', servidor: 'JustMarkets-Live2' });
+
+      const [correo] = (await fuente.query(
+        `SELECT payload FROM notifications
+          WHERE recipient = $1 AND template = 'cuenta-trading-cambiada' AND payload->>'numero' = '99887766'`,
+        [cliente.correo],
+      )) as { payload: Record<string, string> }[];
+      expect(correo?.payload).toMatchObject({ reconectar: 'si' });
+      const auditoria = await fuente.getRepository(AuditLog).findOneByOrFail({
+        action: 'cuenta.cambiada-por-admin',
+        targetId: cuentaId,
+      });
+      expect(auditoria.metadata).toMatchObject({ campos: ['servidor', 'numero'], motivo });
+
+      // Una cuenta que ya está en la plataforma no se puede tomar.
+      const otra = await cuentaPagada(admin);
+      const repetida = await admin.web
+        .put(`/admin/cuentas/${cuentaId}/datos`, {
+          broker: 'JustMarkets',
+          servidor: 'JustMarkets-Live',
+          numero: otra.numero,
+          motivo,
+        })
+        .expect(400);
+      expect(repetida.body.campos.numero).toBeDefined();
     });
 
     it('capital y riesgo los ve el cliente; las notas, solo los admins', async () => {

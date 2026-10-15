@@ -9,12 +9,13 @@ import {
   AdminCuentasController,
   AdminLicenciasController,
 } from './operacion.controller.js';
+import { LicenciasModule } from '../licencias/licencias.module.js';
 import { SesionesModule } from '../sesiones/sesiones.module.js';
 import { ResumenAdminService } from './resumen.service.js';
 
 /** El panel de administración: Hoy, cuentas, licencias y ajustes. Los pagos viven en `PagosModule`. */
 @Module({
-  imports: [SesionesModule],
+  imports: [SesionesModule, LicenciasModule],
   controllers: [
     AdminController,
     AdminCuentasController,

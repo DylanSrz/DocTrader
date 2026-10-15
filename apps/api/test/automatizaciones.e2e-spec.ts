@@ -204,15 +204,19 @@ describe('automatizaciones', () => {
       .put(`/cuentas/${cuentaId}`, {
         titular: datos.titular,
         broker: datos.broker,
-        servidor: 'JustMarkets-Live2',
+        servidor: datos.servidor,
         numero: datos.numero,
+        contrasenaOperativa: 'otra-operativa-1',
       })
       .expect(200);
     const [aviso] = (await fuente.query(
       `SELECT payload FROM notifications WHERE user_id = $1 AND template = 'cuenta-por-conectar'`,
       [admin.usuario.id],
     )) as { payload: Record<string, string> }[];
-    expect(aviso?.payload).toMatchObject({ cliente: 'Laura Gómez Restrepo', campos: 'servidor' });
+    expect(aviso?.payload).toMatchObject({
+      cliente: 'Laura Gómez Restrepo',
+      campos: 'contraseña operativa',
+    });
   });
 });
 

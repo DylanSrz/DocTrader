@@ -72,9 +72,9 @@
       nuevo con los textos vigentes.
 - [x] **Eliminar la cuenta de un cliente que lo pida** (2026-10-15): sí, y lo hace un admin desde el panel. Construido
       en la etapa 9: "Eliminar cliente" en la ficha de Licencias (con el código de la app).
-- [ ] **Cambiar el número de una cuenta con licencia vigente** (revisión de seguridad, etapa 9): hoy el cliente puede
-      cambiar el número o el broker de una cuenta pagada; vuelve a "por conectar" y a los admins les llega el aviso, así
-      que depende de que desconecten la cuenta vieja en Social Trader Tools. ¿Debería pedirse por ticket?
+- [x] **Cambiar el número de una cuenta con licencia vigente** (2026-10-15): se pide por ticket. Construido: el
+      cliente ya no puede cambiar broker, servidor ni número con la licencia vigente (le sale el enlace al ticket) y
+      el admin lo cambia en la ficha de Licencias → "Cambiar broker, servidor o número", con su código.
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
       (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
       prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.

@@ -16,9 +16,11 @@ import { Cliente, ConfirmacionReciente, Roles, SesionActual } from '../sesiones/
 import type { ContextoCliente, SesionActiva } from '../sesiones/sesiones.service.js';
 import { AjustesAdminService } from './ajustes-admin.service.js';
 import { ClientesAdminService } from './clientes-admin.service.js';
+import { CuentasService } from '../licencias/cuentas.service.js';
 import { CuentasAdminService } from './cuentas-admin.service.js';
 import {
   AsignacionDto,
+  DatosCuentaAdminDto,
   DireccionDto,
   EnlacesDto,
   ExtenderDto,
@@ -36,7 +38,10 @@ const uuid = new ParseUUIDPipe();
 @Roles(ROL.ADMIN)
 @Controller('admin/cuentas')
 export class AdminCuentasController {
-  constructor(private readonly cuentas: CuentasAdminService) {}
+  constructor(
+    private readonly cuentas: CuentasAdminService,
+    private readonly cuentasCliente: CuentasService,
+  ) {}
 
   @Get()
   listas() {
@@ -76,6 +81,18 @@ export class AdminCuentasController {
   ) {
     await this.cuentas.marcarDesconectada(id, sesion, cliente);
     return { ok: true };
+  }
+
+  /** Cambiar broker, servidor o número a pedido del cliente: con segundo factor reciente, como todo lo delicado. */
+  @Put(':id/datos')
+  @ConfirmacionReciente()
+  datos(
+    @Param('id', uuid) id: string,
+    @Body() dto: DatosCuentaAdminDto,
+    @SesionActual() sesion: SesionActiva,
+    @Cliente() cliente: ContextoCliente,
+  ) {
+    return this.cuentasCliente.cambiarPorAdmin(id, dto, sesion, cliente);
   }
 
   @Put(':id/asignacion')

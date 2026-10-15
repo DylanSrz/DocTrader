@@ -38,7 +38,7 @@ export function Campo({
           aria-describedby={[idAyuda, idError].filter(Boolean).join(' ') || undefined}
           {...input}
           className={cx(
-            'min-h-[52px] w-full rounded-pildora bg-campo px-5 py-3.5 text-base font-normal text-blanco transition-[background-color,box-shadow] duration-200 placeholder:text-white/35 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none aria-invalid:shadow-[0_0_0_1.5px_var(--color-error)]',
+            'min-h-[52px] w-full rounded-pildora bg-campo px-5 py-3.5 text-base font-normal text-blanco transition-[background-color,box-shadow] duration-200 placeholder:text-white/35 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none read-only:text-ceniza read-only:focus-visible:bg-campo read-only:focus-visible:shadow-none aria-invalid:shadow-[0_0_0_1.5px_var(--color-error)]',
             final ? 'pr-28' : undefined,
           )}
         />

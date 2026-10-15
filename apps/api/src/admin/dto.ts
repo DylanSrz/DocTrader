@@ -2,6 +2,7 @@ import {
   FILTROS_LICENCIAS,
   type FiltroLicencias,
   LIMITES_ADMIN,
+  LIMITES_CUENTA,
   MONEDA,
   type Moneda,
   NIVEL_RIESGO,
@@ -65,6 +66,23 @@ export class MotivoDto {
     message: `Escribe el motivo (entre ${motivo.minimo} y ${motivo.maximo} caracteres).`,
   })
   motivo: string;
+}
+
+const cuenta = LIMITES_CUENTA;
+
+/** El admin cambia los datos que identifican una cuenta en el broker (a pedido del cliente, por ticket). */
+export class DatosCuentaAdminDto extends MotivoDto {
+  @IsString()
+  @Length(cuenta.broker.minimo, cuenta.broker.maximo, { message: 'Escribe el nombre del broker.' })
+  broker: string;
+
+  @IsString()
+  @Length(cuenta.servidor.minimo, cuenta.servidor.maximo, { message: 'Escribe el servidor.' })
+  servidor: string;
+
+  @IsString()
+  @Matches(/^\s*\d{4,16}\s*$/, { message: 'Escribe solo los números de la cuenta.' })
+  numero: string;
 }
 
 export class ExtenderDto extends MotivoDto {

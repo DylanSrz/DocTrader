@@ -22,6 +22,7 @@ import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
 import { Asignacion } from '../cuentas/acciones-cuenta';
 import {
   Cedula,
+  CambiarDatosCuenta,
   EliminarCliente,
   Exportar,
   Extender,
@@ -146,6 +147,15 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
               : ''}
           </dd>
         </dl>
+        {eliminado ? null : (
+          <CambiarDatosCuenta
+            key={`${ficha.cuenta.numero}-${ficha.cuenta.servidor}`}
+            cuenta={ficha.cuenta.id}
+            broker={ficha.cuenta.broker}
+            servidor={ficha.cuenta.servidor}
+            numero={ficha.cuenta.numero}
+          />
+        )}
       </Seccion>
 
       {eliminado ? null : (

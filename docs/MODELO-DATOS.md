@@ -389,7 +389,9 @@ stateDiagram-v2
 2. ~~**La prueba no tiene gracia.**~~ Retirada con la licencia de prueba el 2026-10-15.
 3. **Una cuenta de trading solo puede estar en un cliente a la vez.**
 4. **Si el cliente cambia la contraseña o los datos de una cuenta conectada**, vuelve a "por conectar" para que
-   Argemiro la actualice en Social Trader Tools.
+   Argemiro la actualice en Social Trader Tools. **Con la licencia vigente** (activa, en gracia o suspendida) el
+   cliente solo cambia el titular y las contraseñas; el broker, el servidor o el número los pide por ticket y los
+   cambia un admin desde la ficha de Licencias, con el código de su app (decisión de Argemiro, 2026-10-15).
 5. **Suspender no congela los días:** la licencia sigue corriendo mientras está suspendida.
 
 ## 7. Cómo quedó construido (etapa 3, 2026-10-15)
