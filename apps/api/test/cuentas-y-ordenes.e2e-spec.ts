@@ -417,9 +417,11 @@ describe('órdenes de pago', () => {
   it('la prueba y la trimestral no se compran y sin dirección activa no se crea la orden', async () => {
     const { web } = await clienteConSesion();
     const cuenta = await web.post('/cuentas', datosCuenta()).expect(201);
-    await web
+    // La prueba solo se paga con una solicitud aprobada.
+    const prueba = await web
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'PRUEBA', moneda: 'USDT' })
-      .expect(400);
+      .expect(409);
+    expect(prueba.body.codigo).toBe('PLAN_NO_DISPONIBLE');
     // La trimestral ya no se vende (2026-10-15).
     await web
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'TRIMESTRAL', moneda: 'USDT' })

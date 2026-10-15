@@ -82,8 +82,9 @@ export const NOMBRE_TIPO_ORDEN: Record<TipoOrden, string> = {
   COMPLETAR_PRUEBA: 'Completar la prueba con',
 };
 
-/** "Licencia mensual", "Renovación mensual", "Cambio a semestral". */
+/** "Licencia mensual", "Renovación mensual", "Cambio a semestral", "Prueba". */
 export function conceptoOrden(tipo: TipoOrden, nombrePlan: string): string {
+  if (tipo === 'PRUEBA') return 'Licencia de prueba';
   return `${NOMBRE_TIPO_ORDEN[tipo]} ${nombrePlan.toLowerCase()}`;
 }
 

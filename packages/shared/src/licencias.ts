@@ -40,15 +40,15 @@ export function diasEntre(desde: Date, hasta: Date): number {
 }
 
 export type ResultadoTipoOrden =
-  | { tipo: TipoOrden }
-  | { error: 'PLAN_NO_DISPONIBLE' | 'LICENCIA_EN_PRUEBA' | 'LICENCIA_SUSPENDIDA' };
+  { tipo: TipoOrden } | { error: 'PLAN_NO_DISPONIBLE' | 'LICENCIA_SUSPENDIDA' };
 
 /**
  * Qué tipo de orden crea el cliente al elegir un plan para una licencia (`docs/MODELO-DATOS.md` §4.1):
  * - sin pagar o vencida → licencia NUEVA;
  * - activa o en gracia → a un plan más largo es CAMBIO_DE_PLAN; al mismo o a uno más corto, RENOVACION.
- *   En los dos casos los días se suman al vencimiento actual.
- * La prueba se pide y se completa por su propio camino (etapa 6).
+ *   En los dos casos los días se suman al vencimiento actual;
+ * - en prueba → COMPLETAR_PRUEBA: se paga la diferencia y la licencia cuenta desde el inicio de la prueba.
+ * La prueba misma no se compra aquí: se pide, el admin la aprueba y se paga con su propia orden.
  */
 export function tipoDeOrden(
   licencia: { estado: EstadoLicencia; rangoPlan: number | null },
@@ -70,7 +70,7 @@ export function tipoDeOrden(
             : TIPO_ORDEN.RENOVACION,
       };
     case ESTADO_LICENCIA.PRUEBA:
-      return { error: 'LICENCIA_EN_PRUEBA' };
+      return { tipo: TIPO_ORDEN.COMPLETAR_PRUEBA };
     case ESTADO_LICENCIA.SUSPENDIDA:
       return { error: 'LICENCIA_SUSPENDIDA' };
   }
@@ -79,13 +79,17 @@ export function tipoDeOrden(
 /**
  * Hasta cuándo quedaría la licencia si se aprueba una orden. En una licencia nueva la fecha depende del día en que
  * se apruebe el pago, así que se devuelve `null`; en una renovación o un cambio de plan los días se suman al
- * vencimiento actual (también en la gracia: esos días cuentan como usados).
+ * vencimiento actual (también en la gracia: esos días cuentan como usados). Al completar la prueba, el plan cuenta
+ * desde el día en que empezó la prueba.
  */
 export function vencimientoSiSeAprueba(
   tipo: TipoOrden,
-  licencia: { finActual: Date | null },
+  licencia: { finActual: Date | null; inicioPrueba?: Date | null },
   plan: DuracionPlan,
 ): Date | null {
+  if (tipo === TIPO_ORDEN.COMPLETAR_PRUEBA && licencia.inicioPrueba) {
+    return finDePeriodo(licencia.inicioPrueba, plan);
+  }
   if (
     (tipo === TIPO_ORDEN.RENOVACION || tipo === TIPO_ORDEN.CAMBIO_DE_PLAN) &&
     licencia.finActual

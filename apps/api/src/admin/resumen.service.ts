@@ -50,6 +50,10 @@ const ACCIONES_VISIBLES = [
   'ajustes.aprobacion_automatica',
   'contenido.preguntas_guardadas',
   'contenido.legal_publicado',
+  'prueba.solicitada',
+  'prueba.bloqueada',
+  'prueba.aprobada',
+  'prueba.rechazada',
 ];
 
 /** Una frase por evento de la auditoría, en el tono del panel. */
@@ -109,6 +113,14 @@ export function fraseActividad(f: FilaActividad): string {
       return `${quien} ${f.metadata.despues ? 'encendió' : 'apagó'} la aprobación automática.`;
     case 'contenido.preguntas_guardadas':
       return `${quien} editó las preguntas frecuentes.`;
+    case 'prueba.solicitada':
+      return `${quien} pidió la prueba de 15 días.`;
+    case 'prueba.bloqueada':
+      return `${quien} pidió la prueba y la bloqueamos: sus datos ya tuvieron una.`;
+    case 'prueba.aprobada':
+      return `${quien} aprobó una solicitud de prueba.`;
+    case 'prueba.rechazada':
+      return `${quien} rechazó una solicitud de prueba.`;
     case 'contenido.legal_publicado':
       return `${quien} publicó una versión nueva de un texto legal.`;
     default:
@@ -128,6 +140,7 @@ export class ResumenAdminService {
         m.query(
           `SELECT
              (SELECT count(*)::int FROM payment_orders WHERE status = 'REPORTADA') AS pagos,
+             (SELECT count(*)::int FROM trial_requests WHERE status = 'PENDIENTE') AS pruebas,
              (SELECT count(*)::int FROM trading_accounts
                WHERE connection_status = 'POR_CONECTAR' AND deleted_at IS NULL) AS por_conectar,
              (SELECT count(*)::int FROM trading_accounts
@@ -136,7 +149,13 @@ export class ResumenAdminService {
                WHERE l.status = 'ACTIVA' AND l.ends_at <= now() + interval '7 days'
                  AND t.deleted_at IS NULL) AS vencen`,
         ) as Promise<
-          { pagos: number; por_conectar: number; por_desconectar: number; vencen: number }[]
+          {
+            pagos: number;
+            pruebas: number;
+            por_conectar: number;
+            por_desconectar: number;
+            vencen: number;
+          }[]
         >,
         m.query(
           `SELECT
@@ -205,6 +224,7 @@ export class ResumenAdminService {
     return {
       pendientes: {
         pagos: pendientes!.pagos,
+        pruebas: pendientes!.pruebas,
         porConectar: pendientes!.por_conectar,
         porDesconectar: pendientes!.por_desconectar,
         vencenEn7Dias: pendientes!.vencen,

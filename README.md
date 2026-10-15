@@ -105,6 +105,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `AUDIT_HMAC_KEY` | Una llave nueva: `openssl rand -base64 32`. Guárdala en el gestor de contraseñas: si se pierde, la auditoría vieja ya no se puede verificar |
    | `DATA_ENCRYPTION_KEY` | Otra llave nueva (`openssl rand -base64 32`). Cifra cédulas y segundos factores: **si se pierde, esos datos no se recuperan** |
    | `LOOKUP_HMAC_KEY` | Otra llave nueva (`openssl rand -base64 32`). Para buscar cédulas repetidas sin descifrarlas |
+   | `TRIAL_HMAC_KEY` | Otra llave nueva (`openssl rand -base64 32`), solo para las huellas de la prueba. Guárdala: **si se cambia, las pruebas anteriores dejan de bloquear**. Sin ella, las solicitudes de prueba quedan cerradas |
    | `RESEND_API_KEY` | La llave de Resend (cuando el dominio esté verificado). Sin ella, los correos esperan en cola |
 
    Solo en la API, además:
@@ -115,6 +116,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `TURNSTILE_SECRET` | Clave secreta de Cloudflare Turnstile (cuando exista la cuenta) |
    | `COINGECKO_API_KEY` | Opcional: llave gratis de CoinGecko (plan Demo) para comparar el precio de BTC con más consultas |
    | `TRONGRID_API_KEY`, `TRONSCAN_API_KEY` | Opcionales, también en el worker: llaves gratis de TronGrid y Tronscan para verificar pagos en Tron con más consultas |
+   | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_VERIFY_SERVICE_SID` | SMS para verificar el teléfono antes de pedir la prueba (Twilio Verify). Sin ellas no se envían SMS y la prueba queda cerrada |
 
 5. Revisar `https://<dominio-de-la-api>/salud`: debe responder `"estado":"ok"` y, al minuto, mostrar el latido del
    worker. Sin el secreto de la web, cualquier otra ruta responde 404.

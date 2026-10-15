@@ -1,5 +1,10 @@
 import {
+  CODIGO_PLAN,
+  ESTADO_LICENCIA,
   ESTADO_ORDEN,
+  type EstadoLicencia,
+  type ResultadoTipoOrden,
+  TIPO_ORDEN,
   ESTADO_VERIFICACION,
   MONEDA,
   NOMBRE_RED,
@@ -27,8 +32,6 @@ const UNIDADES_USDT_POR_CENTAVO = 10_000n;
 
 const MENSAJES_TIPO = {
   PLAN_NO_DISPONIBLE: 'Esa licencia no está disponible.',
-  LICENCIA_EN_PRUEBA:
-    'Esta cuenta está en prueba: para seguir, completa la prueba pagando la diferencia.',
   LICENCIA_SUSPENDIDA: 'Esta licencia está suspendida. Escríbenos a soporte.',
 } as const;
 
@@ -82,12 +85,24 @@ export class OrdenesService {
         const planActual = licencia.planId
           ? await m.getRepository(Plan).findOneBy({ id: licencia.planId })
           : null;
-        const resultado = tipoDeOrden(
-          { estado: licencia.status, rangoPlan: planActual?.rank ?? null },
-          plan,
-        );
+        const resultado =
+          plan.code === CODIGO_PLAN.PRUEBA
+            ? await this.tipoPrueba(m, sesion.usuarioId, cuenta.id, licencia.status)
+            : tipoDeOrden({ estado: licencia.status, rangoPlan: planActual?.rank ?? null }, plan);
         if ('error' in resultado) {
           throw errorApi(HttpStatus.CONFLICT, resultado.error, MENSAJES_TIPO[resultado.error]);
+        }
+        // Al completar la prueba se descuenta lo que ya pagó por ella: paga la diferencia.
+        const credito =
+          resultado.tipo === TIPO_ORDEN.COMPLETAR_PRUEBA
+            ? await this.pagadoPorLaPrueba(m, licencia.id)
+            : 0;
+        if (credito >= plan.priceUsdCents) {
+          throw errorApi(
+            HttpStatus.CONFLICT,
+            'PLAN_NO_DISPONIBLE',
+            'Con ese plan no hay diferencia por pagar. Elige otro o escríbenos a soporte.',
+          );
         }
 
         await this.cerrarAbierta(m, licencia.id);
@@ -108,7 +123,7 @@ export class OrdenesService {
 
         const ajustes = await leerAjustes(m);
         const ahora = new Date();
-        const montoUsd = plan.priceUsdCents;
+        const montoUsd = plan.priceUsdCents - credito;
         const unidades =
           centavosPorBtc === null
             ? BigInt(montoUsd) * UNIDADES_USDT_POR_CENTAVO
@@ -121,7 +136,7 @@ export class OrdenesService {
           planId: plan.id,
           type: resultado.tipo,
           priceUsdCents: plan.priceUsdCents,
-          creditUsdCents: 0,
+          creditUsdCents: credito,
           amountUsdCents: montoUsd,
           currency: dto.moneda,
           network: red,
@@ -134,6 +149,14 @@ export class OrdenesService {
         });
         const id = insertada.identifiers[0]!.id as string;
         const orden = await m.getRepository(PaymentOrder).findOneByOrFail({ id });
+        if (resultado.tipo === TIPO_ORDEN.PRUEBA) {
+          // La solicitud apunta a su última orden: así el admin ve el pago junto a la prueba.
+          await m.query(
+            `UPDATE trial_requests SET payment_order_id = $1, updated_at = now()
+              WHERE user_id = $2 AND trading_account_id = $3 AND status = 'APROBADA'`,
+            [orden.id, sesion.usuarioId, cuenta.id],
+          );
+        }
         await this.auditoria.registrar(
           {
             actorId: sesion.usuarioId,
@@ -166,6 +189,37 @@ export class OrdenesService {
         throw error;
       });
     return this.obtener(sesion.usuarioId, numero);
+  }
+
+  /**
+   * La orden de la prueba solo existe con una solicitud aprobada para esa cuenta, mientras la licencia no tenga ningún
+   * pago (`docs/CONTEXTO.md`, "Control de la prueba").
+   */
+  private async tipoPrueba(
+    m: EntityManager,
+    usuarioId: string,
+    cuentaId: string,
+    estado: EstadoLicencia,
+  ): Promise<ResultadoTipoOrden> {
+    const [aprobada] = (await m.query(
+      `SELECT id FROM trial_requests
+        WHERE user_id = $1 AND trading_account_id = $2 AND status = 'APROBADA'`,
+      [usuarioId, cuentaId],
+    )) as { id: string }[];
+    if (!aprobada || estado !== ESTADO_LICENCIA.PENDIENTE_PAGO) {
+      return { error: 'PLAN_NO_DISPONIBLE' };
+    }
+    return { tipo: TIPO_ORDEN.PRUEBA };
+  }
+
+  /** Lo que el cliente pagó por la prueba de esta licencia (normalmente USD 50). */
+  private async pagadoPorLaPrueba(m: EntityManager, licenciaId: string): Promise<number> {
+    const [fila] = (await m.query(
+      `SELECT coalesce(sum(amount_usd_cents), 0)::int AS pagado FROM payment_orders
+        WHERE license_id = $1 AND type = 'PRUEBA' AND status = 'APROBADA'`,
+      [licenciaId],
+    )) as { pagado: number }[];
+    return fila?.pagado ?? 0;
   }
 
   /**

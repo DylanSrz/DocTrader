@@ -49,6 +49,24 @@ const esquema = z.object({
    */
   TRONGRID_API_KEY: z.string().min(1).optional(),
   TRONSCAN_API_KEY: z.string().min(1).optional(),
+  /**
+   * Huellas del control de la prueba (`docs/SEGURIDAD.md` §4.4): una llave propia, distinta de las demás, que no se
+   * rota borrando la anterior. Sin ella, las solicitudes de prueba quedan cerradas.
+   */
+  TRIAL_HMAC_KEY: llaveBase64De32Bytes.optional(),
+  /**
+   * SMS para verificar el teléfono (Twilio Verify, `docs/DECISIONES-TECNICAS.md` §1). En desarrollo y en pruebas,
+   * sin estas variables, el código se escribe en el registro de la API; en producción, sin ellas, no se envían SMS.
+   */
+  TWILIO_ACCOUNT_SID: z
+    .string()
+    .regex(/^AC[0-9a-f]{32}$/, 'empieza por AC')
+    .optional(),
+  TWILIO_AUTH_TOKEN: z.string().min(16).optional(),
+  TWILIO_VERIFY_SERVICE_SID: z
+    .string()
+    .regex(/^VA[0-9a-f]{32}$/, 'empieza por VA')
+    .optional(),
 });
 
 export type Entorno = z.infer<typeof esquema>;

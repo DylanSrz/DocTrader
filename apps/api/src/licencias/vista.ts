@@ -53,6 +53,7 @@ export function vistaCuenta(
       id: licencia.id,
       estado: licencia.status,
       esPrueba: licencia.isTrial,
+      inicioPrueba: licencia.trialStartedAt,
       plan: plan ? vistaPlan(plan) : null,
       inicio: licencia.startsAt,
       fin: licencia.endsAt,
@@ -89,7 +90,11 @@ export function vistaOrden(
   licencia: License,
   confirmacionesNecesarias: number,
 ) {
-  const vence = vencimientoSiSeAprueba(orden.type, { finActual: licencia.endsAt }, plan);
+  const vence = vencimientoSiSeAprueba(
+    orden.type,
+    { finActual: licencia.endsAt, inicioPrueba: licencia.trialStartedAt },
+    plan,
+  );
   return {
     id: orden.id,
     numero: orden.number,

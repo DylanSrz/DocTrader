@@ -6,6 +6,7 @@ import { PaginaPublica1792200000000 } from './migraciones/1792200000000-pagina-p
 import { LicenciasYOrdenes1792300000000 } from './migraciones/1792300000000-licencias-y-ordenes.js';
 import { PlanesYMarca1792400000000 } from './migraciones/1792400000000-planes-y-marca.js';
 import { OperacionAdmin1792500000000 } from './migraciones/1792500000000-operacion-admin.js';
+import { LicenciaDePrueba1792600000000 } from './migraciones/1792600000000-licencia-de-prueba.js';
 
 export const MIGRACIONES = [
   Inicial1792000000000,
@@ -14,6 +15,7 @@ export const MIGRACIONES = [
   LicenciasYOrdenes1792300000000,
   PlanesYMarca1792400000000,
   OperacionAdmin1792500000000,
+  LicenciaDePrueba1792600000000,
 ];
 
 /** Opciones de la base de datos, compartidas por la API, el worker y los scripts de migración y semilla. */

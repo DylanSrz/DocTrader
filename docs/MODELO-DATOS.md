@@ -498,3 +498,29 @@ stateDiagram-v2
 - **Auditoría nueva:** `cuenta.ver_contrasenas`, `cuenta.conectada`, `cuenta.desconectada`, `cuenta.asignacion` (sin
   el texto de las notas), `cliente.ver_cedula`, `licencia.extendida`, `licencia.suspendida`, `licencia.reactivada`,
   `licencias.exportadas`, `direccion.*` y `ajustes.*` (con el valor anterior y el nuevo).
+
+## 10. Cómo quedó construido (etapa 6, 2026-10-15)
+
+- **`trial_requests`:** como en §3.5, sin `id_photo_file_id` (la foto de la cédula llega con la tabla `files` en la
+  etapa 7). `block_reasons` y `signals` son listas `{ tipo, texto, solicitudId }`. `device_hash` ya es la huella HMAC
+  del dispositivo. Índice único: una solicitud PENDIENTE o APROBADA por persona.
+- **`trial_registry`:** sin llave foránea a la solicitud y con un disparador que impide cambiar filas (solo se
+  agregan). Las huellas son HMAC-SHA256 de `"<TIPO>:<valor normalizado>"` con `TRIAL_HMAC_KEY` (versión 1): cédula
+  sin puntos ni espacios, cuenta = broker + servidor + número normalizados, correo canónico, teléfono E.164, número
+  de cuenta normalizado, dispositivo y billetera (`TRON:<dirección>` o `BITCOIN:<dirección>`).
+- **Cuándo se escriben:** al **aprobar la solicitud**, las de cédula, cuenta, correo, teléfono, número de cuenta y
+  dispositivo (aunque el cliente no llegue a pagar, ya usó su prueba); al **aprobar el pago** de la prueba, la
+  billetera de origen.
+- **La orden de USD 50 la crea el cliente**, no el admin: una orden vale una hora y el admin aprueba cuando el
+  cliente quizá no está conectado. Al aprobar la solicitud, el cliente recibe un correo y paga desde su panel; la
+  solicitud apunta a su última orden (`payment_order_id`). Crear una orden de PRUEBA exige una solicitud APROBADA
+  para esa cuenta y la licencia sin ningún pago.
+- **Fechas al aprobar:** PRUEBA → licencia `PRUEBA`, `is_trial`, `trial_started_at` = hoy, fin = hoy + 15 días,
+  `grace_ends_at` = fin (sin gracia) y la cuenta con `locked_until` = fin. COMPLETAR_PRUEBA → crédito = lo pagado
+  por la prueba; el plan cuenta desde `trial_started_at`; `is_trial` = false; se quita el bloqueo de la cuenta.
+- **Bloqueo de la cuenta:** el broker, el servidor y el número no se cambian mientras haya una solicitud en
+  revisión o aprobada sin completar, ni durante la prueba (se revisó y se registra con esos datos).
+- **Vencimiento:** el worker pasa a `VENCIDA` una licencia `PRUEBA` al llegar `ends_at`; la conexión sigue la
+  regla de §4.4. Vencida, el siguiente pago es una licencia NUEVA al precio completo.
+- **Borrado de clientes (etapa 8):** la restricción de `users` exige cédula y teléfono a los clientes; el borrado
+  tendrá que anonimizarlos (o relajar esa regla para `DELETED`). Las huellas del registro quedan.
