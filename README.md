@@ -87,12 +87,12 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
 ### API y worker — Railway
 
 1. **New Project → Deploy from GitHub repo** → `DylanSrz/DocTrader`. Ese primer servicio es la **API**:
-   - Settings → **Config-as-code**: `apps/api/railway/api.json` (build, arranque, `/salud` y, antes de cada
-     despliegue, migraciones y semilla; la semilla no repite ni pisa nada).
+   - Settings: build, arranque, pre-deploy (migraciones y semilla; la semilla no repite ni pisa nada) y `/salud`,
+     con los valores de la tabla de "Lo que aprendimos" más abajo.
    - Settings → Networking → **Generate Domain** (después, `api.doctraderpro.com`).
 2. En el mismo proyecto: **New → Database → PostgreSQL** y **New → Database → Redis**.
-3. **New → GitHub repo** otra vez, mismo repositorio: es el **worker**. Config-as-code:
-   `apps/api/railway/worker.json`. No necesita dominio.
+3. **New → GitHub repo** otra vez, mismo repositorio: es el **worker**. Settings con los valores de la tabla de abajo.
+   No necesita dominio.
 4. Variables, en la API y en el worker (los mismos valores en los dos):
 
    | Variable | Valor |
@@ -131,6 +131,23 @@ build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabo
 | Worker (Railway) | Sin dominio; su latido se ve en `/salud` de la API |
 
 **Lo que aprendimos al configurar Railway:**
+- **Railway ya no aplica los archivos `railway.json`** ("Config as Code" quedó obsoleto; ahora es `.railway/railway.ts`).
+  Los de `apps/api/railway/` quedan solo como referencia: la configuración real se pone en **Settings** de cada
+  servicio (2026-10-15):
+
+  | | API (`@doctrader/api`) | Worker |
+  |---|---|---|
+  | Build Command | `pnpm install --frozen-lockfile && pnpm --filter @doctrader/api build` | igual |
+  | Start Command | `node apps/api/dist/main.js` | `node apps/api/dist/worker.js` |
+  | Pre-deploy Command | `node apps/api/dist/database/preparar-despliegue.js` (migraciones y semilla) | — |
+  | Healthcheck Path | `/salud` | — |
+  | Restart Policy | On failure | Always |
+  | Watch Paths | `apps/api/**`, `packages/shared/**`, `pnpm-lock.yaml` | igual |
+
+  Sin el pre-deploy, la base de datos queda vacía y la API responde 500 ("relation users does not exist"). Sin el
+  build command, Railway compila todo el monorepo (incluida la web) y la compilación puede tardar 12 minutos y caerse.
+- "Redeploy" de un despliegue viejo usa la configuración de ese momento: después de cambiar Settings hay que hacer un
+  despliegue nuevo del último commit.
 - Al importar el repositorio, Railway crea un servicio por paquete del monorepo. Solo se dejan la API y el worker.
 - **Root Directory vacío** en los dos servicios.
 - La ruta del archivo de configuración **lleva barra inicial** (`/apps/api/railway/api.json`); los comandos **no**
