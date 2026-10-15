@@ -15,14 +15,17 @@ export class AdminController {
   @Get('resumen')
   async resumen() {
     const usuarios = this.fuente.getRepository(User);
-    const [clientes, verificados] = await Promise.all([
+    const [clientes, verificados, [pagos]] = await Promise.all([
       usuarios.countBy({ role: ROL.CLIENTE, status: Not(ESTADO_USUARIO.BORRADO) }),
       usuarios.countBy({
         role: ROL.CLIENTE,
         status: Not(ESTADO_USUARIO.BORRADO),
         emailVerifiedAt: Not(IsNull()),
       }),
+      this.fuente.query(
+        `SELECT count(*)::int AS n FROM payment_orders WHERE status = 'REPORTADA'`,
+      ) as Promise<{ n: number }[]>,
     ]);
-    return { clientes, clientesVerificados: verificados };
+    return { clientes, clientesVerificados: verificados, pagosPorRevisar: pagos?.n ?? 0 };
   }
 }

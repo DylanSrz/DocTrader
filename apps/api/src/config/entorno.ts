@@ -43,6 +43,12 @@ const esquema = z.object({
    * consultas). `docs/DECISIONES-TECNICAS.md` §2.
    */
   COINGECKO_API_KEY: z.string().min(1).optional(),
+  /**
+   * Verificación de pagos en Tron: TronGrid (principal) y Tronscan (respaldo). Funcionan sin llave con pocos
+   * pagos; con llave (gratis) tienen más consultas. Bitcoin usa mempool.space y Blockstream, sin llave.
+   */
+  TRONGRID_API_KEY: z.string().min(1).optional(),
+  TRONSCAN_API_KEY: z.string().min(1).optional(),
 });
 
 export type Entorno = z.infer<typeof esquema>;

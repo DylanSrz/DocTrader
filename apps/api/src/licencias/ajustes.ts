@@ -6,12 +6,15 @@ export interface AjustesLicencias {
   diasGracia: number;
   minutosOrden: number;
   confirmaciones: Record<Red, number>;
+  /** Aprobar solos los pagos verificados (apagado por defecto). */
+  aprobacionAutomatica: boolean;
 }
 
 export async function leerAjustes(m: EntityManager): Promise<AjustesLicencias> {
   // Consulta directa: el tipo recursivo del JSON de `settings` es demasiado profundo para `findBy`.
   const filas = (await m.query(
-    `SELECT key, value FROM settings WHERE key IN ('grace_days', 'order_ttl_minutes', 'min_confirmations')`,
+    `SELECT key, value FROM settings
+      WHERE key IN ('grace_days', 'order_ttl_minutes', 'min_confirmations', 'auto_approve_payments')`,
   )) as { key: string; value: unknown }[];
   const valor = new Map(filas.map((f) => [f.key, f.value]));
   const confirmaciones = valor.get('min_confirmations') as Partial<Record<Red, number>> | undefined;
@@ -22,6 +25,7 @@ export async function leerAjustes(m: EntityManager): Promise<AjustesLicencias> {
       TRON: entero(confirmaciones?.TRON, 20),
       BITCOIN: entero(confirmaciones?.BITCOIN, 2),
     },
+    aprobacionAutomatica: valor.get('auto_approve_payments') === true,
   };
 }
 

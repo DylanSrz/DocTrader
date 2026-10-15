@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { AvisoBreve } from '@/components/panel/aviso-breve';
 import { Cabecera } from '@/components/panel/cabecera';
 import { PieLegal } from '@/components/pie-legal';
 
@@ -8,6 +9,7 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
       <Cabecera
         pestanas={[
           { href: '/admin', texto: 'Hoy' },
+          { href: '/admin/pagos', texto: 'Pagos' },
           { href: '/admin/preguntas', texto: 'Preguntas' },
           { href: '/admin/legal', texto: 'Textos legales' },
         ]}
@@ -16,6 +18,7 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
         {children}
       </main>
       <PieLegal />
+      <AvisoBreve />
     </div>
   );
 }

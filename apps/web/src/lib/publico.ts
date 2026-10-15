@@ -85,8 +85,13 @@ const LANDING_DE_RESPALDO: Landing = {
 };
 
 /**
- * Datos de la landing. Quedan en caché hasta que el admin cambia algo (o una hora como máximo); si la API no
- * responde, se usan los de respaldo por pocos minutos y se vuelve a intentar.
+ * Cuánto dura en caché lo que llega de la API. Lo que cambia el admin se ve al instante (`updateTag`); lo que
+ * cambia sin pasar por el panel (una migración al desplegar) se ve en 5 minutos como máximo.
+ */
+const CINCO_MINUTOS = { stale: 300, revalidate: 300, expire: 86_400 };
+
+/**
+ * Datos de la landing. Si la API no responde, se usan los de respaldo por pocos minutos y se vuelve a intentar.
  */
 export async function obtenerLanding(): Promise<Landing> {
   'use cache';
@@ -96,7 +101,7 @@ export async function obtenerLanding(): Promise<Landing> {
     cacheLife('minutes');
     return LANDING_DE_RESPALDO;
   }
-  cacheLife('hours');
+  cacheLife(CINCO_MINUTOS);
   return {
     planes: datos.planes,
     preguntas: datos.preguntas ?? LANDING_DE_RESPALDO.preguntas,
@@ -118,7 +123,7 @@ export async function obtenerTextoLegal(tipo: TipoDocumentoLegal): Promise<Texto
   cacheTag(ETIQUETA_LEGAL);
   const desdeApi = await leerPublico<TextoLegal>(`/publico/legal/${DOCUMENTOS_LEGALES[tipo].ruta}`);
   if (desdeApi) {
-    cacheLife('days');
+    cacheLife(CINCO_MINUTOS);
     return desdeApi;
   }
   cacheLife('minutes');

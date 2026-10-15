@@ -456,3 +456,22 @@ stateDiagram-v2
   como expiradas y no acepta su hash.
 - **Quitar una cuenta:** solo con la licencia sin pagar o vencida, sin conexión (o ya desconectada) y sin pago
   reportado. Es un borrado lógico y las contraseñas se borran en el acto.
+
+## 8. Cómo quedó construido (etapa 4, 2026-10-15)
+
+- **`verification_detail`** guarda `{ proveedor, revisadaEn, chequeos: [{ clave, estado, texto }], nota, error }`.
+  `clave` es `HASH`, `DESTINO`, `MONTO`, `FECHA` o `CONFIRMACIONES`; `estado`, `OK`, `FALLA` o `ESPERA`.
+- **Qué estados se vuelven a mirar:** `SIN_VERIFICAR`, `ESPERANDO_CONFIRMACIONES` y `ERROR_PROVEEDOR` (cada 30 s).
+  `MONTO_INCOMPLETO` y `NO_COINCIDE` no cambian con el tiempo: los decide el admin. Si los proveedores fallan, el
+  estado anterior se conserva y solo se anota el error.
+- **Chequeo de la fecha:** la hora del bloque debe ser posterior a la creación de la orden, con 2 minutos de
+  tolerancia por diferencia de relojes. Un pago de Bitcoin sin confirmar espera ese chequeo.
+- **Aprobar:** `VERIFICADA` se aprueba directo; los demás estados piden `forzar` ("aprobar de todos modos") y queda
+  anotado en la auditoría. La aprobación automática solo aprueba `VERIFICADA` y se registra con el actor `SYSTEM`.
+- **Comisión:** se copia el `commission_bp` del perfil de socio al aprobar y `commission_usd_cents` =
+  `amount_usd_cents × bp / 10000`, redondeado al centavo.
+- **Conexión al pagar:** `SIN_LICENCIA` y `DESCONECTADA` pasan a `POR_CONECTAR`; `POR_DESCONECTAR` vuelve a
+  `CONECTADA` (renovó a tiempo); las demás se quedan como están.
+- **Vencimiento por fecha:** `ACTIVA` → `EN_GRACIA` al pasar `ends_at`; `EN_GRACIA` → `VENCIDA` al pasar
+  `grace_ends_at`. Al vencer: `CONECTADA` → `POR_DESCONECTAR` y `POR_CONECTAR` → `SIN_LICENCIA`. La licencia en
+  prueba y la suspendida se manejan en las etapas 5 y 6.

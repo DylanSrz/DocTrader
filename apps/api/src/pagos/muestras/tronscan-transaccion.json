@@ -1,0 +1,24 @@
+{
+  "hash": "cea2aee8c50be6f2aa8e22a53c3c4439bf9dce5c8d90ab81f77cc68f182bfa74",
+  "block": 86171053,
+  "timestamp": 1789185213000,
+  "confirmations": 951061,
+  "confirmed": true,
+  "contractRet": "SUCCESS",
+  "revert": false,
+  "ownerAddress": "TKfz7Pu3jtxWrfHzVeozQjXsb3RfuUHGE2",
+  "trc20TransferInfo": [
+    {
+      "symbol": "USDT",
+      "to_address": "TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x",
+      "tokenType2": "trc20",
+      "contract_address": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t",
+      "type": "Transfer",
+      "decimals": 6,
+      "tokenType": "trc20",
+      "from_address": "TKfz7Pu3jtxWrfHzVeozQjXsb3RfuUHGE2",
+      "amount_str": "26230000",
+      "status": 0
+    }
+  ]
+}

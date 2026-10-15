@@ -14,6 +14,8 @@ export const PLANTILLA = {
   CODIGO_RECUPERACION_USADO: 'codigo-recuperacion-usado',
   CUENTA_TRADING_CAMBIADA: 'cuenta-trading-cambiada',
   PRECIO_BTC_DIFERENTE: 'precio-btc-diferente',
+  PAGO_APROBADO: 'pago-aprobado',
+  PAGO_RECHAZADO: 'pago-rechazado',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -190,6 +192,28 @@ export function renderizar(
           `Los proveedores del precio de BTC no coinciden: Binance dice USD ${datos.binance} y CoinGecko USD ${datos.coingecko} (más de 1 % de diferencia).`,
           'Mientras no coincidan, los clientes no pueden crear órdenes en BTC; las de USDT siguen funcionando. Si se repite, revisa los proveedores.',
         ],
+      });
+    case PLANTILLA.PAGO_APROBADO:
+      return armar({
+        asunto: `Pago aprobado: tu licencia ${datos.plan} está activa`,
+        saludo,
+        parrafos: [
+          `Aprobamos el pago de la orden ${datos.orden}. La licencia ${datos.plan} de la cuenta de trading ${datos.cuenta} está activa hasta el ${datos.vence}.`,
+          datos.conectar === 'si'
+            ? 'Ahora conectamos la cuenta al copy trading. Te avisaremos por correo cuando quede conectada.'
+            : 'La cuenta sigue conectada al copy trading; no tienes que hacer nada.',
+        ],
+        boton: { texto: 'Ver mis cuentas', url: `${web}/panel` },
+      });
+    case PLANTILLA.PAGO_RECHAZADO:
+      return armar({
+        asunto: `No pudimos aprobar el pago de la orden ${datos.orden}`,
+        saludo,
+        parrafos: [
+          `Revisamos el pago de la orden ${datos.orden} y no lo pudimos aprobar. Motivo: ${datos.motivo}`,
+          'Si crees que es un error o quieres saber cómo seguir, responde este correo o escríbenos por Telegram.',
+        ],
+        boton: { texto: 'Ver mis pagos', url: `${web}/panel/pagos` },
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);

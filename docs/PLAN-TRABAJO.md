@@ -117,12 +117,32 @@ prueba sin pagos.
   - **Queda para la etapa 4:** verificar el hash en la blockchain y aprobar o rechazar el pago (hasta entonces, una
     orden reportada espera). La prueba de 15 días y completarla llegan en la etapa 6.
 
-### Etapa 4 — Verificación y aprobación de pagos
+### Etapa 4 — Verificación y aprobación de pagos ✅ (2026-10-15)
 - Worker con BullMQ: verificadores de Tron y Bitcoin con proveedor de respaldo, confirmaciones y reintentos.
 - Vista de pagos del admin con los cinco chequeos, aprobar, rechazar con motivo y aprobación automática (apagada).
 - Al aprobar: periodo, licencia activa, comisión del socio y cuenta "por conectar".
 - **Hecho cuando:** un pago real en la red de prueba se verifica solo y, al aprobarlo, la licencia queda activa con
   las fechas correctas.
+- **Resultado:**
+  - **Verificación:** TronGrid y Tronscan (USDT en Tron), mempool.space y Blockstream (Bitcoin). Si el principal
+    falla se usa el de respaldo; si fallan los dos, el pago queda "sin respuesta de la blockchain" y se reintenta.
+    El worker revisa los pagos reportados cada 30 segundos y guarda los cinco chequeos (hash sin usar, destino y
+    moneda, monto, fecha posterior a la orden y confirmaciones), lo recibido, la billetera de origen y el bloque.
+    Una transacción que no aparece en 6 horas queda "no coincide".
+  - **Panel de admin, pestaña "Pagos":** pagos por revisar con los chequeos en triángulos, "Aprobar pago" (solo
+    verificados), "Aprobar de todos modos" (los demás, con confirmación), "Rechazar" con motivo (le llega al
+    cliente por correo), "Verificar de nuevo", el interruptor de aprobación automática (encenderla pide el código
+    de la app), los revisados de la semana y las órdenes expiradas. "Hoy" muestra cuántos pagos esperan.
+  - **Al aprobar,** en una transacción: periodo nuevo, licencia activa con sus fechas (las renovaciones y cambios
+    de plan suman al vencimiento, también en la gracia), % y comisión del socio copiados en la orden, la cuenta pasa
+    a "por conectar" (o sigue conectada si estaba por desconectar), correo al cliente y auditoría.
+  - **Estados de licencia** (cada 5 minutos): activa → en gracia → vencida; al vencer, la cuenta conectada pasa a
+    "por desconectar".
+  - Probado con transacciones reales de USDT de la dirección de cobro (TronGrid y Tronscan dan lo mismo) y
+    respuestas grabadas de los cuatro proveedores. 84 pruebas de punta a punta y recorrido en el navegador (reportar,
+    verificar en la blockchain real, rechazar, aprobar de todos modos y ver la licencia activa).
+  - **Falta:** un pago real de punta a punta en producción (ver `PENDIENTES.md`). La red de prueba de Tron (Nile)
+    usa otro contrato de USDT, así que la prueba útil es un pago real pequeño a la dirección de producción.
 
 ### Etapa 5 — Operación del admin
 - Hoy, listas por conectar y por desconectar, ver contraseñas con segundo factor, ficha del cliente (capital, riesgo,

@@ -10,3 +10,10 @@ const formato = new Intl.DateTimeFormat('es-CO', {
 export function fechaLegible(fecha: Date = new Date()): string {
   return formato.format(fecha);
 }
+
+const soloFecha = new Intl.DateTimeFormat('es-CO', { dateStyle: 'long', timeZone: ZONA_HORARIA });
+
+/** Solo la fecha, en hora de Colombia: "14 de abril de 2027". */
+export function fechaSinHora(fecha: Date): string {
+  return soloFecha.format(fecha);
+}
