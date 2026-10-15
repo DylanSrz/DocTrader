@@ -1,6 +1,15 @@
 'use client';
 
-import { createContext, type ReactNode, useCallback, useContext, useId, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useRef,
+} from 'react';
 import { cx } from '@/components/ui';
 
 const CerrarLateral = createContext<() => void>(() => {});
@@ -96,5 +105,76 @@ export function PieLateral({ children }: { children: ReactNode }) {
     <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-3 px-8 pt-[18px] pb-[calc(22px+env(safe-area-inset-bottom,0px))] max-sm:px-5">
       {children}
     </div>
+  );
+}
+
+/**
+ * Panel lateral que ya viene abierto porque la URL lo pide (`?ficha=…`). Al cerrarlo, vuelve a la URL sin él y
+ * devuelve el foco al enlace que lo abrió (`idOrigen`).
+ */
+export function LateralAbierto({
+  titulo,
+  subtitulo,
+  cerrarEn,
+  idOrigen,
+  children,
+}: {
+  titulo: string;
+  subtitulo?: ReactNode;
+  /** La URL de la lista, sin el panel. */
+  cerrarEn: string;
+  idOrigen?: string;
+  children: ReactNode;
+}) {
+  const dialogo = useRef<HTMLDialogElement>(null);
+  const idTitulo = useId();
+  const router = useRouter();
+  useEffect(() => {
+    const nodo = dialogo.current;
+    if (nodo && !nodo.open) nodo.showModal();
+  }, []);
+  const cerrar = useCallback(() => dialogo.current?.close(), []);
+  return (
+    <dialog
+      ref={dialogo}
+      aria-labelledby={idTitulo}
+      className="lateral"
+      onClose={() => {
+        router.replace(cerrarEn, { scroll: false });
+        if (idOrigen) requestAnimationFrame(() => document.getElementById(idOrigen)?.focus());
+      }}
+      onClick={(evento) => {
+        if (evento.target === dialogo.current) cerrar();
+      }}
+    >
+      <div className="grid h-full grid-rows-[auto_1fr]">
+        <div className="flex items-start justify-between gap-4 px-8 pt-[calc(28px+env(safe-area-inset-top,0px))] pb-2 max-sm:px-5">
+          <div className="grid gap-1.5">
+            <h2
+              id={idTitulo}
+              className="text-[clamp(32px,5vw,44px)] leading-[1.05] tracking-[-0.04em]"
+            >
+              {titulo}
+            </h2>
+            {subtitulo ? <p className="text-sm text-ceniza">{subtitulo}</p> : null}
+          </div>
+          <button
+            type="button"
+            onClick={cerrar}
+            aria-label="Cerrar"
+            className="grid size-[46px] shrink-0 place-items-center rounded-full bg-campo text-blanco transition-colors duration-200 hover:bg-campo-foco"
+          >
+            <svg viewBox="0 0 14 14" aria-hidden="true" className="size-3.5">
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </button>
+        </div>
+        <CerrarLateral value={cerrar}>
+          <div className="grid content-start gap-[clamp(40px,5vw,56px)] overflow-y-auto overscroll-contain px-8 pt-6 pb-[calc(40px+env(safe-area-inset-bottom,0px))] max-sm:px-5">
+            {children}
+          </div>
+        </CerrarLateral>
+      </div>
+    </dialog>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { avisar } from '@/components/panel/aviso-breve';
+import { conAviso } from '@/components/admin/operacion';
 import { CuerpoLateral, Lateral, PieLateral, useCerrarLateral } from '@/components/panel/lateral';
 import { Aviso, BotonEnviar, Campo } from '@/components/ui';
 import {
@@ -12,16 +12,21 @@ import {
   verificarPago,
 } from '../acciones';
 
-/** Al terminar bien: aviso breve (y, dentro del panel lateral, se cierra). */
+// El aviso sale desde la acción: al aprobar, el pago sale de la lista y su efecto ya no correría.
+const aprobarPagoConAviso = conAviso(aprobarPago);
+const rechazarPagoConAviso = conAviso(rechazarPago);
+const verificarPagoConAviso = conAviso(verificarPago);
+const cambiarAprobacionAutomaticaConAviso = conAviso(cambiarAprobacionAutomatica);
+
+/** Al terminar bien, dentro del panel lateral: se cierra. */
 function useAlTerminar(estado: EstadoPago, alTerminar?: () => void) {
   const anterior = useRef(estado.listo);
   useEffect(() => {
     if (estado.listo && estado.listo !== anterior.current) {
       anterior.current = estado.listo;
       alTerminar?.();
-      if (estado.aviso) avisar(estado.aviso);
     }
-  }, [estado.listo, estado.aviso, alTerminar]);
+  }, [estado.listo, alTerminar]);
 }
 
 function MensajeError({ estado }: { estado: EstadoPago }) {
@@ -37,8 +42,8 @@ function MensajeError({ estado }: { estado: EstadoPago }) {
  * (el admin lo revisó en el explorador).
  */
 export function AprobarPago({ numero, forzar }: { numero: string; forzar: boolean }) {
-  const [estado, accion] = useActionState(aprobarPago, {} as EstadoPago);
-  useAlTerminar(estado);
+  const [estado, accion] = useActionState(aprobarPagoConAviso, {} as EstadoPago);
+
   return (
     <form
       action={accion}
@@ -70,8 +75,8 @@ export function AprobarPago({ numero, forzar }: { numero: string; forzar: boolea
 
 /** "Verificar de nuevo": mira la blockchain ahora, sin esperar al worker. */
 export function VerificarPago({ numero }: { numero: string }) {
-  const [estado, accion] = useActionState(verificarPago, {} as EstadoPago);
-  useAlTerminar(estado);
+  const [estado, accion] = useActionState(verificarPagoConAviso, {} as EstadoPago);
+
   return (
     <form action={accion} className="contents">
       <input type="hidden" name="numero" value={numero} />
@@ -95,7 +100,7 @@ const MOTIVOS = [
 ];
 
 function FormularioRechazo({ numero, sugerido }: { numero: string; sugerido: string }) {
-  const [estado, accion] = useActionState(rechazarPago, {} as EstadoPago);
+  const [estado, accion] = useActionState(rechazarPagoConAviso, {} as EstadoPago);
   const cerrar = useCerrarLateral();
   useAlTerminar(estado, cerrar);
   return (
@@ -164,7 +169,7 @@ export function RechazarPago({
  * El interruptor de la aprobación automática. Encenderla pide el código de la app (acción delicada); apagarla, no.
  */
 export function AprobacionAutomatica({ activa }: { activa: boolean }) {
-  const [estado, accion] = useActionState(cambiarAprobacionAutomatica, {} as EstadoPago);
+  const [estado, accion] = useActionState(cambiarAprobacionAutomaticaConAviso, {} as EstadoPago);
   const [pidiendoCodigo, setPidiendoCodigo] = useState(false);
   const alTerminar = () => setPidiendoCodigo(false);
   useAlTerminar(estado, alTerminar);

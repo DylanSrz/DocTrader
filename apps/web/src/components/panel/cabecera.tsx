@@ -25,7 +25,11 @@ async function Usuario() {
  * Barra de los paneles: logo, pestañas en mayúsculas (la activa en blanco con un triángulo naranja debajo) y el
  * nombre con "Salir". Igual a la del prototipo del panel del cliente.
  */
-export function Cabecera({ pestanas }: { pestanas: { href: string; texto: string }[] }) {
+export function Cabecera({
+  pestanas,
+}: {
+  pestanas: { href: string; texto: string; tambien?: string[] }[];
+}) {
   return (
     <header className="pt-[calc(env(safe-area-inset-top,0px)+14px)]">
       <div className="contenedor grid min-h-16 grid-cols-[auto_1fr_auto] items-center gap-x-6 max-md:grid-cols-[1fr_auto]">

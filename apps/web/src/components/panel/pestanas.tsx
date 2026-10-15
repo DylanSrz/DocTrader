@@ -7,13 +7,15 @@ import { usePathname } from 'next/navigation';
 export function Pestanas({ pestanas }: { pestanas: Pestana[] }) {
   const ruta = usePathname();
   // La pestaña activa es la de la ruta más larga que coincide (/admin/legal/terminos → /admin/legal).
+  // `tambien`: otras rutas que viven bajo esa pestaña (las preguntas y los textos legales, bajo Ajustes).
   const activa = pestanas
-    .filter((p) => ruta === p.href || ruta.startsWith(`${p.href}/`))
-    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+    .flatMap((p) => [p.href, ...(p.tambien ?? [])].map((ruta) => ({ ruta, href: p.href })))
+    .filter((p) => ruta === p.ruta || ruta.startsWith(`${p.ruta}/`))
+    .sort((a, b) => b.ruta.length - a.ruta.length)[0]?.href;
   return <ListaPestanas pestanas={pestanas} activa={activa} />;
 }
 
-type Pestana = { href: string; texto: string };
+type Pestana = { href: string; texto: string; tambien?: string[] };
 
 /** Las pestañas sin saber la ruta (mientras se prerenderiza la página): ninguna marcada. */
 export function ListaPestanas({ pestanas, activa }: { pestanas: Pestana[]; activa?: string }) {

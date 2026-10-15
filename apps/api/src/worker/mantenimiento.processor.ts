@@ -2,6 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Inject, Logger } from '@nestjs/common';
 import type { Job } from 'bullmq';
 import type { Redis } from 'ioredis';
+import { AjustesAdminService } from '../admin/ajustes-admin.service.js';
 import { AvisosEnvio } from '../avisos/avisos-envio.js';
 import { VencimientoLicencias } from '../licencias/vencimiento-licencias.js';
 import { VencimientoOrdenes } from '../licencias/vencimiento-ordenes.js';
@@ -10,6 +11,7 @@ import { REDIS } from '../redis/redis.module.js';
 import {
   CLAVE_LATIDO_WORKER,
   COLA_MANTENIMIENTO,
+  TRABAJO_ACTIVAR_DIRECCIONES,
   TRABAJO_ENVIAR_AVISOS,
   TRABAJO_ESTADOS_LICENCIA,
   TRABAJO_EXPIRAR_ORDENES,
@@ -19,7 +21,8 @@ import {
 
 /**
  * Trabajos de mantenimiento: el latido (prueba que el worker está vivo), el envío de correos pendientes y el
- * vencimiento de las órdenes de pago, la verificación de los pagos en la blockchain y los estados de las licencias.
+ * vencimiento de las órdenes de pago, la verificación de los pagos en la blockchain, los estados de las licencias y
+ * la activación de las direcciones de depósito que cumplieron sus 24 horas.
  */
 @Processor(COLA_MANTENIMIENTO)
 export class MantenimientoProcessor extends WorkerHost {
@@ -31,6 +34,7 @@ export class MantenimientoProcessor extends WorkerHost {
     private readonly ordenes: VencimientoOrdenes,
     private readonly pagos: VerificacionPagos,
     private readonly licencias: VencimientoLicencias,
+    private readonly ajustes: AjustesAdminService,
   ) {
     super();
   }
@@ -51,6 +55,9 @@ export class MantenimientoProcessor extends WorkerHost {
         return;
       case TRABAJO_ESTADOS_LICENCIA:
         await this.licencias.actualizar();
+        return;
+      case TRABAJO_ACTIVAR_DIRECCIONES:
+        await this.ajustes.activarDirecciones();
         return;
       default:
         this.logger.warn(`Trabajo desconocido en ${COLA_MANTENIMIENTO}: ${job.name}`);

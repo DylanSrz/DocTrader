@@ -10,8 +10,13 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
         pestanas={[
           { href: '/admin', texto: 'Hoy' },
           { href: '/admin/pagos', texto: 'Pagos' },
-          { href: '/admin/preguntas', texto: 'Preguntas' },
-          { href: '/admin/legal', texto: 'Textos legales' },
+          { href: '/admin/cuentas', texto: 'Cuentas' },
+          { href: '/admin/licencias', texto: 'Licencias' },
+          {
+            href: '/admin/ajustes',
+            texto: 'Ajustes',
+            tambien: ['/admin/preguntas', '/admin/legal'],
+          },
         ]}
       />
       <main id="contenido" className="contenedor flex-1 py-16 lg:py-24">

@@ -50,6 +50,16 @@ export class TradingAccount {
   @Column({ name: 'connection_status', type: 'varchar', length: 16, default: 'SIN_LICENCIA' })
   connectionStatus: EstadoConexion;
 
+  /** Desde cuándo está en el estado de conexión actual. Lo mantiene un disparador de la base de datos. */
+  @Column({
+    name: 'connection_changed_at',
+    type: 'timestamptz',
+    insert: false,
+    update: false,
+    default: () => 'now()',
+  })
+  connectionChangedAt: Date;
+
   @Column({ name: 'connected_at', type: 'timestamptz', nullable: true })
   connectedAt: Date | null;
 

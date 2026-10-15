@@ -1,31 +1,17 @@
-import { ESTADO_USUARIO, ROL } from '@doctrader/shared';
+import { ROL } from '@doctrader/shared';
 import { Controller, Get } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { type DataSource, IsNull, Not } from 'typeorm';
-import { User } from '../database/entidades/index.js';
 import { Roles } from '../sesiones/decoradores.js';
+import { ResumenAdminService } from './resumen.service.js';
 
 /** Panel de administración. Todo lo que cuelga de `/admin` es solo para admins con sesión completa. */
 @Roles(ROL.ADMIN)
 @Controller('admin')
 export class AdminController {
-  constructor(@InjectDataSource() private readonly fuente: DataSource) {}
+  constructor(private readonly resumen: ResumenAdminService) {}
 
-  /** Cifras de la portada del panel. Crece en las etapas siguientes (pagos, licencias, por conectar…). */
+  /** La portada del panel ("Hoy"). */
   @Get('resumen')
-  async resumen() {
-    const usuarios = this.fuente.getRepository(User);
-    const [clientes, verificados, [pagos]] = await Promise.all([
-      usuarios.countBy({ role: ROL.CLIENTE, status: Not(ESTADO_USUARIO.BORRADO) }),
-      usuarios.countBy({
-        role: ROL.CLIENTE,
-        status: Not(ESTADO_USUARIO.BORRADO),
-        emailVerifiedAt: Not(IsNull()),
-      }),
-      this.fuente.query(
-        `SELECT count(*)::int AS n FROM payment_orders WHERE status = 'REPORTADA'`,
-      ) as Promise<{ n: number }[]>,
-    ]);
-    return { clientes, clientesVerificados: verificados, pagosPorRevisar: pagos?.n ?? 0 };
+  leerResumen() {
+    return this.resumen.resumen();
   }
 }

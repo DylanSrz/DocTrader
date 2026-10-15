@@ -425,7 +425,9 @@ describe('órdenes de pago', () => {
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'TRIMESTRAL', moneda: 'USDT' })
       .expect(400);
 
-    await fuente.query(`UPDATE deposit_addresses SET status = 'INACTIVA' WHERE network = 'TRON'`);
+    await fuente.query(
+      `UPDATE deposit_addresses SET status = 'INACTIVA' WHERE network = 'TRON' AND status = 'ACTIVA'`,
+    );
     try {
       const sin = await web
         .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })

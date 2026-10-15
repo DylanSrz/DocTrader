@@ -144,12 +144,38 @@ prueba sin pagos.
   - **Falta:** un pago real de punta a punta en producción (ver `PENDIENTES.md`). La red de prueba de Tron (Nile)
     usa otro contrato de USDT, así que la prueba útil es un pago real pequeño a la dirección de producción.
 
-### Etapa 5 — Operación del admin
+### Etapa 5 — Operación del admin ✅ (2026-10-15)
 - Hoy, listas por conectar y por desconectar, ver contraseñas con segundo factor, ficha del cliente (capital, riesgo,
   notas, extender días, suspender).
 - Licencias con filtros y exportar a CSV; ajustes (precios, gracia, confirmaciones, enlaces, cifras de Myfxbook,
   preguntas frecuentes); direcciones de depósito con la espera de 24 horas.
 - **Hecho cuando:** Argemiro puede operar un día completo desde el panel sin ayuda.
+- **Resultado:**
+  - **Pestañas del admin:** Hoy, Pagos, Cuentas, Licencias y Ajustes (las preguntas frecuentes y los textos legales
+    quedan dentro de Ajustes).
+  - **Hoy:** lo pendiente (pagos por revisar, cuentas por conectar y por desconectar, licencias que vencen en 7
+    días), las ventas del mes con la gráfica de triángulos por día y plan (y su tabla), hoy, el mes anterior y el
+    año, por moneda, cuentas conectadas, nuevas y renovaciones del mes, y la actividad reciente sacada de la
+    auditoría. Se actualiza cada minuto.
+  - **Cuentas:** por conectar con los datos para Social Trader Tools y botones de copiar; "Ver contraseñas" pide el
+    código de la app si la confirmación de 5 minutos venció, queda en la auditoría y las oculta a los 60 segundos;
+    capital recomendado y nivel de riesgo (los ve el cliente); "Marcar como conectada" (correo al cliente). Las que
+    esperan la aprobación del pago aparecen aparte. Por desconectar: gracia terminada o suspendida, con "Marcar como
+    desconectada". Una cuenta que ya estuvo conectada y vuelve (cambió sus datos) se marca distinto.
+  - **Licencias:** filtros con conteos (todas, activas, vence en 7 días, en gracia, vencidas, pendientes, en prueba,
+    suspendidas), búsqueda por nombre, correo o cuenta, y exportar a CSV (pide el código; nunca lleva contraseñas
+    ni cédulas; queda en la auditoría). La ficha (panel lateral) trae contacto con la cédula enmascarada ("Ver
+    completa" queda en la auditoría), la cuenta, capital, riesgo y notas internas, extender días con motivo (correo
+    al cliente), periodos, pagos, otras cuentas del cliente y suspender (segundo clic) o quitar la suspensión.
+  - **Ajustes:** precios (la prueba debe costar menos que el mensual) y duración de la prueba; días de gracia,
+    vigencia de la orden y confirmaciones (ambos con el código de la app); la aprobación automática; direcciones de
+    depósito; enlaces de la página y correo de soporte; cifras de Myfxbook. Los cambios de la página pública se ven
+    al instante.
+  - **Direcciones de depósito:** se validan con su checksum (Tron y Bitcoin: 1…, 3…, bc1q… y bc1p…); entran "en
+    espera" 24 horas y les llega un correo a los dos admins con la dirección completa; cualquiera la cancela sin
+    código (salida de emergencia); el worker las activa al cumplir las 24 horas; desactivar y reactivar piden el
+    código. Las órdenes nuevas usan la activa más reciente de cada red.
+  - 103 pruebas de punta a punta (19 nuevas) y recorrido en el navegador a 390 y 1440 px.
 
 ### Etapa 6 — Licencia de prueba
 - Verificación del teléfono por SMS (Twilio Verify) con límites y protección contra fraude.

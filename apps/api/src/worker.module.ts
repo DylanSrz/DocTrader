@@ -1,6 +1,7 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AjustesAdminService } from './admin/ajustes-admin.service.js';
 import { AvisosEnvio } from './avisos/avisos-envio.js';
 import { BaseModule } from './base.module.js';
 import type { Entorno } from './config/entorno.js';
@@ -39,6 +40,7 @@ import { ProgramarTrabajos } from './worker/programar-trabajos.js';
     AvisosEnvio,
     VencimientoOrdenes,
     VencimientoLicencias,
+    AjustesAdminService,
   ],
 })
 export class WorkerModule {}
