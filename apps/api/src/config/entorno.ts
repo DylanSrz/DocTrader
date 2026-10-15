@@ -35,6 +35,8 @@ const esquema = z.object({
     .transform((valor) => valor === 'true'),
   /** Correos: Resend en producción; Mailpit en desarrollo; si no hay ninguno, se escriben en el registro. */
   RESEND_API_KEY: z.string().min(1).optional(),
+  /** Errores en Sentry (opcional). Sin ella, los errores solo quedan en los registros de Railway. */
+  SENTRY_DSN: z.url().optional(),
   MAILPIT_URL: z.url().optional(),
   MAIL_FROM: z.string().default('DocTraderPRO <notificaciones@doctraderpro.com>'),
   MAIL_REPLY_TO: z.email().default('support@doctraderpro.com'),

@@ -26,6 +26,7 @@ import {
   RecoveryCode,
   User,
 } from '../database/entidades/index.js';
+import { claveIngresosFallidos } from '../monitoreo/alertas.js';
 import { REDIS } from '../redis/redis.module.js';
 import { secretoAleatorio } from '../seguridad/cifrado.js';
 import { CifradoService } from '../seguridad/cifrado.service.js';
@@ -391,10 +392,13 @@ export class AccesoService {
     const correcta = await this.contrasenas.coincide(usuario?.passwordHash ?? null, dto.contrasena);
 
     if (!usuario || !correcta) {
+      const alerta = claveIngresosFallidos(new Date());
       const resultado = await this.redis
         .multi()
         .incr(claveFallos)
         .expire(claveFallos, 3_600)
+        .incr(alerta)
+        .expire(alerta, 3 * 3_600)
         .exec();
       const total = Number(resultado?.[0]?.[1] ?? 1);
       if (total >= FALLOS_PARA_ESPERAR) {

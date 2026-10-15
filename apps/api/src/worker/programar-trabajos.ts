@@ -4,6 +4,7 @@ import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 import {
   COLA_MANTENIMIENTO,
+  TRABAJO_ALERTAS,
   TRABAJO_ACTIVAR_DIRECCIONES,
   TRABAJO_BORRAR_ARCHIVOS,
   TRABAJO_BORRAR_DATOS,
@@ -85,6 +86,12 @@ export class ProgramarTrabajos implements OnApplicationBootstrap {
       TRABAJO_BORRAR_DATOS,
       { pattern: '0 3 * * *', tz: ZONA_HORARIA },
       { name: TRABAJO_BORRAR_DATOS, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // Alertas a los admins: pagos sin verificar hace más de una hora y picos de ingresos fallidos.
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_ALERTAS,
+      { every: 15 * 60_000 },
+      { name: TRABAJO_ALERTAS, opts: { removeOnComplete: true, removeOnFail: 100 } },
     );
   }
 }
