@@ -1,3 +1,4 @@
+import { aUnidadesBase } from '@doctrader/shared';
 import type { INestApplication } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
@@ -53,9 +54,7 @@ async function cuentaPagada(admin: Admin, plan = 'MENSUAL') {
     hora: new Date(),
     bloque: 100,
     confirmaciones: 25,
-    pagos: [
-      { direccion: orden.body.direccion, unidades: BigInt(orden.body.montoUsdCentavos) * 10_000n },
-    ],
+    pagos: [{ direccion: orden.body.direccion, unidades: aUnidadesBase(orden.body.monto, 'USDT') }],
     otraMoneda: false,
     remitentes: [],
   });

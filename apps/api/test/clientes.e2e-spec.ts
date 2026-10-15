@@ -1,3 +1,4 @@
+import { aUnidadesBase } from '@doctrader/shared';
 import type { INestApplication } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
@@ -49,7 +50,7 @@ async function reportar(cliente: Cliente, cuentaId: string) {
     pagos: [
       {
         direccion: orden.body.direccion,
-        unidades: BigInt(orden.body.montoUsdCentavos) * 10_000n,
+        unidades: aUnidadesBase(orden.body.monto, 'USDT'),
       },
     ],
     otraMoneda: false,

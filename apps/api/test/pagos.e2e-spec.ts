@@ -1,3 +1,4 @@
+import { aUnidadesBase } from '@doctrader/shared';
 import type { INestApplication } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
@@ -56,7 +57,7 @@ async function pagar(
     hash,
     lectura({
       direccion: orden.body.direccion,
-      unidades: BigInt(orden.body.montoUsdCentavos) * 10_000n,
+      unidades: aUnidadesBase(orden.body.monto, 'USDT'),
     }),
   );
   await cliente.web.post(`/ordenes/${orden.body.numero}/reportar`, { hash }).expect(200);
@@ -106,12 +107,12 @@ describe('verificación y aprobación de pagos', () => {
     expect(revision).toMatchObject({
       verificacion: 'VERIFICADA',
       cliente: { nombre: 'Laura Gómez Restrepo' },
-      monto: '120',
-      recibido: '120',
+      monto: expect.stringMatching(/^119\.\d{2}$/),
       confirmaciones: 25,
       confirmacionesNecesarias: 20,
       proveedor: 'Prueba',
     });
+    expect(revision.recibido).toBe(revision.monto);
     expect(revision.chequeos.map((c: { estado: string }) => c.estado)).toEqual([
       'OK',
       'OK',
@@ -183,6 +184,39 @@ describe('verificación y aprobación de pagos', () => {
     expect(meses).toBe(6);
   });
 
+  it('nadie puede reportar como suyo el pago de otra orden, aunque llegue a la misma dirección', async () => {
+    const victima = await clienteConSesion(app);
+    const atacante = await clienteConSesion(app);
+    const suya = await victima.web.post('/cuentas', datosCuenta()).expect(201);
+    const ajena = await atacante.web.post('/cuentas', datosCuenta()).expect(201);
+    const orden = await victima.web
+      .post('/ordenes', { cuentaId: suya.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    const trampa = await atacante.web
+      .post('/ordenes', { cuentaId: ajena.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    expect(trampa.body.monto).not.toBe(orden.body.monto);
+
+    // La víctima paga su monto exacto; el atacante ve el hash en la blockchain y lo reporta primero.
+    const hash = hashNuevo();
+    blockchain.set(
+      hash,
+      exacto()({
+        direccion: orden.body.direccion,
+        unidades: aUnidadesBase(orden.body.monto, 'USDT'),
+      }),
+    );
+    await atacante.web.post(`/ordenes/${trampa.body.numero}/reportar`, { hash }).expect(200);
+    await verificacion.verificarPendientes();
+    const revision = await pendiente(admin, trampa.body.numero);
+    // El monto de la víctima no es el de la trampa: queda menor (incompleto) o mayor (no coincide), nunca verificado.
+    expect(['MONTO_INCOMPLETO', 'NO_COINCIDE']).toContain(revision.verificacion);
+    expect(revision.chequeos.find((c: { clave: string }) => c.clave === 'MONTO')).toMatchObject({
+      estado: 'FALLA',
+    });
+    await admin.web.post(`/admin/pagos/${trampa.body.numero}/aprobar`, {}).expect(409);
+  });
+
   it('un monto incompleto no se aprueba sin forzar; se rechaza con motivo y le llega al cliente', async () => {
     const cliente = await clienteConSesion(app);
     const cuenta = await cliente.web.post('/cuentas', datosCuenta()).expect(201);
@@ -191,7 +225,7 @@ describe('verificación y aprobación de pagos', () => {
     );
     const revision = await pendiente(admin, numero);
     expect(revision.verificacion).toBe('MONTO_INCOMPLETO');
-    expect(revision.recibido).toBe('115');
+    expect(Number(revision.recibido)).toBeCloseTo(Number(revision.monto) - 5, 2);
 
     const sinForzar = await admin.web.post(`/admin/pagos/${numero}/aprobar`, {}).expect(409);
     expect(sinForzar.body.codigo).toBe('NO_VERIFICADO');

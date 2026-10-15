@@ -102,15 +102,18 @@ export function evaluar(
   }
   chequeos.push(destino);
 
-  const montoOk = recibido >= orden.unidades;
+  // Exacto: cada orden abierta tiene un monto distinto, y es lo que liga el pago a su orden. Uno mayor puede ser el
+  // pago de otra persona; lo revisa un admin (ve los remitentes) y lo aprueba a mano si corresponde.
+  const montoOk = recibido === orden.unidades;
+  const montoMayor = recibido > orden.unidades;
   chequeos.push({
     clave: 'MONTO',
     estado: montoOk ? 'OK' : 'FALLA',
     texto: montoOk
-      ? recibido === orden.unidades
-        ? 'El monto es igual al de la orden'
-        : `El monto es mayor al de la orden (${monto(recibido)} de ${monto(orden.unidades)})`
-      : `El monto es menor al de la orden (${monto(recibido)} de ${monto(orden.unidades)})`,
+      ? 'El monto es igual al de la orden'
+      : montoMayor
+        ? `Llegó más que el monto de la orden (${monto(recibido)} de ${monto(orden.unidades)}): revisa que sea de este cliente`
+        : `El monto es menor al de la orden (${monto(recibido)} de ${monto(orden.unidades)})`,
   });
 
   const fecha: Chequeo =
@@ -129,7 +132,7 @@ export function evaluar(
   });
 
   let estado: EstadoVerificacion;
-  if (destino.estado === 'FALLA' || fecha.estado === 'FALLA') {
+  if (destino.estado === 'FALLA' || fecha.estado === 'FALLA' || montoMayor) {
     estado = ESTADO_VERIFICACION.NO_COINCIDE;
   } else if (!montoOk) {
     estado = ESTADO_VERIFICACION.MONTO_INCOMPLETO;
