@@ -78,6 +78,7 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
 function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) => string }) {
   const estado = ESTADO_LICENCIA_ADMIN[ficha.estado];
   const vigente = ['ACTIVA', 'EN_GRACIA'].includes(ficha.estado);
+  const eliminado = ficha.cliente.estado === 'DELETED';
   return (
     <>
       <div className="grid justify-items-start gap-3">
@@ -98,7 +99,7 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
         ) : null}
       </div>
 
-      {ficha.cliente.estado === 'DELETED' ? null : (
+      {eliminado ? null : (
         <Seccion titulo="Contacto">
           <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-6 gap-y-1 text-[15px]">
             <dt className="text-ceniza">Cédula</dt>
@@ -147,16 +148,18 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
         </dl>
       </Seccion>
 
-      <Seccion titulo="Ajustar">
-        <Asignacion
-          cuenta={ficha.cuenta.id}
-          capitalUsdCentavos={ficha.cuenta.capitalUsdCentavos}
-          riesgo={ficha.cuenta.riesgo}
-          notas={ficha.cuenta.notas}
-        />
-      </Seccion>
+      {eliminado ? null : (
+        <Seccion titulo="Ajustar">
+          <Asignacion
+            cuenta={ficha.cuenta.id}
+            capitalUsdCentavos={ficha.cuenta.capitalUsdCentavos}
+            riesgo={ficha.cuenta.riesgo}
+            notas={ficha.cuenta.notas}
+          />
+        </Seccion>
+      )}
 
-      {ficha.vence ? (
+      {ficha.vence && !eliminado ? (
         <Seccion titulo="Extender días">
           <Extender licencia={ficha.id} />
         </Seccion>
@@ -253,7 +256,7 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
         </Seccion>
       ) : null}
 
-      {ficha.cliente.estado === 'DELETED' ? (
+      {eliminado ? (
         <Seccion titulo="Cliente eliminado">
           <p className="text-sm text-ceniza">
             Sus datos personales se borraron a su pedido. Quedan sus órdenes y pagos, que exige la

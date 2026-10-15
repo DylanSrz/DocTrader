@@ -160,10 +160,18 @@ describe('eliminar un cliente', () => {
 
     // Licencia terminada, ticket borrado, pagos conservados, aviso y auditoría.
     const [licencia] = (await fuente.query(
-      `SELECT status FROM licenses WHERE trading_account_id = $1`,
+      `SELECT id, status FROM licenses WHERE trading_account_id = $1`,
       [conectada.body.id],
-    )) as { status: string }[];
+    )) as { id: string; status: string }[];
     expect(licencia!.status).toBe('VENCIDA');
+    // Y nadie la revive extendiéndole días.
+    const extender = await admin.web
+      .post(`/admin/licencias/${licencia!.id}/extender`, {
+        dias: 5,
+        motivo: 'Compensación por una falla.',
+      })
+      .expect(409);
+    expect(extender.body.codigo).toBe('CLIENTE_ELIMINADO');
     expect(
       await fuente.query(`SELECT 1 FROM tickets WHERE user_id = $1`, [cliente.usuario.id]),
     ).toHaveLength(0);

@@ -2,6 +2,7 @@ import {
   DIAS_VENCE_PRONTO,
   diasEntre,
   ESTADO_LICENCIA,
+  ESTADO_USUARIO,
   type EstadoConexion,
   type EstadoLicencia,
   type EstadoOrden,
@@ -370,6 +371,14 @@ export class LicenciasAdminService {
             : 'Esta licencia no se puede extender.',
         );
       }
+      const dueno = await m.getRepository(User).findOneByOrFail({ id: licencia.userId });
+      if (dueno.status === ESTADO_USUARIO.BORRADO) {
+        throw errorApi(
+          HttpStatus.CONFLICT,
+          'CLIENTE_ELIMINADO',
+          'El cliente pidió eliminar su cuenta: su licencia ya no se puede extender.',
+        );
+      }
       const ahora = new Date();
       // Si ya se acabó la gracia, los días cuentan desde hoy: no se gastan en un tiempo que ya pasó.
       const finGracia = licencia.graceEndsAt ?? licencia.endsAt;
@@ -410,7 +419,6 @@ export class LicenciasAdminService {
             .update({ id: cuenta.id }, { connectionStatus: conexion });
         }
       }
-      const dueno = await m.getRepository(User).findOneByOrFail({ id: licencia.userId });
       await this.avisos.encolar(m, {
         usuarioId: dueno.id,
         correo: dueno.email,
