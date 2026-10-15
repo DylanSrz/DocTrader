@@ -67,12 +67,12 @@
 
 ## ❓ Por confirmar con Argemiro
 
-- [ ] **Aceptar de nuevo los textos legales** (etapa 8, quedó para después): cuando se publica una versión nueva
-      de los términos o de la política de datos (como al quitar la prueba), ¿los clientes deben aceptarla al volver a
-      entrar? Hoy la nueva versión aplica a los registros nuevos; los clientes actuales aceptaron la anterior.
-- [ ] **Eliminar la cuenta de un cliente que lo pida** (etapa 8, quedó para después): la política dice que se borra
-      salvo lo que exija la ley (órdenes y pagos). Falta definir si se hace desde el panel (anonimizar nombre, cédula,
-      correo y teléfono) o a mano mientras haya pocos casos.
+- [x] **Aceptar de nuevo los textos legales** (2026-10-15): no hace falta. Los clientes de hoy son de prueba y, antes
+      de salir a producción, se limpia la base de datos (todo menos los admins): todos los clientes se registran de
+      nuevo con los textos vigentes.
+- [x] **Eliminar la cuenta de un cliente que lo pida** (2026-10-15): sí, y lo hace un admin desde el panel. Falta
+      construirlo: anonimizar nombre, cédula, correo y teléfono, borrar sus contraseñas de trading y sus tickets, y
+      conservar órdenes y pagos (los exige la ley).
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
       (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
       prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.

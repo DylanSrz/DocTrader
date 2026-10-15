@@ -249,9 +249,9 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
   - 113 pruebas de punta a punta (6 nuevas: el ciclo completo de una licencia mensual con todos sus correos una
     vez, sin recordatorio con el pago en revisión, cuenta por actualizar, porcentaje del socio, liquidación y pago
     de quincenas, borrado de datos) y recorrido en el navegador de "Socio" a 1440 y 390 px.
-  - **Queda para después:** que los clientes acepten de nuevo los textos legales cuando cambian (los términos y la
-    política se republicaron sin la prueba) y la eliminación de un cliente que la pida (anonimizar sus datos; hoy
-    se haría a mano). Ver `PENDIENTES.md`.
+  - **Queda para después:** eliminar desde el panel la cuenta de un cliente que lo pida (anonimizar sus datos y
+    conservar órdenes y pagos). No hace falta pedir que acepten de nuevo los textos legales: los clientes de hoy son
+    de prueba y la base de datos se limpia antes de salir (ver §5).
 
 ### Etapa 9 — Endurecimiento y lanzamiento
 - Revisión de seguridad completa contra `SEGURIDAD.md`, Sentry, monitor de disponibilidad, copias de seguridad y una
@@ -278,6 +278,8 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 - [ ] Copia de seguridad restaurada con éxito al menos una vez.
 
 **Funcionamiento**
+- [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
+      correos; quedan solo los dos admins, los ajustes y los textos legales vigentes.
 - [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.
 - [ ] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook.
 - [ ] Monitor de disponibilidad y alertas activos.
