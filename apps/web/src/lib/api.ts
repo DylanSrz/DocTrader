@@ -48,20 +48,33 @@ export async function llamarApi<T>(
       },
       body: opciones.cuerpo === undefined ? undefined : JSON.stringify(opciones.cuerpo),
       cache: 'no-store',
+      // Una redirección significa que API_URL está mal (por ejemplo, con http:// en vez de https://): al
+      // seguirla, el POST se volvería GET. Mejor fallar y decirlo en el registro.
+      redirect: 'manual',
       signal: AbortSignal.timeout(15_000),
     });
+    if (respuesta.status >= 300 && respuesta.status < 400) {
+      console.error(
+        `La API redirige ${ruta} a ${respuesta.headers.get('location')}: revisa API_URL (debe empezar con https://)`,
+      );
+      return { ok: false, estado: 502, error: SIN_CONEXION };
+    }
     const cuerpo: unknown = await respuesta.json().catch(() => null);
     if (respuesta.ok) return { ok: true, estado: respuesta.status, datos: cuerpo as T };
     const error = cuerpo as Partial<ErrorApi> | null;
+    if (error?.codigo && error.mensaje) {
+      if (respuesta.status >= 500)
+        console.error(`La API respondió ${respuesta.status} en ${ruta}: ${error.codigo}`);
+      return { ok: false, estado: respuesta.status, error: error as ErrorApi };
+    }
+    console.error(`Respuesta inesperada de la API en ${ruta}: ${respuesta.status}`);
     return {
       ok: false,
       estado: respuesta.status,
-      error:
-        error?.codigo && error.mensaje
-          ? (error as ErrorApi)
-          : { codigo: 'ERROR', mensaje: 'Algo salió mal. Intenta de nuevo en un momento.' },
+      error: { codigo: 'ERROR', mensaje: 'Algo salió mal. Intenta de nuevo en un momento.' },
     };
-  } catch {
+  } catch (falla) {
+    console.error(`No se pudo llamar a la API en ${ruta}: ${(falla as Error).message}`);
     return { ok: false, estado: 503, error: SIN_CONEXION };
   }
 }

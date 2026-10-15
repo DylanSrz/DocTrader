@@ -5,6 +5,7 @@ import type { NextFunction, Response } from 'express';
 import helmet from 'helmet';
 import type { Entorno } from './config/entorno.js';
 import { errorDeCampos } from './seguridad/errores.js';
+import { FiltroErrores } from './seguridad/filtro-errores.js';
 import type { Peticion } from './sesiones/contexto.js';
 import { WebMiddleware } from './sesiones/web.middleware.js';
 
@@ -47,6 +48,7 @@ export function configurarApp(app: INestApplication): void {
   );
   // Las peticiones de la API son formularios pequeños: nada de cuerpos grandes.
   express.useBodyParser('json', { limit: '32kb' });
+  app.useGlobalFilters(new FiltroErrores());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
