@@ -17,7 +17,13 @@ import type {
 /** Respuestas de la API del panel de administración (`apps/api/src/admin`). Las fechas llegan como texto ISO. */
 
 export interface Resumen {
-  pendientes: { pagos: number; porConectar: number; porDesconectar: number; vencenEn7Dias: number };
+  pendientes: {
+    pagos: number;
+    pruebas: number;
+    porConectar: number;
+    porDesconectar: number;
+    vencenEn7Dias: number;
+  };
   ventas: {
     mes: { usdCentavos: number; licencias: number };
     hoyUsdCentavos: number;

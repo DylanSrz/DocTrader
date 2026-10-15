@@ -54,6 +54,9 @@
       ustedes, revisar que a los dos admins les llegue el correo con la dirección completa y cancelarla. Mientras
       está en espera, ninguna orden la usa.
 
+- [ ] **La prueba con un SMS real** (etapa 6), cuando Twilio esté listo: con un cliente nuevo, pedir la prueba
+      desde "Mis cuentas", verificar el teléfono con el SMS, aprobar la solicitud en Pagos y pagar los USD 50.
+
 ## ❓ Por confirmar con Argemiro
 
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
@@ -77,7 +80,14 @@
 - [x] **Cloudflare Turnstile** (2026-10-15): llaves en Vercel y en la API.
 - [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
       una llave gratis del plan Demo (`COINGECKO_API_KEY` en la API de Railway) hay más consultas al mes.
-- [ ] Crear cuando se necesiten: Twilio (SMS, etapa 6), Cloudflare R2 (archivos, etapa 7), Sentry (errores).
+- [ ] **Twilio (SMS de la prueba, etapa 6):** crear la cuenta, un servicio de Verify (nombre "DocTraderPRO"),
+      permisos geográficos solo para Colombia y Fraud Guard en nivel estándar; recargar saldo (la cuenta de prueba
+      solo envía a números verificados). Poner `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` y
+      `TWILIO_VERIFY_SERVICE_SID` en la API de Railway. Sin ellas, la prueba queda cerrada.
+- [ ] **`TRIAL_HMAC_KEY`** (etapa 6): una llave nueva (`openssl rand -base64 32`) en la API y en el worker de
+      Railway, guardada en el gestor de contraseñas. Si se pierde o se cambia, las pruebas anteriores dejan de
+      bloquear.
+- [ ] Crear cuando se necesiten: Cloudflare R2 (archivos, etapa 7), Sentry (errores).
       Ver `docs/DECISIONES-TECNICAS.md`.
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.

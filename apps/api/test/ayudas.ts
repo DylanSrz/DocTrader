@@ -15,29 +15,42 @@ import { comoLaWeb } from './crear-app.js';
 let consecutivo = 0;
 const unico = () => `${Date.now()}${(consecutivo += 1)}`;
 
-export async function clienteConSesion(app: INestApplication) {
+export async function clienteConSesion(
+  app: INestApplication,
+  datos: {
+    nombre?: string;
+    cedula?: string;
+    correo?: string;
+    telefono?: string;
+    dispositivo?: string;
+  } = {},
+) {
   const fuente = app.get<DataSource>(getDataSourceToken());
   const id = unico();
-  const correo = `cliente.${id}@correo.co`;
+  const correo = datos.correo ?? `cliente.${id}@correo.co`;
   const contrasena = 'una contraseña bien larga';
   await comoLaWeb(app)
     .post('/auth/registro', {
-      nombre: 'Laura Gómez Restrepo',
-      cedula: id.slice(-10),
+      nombre: datos.nombre ?? 'Laura Gómez Restrepo',
+      cedula: datos.cedula ?? id.slice(-10),
       correo,
-      telefono: `32${id.slice(-8)}`,
+      telefono: datos.telefono ?? `32${id.slice(-8)}`,
       contrasena,
       aceptaTerminos: true,
       aceptaDatos: true,
       aceptaRiesgo: true,
     })
     .expect(202);
-  const aviso = await fuente
-    .getRepository(Notification)
-    .findOneByOrFail({ recipient: correo, template: 'verificar-correo' });
+  // El último: quien se registra de nuevo con el mismo correo recibe otro enlace.
+  const aviso = await fuente.getRepository(Notification).findOneOrFail({
+    where: { recipient: correo, template: 'verificar-correo' },
+    order: { createdAt: 'DESC' },
+  });
   const enlace = app.get(CifradoService).descifrar(aviso.secretEnc!, CONTEXTO_SECRETO_AVISO);
   await comoLaWeb(app).post('/auth/verificar-correo', { token: enlace }).expect(200);
-  const ingreso = await comoLaWeb(app).post('/auth/ingresar', { correo, contrasena }).expect(200);
+  const ingreso = await comoLaWeb(app)
+    .post('/auth/ingresar', { correo, contrasena, dispositivo: datos.dispositivo })
+    .expect(200);
   const usuario = await fuente.getRepository(User).findOneByOrFail({ email: correo });
   return { web: comoLaWeb(app, { token: ingreso.body.token as string }), usuario, correo };
 }

@@ -177,12 +177,38 @@ prueba sin pagos.
     código. Las órdenes nuevas usan la activa más reciente de cada red.
   - 103 pruebas de punta a punta (19 nuevas) y recorrido en el navegador a 390 y 1440 px.
 
-### Etapa 6 — Licencia de prueba
+### Etapa 6 — Licencia de prueba ✅ (2026-10-15)
 - Verificación del teléfono por SMS (Twilio Verify) con límites y protección contra fraude.
 - Solicitud con bloqueos y señales, registro de huellas, aprobación del admin y orden de USD 50.
 - Completar la prueba pagando la diferencia; bloqueo de cambios de la cuenta durante la prueba.
 - **Hecho cuando:** las pruebas automáticas confirman que la misma cédula, cuenta, correo o teléfono no pueden pedir
   una segunda prueba, aunque se registren de nuevo.
+- **Resultado:**
+  - **Panel del cliente, "Prueba"** (`/panel/prueba`): tres pasos (correo, teléfono por SMS y cuenta de trading) y
+    el estado de la solicitud (en revisión, aprobada con "Pagar la prueba", rechazada con el motivo o bloqueada
+    con lo que coincidió). "Mis cuentas" invita a pedirla mientras el cliente no haya pedido ninguna, da prioridad
+    a la prueba aprobada y, en prueba, muestra los días y "Completar" a cada plan con la diferencia y hasta cuándo
+    queda.
+  - **SMS:** Twilio Verify (genera, envía y valida el código; sin librería, por HTTP). Límites: 3 por teléfono por
+    hora, 5 por día, 10 por IP por hora y 8 intentos de código cada 15 minutos; Turnstile antes de cada envío. En
+    desarrollo el código se escribe en el registro de la API; en producción, sin Twilio, la prueba queda cerrada.
+  - **Bloqueos:** cédula, cuenta (broker + servidor + número normalizados), correo (canónico) y teléfono que ya
+    tuvieron prueba, comparados con huellas HMAC (`TRIAL_HMAC_KEY`) que sobreviven al borrado del cliente. La
+    solicitud bloqueada se guarda para el admin y el cliente ve el motivo.
+  - **Señales** (no bloquean): número de cuenta usado en otro broker, mismo dispositivo, misma IP, titular
+    parecido, número de cuenta parecido, rechazos o bloqueos anteriores del mismo cliente; y, al revisar el pago,
+    billetera de origen que ya pagó otra prueba.
+  - **Admin, Pagos → "Solicitudes de prueba":** cada solicitud con sus señales; sin señales, "Aprobar prueba"; con
+    señales, "Rechazar" (motivo por correo) primero y "Aprobar de todos modos". Las bloqueadas de 30 días. "Hoy"
+    cuenta las pruebas por aprobar. Correo a los admins con cada solicitud.
+  - **Al aprobar la solicitud:** las huellas entran al registro y el cliente recibe un correo para pagar. **Al
+    aprobar el pago de USD 50:** la licencia queda "en prueba" por 15 días sin gracia, la cuenta por conectar y
+    bloqueada (sin cambiar broker, servidor ni número). **Completar:** paga la diferencia (USD 70 o 449) y el plan
+    cuenta desde el inicio de la prueba. Al terminar los 15 días sin completarla, vence y pasa a por desconectar.
+  - 109 pruebas de punta a punta (6 nuevas: el recorrido completo, los bloqueos aunque se registren de nuevo con
+    los mismos datos, las señales, el rechazo, el límite de SMS y el vencimiento) y recorrido en el navegador.
+  - **Falta:** crear la cuenta de Twilio y probar un SMS real (ver `PENDIENTES.md`). La foto de la cédula
+    (opcional, apagada) llega con los archivos de la etapa 7.
 
 ### Etapa 7 — Soporte
 - Tickets del cliente con adjuntos en R2, bandeja del admin con filtros, asignación, prioridad, notas internas y

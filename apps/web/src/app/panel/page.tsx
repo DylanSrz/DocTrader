@@ -2,6 +2,7 @@ import {
   DIAS_VENCE_PRONTO,
   diasEntre,
   diasRestantes,
+  finDePeriodo,
   sumarMeses,
   ZONA_HORARIA,
 } from '@doctrader/shared';
@@ -13,13 +14,24 @@ import { Lateral } from '@/components/panel/lateral';
 import { BotonOrden, ElegirPlan } from '@/components/panel/ordenes';
 import { Enlace, Estado, Pildora } from '@/components/ui';
 import { dias, fechaLarga, NOMBRE_RIESGO, rangoFechas, usd } from '@/lib/formato';
-import { type CuentaVista, leerPanel, type MisCuentas, type PlanVista } from '@/lib/panel';
+import {
+  type CuentaVista,
+  type EstadoPrueba,
+  leerPanel,
+  type MisCuentas,
+  type PlanVista,
+} from '@/lib/panel';
 import { obtenerLanding } from '@/lib/publico';
 import { requerirSesion } from '@/lib/sesion';
 
 export const metadata: Metadata = { title: 'Mis cuentas' };
 
-const hora = new Intl.DateTimeFormat('es-CO', { timeStyle: 'short', timeZone: ZONA_HORARIA });
+const formatoHora = new Intl.DateTimeFormat('es-CO', {
+  timeStyle: 'short',
+  timeZone: ZONA_HORARIA,
+});
+/** "7:59 a. m" sin el punto final, para que la frase termine con uno solo. */
+const hora = { format: (fecha: Date) => formatoHora.format(fecha).replace(/\.$/, '') };
 
 /** "mensual por USD 120 o semestral por USD 499", con los planes a la venta. */
 function listaPrecios(planes: PlanVista[]): string {
@@ -39,6 +51,24 @@ function opcionesDePlanes(planes: PlanVista[]): PlanOpcion[] {
         : `${p.meses} meses${p.mesesObsequio ? ` + ${p.mesesObsequio} de obsequio` : ''}`,
     precio: String(p.precioUsdCentavos / 100),
   }));
+}
+
+/** Completar la prueba: cada plan con la diferencia que se paga y hasta cuándo queda, contando desde la prueba. */
+function opcionesParaCompletar(cuenta: CuentaVista, planes: PlanVista[]) {
+  const { licencia } = cuenta;
+  if (licencia.estado !== 'PRUEBA' || !licencia.inicioPrueba) return [];
+  const pagado = licencia.plan?.precioUsdCentavos ?? 0;
+  return planes
+    .filter((p) => p.precioUsdCentavos > pagado && p.meses !== null)
+    .map((p) => ({
+      plan: p,
+      diferencia: p.precioUsdCentavos - pagado,
+      hasta: finDePeriodo(new Date(licencia.inicioPrueba!), {
+        durationMonths: p.meses,
+        bonusMonths: p.mesesObsequio,
+        durationDays: null,
+      }),
+    }));
 }
 
 /** El tramo de la licencia que se dibuja: los periodos que no han terminado (o el último, si ya venció). */
@@ -93,12 +123,14 @@ function estadoDe(cuenta: CuentaVista, quedan: number | null) {
 function Titular({
   cuentas,
   planes,
+  prueba,
   ahora,
   nombre,
   nombreCompleto,
 }: {
   cuentas: CuentaVista[];
   planes: PlanVista[];
+  prueba: EstadoPrueba;
   ahora: Date;
   nombre: string;
   nombreCompleto: string;
@@ -122,6 +154,13 @@ function Titular({
       !c.ordenAbierta,
   );
   const porConectar = cuentas.find((c) => c.conexion === 'POR_CONECTAR');
+  const enPrueba = cuentas.find((c) => c.licencia.estado === 'PRUEBA' && !c.ordenAbierta);
+  // Aprobada y sin un pago en curso (la orden anterior pudo vencer sin pagarse).
+  const pruebaAprobada =
+    prueba.solicitud?.estado === 'APROBADA' &&
+    !['PENDIENTE', 'REPORTADA', 'APROBADA'].includes(prueba.solicitud.orden?.estado ?? '')
+      ? prueba.solicitud
+      : null;
 
   if (cuentas.length === 0) {
     titulo = `Hola, ${nombre}. Agrega tu primera cuenta de trading.`;
@@ -160,6 +199,19 @@ function Titular({
         {`Renovar ${c.licencia.plan.nombre.toLowerCase()}`}
       </BotonOrden>
     ) : null;
+  } else if (pruebaAprobada) {
+    titulo = 'Aprobamos tu prueba.';
+    texto = (
+      <>
+        Paga la prueba de la cuenta <span className="cifra">{pruebaAprobada.cuenta.numero}</span> y
+        la conectamos apenas verifiquemos el pago.
+      </>
+    );
+    accion = (
+      <BotonOrden cuentaId={pruebaAprobada.cuentaId} plan="PRUEBA" variante="pildora">
+        {`Pagar la prueba (${usd(prueba.precioUsdCentavos ?? 5_000)})`}
+      </BotonOrden>
+    );
   } else if (pendiente?.ordenAbierta) {
     titulo = 'Tienes un pago pendiente.';
     texto = (
@@ -179,6 +231,25 @@ function Titular({
     accion = (
       <Enlace href={`/panel/pagos?orden=${reportada.ordenAbierta.numero}`}>Ver el pago</Enlace>
     );
+  } else if (enPrueba?.licencia.fin) {
+    const quedan = diasRestantes(new Date(enPrueba.licencia.fin), ahora);
+    const semestral = opcionesParaCompletar(enPrueba, planes).at(-1);
+    titulo =
+      quedan === 0
+        ? 'Tu prueba termina hoy.'
+        : `Te ${quedan === 1 ? 'queda' : 'quedan'} ${dias(quedan)} de prueba.`;
+    texto = (
+      <>
+        Para seguir con la cuenta <span className="cifra">{enPrueba.numero}</span>, paga solo la
+        diferencia del plan que elijas antes del {fechaLarga(enPrueba.licencia.fin)}. Tus días de
+        prueba cuentan dentro del plan.
+      </>
+    );
+    accion = semestral ? (
+      <BotonOrden cuentaId={enPrueba.id} plan={semestral.plan.codigo} variante="pildora">
+        {`Completar a ${semestral.plan.nombre.toLowerCase()} (${usd(semestral.diferencia)})`}
+      </BotonOrden>
+    ) : null;
   } else if (sinPagar) {
     titulo =
       sinPagar.licencia.estado === 'VENCIDA' ? 'Una licencia venció.' : 'Falta pagar la licencia.';
@@ -255,11 +326,17 @@ function TarjetaCuenta({
   cuenta,
   planes,
   diasGracia,
+  pedirPrueba,
+  pagarPrueba,
   ahora,
 }: {
   cuenta: CuentaVista;
   planes: PlanVista[];
   diasGracia: number;
+  /** Se puede pedir la prueba para esta cuenta (nunca se ha pagado y el cliente no ha pedido ninguna). */
+  pedirPrueba: boolean;
+  /** La prueba de esta cuenta está aprobada y falta pagarla. */
+  pagarPrueba: boolean;
   ahora: Date;
 }) {
   const { licencia, ordenAbierta } = cuenta;
@@ -277,12 +354,15 @@ function TarjetaCuenta({
     ordenAbierta?.estado !== 'REPORTADA';
   const bloqueada = Boolean(cuenta.bloqueadaHasta && new Date(cuenta.bloqueadaHasta) > ahora);
   const masLargos = plan ? planes.filter((p) => p.rango > plan.rango) : [];
+  const completar = ordenAbierta ? [] : opcionesParaCompletar(cuenta, planes);
 
   let nota: ReactNode = null;
   if (ordenAbierta?.estado === 'REPORTADA') {
     nota = `Reportaste el pago de la orden ${ordenAbierta.numero}. Lo estamos revisando; te avisamos por correo.`;
   } else if (ordenAbierta) {
     nota = `Tienes la orden ${ordenAbierta.numero} sin pagar. Vale hasta las ${hora.format(new Date(ordenAbierta.expiraEn))}.`;
+  } else if (licencia.estado === 'PRUEBA' && licencia.fin) {
+    nota = `Para seguir, paga solo la diferencia del plan que elijas antes del ${fechaLarga(licencia.fin)}. Tus días de prueba cuentan dentro del plan. Durante la prueba no se pueden cambiar el broker, el servidor ni el número.`;
   } else if (licencia.estado === 'PENDIENTE_PAGO') {
     nota =
       'Paga la licencia para que conectemos la cuenta. Empieza a contar el día que aprobamos el pago.';
@@ -359,6 +439,20 @@ function TarjetaCuenta({
           </>
         ) : null}
         {nota ? <p className="max-w-[32em] text-[15px] text-niebla">{nota}</p> : null}
+        {completar.length > 0 ? (
+          <ul aria-label="Completar la prueba" className="grid gap-1">
+            {completar.map((o) => (
+              <li key={o.plan.codigo} className="flex flex-wrap items-baseline gap-x-4">
+                <BotonOrden cuentaId={cuenta.id} plan={o.plan.codigo}>
+                  {o.plan.nombre}
+                </BotonOrden>
+                <span className="text-[15px] text-niebla">
+                  {usd(o.diferencia)} más, hasta el {fechaLarga(o.hasta)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           {ordenAbierta ? (
             <Enlace href={`/panel/pagos?orden=${ordenAbierta.numero}`}>
@@ -369,6 +463,16 @@ function TarjetaCuenta({
             <Lateral titulo={`Licencia para la cuenta ${cuenta.numero}`} boton="Pagar licencia">
               <ElegirPlan cuentaId={cuenta.id} planes={opciones} />
             </Lateral>
+          ) : null}
+          {pagarPrueba ? (
+            <BotonOrden cuentaId={cuenta.id} plan="PRUEBA">
+              Pagar la prueba
+            </BotonOrden>
+          ) : null}
+          {pagable && pedirPrueba && licencia.estado === 'PENDIENTE_PAGO' ? (
+            <Enlace href="/panel/prueba" gris>
+              Pedir la prueba
+            </Enlace>
           ) : null}
           {renovable && plan ? (
             <BotonOrden cuentaId={cuenta.id} plan={plan.codigo}>
@@ -403,10 +507,13 @@ function TarjetaCuenta({
 
 async function Contenido() {
   const sesion = await requerirSesion('CLIENT');
-  const [{ cuentas, planes, diasGracia }, landing] = await Promise.all([
+  const [{ cuentas, planes, diasGracia }, landing, prueba] = await Promise.all([
     leerPanel<MisCuentas>('/cuentas'),
     obtenerLanding(),
+    leerPanel<EstadoPrueba>('/prueba'),
   ]);
+  // La prueba se ofrece mientras el cliente no haya pedido ninguna (es una sola vez por persona).
+  const ofrecerPrueba = prueba.disponible && !prueba.solicitud;
   const ahora = new Date();
   const nombre = sesion.usuario.nombre.split(' ')[0] ?? sesion.usuario.nombre;
   const opciones = opcionesDePlanes(planes);
@@ -416,6 +523,7 @@ async function Contenido() {
       <Titular
         cuentas={cuentas}
         planes={planes}
+        prueba={prueba}
         ahora={ahora}
         nombre={nombre}
         nombreCompleto={sesion.usuario.nombre}
@@ -449,6 +557,16 @@ async function Contenido() {
                 cuenta={cuenta}
                 planes={planes}
                 diasGracia={diasGracia}
+                pedirPrueba={ofrecerPrueba}
+                pagarPrueba={
+                  prueba.solicitud?.estado === 'APROBADA' &&
+                  prueba.solicitud.cuentaId === cuenta.id &&
+                  cuenta.licencia.estado === 'PENDIENTE_PAGO' &&
+                  cuenta.ordenAbierta?.estado !== 'REPORTADA' &&
+                  !['PENDIENTE', 'REPORTADA', 'APROBADA'].includes(
+                    prueba.solicitud.orden?.estado ?? '',
+                  )
+                }
                 ahora={ahora}
               />
             ))}
@@ -468,6 +586,22 @@ async function Contenido() {
             <p className="max-w-[36em] text-niebla">
               Cada cuenta de trading lleva su propia licencia: {listaPrecios(planes)}.
             </p>
+          </section>
+        ) : null}
+        {ofrecerPrueba ? (
+          <section
+            aria-labelledby="t-prueba"
+            className="grid content-start justify-items-start gap-[18px]"
+          >
+            <h2 id="t-prueba" className="text-medio">
+              ¿Quieres probar primero?
+            </h2>
+            <p className="max-w-[36em] text-niebla">
+              Pide {prueba.dias ?? 15} días de prueba por {usd(prueba.precioUsdCentavos ?? 5_000)}.
+              Si te gusta, pagas solo la diferencia del plan que elijas. Es una sola vez por persona
+              y por cuenta de trading.
+            </p>
+            <Enlace href="/panel/prueba">Pedir la prueba</Enlace>
           </section>
         ) : null}
         <section

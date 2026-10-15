@@ -72,13 +72,29 @@ describe('tipoDeOrden', () => {
     expect(tipoDeOrden({ estado: 'SUSPENDIDA', rangoPlan: 1 }, mensual)).toEqual({
       error: 'LICENCIA_SUSPENDIDA',
     });
+  });
+
+  it('en prueba, cualquier plan público la completa', () => {
     expect(tipoDeOrden({ estado: 'PRUEBA', rangoPlan: 0 }, mensual)).toEqual({
-      error: 'LICENCIA_EN_PRUEBA',
+      tipo: 'COMPLETAR_PRUEBA',
     });
   });
 });
 
 describe('vencimientoSiSeAprueba', () => {
+  it('completar la prueba cuenta el plan desde el inicio de la prueba', () => {
+    expect(
+      vencimientoSiSeAprueba(
+        'COMPLETAR_PRUEBA',
+        {
+          finActual: new Date('2026-10-18T15:00:00Z'),
+          inicioPrueba: new Date('2026-10-03T15:00:00Z'),
+        },
+        { durationMonths: 6, bonusMonths: 0, durationDays: null },
+      )?.toISOString(),
+    ).toBe('2027-04-03T15:00:00.000Z');
+  });
+
   it('una renovación suma los meses al vencimiento actual', () => {
     expect(
       vencimientoSiSeAprueba(

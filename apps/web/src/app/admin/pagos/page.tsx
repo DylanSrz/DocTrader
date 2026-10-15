@@ -6,7 +6,14 @@ import { Enlace, Estado, Etiqueta, Triangulo, cx } from '@/components/ui';
 import { llamarApi } from '@/lib/api';
 import { conceptoOrden, fechaCorta, montoCripto, nombreRed, usd } from '@/lib/formato';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
-import { AprobacionAutomatica, AprobarPago, RechazarPago, VerificarPago } from './acciones-pago';
+import {
+  AprobacionAutomatica,
+  AprobarPago,
+  AprobarPrueba,
+  RechazarPago,
+  RechazarPrueba,
+  VerificarPago,
+} from './acciones-pago';
 
 export const metadata: Metadata = { title: 'Pagos' };
 
@@ -17,6 +24,7 @@ interface Chequeo {
 }
 
 interface PagoAdmin {
+  billeteraDeOtraPrueba: boolean;
   numero: string;
   tipo: TipoOrden;
   estado: EstadoOrden;
@@ -43,6 +51,138 @@ interface PagoAdmin {
   decididaEn: string | null;
   modo: 'MANUAL' | 'AUTO' | null;
   motivoRechazo: string | null;
+}
+
+interface SolicitudPrueba {
+  id: string;
+  estado: 'BLOQUEADA' | 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
+  cliente: { id: string; nombre: string; correo: string };
+  cuenta: { numero: string; broker: string; servidor: string; titular: string };
+  senales: { tipo: string; texto: string }[];
+  bloqueos: { tipo: string; texto: string }[];
+  motivoRechazo: string | null;
+  creadaEn: string;
+  decididaEn: string | null;
+  orden: { numero: string; estado: EstadoOrden } | null;
+}
+
+interface Pruebas {
+  disponible: boolean;
+  pendientes: SolicitudPrueba[];
+  bloqueadas: SolicitudPrueba[];
+  decididas: SolicitudPrueba[];
+}
+
+/** Lo que el admin ve de cada bloqueo: a quién se parece, no lo que ve el cliente. */
+const BLOQUEO_ADMIN: Record<string, string> = {
+  CEDULA: 'la cédula ya tuvo prueba',
+  CUENTA: 'la cuenta de trading ya tuvo prueba',
+  CORREO: 'el correo ya estaba ligado a una prueba',
+  TELEFONO: 'el teléfono ya estaba ligado a una prueba',
+};
+
+function Solicitud({ s }: { s: SolicitudPrueba }) {
+  const conSenales = s.senales.length > 0;
+  return (
+    <li className="grid grid-cols-[minmax(0,5fr)_minmax(0,6fr)] items-start gap-x-[clamp(32px,6vw,96px)] gap-y-6 max-md:grid-cols-1">
+      <div className="grid justify-items-start gap-4">
+        <Estado tono={conSenales ? 'llama' : 'senal'}>
+          {conSenales
+            ? s.senales.length === 1
+              ? '1 señal'
+              : `${s.senales.length} señales`
+            : 'Sin coincidencias'}
+        </Estado>
+        <h3 className="text-[clamp(26px,2.6vw,34px)] leading-[1.15] tracking-[-0.03em]">
+          {s.cliente.nombre}
+        </h3>
+        <p className="-mt-2 text-[15px] text-ceniza">
+          Cuenta <span className="cifra">{s.cuenta.numero}</span> en{' '}
+          <span translate="no">{s.cuenta.broker}</span>, titular {s.cuenta.titular}. Pidió la prueba
+          el {cuando(s.creadaEn).replace(/\.$/, '')}.
+        </p>
+      </div>
+      <div className="grid justify-items-start gap-5">
+        <ul aria-label="Control de la prueba" className="grid gap-2 text-[15px]">
+          <li className="flex items-start gap-3">
+            <Triangulo className="mt-[7px] text-senal" />
+            <span>Cédula, cuenta, correo y teléfono sin pruebas anteriores</span>
+          </li>
+          {s.senales.map((senal) => (
+            <li key={senal.tipo} className="flex items-start gap-3 text-llama">
+              <Triangulo relleno={false} className="mt-[7px]" />
+              <span>{senal.texto}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="max-w-[34em] text-sm text-ceniza">
+          Al aprobarla, el cliente paga su orden de la prueba. Al conectar la cuenta, confirma que
+          el titular en el broker sea {s.cliente.nombre}.
+        </p>
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          {conSenales ? (
+            <>
+              <RechazarPrueba solicitud={s.id} cliente={s.cliente.nombre} principal />
+              <AprobarPrueba solicitud={s.id} cliente={s.cliente.nombre} conSenales />
+            </>
+          ) : (
+            <>
+              <AprobarPrueba solicitud={s.id} cliente={s.cliente.nombre} conSenales={false} />
+              <RechazarPrueba solicitud={s.id} cliente={s.cliente.nombre} principal={false} />
+            </>
+          )}
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function SeccionPruebas({ pruebas }: { pruebas: Pruebas }) {
+  const n = pruebas.pendientes.length;
+  return (
+    <section
+      id="pruebas"
+      aria-labelledby="t-pruebas"
+      className="mt-[clamp(96px,12vw,168px)] scroll-mt-8"
+    >
+      <div className="mb-[clamp(32px,4vw,48px)] grid gap-3">
+        <h2 id="t-pruebas" className="text-medio">
+          Solicitudes de prueba
+        </h2>
+        <p className="max-w-[40em] text-niebla">
+          {pruebas.disponible
+            ? 'Una sola vez por persona y por cuenta de trading. La plataforma ya bloqueó las que repetían cédula, cuenta, correo o teléfono; aquí quedan las que pasaron, con las señales que encontró.'
+            : 'Las solicitudes están cerradas: faltan la llave de las huellas (TRIAL_HMAC_KEY) o la configuración de los SMS.'}
+        </p>
+      </div>
+      {n > 0 ? (
+        <ol className="grid gap-[clamp(72px,9vw,120px)]">
+          {pruebas.pendientes.map((s) => (
+            <Solicitud key={s.id} s={s} />
+          ))}
+        </ol>
+      ) : (
+        <p className="text-niebla">No hay solicitudes de prueba por revisar.</p>
+      )}
+      {pruebas.bloqueadas.length > 0 ? (
+        <div className="mt-[clamp(48px,6vw,72px)] grid gap-3">
+          <p className="text-sm text-ceniza">
+            Bloqueadas automáticamente en los últimos 30 días: {pruebas.bloqueadas.length}. El
+            cliente vio el motivo y no pudo enviar la solicitud.
+          </p>
+          <ul className="grid gap-1.5 text-[15px] text-niebla">
+            {pruebas.bloqueadas.map((b) => (
+              <li key={b.id}>
+                <b className="font-normal text-blanco">{b.cliente.nombre}</b>:{' '}
+                {b.bloqueos.map((x) => BLOQUEO_ADMIN[x.tipo] ?? x.texto).join(', ')} (
+                {cuando(b.creadaEn).replace(/\.$/, '')}).
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
+  );
 }
 
 interface Pagos {
@@ -169,6 +309,13 @@ function Pago({ pago }: { pago: PagoAdmin }) {
           </ul>
         ) : null}
         {pago.nota ? <p className="max-w-[34em] text-[15px] text-niebla">{pago.nota}</p> : null}
+        {pago.billeteraDeOtraPrueba ? (
+          <p className="flex max-w-[34em] items-start gap-3 text-[15px] text-llama">
+            <Triangulo relleno={false} className="mt-[7px]" />
+            La billetera de origen ya pagó otra prueba. Puede ser un exchange que comparten muchas
+            personas: revisa antes de aprobar.
+          </p>
+        ) : null}
         {pago.error ? (
           <p className="max-w-[34em] text-sm text-ceniza">
             Los proveedores de la blockchain no respondieron la última vez. Seguimos intentando.
@@ -271,7 +418,11 @@ function Tabla({
 
 async function Contenido() {
   await requerirSesion('ADMIN');
-  const respuesta = await llamarApi<Pagos>('/admin/pagos', { token: await tokenDeSesion() });
+  const token = await tokenDeSesion();
+  const [respuesta, solicitudes] = await Promise.all([
+    llamarApi<Pagos>('/admin/pagos', { token }),
+    llamarApi<Pruebas>('/admin/pruebas', { token }),
+  ]);
   if (!respuesta.ok) {
     return <p className="text-error">No pudimos cargar los pagos: {respuesta.error.mensaje}</p>;
   }
@@ -308,6 +459,8 @@ async function Contenido() {
           Los nuevos aparecen aquí apenas el cliente reporta el código de la transacción.
         </p>
       )}
+
+      {solicitudes.ok ? <SeccionPruebas pruebas={solicitudes.datos} /> : null}
 
       <Tabla
         titulo="Revisados esta semana"
