@@ -25,7 +25,7 @@ const SIN_CONEXION: ErrorApi = {
  */
 export async function llamarApi<T>(
   ruta: string,
-  opciones: { metodo?: 'GET' | 'POST' | 'DELETE'; cuerpo?: unknown; token?: string } = {},
+  opciones: { metodo?: 'GET' | 'POST' | 'PUT' | 'DELETE'; cuerpo?: unknown; token?: string } = {},
 ): Promise<RespuestaApi<T>> {
   const url = process.env.API_URL;
   const secreto = process.env.PROXY_SECRET;

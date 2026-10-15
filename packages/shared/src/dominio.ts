@@ -113,15 +113,20 @@ export const TIPO_CONSENTIMIENTO = {
 } as const;
 export type TipoConsentimiento = ValorDe<typeof TIPO_CONSENTIMIENTO>;
 
-/**
- * Versión vigente de cada texto legal (`docs/legal/`). Cuando cambia un texto, cambia su versión y los clientes
- * deben aceptarlo de nuevo. En la etapa 2 esto pasa a la tabla `legal_documents`.
- */
-export const VERSION_LEGAL = {
-  TERMS: '2026-10-14',
-  PRIVACY: '2026-10-14',
-  RISK: '2026-10-14',
+/** Textos legales que se publican desde el panel (`legal_documents`). */
+export const TIPO_DOCUMENTO_LEGAL = {
+  TERMINOS: 'TERMS',
+  DATOS: 'PRIVACY',
+  RIESGO: 'RISK',
 } as const;
+export type TipoDocumentoLegal = ValorDe<typeof TIPO_DOCUMENTO_LEGAL>;
+
+/** Ruta pública de cada texto legal (`/legal/terminos`, …) y su título. */
+export const DOCUMENTOS_LEGALES: Record<TipoDocumentoLegal, { ruta: string; titulo: string }> = {
+  TERMS: { ruta: 'terminos', titulo: 'Términos de la licencia' },
+  PRIVACY: { ruta: 'datos', titulo: 'Tratamiento de datos personales' },
+  RISK: { ruta: 'riesgo', titulo: 'Aviso de riesgo' },
+};
 
 /**
  * En qué punto está una sesión: completa, esperando el código del segundo factor, o (solo admins) obligada a

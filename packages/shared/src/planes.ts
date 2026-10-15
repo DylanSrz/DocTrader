@@ -68,3 +68,16 @@ export function diferenciaParaCompletar(
   }
   return precioPlanCentavos - precioPruebaCentavos;
 }
+
+/** Meses que dura un plan, contando el obsequio (el semestral dura 7). Nulo en la prueba. */
+export function mesesTotales(plan: Pick<DefinicionPlan, 'durationMonths' | 'bonusMonths'>) {
+  return plan.durationMonths === null ? null : plan.durationMonths + plan.bonusMonths;
+}
+
+/** Cuánto sale cada mes del plan, en dólares enteros, para "equivale a USD 106 al mes". */
+export function dolaresPorMes(
+  plan: Pick<DefinicionPlan, 'durationMonths' | 'bonusMonths' | 'priceUsdCents'>,
+): number | null {
+  const meses = mesesTotales(plan);
+  return meses ? Math.round(plan.priceUsdCents / meses / 100) : null;
+}

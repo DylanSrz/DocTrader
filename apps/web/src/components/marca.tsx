@@ -7,7 +7,7 @@ export function Marca() {
   return (
     <Link href="/" className="inline-flex min-h-11 items-center gap-3 text-blanco no-underline">
       <Image src={logo} alt="" width={27} priority />
-      <span className="text-lg font-semibold tracking-[-0.02em]" translate="no">
+      <span className="text-base font-semibold tracking-[-0.02em] sm:text-lg" translate="no">
         DocTraderPRO
       </span>
     </Link>

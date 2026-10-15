@@ -16,6 +16,10 @@ export class Consent {
   @Column({ name: 'document_version', type: 'text', nullable: true })
   documentVersion: string | null;
 
+  /** El texto exacto que aceptó (nulo en mercadeo, que no tiene texto propio). */
+  @Column({ name: 'legal_document_id', type: 'uuid', nullable: true })
+  legalDocumentId: string | null;
+
   @Column({ name: 'accepted_at', type: 'timestamptz', default: () => 'now()' })
   acceptedAt: Date;
 

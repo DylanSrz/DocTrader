@@ -2,6 +2,7 @@ import { AuditLog } from './audit-log.entity.js';
 import { AuthToken } from './auth-token.entity.js';
 import { Consent } from './consent.entity.js';
 import { DepositAddress } from './deposit-address.entity.js';
+import { LegalDocument } from './legal-document.entity.js';
 import { Notification } from './notification.entity.js';
 import { PartnerProfile } from './partner-profile.entity.js';
 import { Plan } from './plan.entity.js';
@@ -15,6 +16,7 @@ export {
   AuthToken,
   Consent,
   DepositAddress,
+  LegalDocument,
   Notification,
   PartnerProfile,
   Plan,
@@ -31,6 +33,7 @@ export const ENTIDADES = [
   AuthToken,
   Consent,
   DepositAddress,
+  LegalDocument,
   Notification,
   PartnerProfile,
   Plan,

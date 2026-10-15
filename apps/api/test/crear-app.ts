@@ -41,6 +41,7 @@ export function comoLaWeb(
     get: (ruta: string) => firmar(request(servidor).get(ruta)),
     post: (ruta: string, cuerpo?: object) =>
       firmar(request(servidor).post(ruta)).send(cuerpo ?? {}),
+    put: (ruta: string, cuerpo?: object) => firmar(request(servidor).put(ruta)).send(cuerpo ?? {}),
     delete: (ruta: string) => firmar(request(servidor).delete(ruta)),
   };
 }

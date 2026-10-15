@@ -75,11 +75,23 @@ prueba sin pagos.
   - **Falta para usarla con clientes reales:** Resend verificado (sin él no salen los correos) y Turnstile
     (`docs/PENDIENTES.md`).
 
-### Etapa 2 — Página pública
+### Etapa 2 — Página pública ✅ (2026-10-15)
 - Landing de la propuesta 2 con planes y precios desde la base de datos, preguntas frecuentes, Myfxbook y broker.
 - Páginas legales desde `legal_documents` (textos de `docs/legal/`).
 - **Hecho cuando:** la landing se ve como el prototipo, carga rápido en celular y los textos legales se pueden
   actualizar sin tocar código.
+- **Resultado:**
+  - **Landing** igual al prototipo (logo de partículas, problema, cuatro pasos, resultados de Myfxbook, precios,
+    preguntas y cierre). Planes, precios, preguntas, cifras y enlaces salen de la base de datos y quedan en caché;
+    si la API no responde, se muestran los datos de la semilla.
+  - **Textos legales** en `legal_documents`, con versiones que la base de datos no deja cambiar ni borrar. Cada
+    autorización del registro apunta a la versión exacta aceptada.
+  - **Panel de admin:** pestañas "Preguntas" (agregar, quitar, ordenar y guardar) y "Textos legales" (editar en
+    Markdown y publicar una versión nueva con el código de la app). La landing y las páginas legales se
+    actualizan al guardar.
+  - `robots.txt` y `sitemap.xml`.
+  - **Queda para después:** pedir que los clientes acepten de nuevo cuando cambie un texto legal (etapa 8, con
+    los correos), y editar precios y cifras de Myfxbook desde el panel (etapa 5, ajustes).
 
 ### Etapa 3 — Cuentas de trading, licencias y órdenes
 - Agregar cuentas con contraseñas cifradas y la regla de una cuenta por cliente.
