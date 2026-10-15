@@ -61,6 +61,10 @@ control total del servidor, no podría mover el dinero de Argemiro.
   - Redis guarda la huella (HMAC) del token, no el token. Al pasar el segundo factor o activarlo, la sesión cambia
     de token.
   - Un código de la app no se acepta dos veces; después de 5 códigos equivocados se cierra la sesión a medias.
+  - Etapa 9: además, máximo 10 códigos por hora por usuario, contados en Redis de forma atómica antes de comparar y
+    compartidos por todas sus sesiones (muchas peticiones al mismo tiempo no ganan intentos). La espera tras varias
+    contraseñas equivocadas es por correo **e IP**: desde otra IP nadie deja fuera al dueño; el desafío y el aviso
+    siguen contando por cuenta. Cambiar los enlaces públicos (Telegram, broker, correo) también pide confirmación.
   - Los enlaces de los correos llevan el secreto después de `#`, que el navegador no envía a ningún servidor, y el
     correo se confirma con un botón (los lectores de correo que abren enlaces solos no lo confirman).
   - Registro y recuperar contraseña responden igual exista o no el correo; si ya existe, se le avisa al dueño.
@@ -125,6 +129,10 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 - Montos en unidades enteras de cada moneda (sin decimales flotantes): USDT en Tron usa 6 decimales y BTC 8.
 - Índice único por red y hash en la base de datos: un hash no se puede usar en dos órdenes, ni siquiera con dos
   peticiones al mismo tiempo.
+- **Monto único por orden** (etapa 9): todas las órdenes usan la misma dirección de depósito, así que el monto es lo
+  que liga un pago a su orden. Cada orden abierta de una red tiene un monto distinto (unos centavos o satoshis menos
+  que el precio, elegido al azar con un candado por red) y la verificación exige el monto exacto. Sin esto, cualquier
+  cliente podía reportar como suyo el hash del pago de otro. Un monto mayor queda para revisión manual.
 - Aprobar un pago bloquea la fila de la orden en una transacción, para que no se apruebe dos veces.
 - Los trabajos del worker son idempotentes: si se repiten, no duplican licencias ni días.
 - La aprobación automática (apagada por defecto) solo aprueba órdenes verificadas con todas las confirmaciones.
@@ -159,7 +167,10 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 - Solo se piden los datos necesarios. La cédula se muestra enmascarada (últimos 4 dígitos) salvo acción explícita.
 - Casilla de autorización en el registro y prueba guardada (fecha, IP, versión de la política).
 - Plazos de borrado automáticos según `docs/legal/politica-datos.md`, ejecutados por el worker.
-- El cliente puede descargar sus datos y pedir que se elimine su cuenta desde su perfil.
+- El cliente pide que se elimine su cuenta desde su perfil (abre un ticket) y un admin la elimina desde su ficha,
+  con el segundo factor: se anonimizan sus datos y se conservan las órdenes y los pagos (etapa 9). Descargar sus
+  datos desde el perfil sigue pendiente; mientras tanto se entregan por solicitud (Ley 1581, consultas en 10 días
+  hábiles).
 - Nunca se usan datos reales de producción en desarrollo.
 
 ## 9. Abuso y bots
@@ -205,7 +216,10 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 - **Auditoría que no se puede editar:** la app solo puede insertar en la tabla de auditoría (sin permisos de cambiar
   ni borrar), y cada registro lleva el hash del anterior, para detectar si alguien la alteró.
   Se audita: ingresos de admins, aprobación o rechazo de pagos, vistas de contraseñas, cambios de direcciones,
-  precios, ajustes y comisión, extensiones de días, suspensiones y exportaciones.
+  precios, ajustes y comisión, extensiones de días, suspensiones, exportaciones y eliminación de clientes. El worker
+  recalcula la cadena cada día y avisa a los admins si no cuadra (etapa 9).
+- **Pendiente (operación):** la API usa hoy el usuario dueño de las tablas; separar un usuario sin permisos de
+  administrador para la app y otro para las migraciones. Las copias: ver README, "Copias de seguridad".
 
 ## 13. Código, dependencias y despliegue
 
@@ -222,7 +236,10 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 
 - Errores en Sentry, con los datos personales y secretos filtrados antes de enviarse.
 - Registros sin datos sensibles (ni contraseñas, ni cédulas completas, ni tokens).
-- Monitor de disponibilidad de la web y la API con alerta a los dos admins.
+- Monitor de disponibilidad de la web y la API con alerta a los dos admins (operación: `/salud` está lista).
+- Construido en la etapa 9: Sentry (API, worker y servidor de la web) sin cuerpos, cookies, parámetros, encabezados
+  sensibles, usuario ni migas; alertas de pagos sin verificar en una hora, más de 50 ingresos fallidos en una hora,
+  trabajos del worker que fallan y auditoría alterada (`apps/api/src/monitoreo/`).
 - Alertas por: muchos ingresos fallidos, trabajos del worker que fallan, pagos sin verificar por más de una hora y
   cambios de direcciones de depósito.
 - **Si pasa algo** (operación):

@@ -70,9 +70,11 @@
 - [x] **Aceptar de nuevo los textos legales** (2026-10-15): no hace falta. Los clientes de hoy son de prueba y, antes
       de salir a producción, se limpia la base de datos (todo menos los admins): todos los clientes se registran de
       nuevo con los textos vigentes.
-- [x] **Eliminar la cuenta de un cliente que lo pida** (2026-10-15): sí, y lo hace un admin desde el panel. Falta
-      construirlo: anonimizar nombre, cédula, correo y teléfono, borrar sus contraseñas de trading y sus tickets, y
-      conservar órdenes y pagos (los exige la ley).
+- [x] **Eliminar la cuenta de un cliente que lo pida** (2026-10-15): sí, y lo hace un admin desde el panel. Construido
+      en la etapa 9: "Eliminar cliente" en la ficha de Licencias (con el código de la app).
+- [ ] **Cambiar el número de una cuenta con licencia vigente** (revisión de seguridad, etapa 9): hoy el cliente puede
+      cambiar el número o el broker de una cuenta pagada; vuelve a "por conectar" y a los admins les llega el aviso, así
+      que depende de que desconecten la cuenta vieja en Social Trader Tools. ¿Debería pedirse por ticket?
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
       (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
       prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.
@@ -100,7 +102,17 @@
       API **y** en el worker de Railway (el worker borra los adjuntos sin usar). No hace falta CORS en R2: el
       navegador sube a la API y descarga con un enlace firmado. Sin estas variables, los tickets funcionan sin
       adjuntos. `WEB_ORIGIN` de la API debe ser la dirección exacta de la web (la subida es directa a la API).
-- [ ] Crear cuando se necesite: Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
+- [ ] **Sentry (etapa 9):** crear un proyecto (plan gratis) y poner su DSN en `SENTRY_DSN` de la API y el worker de
+      Railway y de Vercel. El código ya está listo y no envía datos personales; sin la variable no hace nada.
+- [ ] **Monitor de disponibilidad (etapa 9):** por ejemplo UptimeRobot o Better Stack (gratis), revisando cada 5
+      minutos `https://<api>/salud` (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo
+      a los dos admins.
+- [ ] **Copias de seguridad (etapa 9):** activar las copias programadas del volumen de Postgres en Railway (pestaña
+      Backups) y crear el depósito de R2 `doctrader-copias` con su token y los 6 secretos del flujo semanal (ver
+      README, "Copias de seguridad"). Después, correr el flujo a mano una vez y revisar que la restauración pase.
+- [ ] **Base de datos con permisos separados (etapa 9, `SEGURIDAD.md` §12):** hoy la API usa el usuario dueño de las
+      tablas. Lo ideal es un usuario sin permisos de administrador para la API y el worker, y el dueño solo para las
+      migraciones. Se puede hacer después del lanzamiento.
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
