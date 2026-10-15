@@ -475,3 +475,26 @@ stateDiagram-v2
 - **Vencimiento por fecha:** `ACTIVA` → `EN_GRACIA` al pasar `ends_at`; `EN_GRACIA` → `VENCIDA` al pasar
   `grace_ends_at`. Al vencer: `CONECTADA` → `POR_DESCONECTAR` y `POR_CONECTAR` → `SIN_LICENCIA`. La licencia en
   prueba y la suspendida se manejan en las etapas 5 y 6.
+
+## 9. Cómo quedó construido (etapa 5, 2026-10-15)
+
+- **`trading_accounts.connection_changed_at`:** desde cuándo la cuenta está en su estado de conexión actual ("por
+  conectar desde ayer"). Lo mantiene un disparador de la base de datos en cada cambio de `connection_status`, venga de
+  la API, del worker o de la aprobación de un pago.
+- **`license_periods.note`:** el motivo de un periodo `EXTENSION_ADMIN`, con `created_by` (quién lo extendió).
+- **Extender días:** se suman a `ends_at`; si ya terminó la gracia, desde hoy (no se gastan en un tiempo que pasó).
+  La licencia queda en el estado de sus fechas (una suspendida sigue suspendida) y `grace_ends_at` se recalcula con
+  los días de gracia vigentes. Si vuelve a estar vigente, la conexión sigue la misma regla que al pagar.
+- **Suspender:** solo una licencia activa, en gracia o en prueba. Conexión: `CONECTADA` → `POR_DESCONECTAR` y
+  `POR_CONECTAR` → `SIN_LICENCIA`. **Quitar la suspensión** devuelve el estado de sus fechas (activa, en gracia o
+  vencida; en prueba si lo era) y, si sigue vigente, la conexión vuelve como al pagar. El worker no toca las
+  suspendidas.
+- **Direcciones de depósito:** una nueva entra `EN_ESPERA` con `activates_at` = ahora + 24 horas; el trabajo
+  `activar-direcciones` (cada minuto) la pasa a `ACTIVA`. Cancelar solo aplica a `EN_ESPERA`; desactivar, a `ACTIVA`;
+  reactivar, a `INACTIVA` (sin nueva espera). Cada cambio avisa por correo a los admins activos.
+- **Ajustes:** `grace_days`, `order_ttl_minutes` y `min_confirmations` se editan juntos; `links` y `support_email`
+  juntos; `myfxbook` conserva lo que el panel no edita (el número de cuenta). Precios en `plans.price_usd_cents`;
+  la duración de la prueba en `plans.duration_days`. La prueba debe costar menos que el plan activo más barato.
+- **Auditoría nueva:** `cuenta.ver_contrasenas`, `cuenta.conectada`, `cuenta.desconectada`, `cuenta.asignacion` (sin
+  el texto de las notas), `cliente.ver_cedula`, `licencia.extendida`, `licencia.suspendida`, `licencia.reactivada`,
+  `licencias.exportadas`, `direccion.*` y `ajustes.*` (con el valor anterior y el nuevo).

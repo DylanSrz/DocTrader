@@ -8,4 +8,5 @@ export { Enlace } from './enlace';
 export { Estado } from './estado';
 export { Etiqueta } from './etiqueta';
 export { Pildora } from './pildora';
+export { Selector } from './selector';
 export { Triangulo } from './triangulo';

@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull } from 'typeorm';
 import { opcionesBaseDeDatos } from '../src/database/data-source.js';
 import { DepositAddress, PartnerProfile, Plan, User } from '../src/database/entidades/index.js';
 import { PlanesYMarca1792400000000 } from '../src/database/migraciones/1792400000000-planes-y-marca.js';
@@ -116,7 +116,10 @@ describe('semilla', () => {
   });
 
   it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 10 %', async () => {
-    const direcciones = await fuente.getRepository(DepositAddress).find();
+    // Las de la semilla no tienen autor; las que agregan otras pruebas desde el panel, sí.
+    const direcciones = await fuente
+      .getRepository(DepositAddress)
+      .find({ where: { createdBy: IsNull() } });
     expect(direcciones.map((d) => `${d.currency}:${d.status}`).sort()).toEqual([
       'BTC:ACTIVA',
       'USDT:ACTIVA',

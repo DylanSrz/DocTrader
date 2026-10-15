@@ -81,7 +81,8 @@ export async function adminConSesion(app: INestApplication) {
   };
 }
 
-let numeroCuenta = 60_000_000;
+// Distinto en cada archivo de pruebas: la base de datos es la misma para todos.
+let numeroCuenta = Date.now();
 
 export function datosCuenta(cambios: Record<string, string> = {}) {
   numeroCuenta += 1;

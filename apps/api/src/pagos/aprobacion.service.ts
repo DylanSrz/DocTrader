@@ -4,7 +4,6 @@ import {
   ESTADO_LICENCIA,
   ESTADO_ORDEN,
   ESTADO_VERIFICACION,
-  type EstadoConexion,
   finDePeriodo,
   sumarDias,
   TIPO_ORDEN,
@@ -25,6 +24,7 @@ import {
   User,
 } from '../database/entidades/index.js';
 import { leerAjustes } from '../licencias/ajustes.js';
+import { conexionAlActivar } from '../licencias/conexion.js';
 import { errorApi } from '../seguridad/errores.js';
 
 /** Quién decide: un admin (con su IP y navegador, para la auditoría) o el sistema, con la aprobación automática. */
@@ -37,20 +37,6 @@ function noRevisable(numero: string) {
     'NO_REVISABLE',
     `La orden ${numero} ya no está por revisar. Recarga la página.`,
   );
-}
-
-/** Lo que pasa con la conexión de la cuenta cuando su licencia queda pagada (`docs/MODELO-DATOS.md` §4.4). */
-function conexionAlPagar(actual: EstadoConexion): EstadoConexion {
-  switch (actual) {
-    case ESTADO_CONEXION.SIN_LICENCIA:
-    case ESTADO_CONEXION.DESCONECTADA:
-      return ESTADO_CONEXION.POR_CONECTAR;
-    // Renovó antes de que la desconectaran: sigue conectada.
-    case ESTADO_CONEXION.POR_DESCONECTAR:
-      return ESTADO_CONEXION.CONECTADA;
-    default:
-      return actual;
-  }
 }
 
 /**
@@ -154,7 +140,7 @@ export class AprobacionPagos {
       const cuenta = await m
         .getRepository(TradingAccount)
         .findOneByOrFail({ id: orden.tradingAccountId });
-      const conexion = conexionAlPagar(cuenta.connectionStatus);
+      const conexion = conexionAlActivar(cuenta.connectionStatus);
       if (conexion !== cuenta.connectionStatus) {
         await m
           .getRepository(TradingAccount)

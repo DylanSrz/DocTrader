@@ -3,6 +3,7 @@ import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import type { Queue } from 'bullmq';
 import {
   COLA_MANTENIMIENTO,
+  TRABAJO_ACTIVAR_DIRECCIONES,
   TRABAJO_ENVIAR_AVISOS,
   TRABAJO_ESTADOS_LICENCIA,
   TRABAJO_EXPIRAR_ORDENES,
@@ -43,6 +44,12 @@ export class ProgramarTrabajos implements OnApplicationBootstrap {
       TRABAJO_ESTADOS_LICENCIA,
       { every: 5 * 60_000 },
       { name: TRABAJO_ESTADOS_LICENCIA, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // Una dirección de depósito nueva se activa al cumplir sus 24 horas de espera.
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_ACTIVAR_DIRECCIONES,
+      { every: 60_000 },
+      { name: TRABAJO_ACTIVAR_DIRECCIONES, opts: { removeOnComplete: true, removeOnFail: 100 } },
     );
   }
 }

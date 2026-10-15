@@ -47,6 +47,13 @@
       admin queda **verificado** a los pocos minutos (20 confirmaciones). Aprobarlo y revisar que la licencia quede
       activa por un mes. El dinero llega a la cuenta de Binance de cobro.
 
+- [ ] **Un día de operación desde el panel** (etapa 5): con el pago anterior aprobado, ir a "Cuentas", ver las
+      contraseñas (pide el código de la app), conectar la cuenta en Social Trader Tools, fijar capital y riesgo y
+      "Marcar como conectada". El cliente debe recibir el correo y ver el capital y el riesgo en su panel.
+- [ ] **Direcciones de depósito** (etapa 5): agregar desde "Ajustes" una dirección de USDT (Tron) que sea de
+      ustedes, revisar que a los dos admins les llegue el correo con la dirección completa y cancelarla. Mientras
+      está en espera, ninguna orden la usa.
+
 ## ❓ Por confirmar con Argemiro
 
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual

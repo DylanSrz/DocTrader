@@ -16,6 +16,9 @@ export const PLANTILLA = {
   PRECIO_BTC_DIFERENTE: 'precio-btc-diferente',
   PAGO_APROBADO: 'pago-aprobado',
   PAGO_RECHAZADO: 'pago-rechazado',
+  CUENTA_CONECTADA: 'cuenta-conectada',
+  LICENCIA_EXTENDIDA: 'licencia-extendida',
+  DIRECCION_DEPOSITO: 'direccion-deposito',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -214,6 +217,43 @@ export function renderizar(
           'Si crees que es un error o quieres saber cómo seguir, responde este correo o escríbenos por Telegram.',
         ],
         boton: { texto: 'Ver mis pagos', url: `${web}/panel/pagos` },
+      });
+    case PLANTILLA.CUENTA_CONECTADA:
+      return armar({
+        asunto: `Tu cuenta ${datos.cuenta} está conectada`,
+        saludo,
+        parrafos: [
+          datos.actualizada === 'si'
+            ? `Actualizamos la cuenta de trading ${datos.cuenta} (${datos.broker}) en el copy trading con los datos nuevos. Ya está conectada otra vez.`
+            : `Conectamos la cuenta de trading ${datos.cuenta} (${datos.broker}) al copy trading. Desde ahora, la operativa se replica en ella.`,
+          'Mantén en la cuenta el capital recomendado que ves en tu panel. Si cambias la contraseña de la cuenta en el broker, actualízala también en tu panel para que no se desconecte.',
+        ],
+        boton: { texto: 'Ver mis cuentas', url: `${web}/panel` },
+      });
+    case PLANTILLA.LICENCIA_EXTENDIDA:
+      return armar({
+        asunto: `Sumamos ${datos.dias} a tu licencia`,
+        saludo,
+        parrafos: [
+          `Sumamos ${datos.dias} a la licencia de la cuenta de trading ${datos.cuenta}, sin costo. Ahora vence el ${datos.vence}.`,
+        ],
+        boton: { texto: 'Ver mis cuentas', url: `${web}/panel` },
+      });
+    case PLANTILLA.DIRECCION_DEPOSITO:
+      return armar({
+        asunto: `Dirección de depósito ${datos.accion}: ${datos.red}`,
+        saludo,
+        parrafos: [
+          `${datos.quien} ${datos.verbo} una dirección de depósito de ${datos.red} el ${datos.fecha}:`,
+          datos.direccion ?? '',
+          ...(datos.activa
+            ? [
+                `Los clientes la verán en sus órdenes desde el ${datos.activa}. Si no reconoces este cambio, cancélala antes desde Ajustes y cambia la contraseña del panel.`,
+              ]
+            : []),
+        ],
+        boton: { texto: 'Ver las direcciones', url: `${web}/admin/ajustes#direcciones` },
+        despues: ['Este aviso les llega a los dos administradores.'],
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);

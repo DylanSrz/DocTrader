@@ -25,7 +25,13 @@ const SIN_CONEXION: ErrorApi = {
  */
 export async function llamarApi<T>(
   ruta: string,
-  opciones: { metodo?: 'GET' | 'POST' | 'PUT' | 'DELETE'; cuerpo?: unknown; token?: string } = {},
+  opciones: {
+    metodo?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    cuerpo?: unknown;
+    token?: string;
+    /** La respuesta buena es texto (un CSV, por ejemplo) y no JSON. */
+    texto?: boolean;
+  } = {},
 ): Promise<RespuestaApi<T>> {
   const url = process.env.API_URL;
   const secreto = process.env.PROXY_SECRET;
@@ -58,6 +64,9 @@ export async function llamarApi<T>(
         `La API redirige ${ruta} a ${respuesta.headers.get('location')}: revisa API_URL (debe empezar con https://)`,
       );
       return { ok: false, estado: 502, error: SIN_CONEXION };
+    }
+    if (respuesta.ok && opciones.texto) {
+      return { ok: true, estado: respuesta.status, datos: (await respuesta.text()) as T };
     }
     const cuerpo: unknown = await respuesta.json().catch(() => null);
     if (respuesta.ok) return { ok: true, estado: respuesta.status, datos: cuerpo as T };

@@ -50,7 +50,7 @@ import {
 } from './segundo-factor.js';
 
 /** Contextos del cifrado y de las huellas: cada dato con el suyo. */
-const CONTEXTO = {
+export const CONTEXTO = {
   cedula: 'users.cedula',
   totp: 'users.totp',
   totpPendiente: 'totp.pendiente',

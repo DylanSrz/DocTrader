@@ -29,6 +29,10 @@ export class LicensePeriod {
   @Column({ name: 'bonus_months', type: 'integer', default: 0 })
   bonusMonths: number;
 
+  /** Motivo de los días que extiende un admin. */
+  @Column({ type: 'text', nullable: true })
+  note: string | null;
+
   @Column({ name: 'created_by', type: 'uuid', nullable: true })
   createdBy: string | null;
 

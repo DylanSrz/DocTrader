@@ -147,3 +147,35 @@ export function calendarioLicencia(
   }
   return filas;
 }
+
+/** Filtros de la lista de licencias del admin, en el orden en que se muestran. */
+export const FILTROS_LICENCIAS = [
+  'todas',
+  'activas',
+  'vence',
+  'gracia',
+  'vencidas',
+  'pendientes',
+  'prueba',
+  'suspendidas',
+] as const;
+export type FiltroLicencias = (typeof FILTROS_LICENCIAS)[number];
+
+export const NOMBRE_FILTRO_LICENCIAS: Record<FiltroLicencias, string> = {
+  todas: 'Todas',
+  activas: 'Activas',
+  vence: `Vence en ${DIAS_VENCE_PRONTO} días`,
+  gracia: 'En gracia',
+  vencidas: 'Vencidas',
+  pendientes: 'Pendientes de pago',
+  prueba: 'En prueba',
+  suspendidas: 'Suspendidas',
+};
+
+/** Límites de lo que un admin puede ajustar a mano en una licencia. */
+export const LIMITES_ADMIN = {
+  diasExtension: { minimo: 1, maximo: 90 },
+  motivo: { minimo: 5, maximo: 300 },
+  capitalUsd: { minimo: 1, maximo: 10_000_000 },
+  notas: 2_000,
+} as const;

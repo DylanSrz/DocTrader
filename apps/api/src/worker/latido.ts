@@ -6,3 +6,4 @@ export const TRABAJO_ENVIAR_AVISOS = 'enviar-avisos';
 export const TRABAJO_EXPIRAR_ORDENES = 'expirar-ordenes';
 export const TRABAJO_VERIFICAR_PAGOS = 'verificar-pagos';
 export const TRABAJO_ESTADOS_LICENCIA = 'estados-licencia';
+export const TRABAJO_ACTIVAR_DIRECCIONES = 'activar-direcciones';

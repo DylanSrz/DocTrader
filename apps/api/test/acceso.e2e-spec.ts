@@ -371,7 +371,7 @@ describe('admins: segundo factor obligatorio', () => {
     const resumen = await comoLaWeb(app, { token: activacion.body.token })
       .get('/admin/resumen')
       .expect(200);
-    expect(resumen.body.clientes).toBeGreaterThan(0);
+    expect(resumen.body.cuentas.clientes).toBeGreaterThan(0);
 
     const usuario = await fuente.getRepository(User).findOneByOrFail({ email: correoAdmin });
     expect(usuario.totpSecretEnc!.toString('latin1')).not.toContain(secretoTotp);
