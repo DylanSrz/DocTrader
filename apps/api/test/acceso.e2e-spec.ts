@@ -134,7 +134,13 @@ describe('registro', () => {
       'RISK',
       'TERMS',
     ]);
-    expect(autorizaciones.find((a) => a.type === 'TERMS')!.documentVersion).toBe('2026-10-14');
+    const terminos = autorizaciones.find((a) => a.type === 'TERMS')!;
+    // Apunta al texto vigente (otras pruebas pueden haber publicado versiones nuevas).
+    const [vigente] = (await fuente.query(
+      `SELECT id, version FROM legal_documents WHERE type = 'TERMS' ORDER BY version DESC LIMIT 1`,
+    )) as { id: string; version: number }[];
+    expect(terminos.legalDocumentId).toBe(vigente!.id);
+    expect(terminos.documentVersion).toBe(String(vigente!.version));
 
     const { aviso, secreto } = await ultimoCorreo(datos.correo, 'verificar-correo');
     expect(aviso!.status).toBe('PENDIENTE');

@@ -6,7 +6,7 @@ import {
   normalizarTelefono,
   ROL,
   TIPO_CONSENTIMIENTO,
-  VERSION_LEGAL,
+  TIPO_DOCUMENTO_LEGAL,
 } from '@doctrader/shared';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -15,6 +15,7 @@ import QRCode from 'qrcode';
 import { type DataSource, type EntityManager, IsNull, MoreThan } from 'typeorm';
 import { AuditoriaService } from '../auditoria/auditoria.service.js';
 import { AvisosService } from '../avisos/avisos.service.js';
+import { ContenidoService } from '../contenido/contenido.service.js';
 import { fechaLegible } from '../avisos/fecha.js';
 import { PLANTILLA } from '../avisos/plantillas.js';
 import {
@@ -121,6 +122,7 @@ export class AccesoService {
     private readonly limites: LimitesService,
     private readonly avisos: AvisosService,
     private readonly auditoria: AuditoriaService,
+    private readonly contenido: ContenidoService,
   ) {}
 
   // ── Registro y verificación del correo ──────────────────────────────────────────────────────────────
@@ -188,21 +190,36 @@ export class AccesoService {
           }),
         );
 
-        const tipos = [
-          [TIPO_CONSENTIMIENTO.TERMINOS, VERSION_LEGAL.TERMS],
-          [TIPO_CONSENTIMIENTO.DATOS, VERSION_LEGAL.PRIVACY],
-          [TIPO_CONSENTIMIENTO.RIESGO, VERSION_LEGAL.RISK],
-          ...(dto.aceptaMercadeo ? [[TIPO_CONSENTIMIENTO.MERCADEO, null] as const] : []),
-        ] as const;
-        await m.getRepository(Consent).insert(
-          tipos.map(([type, documentVersion]) => ({
+        // Cada autorización apunta a la versión exacta del texto vigente que la persona aceptó.
+        const textos = await Promise.all(
+          [
+            TIPO_DOCUMENTO_LEGAL.TERMINOS,
+            TIPO_DOCUMENTO_LEGAL.DATOS,
+            TIPO_DOCUMENTO_LEGAL.RIESGO,
+          ].map((tipo) => this.contenido.legalVigente(tipo, m).then((texto) => ({ tipo, texto }))),
+        );
+        await m.getRepository(Consent).insert([
+          ...textos.map(({ tipo, texto }) => ({
             userId: usuario.id,
-            type,
-            documentVersion,
+            type: tipo,
+            legalDocumentId: texto?.id ?? null,
+            documentVersion: texto ? String(texto.version) : null,
             ip: cliente.ip,
             userAgent: cliente.userAgent ?? null,
           })),
-        );
+          ...(dto.aceptaMercadeo
+            ? [
+                {
+                  userId: usuario.id,
+                  type: TIPO_CONSENTIMIENTO.MERCADEO,
+                  legalDocumentId: null,
+                  documentVersion: null,
+                  ip: cliente.ip,
+                  userAgent: cliente.userAgent ?? null,
+                },
+              ]
+            : []),
+        ]);
 
         const token = await this.crearEnlace(m, usuario.id, PROPOSITO_ENLACE.VERIFICAR_CORREO);
         await this.avisos.encolar(m, {

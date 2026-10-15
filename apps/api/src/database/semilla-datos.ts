@@ -1,8 +1,15 @@
+import { existsSync, readFileSync } from 'node:fs';
 import {
+  CORREO_SOPORTE,
+  ENLACES_INICIALES,
   ESTADO_DIRECCION,
+  MYFXBOOK_INICIAL,
   ESTADO_USUARIO,
   MONEDA,
   PLANES_INICIALES,
+  PREGUNTAS_INICIALES,
+  TIPO_DOCUMENTO_LEGAL,
+  type TipoDocumentoLegal,
   RED,
   ROL,
   correoCanonico,
@@ -12,6 +19,7 @@ import { registrarEnCadena } from '../auditoria/cadena.js';
 import {
   AuthToken,
   DepositAddress,
+  LegalDocument,
   PartnerProfile,
   Plan,
   RecoveryCode,
@@ -50,24 +58,33 @@ const AJUSTES: Record<string, ValorJson> = {
   'trial.require_verified_contact': true,
   'trial.require_id_photo': false,
   'tickets.auto_close_days': 7,
-  links: {
-    telegram: 'https://t.me/+cdmWH_xLubdhMDhh',
-    instagram: 'https://www.instagram.com/doctraderproiasystem/',
-    broker: { name: 'JustMarkets', url: 'https://one.justmarkets.link/a/5vmbn05zda' },
-  },
-  myfxbook: {
-    url: 'https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459',
-    accountId: '12253459',
-    // Solo la ganancia mientras el historial esté incompleto (ver docs/PENDIENTES.md).
-    figures: {
-      gainPercent: '246.68',
-      maxDrawdownPercent: null,
-      auditedSince: null,
-      asOf: '2026-10-14',
-    },
-  },
-  support_email: 'support@doctraderpro.com',
+  links: ENLACES_INICIALES,
+  myfxbook: MYFXBOOK_INICIAL,
+  support_email: CORREO_SOPORTE,
+  // Preguntas frecuentes de la landing: Argemiro las edita desde el panel.
+  faq: PREGUNTAS_INICIALES.map((p) => ({ ...p })),
 };
+
+/** Textos legales iniciales: los borradores de `docs/legal/`. Después se publican versiones nuevas desde el panel. */
+const ARCHIVOS_LEGALES: Record<TipoDocumentoLegal, string> = {
+  [TIPO_DOCUMENTO_LEGAL.TERMINOS]: 'terminos-licencia.md',
+  [TIPO_DOCUMENTO_LEGAL.DATOS]: 'politica-datos.md',
+  [TIPO_DOCUMENTO_LEGAL.RIESGO]: 'aviso-riesgo.md',
+};
+
+/**
+ * El texto de un borrador sin su título (la página lo pone aparte) ni la nota interna que abre cada archivo
+ * ("Borrador del…, conviene que lo revise un abogado"). `null` si el archivo no está (por ejemplo, en una imagen
+ * que no copió `docs/`).
+ */
+export function textoLegalInicial(tipo: TipoDocumentoLegal): string | null {
+  const ruta = new URL(`../../../../docs/legal/${ARCHIVOS_LEGALES[tipo]}`, import.meta.url);
+  if (!existsSync(ruta)) return null;
+  return readFileSync(ruta, 'utf8')
+    .replace(/^# .*\n+/, '')
+    .replace(/^(>.*\n)+\n*/, '')
+    .trim();
+}
 
 /** Aplica la semilla y devuelve lo que creó (vacío si ya estaba todo). */
 export async function aplicarSemilla(
@@ -108,6 +125,15 @@ export async function aplicarSemilla(
         activatesAt: ahora,
       });
       creado.push(`dirección ${d.currency} ${d.network}`);
+    }
+
+    for (const tipo of Object.values(TIPO_DOCUMENTO_LEGAL)) {
+      const existe = await m.getRepository(LegalDocument).exists({ where: { type: tipo } });
+      if (existe) continue;
+      const contenido = textoLegalInicial(tipo);
+      if (!contenido) continue;
+      await m.getRepository(LegalDocument).insert({ type: tipo, version: 1, contentMd: contenido });
+      creado.push(`texto legal ${tipo}`);
     }
 
     for (const correo of ADMINS_RETIRADOS) {

@@ -35,11 +35,14 @@ describe('semilla', () => {
       'USDT:ACTIVA',
     ]);
 
+    // Otras pruebas crean admins propios (con dominio doctraderpro.com): aquí cuentan solo los de la semilla.
     const admins = await fuente.getRepository(User).findBy({ role: 'ADMIN' });
-    expect(admins.map((a) => a.email).sort()).toEqual([
-      'doctraderproiasystem@gmail.com',
-      'dylansrz96@gmail.com',
-    ]);
+    expect(
+      admins
+        .map((a) => a.email)
+        .filter((c) => c.endsWith('@gmail.com'))
+        .sort(),
+    ).toEqual(['doctraderproiasystem@gmail.com', 'dylansrz96@gmail.com']);
 
     const socio = await fuente.getRepository(PartnerProfile).find();
     expect(socio).toHaveLength(1);
