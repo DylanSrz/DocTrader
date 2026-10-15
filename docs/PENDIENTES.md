@@ -65,7 +65,7 @@
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
-- [x] Correo de admin de Argemiro: doctraderpro@gmail.com.
+- [x] Correo de admin de Argemiro: doctraderproiasystem@gmail.com (2026-10-15; antes se registró por error doctraderpro@gmail.com, que la semilla retira).
 - [ ] Segundo factor y gestor de contraseñas compartido para las cuentas de servicio (ver `docs/SEGURIDAD.md`).
 
 ## ✅ Resuelto (resumen)

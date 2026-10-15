@@ -173,7 +173,7 @@ debe informar esta finalidad (prevención de fraude en la prueba).
 
 ### Cuentas de servicio
 - Se crean con el correo de **Dylan (dylansrz96@gmail.com)**; los pagos los cubre Argemiro.
-- Admins de la plataforma: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderpro@gmail.com).
+- Admins de la plataforma: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderproiasystem@gmail.com).
 
 ### Seguridad
 Plan completo en `docs/SEGURIDAD.md`. Lo principal: segundo factor obligatorio para admins, sesiones en el servidor,
