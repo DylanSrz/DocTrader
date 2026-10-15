@@ -222,7 +222,7 @@ export class CuentasService {
         const clave = this.huellaCuenta(datos.broker, datos.servidor, datos.numero);
         if (cambiaIdentidad) await this.exigirCuentaLibre(m, clave, sesion.usuarioId, cuenta.id);
 
-        // Si ya estaba conectada, Argemiro tiene que actualizarla en Social Trader Tools (MODELO-DATOS §6, regla 4).
+        // Si ya estaba conectada, el admin tiene que actualizarla en Social Trader Tools (MODELO-DATOS §6, regla 4).
         const reconectar =
           cambios.some((c) => c !== 'titular') &&
           cuenta.connectionStatus === ESTADO_CONEXION.CONECTADA;

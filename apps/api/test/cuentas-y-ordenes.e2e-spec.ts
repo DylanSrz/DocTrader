@@ -113,7 +113,6 @@ describe('cuentas de trading', () => {
     expect(lista.body.cuentas).toHaveLength(1);
     expect(lista.body.planes.map((p: { codigo: string }) => p.codigo)).toEqual([
       'MENSUAL',
-      'TRIMESTRAL',
       'SEMESTRAL',
     ]);
     expect(lista.body.diasGracia).toBe(3);
@@ -259,7 +258,7 @@ describe('órdenes de pago', () => {
     const cuenta = await web.post('/cuentas', datosCuenta()).expect(201);
     const antes = Date.now();
     const orden = await web
-      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'TRIMESTRAL', moneda: 'USDT' })
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'SEMESTRAL', moneda: 'USDT' })
       .expect(201);
     expect(orden.body).toMatchObject({
       tipo: 'NUEVA',
@@ -267,12 +266,12 @@ describe('órdenes de pago', () => {
       moneda: 'USDT',
       red: 'TRON',
       direccion: 'TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x',
-      monto: '319',
-      montoUsdCentavos: 31_900,
+      monto: '499',
+      montoUsdCentavos: 49_900,
       precioBtcUsd: null,
       confirmacionesNecesarias: 20,
       vencimientoSiSeAprueba: null,
-      plan: { codigo: 'TRIMESTRAL', meses: 3 },
+      plan: { codigo: 'SEMESTRAL', meses: 6, mesesObsequio: 0 },
       cuenta: { id: cuenta.body.id },
     });
     expect(orden.body.numero).toMatch(/^DTP-\d{6}$/);
@@ -301,7 +300,7 @@ describe('órdenes de pago', () => {
       monto: '0.00397927',
       precioBtcUsd: '125400.00',
       confirmacionesNecesarias: 2,
-      plan: { codigo: 'SEMESTRAL', meses: 6, mesesObsequio: 1 },
+      plan: { codigo: 'SEMESTRAL', meses: 6, mesesObsequio: 0 },
     });
   });
 
@@ -404,8 +403,8 @@ describe('órdenes de pago', () => {
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'SEMESTRAL', moneda: 'USDT' })
       .expect(201);
     expect(cambio.body.tipo).toBe('CAMBIO_DE_PLAN');
-    // Seis meses más el de obsequio, sumados al vencimiento actual.
-    expect(cambio.body.vencimientoSiSeAprueba).toBe('2027-07-15T15:00:00.000Z');
+    // Seis meses, sumados al vencimiento actual.
+    expect(cambio.body.vencimientoSiSeAprueba).toBe('2027-06-15T15:00:00.000Z');
 
     const lista = await web.get('/cuentas').expect(200);
     expect(lista.body.cuentas[0].licencia).toMatchObject({
@@ -415,11 +414,15 @@ describe('órdenes de pago', () => {
     });
   });
 
-  it('la prueba no se compra directo y sin dirección activa no se crea la orden', async () => {
+  it('la prueba y la trimestral no se compran y sin dirección activa no se crea la orden', async () => {
     const { web } = await clienteConSesion();
     const cuenta = await web.post('/cuentas', datosCuenta()).expect(201);
     await web
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'PRUEBA', moneda: 'USDT' })
+      .expect(400);
+    // La trimestral ya no se vende (2026-10-15).
+    await web
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'TRIMESTRAL', moneda: 'USDT' })
       .expect(400);
 
     await fuente.query(`UPDATE deposit_addresses SET status = 'INACTIVA' WHERE network = 'TRON'`);
@@ -442,7 +445,7 @@ describe('órdenes de pago', () => {
       .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
       .expect(201);
     const segunda = await web
-      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'TRIMESTRAL', moneda: 'USDT' })
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'SEMESTRAL', moneda: 'USDT' })
       .expect(201);
     const lista = await web.get('/ordenes').expect(200);
     expect(lista.body.map((o: { numero: string }) => o.numero)).toEqual([

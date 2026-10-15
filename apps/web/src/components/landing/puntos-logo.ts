@@ -1,5 +1,5 @@
 /**
- * El logo de Argemiro (cerebro, barras y flecha) muestreado en 2200 puntos, el mismo del prototipo de la
+ * El logo de la marca (cerebro, barras y flecha) muestreado en 2200 puntos, el mismo del prototipo de la
  * propuesta 2. Cada punto son 6 caracteres hexadecimales: x (2), y (3) y color (1: 0 el rojo del cerebro, 1 el
  * naranja de las barras y la flecha). El dibujo mide 255 × 305.
  */

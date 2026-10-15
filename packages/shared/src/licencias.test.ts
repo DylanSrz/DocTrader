@@ -13,10 +13,16 @@ const bogota = (iso: string) => new Date(`${iso}-05:00`);
 const plan = (code: string) => PLANES_INICIALES.find((p) => p.code === code)!;
 
 describe('finDePeriodo', () => {
-  it('la semestral dura 7 meses con el obsequio', () => {
+  it('la semestral dura 6 meses', () => {
     expect(finDePeriodo(bogota('2026-10-09T10:00:00'), plan('SEMESTRAL'))).toEqual(
-      bogota('2027-05-09T10:00:00'),
+      bogota('2027-04-09T10:00:00'),
     );
+  });
+
+  it('suma el mes de obsequio si el plan lo tiene', () => {
+    expect(
+      finDePeriodo(bogota('2026-10-09T10:00:00'), { ...plan('SEMESTRAL'), bonusMonths: 1 }),
+    ).toEqual(bogota('2027-05-09T10:00:00'));
   });
 
   it('la prueba dura 15 días', () => {
@@ -78,9 +84,9 @@ describe('vencimientoSiSeAprueba', () => {
       vencimientoSiSeAprueba(
         'RENOVACION',
         { finActual: bogota('2026-10-15T10:00:00') },
-        plan('TRIMESTRAL'),
+        plan('SEMESTRAL'),
       ),
-    ).toEqual(bogota('2027-01-15T10:00:00'));
+    ).toEqual(bogota('2027-04-15T10:00:00'));
   });
 
   it('una licencia nueva cuenta desde la aprobación: todavía no hay fecha', () => {
@@ -105,7 +111,7 @@ describe('cuentas de trading', () => {
 });
 
 describe('calendarioLicencia', () => {
-  it('una trimestral del 15 jul al 15 oct, vista el 10 oct: 3 filas y 5 días por delante', () => {
+  it('tres meses del 15 jul al 15 oct, vistos el 10 oct: 3 filas y 5 días por delante', () => {
     const filas = calendarioLicencia(
       bogota('2026-07-15T10:00:00'),
       bogota('2026-10-15T10:00:00'),
@@ -118,7 +124,7 @@ describe('calendarioLicencia', () => {
     expect(todos.filter((d) => d === 'restante')).toHaveLength(4);
   });
 
-  it('la semestral marca el séptimo mes como obsequio', () => {
+  it('marca los meses de obsequio aparte (licencias viejas de 6 + 1)', () => {
     const inicio = bogota('2026-10-09T10:00:00');
     const fin = bogota('2027-05-09T10:00:00');
     const filas = calendarioLicencia(inicio, fin, bogota('2026-10-09T11:00:00'), [

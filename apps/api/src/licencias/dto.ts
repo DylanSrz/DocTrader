@@ -63,9 +63,8 @@ export class NuevaOrdenDto {
   @IsUUID('all', { message: 'Elige una cuenta de trading.' })
   cuentaId: string;
 
-  @IsIn([CODIGO_PLAN.MENSUAL, CODIGO_PLAN.TRIMESTRAL, CODIGO_PLAN.SEMESTRAL], {
-    message: 'Elige una licencia.',
-  })
+  // La trimestral ya no se vende (2026-10-15); la API además revisa que el plan esté activo.
+  @IsIn([CODIGO_PLAN.MENSUAL, CODIGO_PLAN.SEMESTRAL], { message: 'Elige una licencia.' })
   plan: CodigoPlan;
 
   @IsIn(Object.values(MONEDA), { message: 'Elige con qué pagas.' })

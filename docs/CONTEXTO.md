@@ -34,12 +34,12 @@ deben reflejar esto (nunca prometer rentabilidad).
 | Licencia | Precio | Duración | Notas |
 |---|---|---|---|
 | **Mensual** | USD 120 | 1 mes | Sin obsequio. Se renueva al mismo precio (nueva el 2026-10-12) |
-| **Trimestral** | USD 319 | 3 meses | Sin obsequio. Se renueva al mismo precio |
-| **Semestral** | USD 499 | **7 meses = 6 + 1 de obsequio** | El mes de obsequio es un cupón que se aplica solo. La renovación cuesta lo mismo y también lo lleva (antes era 5 + 1; cambió el 2026-10-12) |
+| **Semestral** | USD 499 | **6 meses** | Sin obsequio desde el 2026-10-15 (antes: 7 meses = 6 + 1 de obsequio). Se renueva al mismo precio |
 | **Prueba** | USD 50 | **15 días** | No se compra directo: la landing invita a solicitarla y el admin la aprueba. **Una sola vez por cliente y por cuenta de trading** (ver "Control de la prueba") |
-| **Completar la prueba** | La diferencia: USD 70 (mensual), USD 269 (trimestral) o USD 449 (semestral) | La del plan elegido | Hasta el último día de la prueba. Los USD 50 se abonan y los 15 días hacen parte del plan: la licencia cuenta desde el día en que empezó la prueba. A semestral lleva el mes de obsequio (7 meses en total; confirmado el 2026-10-12) |
+| **Completar la prueba** | La diferencia: USD 70 (mensual) o USD 449 (semestral) | La del plan elegido | Hasta el último día de la prueba. Los USD 50 se abonan y los 15 días hacen parte del plan: la licencia cuenta desde el día en que empezó la prueba. A semestral son 6 meses en total desde el inicio de la prueba |
 
-- **Cambio de plan antes de vencer:** un mensual puede pasarse a trimestral o semestral, y un trimestral a semestral.
+- **2026-10-15:** la licencia **trimestral se retiró** y la semestral **ya no trae mes de obsequio** (dura 6 meses).
+- **Cambio de plan antes de vencer:** un mensual puede pasarse a semestral.
   Se paga el plan nuevo completo y los días se suman al vencimiento actual.
 - La diferencia para completar la prueba se calcula sola con los precios vigentes (precio del plan − precio de la prueba).
 - Si la prueba vence sin completarse, para continuar compra una licencia nueva al precio completo.
@@ -226,10 +226,10 @@ a los dos admins, auditoría que no se puede editar y copias de seguridad probad
 1. Visita la landing → ve licencias, la invitación a solicitar la prueba, cómo funciona, widget de Myfxbook, broker
    sugerido y FAQ.
 2. Se registra con nombre, cédula, correo y teléfono (verifica correo, acepta términos y aviso de riesgo).
-3. Elige licencia (mensual, trimestral, semestral, o prueba de 15 días si se la aprobaron) para una cuenta de
+3. Elige licencia (mensual, semestral, o prueba de 15 días si se la aprobaron) para una cuenta de
    trading → orden de pago **pendiente** (válida 1 hora).
 4. Pago confirmado (aprobación del admin; Binance Pay cuando esté aprobado) → licencia **activa**.
-   - En prueba: ve las tres opciones para completarla pagando la diferencia (USD 70, 269 o 449) hasta el último
+   - En prueba: ve las dos opciones para completarla pagando la diferencia (USD 70 o 449) hasta el último
      día de la prueba.
 5. Registra los datos de esa cuenta de trading → la cuenta entra a **"por conectar"**.
 6. Argemiro la conecta y la marca como **conectada** → el cliente recibe correo.
@@ -260,7 +260,7 @@ adjuntar, reabrir) y enlace a Telegram.
 - **Listas de trabajo:** por conectar / por desconectar.
 - **Clientes y cuentas:** ficha, datos de la cuenta (contraseñas con acción explícita), capital y
   riesgo, notas, extender días, suspender.
-- **Configuración:** planes y precios (mensual, trimestral, semestral, prueba), mes de obsequio, **días de gracia**, **direcciones de depósito**
+- **Configuración:** planes y precios (mensual, semestral, prueba), **días de gracia**, **direcciones de depósito**
   (moneda, red, dirección), FAQ, broker sugerido, enlace de Telegram, widget de Myfxbook.
 - **Mi perfil de socio** (desarrollador): % de comisión, comisión por periodo, pagos recibidos.
 - **Auditoría** y exportar a Excel/CSV.
@@ -296,7 +296,7 @@ verificación, confirmaciones, monto recibido, billetera de origen, aprobado por
 ## 7. Fases
 
 - **Fase 1 (lanzamiento):** landing + FAQ + Myfxbook + broker sugerido, registro/login, licencias
-  mensual/trimestral/semestral/prueba (con control antiabuso), **tickets de soporte**, pagos cripto por depósito directo con aprobación (Binance Pay Merchant en cuanto Binance lo apruebe),
+  mensual/semestral/prueba (con control antiabuso), **tickets de soporte**, pagos cripto por depósito directo con aprobación (Binance Pay Merchant en cuanto Binance lo apruebe),
   panel del cliente, panel de admin, perfil de socio, recordatorios y gracia.
 - **Fase 2:** pasarela en pesos (COP), referidos, cupones adicionales, avisos por Telegram/WhatsApp,
   versión en inglés.

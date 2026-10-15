@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { opcionesBaseDeDatos } from '../src/database/data-source.js';
 import { DepositAddress, PartnerProfile, Plan, User } from '../src/database/entidades/index.js';
+import { PlanesYMarca1792400000000 } from '../src/database/migraciones/1792400000000-planes-y-marca.js';
 import { aplicarSemilla } from '../src/database/semilla-datos.js';
 import { registrarEnCadena, verificarCadena } from '../src/auditoria/cadena.js';
 
@@ -18,13 +19,99 @@ afterAll(async () => {
 });
 
 describe('semilla', () => {
-  it('carga los cuatro planes con sus precios', async () => {
+  it('carga los planes con sus precios: sin trimestral y la semestral de 6 meses', async () => {
     const planes = await fuente.getRepository(Plan).find({ order: { rank: 'ASC' } });
-    expect(planes.map((p) => [p.code, p.priceUsdCents])).toEqual([
-      ['PRUEBA', 5_000],
-      ['MENSUAL', 12_000],
-      ['TRIMESTRAL', 31_900],
-      ['SEMESTRAL', 49_900],
+    expect(planes.map((p) => [p.code, p.priceUsdCents, p.bonusMonths])).toEqual([
+      ['PRUEBA', 5_000, 0],
+      ['MENSUAL', 12_000, 0],
+      ['SEMESTRAL', 49_900, 0],
+    ]);
+  });
+
+  it('en una base de datos que ya existía, retira la trimestral, quita el obsequio y corrige los textos', async () => {
+    // Como estaba producción antes del 2026-10-15.
+    await fuente.query(
+      `INSERT INTO plans (code, name, duration_months, bonus_months, price_usd_cents, rank, is_public)
+       VALUES ('TRIMESTRAL', 'Trimestral', 3, 0, 31900, 2, true)`,
+    );
+    await fuente.query(`UPDATE plans SET bonus_months = 1 WHERE code = 'SEMESTRAL'`);
+    const [vigente] = (await fuente.query(
+      `SELECT max(version) AS version FROM legal_documents WHERE type = 'TERMS'`,
+    )) as { version: number }[];
+    const viejo = [
+      '| Mensual | 1 mes | USD 120 |',
+      '| Trimestral | 3 meses | USD 319 |',
+      '| Semestral | 7 meses (6 meses + 1 mes de obsequio) | USD 499 |',
+      '',
+      '5.4. **Cambio a un plan más largo:** antes de vencer, una licencia mensual puede pasarse a trimestral o semestral, y',
+      'una trimestral a semestral. Se paga el precio completo del plan nuevo.',
+      '',
+      '5.5. El mes de obsequio del plan semestral se aplica de forma automática y no se puede cambiar por dinero.',
+      '',
+      'la diferencia (hoy USD 70 para mensual, USD 269 para trimestral y USD 449 para semestral). En ese caso, la',
+      'licencia cuenta desde el día en que empezó la prueba; si es semestral, incluye el mes de obsequio.',
+    ].join('\n');
+    await fuente.query(
+      `INSERT INTO legal_documents (type, version, content_md) VALUES ('TERMS', $1, $2)`,
+      [vigente!.version + 1, viejo],
+    );
+    const [faqAntes] = (await fuente.query(`SELECT value FROM settings WHERE key = 'faq'`)) as {
+      value: { pregunta: string; respuesta: string }[];
+    }[];
+    await fuente.query(`UPDATE settings SET value = $1::jsonb WHERE key = 'faq'`, [
+      JSON.stringify([
+        {
+          pregunta: '¿Qué broker?',
+          respuesta: 'Si no tienes uno, yo uso [JustMarkets](https://x.co).',
+        },
+      ]),
+    ]);
+
+    const corredor = fuente.createQueryRunner();
+    try {
+      await new PlanesYMarca1792400000000().up(corredor);
+    } finally {
+      await corredor.release();
+    }
+
+    const planes = await fuente.getRepository(Plan).findBy({});
+    expect(planes.find((p) => p.code === 'TRIMESTRAL')).toMatchObject({
+      isActive: false,
+      isPublic: false,
+    });
+    expect(planes.find((p) => p.code === 'SEMESTRAL')!.bonusMonths).toBe(0);
+
+    const [nuevo] = (await fuente.query(
+      `SELECT version, content_md FROM legal_documents WHERE type = 'TERMS' ORDER BY version DESC LIMIT 1`,
+    )) as { version: number; content_md: string }[];
+    expect(nuevo!.version).toBe(vigente!.version + 2);
+    expect(nuevo!.content_md).not.toMatch(/trimestral|obsequio|269/i);
+    expect(nuevo!.content_md).toContain('| Semestral | 6 meses | USD 499 |');
+    expect(nuevo!.content_md).toContain('una licencia mensual puede pasarse a semestral. Se paga');
+
+    const [faq] = (await fuente.query(`SELECT value FROM settings WHERE key = 'faq'`)) as {
+      value: { respuesta: string }[];
+    }[];
+    expect(faq!.value[0]!.respuesta).toBe(
+      'Si no tienes uno, te sugerimos [JustMarkets](https://x.co).',
+    );
+
+    // Correrla de nuevo no publica otra versión.
+    const otra = fuente.createQueryRunner();
+    try {
+      await new PlanesYMarca1792400000000().up(otra);
+    } finally {
+      await otra.release();
+    }
+    const [ultima] = (await fuente.query(
+      `SELECT max(version) AS version FROM legal_documents WHERE type = 'TERMS'`,
+    )) as { version: number }[];
+    expect(ultima!.version).toBe(vigente!.version + 2);
+
+    // Deja la base de datos como la dejó la semilla, para las demás pruebas.
+    await fuente.query(`DELETE FROM plans WHERE code = 'TRIMESTRAL'`);
+    await fuente.query(`UPDATE settings SET value = $1::jsonb WHERE key = 'faq'`, [
+      JSON.stringify(faqAntes!.value),
     ]);
   });
 
@@ -56,7 +143,7 @@ describe('semilla', () => {
   it('retira el admin que se registró con un correo equivocado y crea el correcto', async () => {
     const [viejo] = (await fuente.query(
       `INSERT INTO users (role, full_name, email, email_canonical, password_hash, totp_enabled_at)
-       VALUES ('ADMIN', 'Argemiro', 'doctraderpro@gmail.com', 'doctraderpro@gmail.com', 'hash', now())
+       VALUES ('ADMIN', 'Admin viejo', 'doctraderpro@gmail.com', 'doctraderpro@gmail.com', 'hash', now())
        RETURNING id`,
     )) as { id: string }[];
     await fuente.query(

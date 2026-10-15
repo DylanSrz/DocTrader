@@ -92,12 +92,12 @@ cambio es siempre una versión nueva.
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| `code` | enum `MENSUAL`, `TRIMESTRAL`, `SEMESTRAL`, `PRUEBA`, **único** | |
+| `code` | enum `MENSUAL`, `TRIMESTRAL`, `SEMESTRAL`, `PRUEBA`, **único** | La trimestral está inactiva desde el 2026-10-15 (se conserva por las órdenes viejas) |
 | `name` | text | |
 | `duration_months` | integer, nulo en la prueba | 1, 3 o 6 |
 | `bonus_months` | integer | 1 en la semestral, 0 en las demás |
 | `duration_days` | integer, solo la prueba | 15 |
-| `price_usd_cents` | integer | 12000, 31900, 49900 y 5000 |
+| `price_usd_cents` | integer | 12000, 49900 y 5000 (la trimestral era 31900) |
 | `rank` | integer | Para saber qué plan es "más largo" (1, 2, 3) |
 | `is_public` | boolean | La prueba no se compra directo |
 | `is_active` | boolean | |
@@ -168,7 +168,7 @@ Cada cambio de ajustes queda en la auditoría con el valor anterior y el nuevo.
 | `license_id`, `payment_order_id`, `plan_id` | uuid | |
 | `kind` | enum `PRUEBA`, `NUEVA`, `RENOVACION`, `CAMBIO_DE_PLAN`, `COMPLETAR_PRUEBA`, `EXTENSION_ADMIN` | La extensión de días la hace un admin sin pago |
 | `period_start`, `period_end` | timestamptz | |
-| `bonus_months` | integer | El mes de obsequio, para mostrarlo en verde limón |
+| `bonus_months` | integer | El mes de obsequio, para mostrarlo en verde limón (hoy ningún plan lo trae) |
 
 ### 3.4. Pagos
 
@@ -320,7 +320,7 @@ stateDiagram-v2
 |---|---|---|
 | NUEVA | Al aprobar | Inicio + meses del plan + mes de obsequio |
 | PRUEBA | Al aprobar | Inicio + 15 días |
-| COMPLETAR_PRUEBA | `trial_started_at` | Inicio + meses del plan + obsequio (prueba del 3 oct → semestral hasta el 3 may) |
+| COMPLETAR_PRUEBA | `trial_started_at` | Inicio + meses del plan + obsequio (prueba del 3 oct → semestral hasta el 3 abr) |
 | RENOVACION con la licencia activa | `ends_at` actual | Inicio + meses del plan + obsequio |
 | RENOVACION en gracia | `ends_at` anterior (los días de gracia cuentan como usados) | Igual |
 | CAMBIO_DE_PLAN (a uno más largo) | `ends_at` actual | Igual; la licencia pasa al plan nuevo |

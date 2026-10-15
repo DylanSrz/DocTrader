@@ -69,8 +69,7 @@ Software**, no una recomendación de inversión.
 | Plan | Duración | Precio |
 |---|---|---|
 | Mensual | 1 mes | USD 120 |
-| Trimestral | 3 meses | USD 319 |
-| Semestral | 7 meses (6 meses + 1 mes de obsequio) | USD 499 |
+| Semestral | 6 meses | USD 499 |
 
 5.2. Los precios están en dólares estadounidenses (USD). DocTraderPRO puede cambiarlos en cualquier momento; el
 cambio aplica solo a compras y renovaciones posteriores.
@@ -78,10 +77,7 @@ cambio aplica solo a compras y renovaciones posteriores.
 5.3. **Renovación:** las licencias no se renuevan solas. El Cliente recibe recordatorios antes del vencimiento y paga
 cada periodo manualmente. Si renueva antes de vencer, los días nuevos se suman al vencimiento actual.
 
-5.4. **Cambio a un plan más largo:** antes de vencer, una licencia mensual puede pasarse a trimestral o semestral, y
-una trimestral a semestral. Se paga el precio completo del plan nuevo y sus días se suman al vencimiento actual.
-
-5.5. El mes de obsequio del plan semestral se aplica de forma automática y no se puede cambiar por dinero.
+5.4. **Cambio a un plan más largo:** antes de vencer, una licencia mensual puede pasarse a semestral. Se paga el precio completo del plan nuevo y sus días se suman al vencimiento actual.
 
 ## 6. Licencia de prueba
 
@@ -95,8 +91,8 @@ correo o el teléfono ya estuvieron ligados a una prueba, aunque sea con otro re
 trading debe ser el mismo Cliente, y durante la prueba no se puede cambiar la cuenta.
 
 6.4. **Completar la prueba:** hasta el último día de la prueba, el Cliente puede pasarla a cualquier plan pagando solo
-la diferencia (hoy USD 70 para mensual, USD 269 para trimestral y USD 449 para semestral). En ese caso, la licencia
-cuenta desde el día en que empezó la prueba; si es semestral, incluye el mes de obsequio. Si la prueba vence sin
+la diferencia (hoy USD 70 para mensual y USD 449 para semestral). En ese caso, la licencia
+cuenta desde el día en que empezó la prueba. Si la prueba vence sin
 completarse, para continuar el Cliente compra una licencia nueva al precio completo.
 
 6.5. Si DocTraderPRO detecta que una persona intentó obtener más de una prueba (con datos falsos, registros
