@@ -111,9 +111,17 @@
       compartido): crearlo cuando la API tenga su dominio propio (por ejemplo `api.doctraderpro.com`), en Sentry
       (Uptime, proyecto `doctrader-api`) o en UptimeRobot/Better Stack, revisando cada 5 minutos `https://<api>/salud`
       (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo a los dos admins.
-- [ ] **Copias de seguridad (etapa 9):** activar las copias programadas del volumen de Postgres en Railway (pestaña
-      Backups) y crear el depósito de R2 `doctrader-copias` con su token y los 6 secretos del flujo semanal (ver
-      README, "Copias de seguridad"). Después, correr el flujo a mano una vez y revisar que la restauración pase.
+- [ ] **Copias de seguridad (etapa 9):** el depósito de R2 `doctrader-copias` ya existe (2026-10-15) y el flujo
+      semanal está en el repositorio. Falta (no hay conector con permiso para esto):
+  - [ ] Railway → Postgres → pestaña Backups: activar las copias Daily y Weekly.
+  - [ ] Cloudflare → R2 → Manage API tokens: un token "Object Read & Write" solo para `doctrader-copias`.
+  - [ ] GitHub → Settings → Secrets → Actions: los 6 secretos (ver README, "Copias de seguridad"). La URL es la
+        `DATABASE_PUBLIC_URL` del Postgres de Railway; `BACKUP_R2_BUCKET` = `doctrader-copias`.
+  - [ ] Actions → "Copia de seguridad" → Run workflow, y revisar que la restauración pase.
+- [x] **Correo del dominio (2026-10-15):** Resend tiene `doctraderpro.com` verificado (región sa-east-1); DKIM
+      (`resend._domainkey`), SPF y MX de rebote en `send.` están publicados; DMARC existe con `p=none`.
+  - [ ] Tras dos semanas sin problemas en los reportes, subir DMARC en Hostinger a
+        `v=DMARC1; p=quarantine; rua=mailto:support@doctraderpro.com` (empezar en `none` es lo correcto).
 - [ ] **Base de datos con permisos separados (etapa 9, `SEGURIDAD.md` §12):** hoy la API usa el usuario dueño de las
       tablas. Lo ideal es un usuario sin permisos de administrador para la API y el worker, y el dueño solo para las
       migraciones. Se puede hacer después del lanzamiento.
