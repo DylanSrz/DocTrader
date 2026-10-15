@@ -21,6 +21,9 @@ export const LIMITES = {
   correoPorCuenta: { nombre: 'correo-cuenta', maximo: 3, ventana: 3_600 },
   enlacePorIp: { nombre: 'enlace-ip', maximo: 20, ventana: 3_600 },
   confirmarPorUsuario: { nombre: 'confirmar', maximo: 5, ventana: 900 },
+  cuentasPorUsuario: { nombre: 'cuentas', maximo: 30, ventana: 3_600 },
+  ordenesPorUsuario: { nombre: 'ordenes', maximo: 30, ventana: 3_600 },
+  reportesPorUsuario: { nombre: 'reportes', maximo: 10, ventana: 3_600 },
 } satisfies Record<string, Regla>;
 
 @Injectable()

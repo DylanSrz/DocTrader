@@ -38,6 +38,11 @@ const esquema = z.object({
   MAILPIT_URL: z.url().optional(),
   MAIL_FROM: z.string().default('DocTraderPRO <notificaciones@doctraderpro.com>'),
   MAIL_REPLY_TO: z.email().default('support@doctraderpro.com'),
+  /**
+   * Precio de BTC para las órdenes: Binance (sin llave) y CoinGecko (plan Demo; la llave es opcional pero da más
+   * consultas). `docs/DECISIONES-TECNICAS.md` §2.
+   */
+  COINGECKO_API_KEY: z.string().min(1).optional(),
 });
 
 export type Entorno = z.infer<typeof esquema>;

@@ -433,3 +433,26 @@ stateDiagram-v2
 4. **Si el cliente cambia la contraseña o los datos de una cuenta conectada**, vuelve a "por conectar" para que
    Argemiro la actualice en Social Trader Tools.
 5. **Suspender no congela los días:** la licencia sigue corriendo mientras está suspendida.
+
+## 7. Cómo quedó construido (etapa 3, 2026-10-15)
+
+- **Restricciones en la base de datos** (además de las reglas en la API):
+  - `trading_accounts_cuenta_vigente`: índice único sobre `account_key_hmac` entre las cuentas no borradas.
+  - `payment_orders_una_abierta`: una sola orden PENDIENTE o REPORTADA por licencia.
+  - `payment_orders_hash_por_red`: índice único (`network`, `tx_hash`).
+  - Una licencia PENDIENTE_PAGO no tiene fechas ni plan; con un periodo aprobado, siempre las tiene.
+  - Todo periodo sale de una orden, salvo `EXTENSION_ADMIN`.
+- **Huellas:** `account_key_hmac` y `account_number_hmac` usan `LOOKUP_HMAC_KEY` (la de buscar sin descifrar). Las
+  huellas del registro de pruebas (`trial_registry`, etapa 6) usarán su propia `TRIAL_HMAC_KEY`.
+- **Tipo de orden:** lo decide la API con el estado de la licencia (`tipoDeOrden` en `packages/shared`): sin pagar o
+  vencida es NUEVA; activa o en gracia, a un plan de `rank` mayor es CAMBIO_DE_PLAN y al mismo o a uno menor,
+  RENOVACION (renovar a un plan más corto queda por confirmar con Argemiro, ver `PENDIENTES.md`).
+- **Orden abierta:** crear otra orden para la misma licencia cancela la PENDIENTE (el cliente cambió de plan o de
+  moneda); si hay una REPORTADA, no se puede crear otra hasta que se revise.
+- **Montos:** USDT = centavos × 10.000. BTC = centavos × 10⁸ ÷ precio en centavos, redondeado hacia arriba (el
+  cliente nunca queda debiendo un satoshi). El precio se guarda en `btc_usd_rate` y vale para toda la orden.
+- **Dirección:** la orden toma la dirección ACTIVA más reciente de la red (`activates_at` ya cumplido) y la copia.
+- **Expiración:** el worker pasa a EXPIRADA las PENDIENTE vencidas cada minuto; mientras tanto, la API ya las muestra
+  como expiradas y no acepta su hash.
+- **Quitar una cuenta:** solo con la licencia sin pagar o vencida, sin conexión (o ya desconectada) y sin pago
+  reportado. Es un borrado lógico y las contraseñas se borran en el acto.

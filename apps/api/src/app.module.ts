@@ -4,6 +4,7 @@ import { AdminModule } from './admin/admin.module.js';
 import { AvisosModule } from './avisos/avisos.module.js';
 import { BaseModule } from './base.module.js';
 import { ContenidoModule } from './contenido/contenido.module.js';
+import { LicenciasModule } from './licencias/licencias.module.js';
 import { SaludModule } from './salud/salud.module.js';
 import { SesionesModule } from './sesiones/sesiones.module.js';
 
@@ -16,6 +17,7 @@ import { SesionesModule } from './sesiones/sesiones.module.js';
     ContenidoModule,
     AccesoModule,
     AdminModule,
+    LicenciasModule,
   ],
 })
 export class AppModule {}

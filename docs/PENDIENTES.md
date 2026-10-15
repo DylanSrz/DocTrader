@@ -1,6 +1,6 @@
 # Pendientes — información por recibir
 
-> Actualizado: 2026-10-14. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
+> Actualizado: 2026-10-15. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
 
 ## ⏳ En espera
 
@@ -40,6 +40,12 @@
       enlace (ver `docs/DECISIONES-TECNICAS.md`, §5).
 - [x] **Redes:** Telegram https://t.me/+cdmWH_xLubdhMDhh · Instagram https://www.instagram.com/doctraderproiasystem/
 
+## ❓ Por confirmar con Argemiro
+
+- [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual o
+      trimestral (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
+      prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.
+
 ## ⚖️ Legal
 
 - [x] **Titular:** DocTraderPRO, Barranquilla, Colombia.
@@ -53,13 +59,10 @@
 
 - [x] **Titular de las cuentas de servicio:** se crean con el correo de Dylan; los pagos los cubre Argemiro.
 - [x] Vercel (web) y Railway (API, worker, PostgreSQL y Redis) creados y funcionando (2026-10-14).
-- [ ] **Resend (ya hace falta, etapa 1 hecha):** crear la cuenta, verificar doctraderpro.com (registros DNS en
-      Hostinger) y poner `RESEND_API_KEY` en el worker de Railway. Hasta entonces, los correos de verificación y de
-      recuperar contraseña quedan en cola y nadie puede confirmar su correo ni crear su primera contraseña (tampoco
-      los admins).
-- [ ] **Cloudflare Turnstile:** crear el sitio en Cloudflare (gratis) y poner `NEXT_PUBLIC_TURNSTILE_SITE_KEY` en
-      Vercel y `TURNSTILE_SECRET` en la API. Mientras no exista, el registro y recuperar contraseña funcionan sin el
-      desafío (los límites de velocidad sí funcionan).
+- [x] **Resend** (2026-10-15): dominio doctraderpro.com verificado y `RESEND_API_KEY` en el worker de Railway.
+- [x] **Cloudflare Turnstile** (2026-10-15): llaves en Vercel y en la API.
+- [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
+      una llave gratis del plan Demo (`COINGECKO_API_KEY` en la API de Railway) hay más consultas al mes.
 - [ ] Crear cuando se necesiten: Twilio (SMS, etapa 6), Cloudflare R2 (archivos, etapa 7), Sentry (errores).
       Ver `docs/DECISIONES-TECNICAS.md`.
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).

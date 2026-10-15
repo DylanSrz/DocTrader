@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AvisosEnvio } from './avisos/avisos-envio.js';
 import { BaseModule } from './base.module.js';
 import type { Entorno } from './config/entorno.js';
+import { VencimientoOrdenes } from './licencias/vencimiento-ordenes.js';
 import { COLA_MANTENIMIENTO } from './worker/latido.js';
 import { MantenimientoProcessor } from './worker/mantenimiento.processor.js';
 import { ProgramarTrabajos } from './worker/programar-trabajos.js';
@@ -27,6 +28,6 @@ import { ProgramarTrabajos } from './worker/programar-trabajos.js';
     }),
     BullModule.registerQueue({ name: COLA_MANTENIMIENTO }),
   ],
-  providers: [MantenimientoProcessor, ProgramarTrabajos, AvisosEnvio],
+  providers: [MantenimientoProcessor, ProgramarTrabajos, AvisosEnvio, VencimientoOrdenes],
 })
 export class WorkerModule {}
