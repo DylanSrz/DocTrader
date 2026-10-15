@@ -1,6 +1,8 @@
-import { ESTADO_SESION, type EstadoSesion, type Rol } from '@doctrader/shared';
+import { ESTADO_SESION, ESTADO_USUARIO, type EstadoSesion, type Rol } from '@doctrader/shared';
 import { type CanActivate, type ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { InjectDataSource } from '@nestjs/typeorm';
+import type { DataSource } from 'typeorm';
 import { errorApi } from '../seguridad/errores.js';
 import type { Peticion } from './contexto.js';
 import { CONFIRMACION_RECIENTE, ESTADOS_PERMITIDOS, PUBLICA, ROLES } from './decoradores.js';
@@ -15,7 +17,19 @@ export class SesionGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly sesiones: SesionesService,
+    @InjectDataSource() private readonly fuente: DataSource,
   ) {}
+
+  /**
+   * Una sesión solo vale mientras la cuenta esté activa: si se suspende o se borra, la sesión se cierra en la
+   * siguiente petición, aunque no haya vencido.
+   */
+  private async cuentaActiva(usuarioId: string): Promise<boolean> {
+    const filas = (await this.fuente.query(`SELECT status FROM users WHERE id = $1`, [
+      usuarioId,
+    ])) as { status: string }[];
+    return filas[0]?.status === ESTADO_USUARIO.ACTIVO;
+  }
 
   async canActivate(contexto: ExecutionContext): Promise<boolean> {
     const destinos = [contexto.getHandler(), contexto.getClass()];
@@ -23,7 +37,11 @@ export class SesionGuard implements CanActivate {
     const publica = this.reflector.getAllAndOverride<boolean>(PUBLICA, destinos);
 
     const token = /^Bearer (.+)$/.exec(peticion.headers.authorization ?? '')?.[1];
-    const sesion = token ? await this.sesiones.obtener(token) : null;
+    let sesion = token ? await this.sesiones.obtener(token) : null;
+    if (sesion && !(await this.cuentaActiva(sesion.usuarioId))) {
+      await this.sesiones.cerrar(sesion);
+      sesion = null;
+    }
     if (sesion) peticion.sesion = sesion;
     if (publica) return true;
 

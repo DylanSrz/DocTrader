@@ -37,7 +37,7 @@ describe('semilla', () => {
 
     const admins = await fuente.getRepository(User).findBy({ role: 'ADMIN' });
     expect(admins.map((a) => a.email).sort()).toEqual([
-      'doctraderpro@gmail.com',
+      'doctraderproiasystem@gmail.com',
       'dylansrz96@gmail.com',
     ]);
 
@@ -47,6 +47,33 @@ describe('semilla', () => {
   });
 
   it('se puede volver a correr sin crear nada nuevo', async () => {
+    expect(await aplicarSemilla(fuente, llave)).toEqual([]);
+  });
+
+  it('retira el admin que se registró con un correo equivocado y crea el correcto', async () => {
+    const [viejo] = (await fuente.query(
+      `INSERT INTO users (role, full_name, email, email_canonical, password_hash, totp_enabled_at)
+       VALUES ('ADMIN', 'Argemiro', 'doctraderpro@gmail.com', 'doctraderpro@gmail.com', 'hash', now())
+       RETURNING id`,
+    )) as { id: string }[];
+    await fuente.query(
+      `INSERT INTO auth_tokens (user_id, purpose, token_hash, expires_at)
+       VALUES ($1, 'RESET_PASSWORD', '\\x01', now() + interval '30 minutes')`,
+      [viejo!.id],
+    );
+
+    expect(await aplicarSemilla(fuente, llave)).toEqual(['admin retirado doctraderpro@gmail.com']);
+
+    const retirado = await fuente.getRepository(User).findOneByOrFail({ id: viejo!.id });
+    expect(retirado.status).toBe('DELETED');
+    expect(retirado.passwordHash).toBeNull();
+    expect(retirado.totpEnabledAt).toBeNull();
+    const pendientes = await fuente.query(
+      `SELECT count(*)::int AS n FROM auth_tokens WHERE user_id = $1 AND used_at IS NULL`,
+      [viejo!.id],
+    );
+    expect(pendientes[0].n).toBe(0);
+    // La segunda vez ya no hay nada que retirar.
     expect(await aplicarSemilla(fuente, llave)).toEqual([]);
   });
 

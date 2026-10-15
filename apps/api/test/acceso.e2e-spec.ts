@@ -315,7 +315,7 @@ describe('recuperar la contraseña', () => {
 });
 
 describe('admins: segundo factor obligatorio', () => {
-  const correoAdmin = 'doctraderpro@gmail.com';
+  const correoAdmin = 'doctraderproiasystem@gmail.com';
   const contrasenaAdmin = 'contraseña de admin muy segura';
   let secretoTotp = '';
   let codigosRecuperacion: string[] = [];
@@ -472,6 +472,13 @@ describe('permisos', () => {
     const { token } = await clienteConSesion();
     const respuesta = await comoLaWeb(app, { token }).get('/admin/resumen').expect(403);
     expect(respuesta.body.codigo).toBe('SIN_PERMISO');
+  });
+
+  it('si la cuenta se suspende o se borra, su sesión deja de servir al instante', async () => {
+    const { datos, token } = await clienteConSesion();
+    await fuente.query(`UPDATE users SET status = 'SUSPENDED' WHERE email = $1`, [datos.correo]);
+    const respuesta = await comoLaWeb(app, { token }).get('/auth/sesion').expect(401);
+    expect(respuesta.body.codigo).toBe('SIN_SESION');
   });
 
   it('un cliente sin segundo factor confirma con su contraseña', async () => {

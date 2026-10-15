@@ -36,7 +36,7 @@ Reglas clave:
   `docs/SEGURIDAD.md`; decisiones técnicas (SMS, blockchain, archivos, cuentas) en `docs/DECISIONES-TECNICAS.md`;
   modelo de datos y estados en `docs/MODELO-DATOS.md`; etapas, entornos, pruebas y lista de lanzamiento en
   `docs/PLAN-TRABAJO.md`.
-  Admins: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderpro@gmail.com). Cuentas de servicio a nombre de Dylan; las paga Argemiro.
+  Admins: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderproiasystem@gmail.com). Cuentas de servicio a nombre de Dylan; las paga Argemiro.
 - Registro con nombre, **cédula**, correo y teléfono. Correo oficial: **support@doctraderpro.com** (contacto y Reply-To).
   Dominio propio: **doctraderpro.com** (DNS en Hostinger); los correos automáticos
   salen por Resend desde el dominio.

@@ -1,5 +1,6 @@
 import {
   ESTADO_DIRECCION,
+  ESTADO_USUARIO,
   MONEDA,
   PLANES_INICIALES,
   RED,
@@ -8,7 +9,14 @@ import {
 } from '@doctrader/shared';
 import type { DataSource } from 'typeorm';
 import { registrarEnCadena } from '../auditoria/cadena.js';
-import { DepositAddress, PartnerProfile, Plan, User } from './entidades/index.js';
+import {
+  AuthToken,
+  DepositAddress,
+  PartnerProfile,
+  Plan,
+  RecoveryCode,
+  User,
+} from './entidades/index.js';
 import type { ValorJson } from './entidades/setting.entity.js';
 
 /**
@@ -18,8 +26,15 @@ import type { ValorJson } from './entidades/setting.entity.js';
 
 const ADMINS = [
   { fullName: 'Dylan', email: 'dylansrz96@gmail.com', socioConComisionBp: 1_000 },
-  { fullName: 'Argemiro', email: 'doctraderpro@gmail.com', socioConComisionBp: null },
+  { fullName: 'Argemiro', email: 'doctraderproiasystem@gmail.com', socioConComisionBp: null },
 ] as const;
+
+/**
+ * Correos que fueron de admin por error y ya no lo son. La cuenta queda borrada, sin contraseña, sin segundo
+ * factor y sin enlaces pendientes, para que nadie con acceso a ese buzón pueda tomarla.
+ * 2026-10-15: el correo de admin de Argemiro era doctraderproiasystem@gmail.com, no doctraderpro@gmail.com.
+ */
+const ADMINS_RETIRADOS = ['doctraderpro@gmail.com'] as const;
 
 /** Direcciones de la cuenta de Binance de Argemiro (2026-10-14), con checksum comprobado. */
 const DIRECCIONES = [
@@ -93,6 +108,38 @@ export async function aplicarSemilla(
         activatesAt: ahora,
       });
       creado.push(`dirección ${d.currency} ${d.network}`);
+    }
+
+    for (const correo of ADMINS_RETIRADOS) {
+      const retirado = await m.getRepository(User).findOneBy({
+        emailCanonical: correoCanonico(correo),
+        role: ROL.ADMIN,
+      });
+      if (!retirado || retirado.status === ESTADO_USUARIO.BORRADO) continue;
+      const teniaContrasena = retirado.passwordHash !== null;
+      await m.getRepository(User).update(retirado.id, {
+        status: ESTADO_USUARIO.BORRADO,
+        deletedAt: ahora,
+        passwordHash: null,
+        totpSecretEnc: null,
+        totpEnabledAt: null,
+      });
+      await m.getRepository(RecoveryCode).delete({ userId: retirado.id });
+      await m
+        .getRepository(AuthToken)
+        .createQueryBuilder()
+        .update()
+        .set({ usedAt: ahora })
+        .where('user_id = :id AND used_at IS NULL', { id: retirado.id })
+        .execute();
+      await registrarEnCadena(m, llaveAuditoria, {
+        actorRole: 'SISTEMA',
+        action: 'usuario.admin_retirado',
+        targetType: 'user',
+        targetId: retirado.id,
+        metadata: { correo, teniaContrasena },
+      });
+      creado.push(`admin retirado ${correo}`);
     }
 
     for (const admin of ADMINS) {
