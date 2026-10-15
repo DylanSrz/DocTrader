@@ -61,6 +61,22 @@ async function Contenido() {
       <div className="mt-[clamp(96px,12vw,168px)]">
         <Seguridad sesion={sesion} />
       </div>
+      <section
+        aria-labelledby="t-eliminar"
+        className="mt-[clamp(96px,12vw,168px)] grid max-w-[980px] justify-items-start gap-5"
+      >
+        <h2 id="t-eliminar" className="text-medio">
+          Eliminar mi cuenta
+        </h2>
+        <p className="max-w-[40em] text-niebla">
+          Si quieres que borremos tu cuenta y tus datos, pídelo en un ticket. Borramos tus datos
+          personales, las contraseñas de tus cuentas de trading y tus tickets; tus licencias
+          terminan sin devolución. Por ley conservamos solo el registro de tus pagos.
+        </p>
+        <Enlace href="/panel/soporte?nuevo=1&tema=OTRO" gris>
+          Pedir que eliminen mi cuenta
+        </Enlace>
+      </section>
     </>
   );
 }

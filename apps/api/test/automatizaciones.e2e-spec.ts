@@ -1,16 +1,20 @@
+import { aUnidadesBase } from '@doctrader/shared';
 import type { INestApplication } from '@nestjs/common';
 import { getDataSourceToken } from '@nestjs/typeorm';
 import type { DataSource } from 'typeorm';
+import { AuditoriaService } from '../src/auditoria/auditoria.service.js';
 import { AvisosService } from '../src/avisos/avisos.service.js';
 import { PrecioBtcService } from '../src/licencias/precio-btc.service.js';
 import { VencimientoLicencias } from '../src/licencias/vencimiento-licencias.js';
 import { LectorBlockchain } from '../src/pagos/lector-blockchain.service.js';
 import type { Lectura } from '../src/pagos/lectura.js';
 import { VerificacionPagos } from '../src/pagos/verificacion-pagos.service.js';
+import { Alertas, claveIngresosFallidos } from '../src/monitoreo/alertas.js';
 import { BorradoDatos } from '../src/privacidad/borrado-datos.js';
+import { REDIS } from '../src/redis/redis.module.js';
 import { SocioService } from '../src/socio/socio.service.js';
 import { adminConSesion, clienteConSesion, datosCuenta, hashNuevo } from './ayudas.js';
-import { crearApp } from './crear-app.js';
+import { comoLaWeb, crearApp } from './crear-app.js';
 
 let app: INestApplication;
 let fuente: DataSource;
@@ -56,7 +60,7 @@ async function pagar(cliente: Cliente, cuentaId: string) {
     pagos: [
       {
         direccion: orden.body.direccion,
-        unidades: BigInt(orden.body.montoUsdCentavos) * 10_000n,
+        unidades: aUnidadesBase(orden.body.monto, 'USDT'),
       },
     ],
     otraMoneda: false,
@@ -200,15 +204,19 @@ describe('automatizaciones', () => {
       .put(`/cuentas/${cuentaId}`, {
         titular: datos.titular,
         broker: datos.broker,
-        servidor: 'JustMarkets-Live2',
+        servidor: datos.servidor,
         numero: datos.numero,
+        contrasenaOperativa: 'otra-operativa-1',
       })
       .expect(200);
     const [aviso] = (await fuente.query(
       `SELECT payload FROM notifications WHERE user_id = $1 AND template = 'cuenta-por-conectar'`,
       [admin.usuario.id],
     )) as { payload: Record<string, string> }[];
-    expect(aviso?.payload).toMatchObject({ cliente: 'Laura Gómez Restrepo', campos: 'servidor' });
+    expect(aviso?.payload).toMatchObject({
+      cliente: 'Laura Gómez Restrepo',
+      campos: 'contraseña operativa',
+    });
   });
 });
 
@@ -441,5 +449,71 @@ describe('borrado de datos vencidos', () => {
       (await fuente.query(`SELECT 1 FROM consents WHERE user_id = $1`, [cliente.usuario.id]))
         .length,
     ).toBeGreaterThan(0);
+  });
+});
+
+describe('alertas a los admins', () => {
+  it('avisan una vez de un pago sin verificar hace más de una hora, de un pico de ingresos fallidos y de un trabajo que falla', async () => {
+    const admin = await adminConSesion(app);
+    const alertas = new Alertas(
+      fuente,
+      app.get(REDIS),
+      app.get(AvisosService),
+      app.get(AuditoriaService),
+    );
+    // La cadena de la auditoría cuadra.
+    expect(await alertas.verificarAuditoria()).toBe(true);
+    const cliente = await clienteConSesion(app);
+    const cuenta = await cliente.web.post('/cuentas', datosCuenta()).expect(201);
+    const orden = await cliente.web
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    // La blockchain no la encuentra: queda sin verificar.
+    await cliente.web
+      .post(`/ordenes/${orden.body.numero}/reportar`, { hash: hashNuevo() })
+      .expect(200);
+    await app.get(VerificacionPagos).verificarPendientes();
+
+    expect((await alertas.revisar()).pagos).toBe(0);
+    await fuente.query(
+      `UPDATE payment_orders SET reported_at = now() - interval '61 minutes' WHERE number = $1`,
+      [orden.body.numero],
+    );
+
+    // Ingresos fallidos de verdad, más el contador de la hora anterior.
+    await comoLaWeb(app)
+      .post('/auth/ingresar', { correo: cliente.correo, contrasena: 'no es la contraseña' })
+      .expect(401);
+    const redis = app.get(REDIS);
+    expect(Number(await redis.get(claveIngresosFallidos(new Date())))).toBeGreaterThan(0);
+    const anterior = new Date(Date.now() - 60 * 60_000);
+    await redis.set(claveIngresosFallidos(anterior), '120');
+
+    await alertas.revisar();
+    await alertas.revisar();
+    await alertas.trabajoFallido('verificar-pagos', new Error('TronGrid no responde'));
+    await alertas.trabajoFallido('verificar-pagos', new Error('TronGrid no responde'));
+    await redis.del(claveIngresosFallidos(anterior));
+
+    const avisos = (await fuente.query(
+      `SELECT template, payload FROM notifications
+        WHERE user_id = $1 AND template IN ('pago-atascado', 'ingresos-fallidos', 'trabajo-fallido')
+        ORDER BY template`,
+      [admin.usuario.id],
+    )) as { template: string; payload: Record<string, string> }[];
+    expect(avisos.map((a) => a.template)).toEqual([
+      'ingresos-fallidos',
+      'pago-atascado',
+      'trabajo-fallido',
+    ]);
+    expect(avisos[0]!.payload.total).toBe('120');
+    expect(avisos[1]!.payload).toMatchObject({
+      orden: orden.body.numero,
+      monto: 'USD 120 en USDT',
+    });
+    expect(avisos[2]!.payload).toMatchObject({
+      trabajo: 'verificar-pagos',
+      error: 'TronGrid no responde',
+    });
   });
 });

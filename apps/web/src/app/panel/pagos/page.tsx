@@ -69,7 +69,8 @@ function Pago({ orden }: { orden: OrdenVista }) {
           {orden.precioBtcUsd
             ? `Precio fijo: ${usd(Math.round(Number(orden.precioBtcUsd)) * 100)} por BTC mientras la orden esté vigente. `
             : ''}
-          Las comisiones de la red las pagas tú: el monto que llega debe ser este o más.
+          Los centavos identifican tu pago: no lo redondees. Las comisiones de la red van aparte:
+          debe llegar exactamente este monto.
         </p>
       </div>
 

@@ -258,6 +258,31 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
   restauración de prueba.
 - Dominio y correo: DNS en Hostinger, Resend verificado, DMARC.
 - Lista de lanzamiento (§5) y lanzamiento suave con pocos clientes antes de anunciarlo.
+- **Lo construido (2026-10-15):**
+  - **Eliminar un cliente que lo pida**, desde su ficha en Licencias, con el código de la app: se anonimizan su nombre,
+    cédula, correo y teléfono; se borran las contraseñas de sus cuentas, sus tickets, sesiones, dispositivos y correos;
+    sus licencias terminan y una cuenta conectada queda por desconectar. Se conservan las órdenes y los pagos. El
+    cliente recibe un correo y puede registrarse de nuevo; en su perfil hay una sección para pedirlo por ticket.
+  - **Revisión de seguridad** contra `SEGURIDAD.md`, con estos arreglos:
+    - **Pagos: monto único por orden.** Todas las órdenes usan la misma dirección y el mismo precio, así que un
+      cliente podía reportar como suyo el hash del pago de otro. Ahora cada orden abierta tiene un monto distinto (de
+      0,01 a 0,99 USDT, o de 1 a 999 satoshis, **menos** que el precio) y la verificación exige el monto exacto; uno
+      mayor queda para revisar a mano.
+    - Segundo factor: máximo 10 códigos por hora por usuario, contados de forma atómica entre todas sus sesiones.
+    - Ingreso: la espera tras varios fallos es por correo e IP (nadie deja fuera al dueño desde otra IP).
+    - Cambiar los enlaces públicos pide el código de la app; el nombre del registro solo admite letras.
+    - El worker recalcula cada día la cadena de la auditoría y avisa si no cuadra.
+  - **Monitoreo:** Sentry en la API, el worker y el servidor de la web, activo solo con `SENTRY_DSN` y sin datos
+    personales. Alertas a los dos admins: pagos sin verificar después de una hora, más de 50 ingresos fallidos en una
+    hora, trabajos del worker que fallan (una vez al día por trabajo) y la auditoría alterada.
+  - **Copias de seguridad:** flujo semanal que copia, restaura en un Postgres vacío, revisa, cifra y guarda en R2 30
+    días (`.github/workflows/copia-de-seguridad.yml`), además de las copias de Railway.
+  - **Limpieza para el lanzamiento:** `node apps/api/dist/database/limpiar.js` (README, "Limpieza antes del
+    lanzamiento").
+  - 119 pruebas de punta a punta (6 nuevas: eliminar un cliente, un hash ajeno no sirve, montos distintos, el límite
+    de códigos en paralelo, el nombre del registro y las alertas).
+  - **Falta (operación, ver `PENDIENTES.md`):** cuenta de Sentry, monitor de disponibilidad, activar las copias en
+    Railway y los secretos de la copia semanal, DNS en Hostinger con DMARC, la lista del §5 y el lanzamiento suave.
 
 ## 5. Lista para el día del lanzamiento
 
@@ -275,11 +300,11 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 - [ ] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación.
 - [ ] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger.
 - [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido.
-- [ ] Copia de seguridad restaurada con éxito al menos una vez.
+- [ ] Copia de seguridad restaurada con éxito al menos una vez (el flujo semanal la restaura y la revisa solo).
 
 **Funcionamiento**
 - [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
-      correos; quedan solo los dos admins, los ajustes y los textos legales vigentes.
+      correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
 - [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.
 - [ ] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook.
 - [ ] Monitor de disponibilidad y alertas activos.

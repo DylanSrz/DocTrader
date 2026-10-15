@@ -251,6 +251,12 @@ export class CuentasAdminService {
           disconnectedBy: sesion.usuarioId,
         },
       );
+      // La cuenta de un cliente eliminado se quedó solo para que la quitaran de Social Trader Tools.
+      await m.query(
+        `UPDATE trading_accounts t SET deleted_at = now()
+           FROM users u WHERE u.id = t.user_id AND t.id = $1 AND u.status = 'DELETED'`,
+        [id],
+      );
       await this.registrar(m, sesion, cliente, 'cuenta.desconectada', cuenta);
     });
   }

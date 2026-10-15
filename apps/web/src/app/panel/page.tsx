@@ -392,6 +392,7 @@ function TarjetaCuenta({
                 numero: cuenta.numero,
               }}
               sePuedeQuitar={sePuedeQuitar}
+              datosFijos={['ACTIVA', 'EN_GRACIA', 'SUSPENDIDA'].includes(licencia.estado)}
             />
           </Lateral>
         </div>

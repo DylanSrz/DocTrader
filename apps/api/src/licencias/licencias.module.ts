@@ -7,5 +7,6 @@ import { PrecioBtcService } from './precio-btc.service.js';
 @Module({
   controllers: [CuentasController, OrdenesController],
   providers: [CuentasService, OrdenesService, PrecioBtcService],
+  exports: [CuentasService],
 })
 export class LicenciasModule {}

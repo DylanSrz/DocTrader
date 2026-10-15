@@ -70,9 +70,11 @@
 - [x] **Aceptar de nuevo los textos legales** (2026-10-15): no hace falta. Los clientes de hoy son de prueba y, antes
       de salir a producción, se limpia la base de datos (todo menos los admins): todos los clientes se registran de
       nuevo con los textos vigentes.
-- [x] **Eliminar la cuenta de un cliente que lo pida** (2026-10-15): sí, y lo hace un admin desde el panel. Falta
-      construirlo: anonimizar nombre, cédula, correo y teléfono, borrar sus contraseñas de trading y sus tickets, y
-      conservar órdenes y pagos (los exige la ley).
+- [x] **Eliminar la cuenta de un cliente que lo pida** (2026-10-15): sí, y lo hace un admin desde el panel. Construido
+      en la etapa 9: "Eliminar cliente" en la ficha de Licencias (con el código de la app).
+- [x] **Cambiar el número de una cuenta con licencia vigente** (2026-10-15): se pide por ticket. Construido: el
+      cliente ya no puede cambiar broker, servidor ni número con la licencia vigente (le sale el enlace al ticket) y
+      el admin lo cambia en la ficha de Licencias → "Cambiar broker, servidor o número", con su código.
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
       (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
       prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.
@@ -100,7 +102,29 @@
       API **y** en el worker de Railway (el worker borra los adjuntos sin usar). No hace falta CORS en R2: el
       navegador sube a la API y descarga con un enlace firmado. Sin estas variables, los tickets funcionan sin
       adjuntos. `WEB_ORIGIN` de la API debe ser la dirección exacta de la web (la subida es directa a la API).
-- [ ] Crear cuando se necesite: Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
+- [x] **Sentry (etapa 9, 2026-10-15):** organización `dylansrz`, proyectos `doctrader-api` (API y worker) y
+      `doctrader-web`. `SENTRY_DSN` ya está en la API y el worker de Railway (empieza a reportar con el próximo
+      despliegue que traiga el código de la etapa 9).
+  - [ ] Falta `SENTRY_DSN` en Vercel (proyecto `doc_trader_pro`, Production y Preview) con el DSN de
+        `doctrader-web` (Sentry → Settings → Projects → doctrader-web → Client Keys). El conector no tuvo permiso.
+- [ ] **Monitor de disponibilidad (etapa 9):** Sentry no acepta monitores en `*.railway.app` (límite del dominio
+      compartido): crearlo cuando la API tenga su dominio propio (por ejemplo `api.doctraderpro.com`), en Sentry
+      (Uptime, proyecto `doctrader-api`) o en UptimeRobot/Better Stack, revisando cada 5 minutos `https://<api>/salud`
+      (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo a los dos admins.
+- [ ] **Copias de seguridad (etapa 9):** el depósito de R2 `doctrader-copias` ya existe (2026-10-15) y el flujo
+      semanal está en el repositorio. Falta (no hay conector con permiso para esto):
+  - [ ] Railway → Postgres → pestaña Backups: activar las copias Daily y Weekly.
+  - [ ] Cloudflare → R2 → Manage API tokens: un token "Object Read & Write" solo para `doctrader-copias`.
+  - [ ] GitHub → Settings → Secrets → Actions: los 6 secretos (ver README, "Copias de seguridad"). La URL es la
+        `DATABASE_PUBLIC_URL` del Postgres de Railway; `BACKUP_R2_BUCKET` = `doctrader-copias`.
+  - [ ] Actions → "Copia de seguridad" → Run workflow, y revisar que la restauración pase.
+- [x] **Correo del dominio (2026-10-15):** Resend tiene `doctraderpro.com` verificado (región sa-east-1); DKIM
+      (`resend._domainkey`), SPF y MX de rebote en `send.` están publicados; DMARC existe con `p=none`.
+  - [ ] Tras dos semanas sin problemas en los reportes, subir DMARC en Hostinger a
+        `v=DMARC1; p=quarantine; rua=mailto:support@doctraderpro.com` (empezar en `none` es lo correcto).
+- [ ] **Base de datos con permisos separados (etapa 9, `SEGURIDAD.md` §12):** hoy la API usa el usuario dueño de las
+      tablas. Lo ideal es un usuario sin permisos de administrador para la API y el worker, y el dueño solo para las
+      migraciones. Se puede hacer después del lanzamiento.
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.

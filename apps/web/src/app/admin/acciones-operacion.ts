@@ -232,6 +232,58 @@ export async function suspenderLicencia(
   return listo(previo, 'Licencia suspendida. La cuenta pasó a por desconectar.');
 }
 
+/** Cambiar broker, servidor o número de una cuenta, a pedido del cliente por ticket. */
+export async function cambiarDatosCuenta(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const id = texto(datos, 'cuenta');
+  const r = await operar<{ reconectar: boolean }>(datos, (t) =>
+    llamarApi(`/admin/cuentas/${encodeURIComponent(id)}/datos`, {
+      metodo: 'PUT',
+      cuerpo: {
+        broker: texto(datos, 'broker').trim(),
+        servidor: texto(datos, 'servidor').trim(),
+        numero: texto(datos, 'numero').trim(),
+        motivo: texto(datos, 'motivo').trim(),
+      },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin', 'layout');
+  return listo(
+    previo,
+    r.datos.reconectar
+      ? 'Datos cambiados. La cuenta quedó por conectar: desconecta la anterior en Social Trader Tools.'
+      : 'Datos cambiados. Le avisamos al cliente.',
+  );
+}
+
+/** Eliminar la cuenta de un cliente que lo pidió (anonimiza sus datos; conserva órdenes y pagos). */
+export async function eliminarCliente(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const id = texto(datos, 'cliente');
+  const r = await operar<{ porDesconectar: number }>(datos, (t) =>
+    llamarApi(`/admin/clientes/${encodeURIComponent(id)}/eliminar`, {
+      metodo: 'POST',
+      cuerpo: { motivo: texto(datos, 'motivo').trim() },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin', 'layout');
+  const n = r.datos.porDesconectar;
+  return listo(
+    previo,
+    n === 0
+      ? 'Cliente eliminado. Le enviamos un correo de confirmación.'
+      : `Cliente eliminado. ${n === 1 ? 'Su cuenta quedó' : `${n} cuentas quedaron`} por desconectar.`,
+  );
+}
+
 export async function reactivarLicencia(
   previo: EstadoOperacion,
   datos: FormData,

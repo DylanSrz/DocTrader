@@ -5,6 +5,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import type { Entorno } from './config/entorno.js';
 import { configurarApp } from './configurar-app.js';
+import { iniciarSentry } from './monitoreo/sentry.js';
+
+iniciarSentry('api');
 
 const app = await NestFactory.create(AppModule);
 configurarApp(app);

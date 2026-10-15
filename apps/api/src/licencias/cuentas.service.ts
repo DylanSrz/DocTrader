@@ -212,6 +212,7 @@ export class CuentasService {
         if (cambios.length === 0 && !soloForma) return;
 
         const cambiaIdentidad = cambios.some((c) => ['broker', 'servidor', 'numero'].includes(c));
+        if (cambiaIdentidad) await this.exigirSinLicenciaVigente(m, cuenta.id);
         const clave = this.huellaCuenta(datos.broker, datos.servidor, datos.numero);
         if (cambiaIdentidad) await this.exigirCuentaLibre(m, clave, sesion.usuarioId, cuenta.id);
 
@@ -354,6 +355,88 @@ export class CuentasService {
     });
   }
 
+  /**
+   * Cambiar el broker, el servidor o el número de una cuenta con licencia vigente lo hace un admin, a pedido del
+   * cliente por ticket (decisión del 2026-10-15): así la licencia no pasa a otra cuenta sin que nadie lo revise. Si
+   * estaba conectada, vuelve a "por conectar"; el admin desconecta la anterior en Social Trader Tools.
+   */
+  async cambiarPorAdmin(
+    id: string,
+    dto: { broker: string; servidor: string; numero: string; motivo: string },
+    sesion: SesionActiva,
+    cliente: ContextoCliente,
+  ) {
+    return this.fuente
+      .transaction(async (m) => {
+        const cuenta = await m
+          .getRepository(TradingAccount)
+          .createQueryBuilder('c')
+          .innerJoin(User, 'u', 'u.id = c.user_id')
+          .where("c.id = :id AND c.deleted_at IS NULL AND u.status <> 'DELETED'", { id })
+          .setLock('pessimistic_write', undefined, ['c'])
+          .getOne();
+        if (!cuenta) throw noEncontrada();
+        const datos = {
+          broker: limpiarTexto(dto.broker),
+          servidor: limpiarTexto(dto.servidor),
+          numero: dto.numero.trim(),
+        };
+        const cambios: string[] = [];
+        if (normalizarParaComparar(datos.broker) !== normalizarParaComparar(cuenta.broker)) {
+          cambios.push('broker');
+        }
+        if (normalizarParaComparar(datos.servidor) !== normalizarParaComparar(cuenta.server)) {
+          cambios.push('servidor');
+        }
+        if (datos.numero !== cuenta.accountNumber) cambios.push('numero');
+        if (cambios.length === 0) return { reconectar: false };
+
+        const clave = this.huellaCuenta(datos.broker, datos.servidor, datos.numero);
+        await this.exigirCuentaLibre(m, clave, cuenta.userId, cuenta.id);
+        const reconectar = cuenta.connectionStatus === ESTADO_CONEXION.CONECTADA;
+        await m.getRepository(TradingAccount).update(
+          { id: cuenta.id },
+          {
+            broker: datos.broker,
+            server: datos.servidor,
+            accountNumber: datos.numero,
+            accountKeyHmac: clave,
+            accountNumberHmac: this.huellaNumero(datos.numero),
+            ...(reconectar ? { connectionStatus: ESTADO_CONEXION.POR_CONECTAR } : {}),
+          },
+        );
+
+        const usuario = await m.getRepository(User).findOneByOrFail({ id: cuenta.userId });
+        await this.avisos.encolar(m, {
+          usuarioId: usuario.id,
+          correo: usuario.email,
+          plantilla: PLANTILLA.CUENTA_TRADING_CAMBIADA,
+          datos: {
+            nombre: usuario.fullName.split(' ')[0] ?? usuario.fullName,
+            numero: datos.numero,
+            fecha: fechaLegible(),
+            campos: cambios.map((c) => NOMBRES_CAMPOS[c]).join(', '),
+            reconectar: reconectar ? 'si' : 'no',
+          },
+        });
+        await this.auditoria.registrar(
+          {
+            actorId: sesion.usuarioId,
+            actorRole: sesion.rol,
+            action: 'cuenta.cambiada-por-admin',
+            targetType: 'trading_account',
+            targetId: cuenta.id,
+            metadata: { campos: cambios, motivo: dto.motivo, reconectar },
+            ip: cliente.ip,
+            userAgent: cliente.userAgent ?? null,
+          },
+          m,
+        );
+        return { reconectar };
+      })
+      .catch(cuentaRepetida);
+  }
+
   /** Una cuenta del cliente, como la muestra la lista. */
   async una(usuarioId: string, id: string) {
     const { cuentas } = await this.listar(usuarioId);
@@ -390,6 +473,21 @@ export class CuentasService {
 
   private huellaNumero(numero: string): Buffer {
     return this.cifrado.huella('numero-cuenta', normalizarParaComparar(numero));
+  }
+
+  /** Con la licencia vigente, el broker, el servidor y el número solo los cambia un admin (por ticket). */
+  private async exigirSinLicenciaVigente(m: EntityManager, cuentaId: string) {
+    const vigente = await m.getRepository(License).existsBy({
+      tradingAccountId: cuentaId,
+      status: In([ESTADO_LICENCIA.ACTIVA, ESTADO_LICENCIA.EN_GRACIA, ESTADO_LICENCIA.SUSPENDIDA]),
+    });
+    if (vigente) {
+      throw errorApi(
+        HttpStatus.CONFLICT,
+        'CAMBIO_POR_TICKET',
+        'Esta cuenta tiene una licencia vigente: para cambiar el broker, el servidor o el número, abre un ticket en Soporte y lo cambiamos por ti.',
+      );
+    }
   }
 
   /** Una cuenta de trading solo puede estar en un cliente. No se dice en cuál. */

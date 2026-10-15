@@ -248,7 +248,6 @@ describe('órdenes de pago', () => {
       moneda: 'USDT',
       red: 'TRON',
       direccion: 'TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x',
-      monto: '499',
       montoUsdCentavos: 49_900,
       precioBtcUsd: null,
       confirmacionesNecesarias: 20,
@@ -257,6 +256,10 @@ describe('órdenes de pago', () => {
       cuenta: { id: cuenta.body.id },
     });
     expect(orden.body.numero).toMatch(/^DTP-\d{6}$/);
+    // Unos centavos menos que el precio (de 0,01 a 0,99), distintos en cada orden abierta.
+    const monto = Number(orden.body.monto);
+    expect(monto).toBeGreaterThanOrEqual(498.01);
+    expect(monto).toBeLessThanOrEqual(498.99);
     const minutos = (new Date(orden.body.expiraEn).getTime() - antes) / 60_000;
     expect(minutos).toBeGreaterThan(59);
     expect(minutos).toBeLessThanOrEqual(60.1);
@@ -278,12 +281,27 @@ describe('órdenes de pago', () => {
       moneda: 'BTC',
       red: 'BITCOIN',
       direccion: '1H8xfingRtsTvhnf4PosyhXvacXdGVWea1',
-      // USD 499 / 125.400 = 0,00397926… BTC
-      monto: '0.00397927',
       precioBtcUsd: '125400.00',
       confirmacionesNecesarias: 2,
       plan: { codigo: 'SEMESTRAL', meses: 6, mesesObsequio: 0 },
     });
+    // USD 499 / 125.400 = 0,00397926… BTC, redondeado hacia arriba (397.927 satoshis), menos de 1 a 999 satoshis.
+    const satoshis = Math.round(Number(orden.body.monto) * 1e8);
+    expect(satoshis).toBeGreaterThanOrEqual(397_927 - 999);
+    expect(satoshis).toBeLessThanOrEqual(397_926);
+  });
+
+  it('dos órdenes abiertas nunca tienen el mismo monto', async () => {
+    const montos = new Set<string>();
+    for (let i = 0; i < 6; i++) {
+      const { web } = await clienteConSesion();
+      const cuenta = await web.post('/cuentas', datosCuenta()).expect(201);
+      const orden = await web
+        .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+        .expect(201);
+      montos.add(orden.body.monto as string);
+    }
+    expect(montos.size).toBe(6);
   });
 
   it('cambiar de moneda o de plan reemplaza la orden pendiente', async () => {

@@ -33,6 +33,11 @@ export const PLANTILLA = {
   CUENTA_POR_DESCONECTAR: 'cuenta-por-desconectar',
   COMISION_CAMBIADA: 'comision-cambiada',
   COMISION_LIQUIDADA: 'comision-liquidada',
+  CUENTA_ELIMINADA: 'cuenta-eliminada',
+  PAGO_ATASCADO: 'pago-atascado',
+  TRABAJO_FALLIDO: 'trabajo-fallido',
+  INGRESOS_FALLIDOS: 'ingresos-fallidos',
+  AUDITORIA_ALTERADA: 'auditoria-alterada',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -431,6 +436,53 @@ export function renderizar(
             : 'Cuando se pague, márquenlo como pagado en el perfil del socio con la referencia del pago.',
         ],
         boton: { texto: 'Ver el perfil del socio', url: `${web}/admin/socio` },
+      });
+    case PLANTILLA.CUENTA_ELIMINADA:
+      return armar({
+        asunto: 'Eliminamos tu cuenta de DocTraderPRO',
+        saludo,
+        parrafos: [
+          'Como lo pediste, eliminamos tu cuenta de DocTraderPRO: tus datos personales, las contraseñas de tus cuentas de trading y tus tickets de soporte.',
+          'Conservamos solo el registro de tus pagos (órdenes, montos y fechas), porque la ley nos exige guardarlo. Tus licencias terminaron y, si alguna cuenta estaba conectada, la desconectamos del copy trading en las próximas horas.',
+          'Si quieres volver, puedes registrarte de nuevo cuando quieras.',
+        ],
+      });
+    case PLANTILLA.PAGO_ATASCADO:
+      return armar({
+        asunto: `Pago sin verificar hace más de una hora: orden ${datos.orden}`,
+        saludo,
+        parrafos: [
+          `El pago de la orden ${datos.orden} (${datos.cliente}, ${datos.monto}) se reportó hace más de una hora y todavía no se pudo verificar en la blockchain. Estado: ${datos.estado}.`,
+          'Puede ser un proveedor caído o un pago con pocas confirmaciones. Revísalo en el explorador y, si está bien, apruébalo a mano.',
+        ],
+        boton: { texto: 'Ver el pago', url: `${web}/admin/pagos` },
+      });
+    case PLANTILLA.TRABAJO_FALLIDO:
+      return armar({
+        asunto: `Falló un trabajo del worker: ${datos.trabajo}`,
+        saludo,
+        parrafos: [
+          `El trabajo "${datos.trabajo}" del worker falló el ${datos.fecha}: ${datos.error}`,
+          'Se vuelve a intentar solo en su próxima vuelta. Si este aviso se repite, revisa los registros del worker en Railway (y Sentry, si está activo). Este aviso llega como máximo una vez al día por trabajo.',
+        ],
+      });
+    case PLANTILLA.INGRESOS_FALLIDOS:
+      return armar({
+        asunto: `${datos.total} ingresos fallidos en una hora`,
+        saludo,
+        parrafos: [
+          `Entre las ${datos.desde} y las ${datos.hasta} hubo ${datos.total} intentos de ingreso con una contraseña equivocada. Puede ser alguien probando contraseñas.`,
+          'La plataforma ya frena los intentos por IP y por cuenta, y pide el desafío anti-bots. Si se repite, revisa los registros en Railway y, si hace falta, activa el modo de ataque de Cloudflare.',
+        ],
+      });
+    case PLANTILLA.AUDITORIA_ALTERADA:
+      return armar({
+        asunto: 'La auditoría no cuadra: revisa la base de datos',
+        saludo,
+        parrafos: [
+          `La revisión diaria encontró que el registro de auditoría número ${datos.fila} no coincide con su huella. Puede ser que alguien con acceso a la base de datos lo haya cambiado o borrado.`,
+          'Sigue el plan de incidentes de docs/SEGURIDAD.md §14: revisa quién tiene acceso a la base de datos, cambia las llaves y contraseñas y compara con la última copia de seguridad.',
+        ],
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);

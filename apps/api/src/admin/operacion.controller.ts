@@ -15,9 +15,12 @@ import {
 import { Cliente, ConfirmacionReciente, Roles, SesionActual } from '../sesiones/decoradores.js';
 import type { ContextoCliente, SesionActiva } from '../sesiones/sesiones.service.js';
 import { AjustesAdminService } from './ajustes-admin.service.js';
+import { ClientesAdminService } from './clientes-admin.service.js';
+import { CuentasService } from '../licencias/cuentas.service.js';
 import { CuentasAdminService } from './cuentas-admin.service.js';
 import {
   AsignacionDto,
+  DatosCuentaAdminDto,
   DireccionDto,
   EnlacesDto,
   ExtenderDto,
@@ -35,7 +38,10 @@ const uuid = new ParseUUIDPipe();
 @Roles(ROL.ADMIN)
 @Controller('admin/cuentas')
 export class AdminCuentasController {
-  constructor(private readonly cuentas: CuentasAdminService) {}
+  constructor(
+    private readonly cuentas: CuentasAdminService,
+    private readonly cuentasCliente: CuentasService,
+  ) {}
 
   @Get()
   listas() {
@@ -77,6 +83,18 @@ export class AdminCuentasController {
     return { ok: true };
   }
 
+  /** Cambiar broker, servidor o número a pedido del cliente: con segundo factor reciente, como todo lo delicado. */
+  @Put(':id/datos')
+  @ConfirmacionReciente()
+  datos(
+    @Param('id', uuid) id: string,
+    @Body() dto: DatosCuentaAdminDto,
+    @SesionActual() sesion: SesionActiva,
+    @Cliente() cliente: ContextoCliente,
+  ) {
+    return this.cuentasCliente.cambiarPorAdmin(id, dto, sesion, cliente);
+  }
+
   @Put(':id/asignacion')
   async asignacion(
     @Param('id', uuid) id: string,
@@ -93,7 +111,10 @@ export class AdminCuentasController {
 @Roles(ROL.ADMIN)
 @Controller('admin')
 export class AdminLicenciasController {
-  constructor(private readonly licencias: LicenciasAdminService) {}
+  constructor(
+    private readonly licencias: LicenciasAdminService,
+    private readonly clientes: ClientesAdminService,
+  ) {}
 
   @Get('licencias')
   listar(@Query() dto: ListaLicenciasDto) {
@@ -162,6 +183,19 @@ export class AdminLicenciasController {
   ) {
     return this.licencias.verCedula(id, sesion, cliente);
   }
+
+  /** Eliminar la cuenta de un cliente que lo pidió: no se puede deshacer, por eso exige el segundo factor. */
+  @Post('clientes/:id/eliminar')
+  @HttpCode(HttpStatus.OK)
+  @ConfirmacionReciente()
+  eliminar(
+    @Param('id', uuid) id: string,
+    @Body() dto: MotivoDto,
+    @SesionActual() sesion: SesionActiva,
+    @Cliente() cliente: ContextoCliente,
+  ) {
+    return this.clientes.eliminar(id, dto.motivo.trim(), sesion, cliente);
+  }
 }
 
 /**
@@ -200,7 +234,9 @@ export class AdminAjustesController {
     return { ok: true };
   }
 
+  /** Los enlaces que ven los clientes (Telegram, broker, correo): un cambio falso serviría para estafarlos. */
   @Put('ajustes/enlaces')
+  @ConfirmacionReciente()
   async enlaces(
     @Body() dto: EnlacesDto,
     @SesionActual() sesion: SesionActiva,

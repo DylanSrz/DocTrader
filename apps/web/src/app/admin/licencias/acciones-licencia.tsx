@@ -8,6 +8,8 @@ import {
   type EstadoCedula,
   type EstadoExportacion,
   type EstadoOperacion,
+  cambiarDatosCuenta,
+  eliminarCliente,
   exportarLicencias,
   extenderLicencia,
   reactivarLicencia,
@@ -18,6 +20,8 @@ import {
 const suspenderLicenciaConAviso = conAviso(suspenderLicencia);
 const reactivarLicenciaConAviso = conAviso(reactivarLicencia);
 const extenderLicenciaConAviso = conAviso(extenderLicencia);
+const eliminarClienteConAviso = conAviso(eliminarCliente);
+const cambiarDatosCuentaConAviso = conAviso(cambiarDatosCuenta);
 const clasesTexto =
   'w-full resize-y rounded-[20px] bg-campo px-5 py-3.5 text-base text-blanco placeholder:text-white/35 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none';
 
@@ -133,6 +137,163 @@ export function Suspender({ licencia }: { licencia: string }) {
           className="text-error decoration-current/40"
         >
           Sí, suspender
+        </BotonEnviar>
+        <button
+          type="button"
+          onClick={() => setConfirmando(false)}
+          className="inline-flex min-h-11 items-center text-sm text-ceniza underline decoration-white/35 underline-offset-[6px] hover:text-blanco"
+        >
+          Cancelar
+        </button>
+      </div>
+      <ErrorOperacion estado={estado} />
+    </form>
+  );
+}
+
+/**
+ * Eliminar la cuenta del cliente que lo pidió. No se puede deshacer: pide un segundo clic, el motivo (queda en la
+ * auditoría) y el código de la app.
+ */
+/** Broker, servidor y número: los cambia un admin cuando el cliente lo pide por ticket. Pide el código. */
+export function CambiarDatosCuenta({
+  cuenta,
+  broker,
+  servidor,
+  numero,
+}: {
+  cuenta: string;
+  broker: string;
+  servidor: string;
+  numero: string;
+}) {
+  const [estado, accion] = useActionState(cambiarDatosCuentaConAviso, {} as EstadoOperacion);
+  const [abierto, setAbierto] = useState(false);
+  useAlListo(estado, () => setAbierto(false));
+  if (!abierto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="inline-flex min-h-11 items-center text-sm text-blanco underline decoration-white/35 underline-offset-[6px] hover:decoration-current"
+      >
+        Cambiar broker, servidor o número
+      </button>
+    );
+  }
+  const v = estado.valores ?? {};
+  return (
+    <form action={accion} className="grid w-full justify-items-start gap-4">
+      <input type="hidden" name="cuenta" value={cuenta} />
+      <p className="text-sm text-ceniza">
+        Solo cuando el cliente lo pide por ticket. Si la cuenta estaba conectada, queda por
+        conectar: desconecta la anterior en Social Trader Tools.
+      </p>
+      <Campo
+        etiqueta="Broker"
+        name="broker"
+        autoComplete="off"
+        required
+        defaultValue={v.broker ?? broker}
+        error={estado.campos?.broker}
+      />
+      <Campo
+        etiqueta="Servidor"
+        name="servidor"
+        autoComplete="off"
+        required
+        defaultValue={v.servidor ?? servidor}
+        error={estado.campos?.servidor}
+      />
+      <Campo
+        etiqueta="Número de cuenta"
+        name="numero"
+        inputMode="numeric"
+        autoComplete="off"
+        required
+        defaultValue={v.numero ?? numero}
+        error={estado.campos?.numero}
+        className="max-w-[16rem]"
+      />
+      <div className="grid w-full gap-2">
+        <label htmlFor={`motivo-cta-${cuenta}`} className="text-[15px] text-blanco">
+          Motivo (por ejemplo, el número del ticket)
+        </label>
+        <textarea
+          id={`motivo-cta-${cuenta}`}
+          name="motivo"
+          rows={2}
+          required
+          minLength={LIMITES_ADMIN.motivo.minimo}
+          maxLength={LIMITES_ADMIN.motivo.maximo}
+          defaultValue={v.motivo}
+          aria-invalid={estado.campos?.motivo ? true : undefined}
+          className={clasesTexto}
+        />
+        {estado.campos?.motivo ? (
+          <p className="text-sm text-error">{estado.campos.motivo}</p>
+        ) : null}
+      </div>
+      <CampoCodigo estado={estado} accion="cambiar los datos de la cuenta" />
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <BotonEnviar variante="enlace" enviando="Guardando…">
+          Guardar los datos nuevos
+        </BotonEnviar>
+        <button
+          type="button"
+          onClick={() => setAbierto(false)}
+          className="inline-flex min-h-11 items-center text-sm text-ceniza underline decoration-white/35 underline-offset-[6px] hover:text-blanco"
+        >
+          Cancelar
+        </button>
+      </div>
+      <ErrorOperacion estado={estado} />
+    </form>
+  );
+}
+
+export function EliminarCliente({ cliente }: { cliente: string }) {
+  const [estado, accion] = useActionState(eliminarClienteConAviso, {} as EstadoOperacion);
+  const [confirmando, setConfirmando] = useState(false);
+  useAlListo(estado, () => setConfirmando(false));
+  if (!confirmando) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirmando(true)}
+        className="inline-flex min-h-11 items-center text-sm text-error underline decoration-current/40 underline-offset-[6px] hover:decoration-current"
+      >
+        Eliminar cliente
+      </button>
+    );
+  }
+  return (
+    <form action={accion} className="grid w-full justify-items-start gap-4">
+      <input type="hidden" name="cliente" value={cliente} />
+      <div className="grid w-full gap-2">
+        <label htmlFor={`motivo-eli-${cliente}`} className="text-[15px] text-blanco">
+          Cómo lo pidió (por ejemplo, el número del ticket; sin datos personales)
+        </label>
+        <textarea
+          id={`motivo-eli-${cliente}`}
+          name="motivo"
+          rows={2}
+          required
+          minLength={LIMITES_ADMIN.motivo.minimo}
+          maxLength={LIMITES_ADMIN.motivo.maximo}
+          defaultValue={estado.valores?.motivo}
+          autoFocus
+          className={clasesTexto}
+        />
+      </div>
+      <CampoCodigo estado={estado} accion="eliminar al cliente" />
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <BotonEnviar
+          variante="enlace"
+          enviando="Eliminando…"
+          className="text-error decoration-current/40"
+        >
+          Sí, eliminar para siempre
         </BotonEnviar>
         <button
           type="button"

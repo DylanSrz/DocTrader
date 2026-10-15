@@ -82,6 +82,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `PROXY_SECRET` | El mismo valor que en la API |
    | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Clave pública de Cloudflare Turnstile (cuando exista la cuenta) |
    | `MOSTRAR_SISTEMA` | `true` solo en *Preview*, para ver `/sistema` |
+   | `SENTRY_DSN` | Opcional: el DSN del proyecto de Sentry. Con él, los errores del servidor de la web llegan a Sentry, sin datos personales |
 4. El dominio `doctraderpro.com` se conecta cuando la landing esté lista (etapa 2), no antes.
 
 ### API y worker — Railway
@@ -107,6 +108,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `LOOKUP_HMAC_KEY` | Otra llave nueva (`openssl rand -base64 32`). Para buscar cédulas repetidas sin descifrarlas |
    | `RESEND_API_KEY` | La llave de Resend (cuando el dominio esté verificado). Sin ella, los correos esperan en cola |
    | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | Cloudflare R2 privado para los adjuntos de soporte (token de R2 con lectura y escritura solo en ese depósito). Sin ellas, los tickets funcionan sin adjuntos |
+   | `SENTRY_DSN` | Opcional: el DSN del proyecto de Sentry (el mismo de la web). Sin ella, los errores solo quedan en los registros de Railway |
 
    Solo en la API, además:
 
@@ -126,6 +128,40 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
 
 GitHub Actions (`.github/workflows/`) corre formato, lint, tipos, pruebas unitarias, pruebas de punta a punta,
 build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabot propone actualizaciones cada semana.
+
+### Copias de seguridad
+
+- **Railway:** activar en el servicio de Postgres, pestaña **Backups**, las copias programadas del volumen (diarias)
+  y, si el plan lo permite, la recuperación a un momento dado (PITR).
+- **Copia semanal fuera de Railway** (`.github/workflows/copia-de-seguridad.yml`): los lunes a las 3:17 a. m. de
+  Colombia copia la base de datos, la **restaura en un Postgres vacío y la revisa**, la cifra (AES-256 con una frase) y
+  la guarda en un depósito privado de R2, 30 días. Se puede correr a mano desde Actions → "Copia de seguridad" → *Run
+  workflow*. Necesita estos secretos del repositorio (Settings → Secrets and variables → Actions); sin ellos avisa y no
+  hace nada:
+
+  | Secreto | Valor |
+  |---|---|
+  | `BACKUP_DATABASE_URL` | La URL pública de Postgres en Railway (`DATABASE_PUBLIC_URL`) |
+  | `BACKUP_PASSPHRASE` | Una frase larga (`openssl rand -base64 32`). Guárdala en el gestor de contraseñas: **sin ella las copias no se abren** |
+  | `BACKUP_R2_ACCOUNT_ID`, `BACKUP_R2_ACCESS_KEY_ID`, `BACKUP_R2_SECRET_ACCESS_KEY`, `BACKUP_R2_BUCKET` | Un depósito de R2 privado **solo para copias** (`doctrader-copias`) y un token de R2 con lectura y escritura solo en él |
+
+- **Restaurar una copia** (en una base de datos nueva, nunca encima de producción sin pensarlo dos veces):
+  1. Descargar el archivo `doctrader-AAAA-MM-DD.dump.gpg` desde el depósito de R2.
+  2. `gpg --decrypt doctrader-AAAA-MM-DD.dump.gpg > doctrader.dump` (pide la frase).
+  3. `pg_restore --no-owner --no-privileges -d <url-de-la-base-nueva> doctrader.dump`.
+  4. Apuntar `DATABASE_URL` de la API y el worker a la base restaurada solo después de revisarla.
+
+### Limpieza antes del lanzamiento
+
+Los clientes de hoy son de prueba. Antes de abrir, en el servicio de la API de Railway (pestaña de la consola o
+`railway ssh`):
+
+1. `node apps/api/dist/database/limpiar.js` muestra lo que se borraría, sin cambiar nada.
+2. `CONFIRMAR_LIMPIEZA=borrar-todos-los-clientes node apps/api/dist/database/limpiar.js` borra todos los clientes con
+   sus cuentas, licencias, órdenes, tickets, adjuntos y correos, y reinicia los números de orden (DTP-000001) y de
+   ticket (1000). Quedan los admins, el socio, los ajustes, los planes, las direcciones de depósito, los textos
+   legales, las preguntas y las respuestas guardadas. La auditoría no se toca (no admite borrados).
+3. Vaciar el depósito de adjuntos (`doctrader-adjuntos`) en Cloudflare R2: todos sus archivos eran de prueba.
 
 ### Dónde está corriendo (2026-10-14)
 

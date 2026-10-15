@@ -129,7 +129,7 @@ export function Enlaces({ ajustes }: { ajustes: Ajustes }) {
         name="telegram"
         type="url"
         spellCheck={false}
-        defaultValue={e?.telegram ?? ''}
+        defaultValue={estado.valores?.telegram ?? e?.telegram ?? ''}
         error={estado.campos?.telegram}
       />
       <Campo
@@ -137,14 +137,14 @@ export function Enlaces({ ajustes }: { ajustes: Ajustes }) {
         name="instagram"
         type="url"
         spellCheck={false}
-        defaultValue={e?.instagram ?? ''}
+        defaultValue={estado.valores?.instagram ?? e?.instagram ?? ''}
         error={estado.campos?.instagram}
       />
       <div className={rejilla}>
         <Campo
           etiqueta="Broker sugerido"
           name="brokerNombre"
-          defaultValue={e?.broker.name ?? ''}
+          defaultValue={estado.valores?.brokerNombre ?? e?.broker.name ?? ''}
           error={estado.campos?.brokerNombre}
         />
         <Campo
@@ -152,7 +152,7 @@ export function Enlaces({ ajustes }: { ajustes: Ajustes }) {
           name="brokerUrl"
           type="url"
           spellCheck={false}
-          defaultValue={e?.broker.url ?? ''}
+          defaultValue={estado.valores?.brokerUrl ?? e?.broker.url ?? ''}
           error={estado.campos?.brokerUrl}
         />
       </div>
@@ -161,10 +161,15 @@ export function Enlaces({ ajustes }: { ajustes: Ajustes }) {
         name="correoSoporte"
         type="email"
         spellCheck={false}
-        defaultValue={ajustes.correoSoporte ?? ''}
+        defaultValue={estado.valores?.correoSoporte ?? ajustes.correoSoporte ?? ''}
         error={estado.campos?.correoSoporte}
       />
-      <Pie estado={estado} enviando="Guardando…" texto="Guardar enlaces" />
+      <Pie
+        estado={estado}
+        enviando="Guardando…"
+        texto="Guardar enlaces"
+        delicado="cambiar los enlaces"
+      />
     </form>
   );
 }

@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { reportarError } from '../monitoreo/sentry.js';
 
 const MENSAJES: Partial<Record<number, { codigo: string; mensaje: string }>> = {
   [HttpStatus.NOT_FOUND]: { codigo: 'NO_ENCONTRADO', mensaje: 'No encontrado.' },
@@ -18,8 +19,8 @@ const MENSAJES: Partial<Record<number, { codigo: string; mensaje: string }>> = {
 
 /**
  * Todas las respuestas de error tienen la misma forma: `{ codigo, mensaje }`, que la web sabe mostrar. Los
- * errores inesperados se registran con su detalle (para verlos en los registros de Railway) y al cliente solo le
- * llega un mensaje genérico.
+ * errores inesperados se registran con su detalle (en los registros de Railway y, si está activo, en Sentry) y al
+ * cliente solo le llega un mensaje genérico.
  */
 @Catch()
 export class FiltroErrores implements ExceptionFilter {
@@ -44,6 +45,7 @@ export class FiltroErrores implements ExceptionFilter {
       `${peticion.method} ${peticion.path}: ${(error as Error)?.message}`,
       (error as Error)?.stack,
     );
+    reportarError(error, { ruta: `${peticion.method} ${peticion.path}` });
     respuesta.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       codigo: 'ERROR_INTERNO',
       mensaje: 'Algo salió mal de nuestro lado. Intenta de nuevo en un momento.',

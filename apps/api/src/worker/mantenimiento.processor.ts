@@ -1,4 +1,4 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Inject, Logger } from '@nestjs/common';
 import type { Job } from 'bullmq';
 import type { Redis } from 'ioredis';
@@ -7,6 +7,8 @@ import { ArchivosService } from '../archivos/archivos.service.js';
 import { AvisosEnvio } from '../avisos/avisos-envio.js';
 import { VencimientoLicencias } from '../licencias/vencimiento-licencias.js';
 import { VencimientoOrdenes } from '../licencias/vencimiento-ordenes.js';
+import { Alertas } from '../monitoreo/alertas.js';
+import { reportarError } from '../monitoreo/sentry.js';
 import { VerificacionPagos } from '../pagos/verificacion-pagos.service.js';
 import { BorradoDatos } from '../privacidad/borrado-datos.js';
 import { REDIS } from '../redis/redis.module.js';
@@ -15,6 +17,7 @@ import { SoporteService } from '../soporte/soporte.service.js';
 import {
   CLAVE_LATIDO_WORKER,
   COLA_MANTENIMIENTO,
+  TRABAJO_ALERTAS,
   TRABAJO_ACTIVAR_DIRECCIONES,
   TRABAJO_BORRAR_ARCHIVOS,
   TRABAJO_BORRAR_DATOS,
@@ -25,6 +28,7 @@ import {
   TRABAJO_LATIDO,
   TRABAJO_LIQUIDAR_COMISION,
   TRABAJO_RECORDATORIOS,
+  TRABAJO_VERIFICAR_AUDITORIA,
   TRABAJO_VERIFICAR_PAGOS,
 } from './latido.js';
 
@@ -33,7 +37,7 @@ import {
  * vencimiento de las órdenes de pago, la verificación de los pagos en la blockchain, los estados de las licencias y
  * la activación de las direcciones de depósito que cumplieron sus 24 horas, el cierre de los tickets resueltos y el
  * borrado de los adjuntos que nadie usó, los recordatorios de vencimiento y la liquidación de la comisión del socio
- * y el borrado diario de los datos vencidos.
+ * el borrado diario de los datos vencidos y las alertas a los admins.
  */
 @Processor(COLA_MANTENIMIENTO)
 export class MantenimientoProcessor extends WorkerHost {
@@ -50,6 +54,7 @@ export class MantenimientoProcessor extends WorkerHost {
     private readonly archivos: ArchivosService,
     private readonly socio: SocioService,
     private readonly borrado: BorradoDatos,
+    private readonly alertas: Alertas,
   ) {
     super();
   }
@@ -89,8 +94,25 @@ export class MantenimientoProcessor extends WorkerHost {
       case TRABAJO_BORRAR_DATOS:
         await this.borrado.ejecutar();
         return;
+      case TRABAJO_ALERTAS:
+        await this.alertas.revisar();
+        return;
+      case TRABAJO_VERIFICAR_AUDITORIA:
+        await this.alertas.verificarAuditoria();
+        return;
       default:
         this.logger.warn(`Trabajo desconocido en ${COLA_MANTENIMIENTO}: ${job.name}`);
     }
+  }
+
+  /** Un trabajo que falla queda en el registro y en Sentry, y avisa a los admins una vez al día por trabajo. */
+  @OnWorkerEvent('failed')
+  async alFallar(job: Job | undefined, error: Error): Promise<void> {
+    const nombre = job?.name ?? 'desconocido';
+    this.logger.error(`Falló el trabajo ${nombre}: ${error.message}`, error.stack);
+    reportarError(error, { trabajo: nombre });
+    await this.alertas.trabajoFallido(nombre, error).catch((e: unknown) => {
+      this.logger.error(`No se pudo avisar del trabajo fallido: ${(e as Error).message}`);
+    });
   }
 }

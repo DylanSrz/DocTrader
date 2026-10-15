@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef } from 'react';
 import { agregarCuenta, editarCuenta, type EstadoPanel, quitarCuenta } from '@/app/panel/acciones';
-import { Aviso, BotonEnviar, Campo, CampoContrasena } from '@/components/ui';
+import { Aviso, BotonEnviar, Campo, CampoContrasena, Enlace } from '@/components/ui';
 import { avisar } from './aviso-breve';
 import { CuerpoLateral, PieLateral, useCerrarLateral } from './lateral';
 
@@ -43,11 +43,14 @@ export function FormularioCuenta({
   planes,
   titularSugerido,
   sePuedeQuitar = false,
+  datosFijos = false,
 }: {
   cuenta?: { id: string; titular: string; broker: string; servidor: string; numero: string };
   planes?: PlanOpcion[];
   titularSugerido?: string;
   sePuedeQuitar?: boolean;
+  /** Con la licencia vigente, el broker, el servidor y el número solo se cambian por ticket. */
+  datosFijos?: boolean;
 }) {
   const editar = Boolean(cuenta);
   const [estado, accion] = useActionState(editar ? editarCuenta : agregarCuenta, {} as EstadoPanel);
@@ -94,6 +97,7 @@ export function FormularioCuenta({
             placeholder="Ej.: JustMarkets"
             required
             maxLength={80}
+            readOnly={datosFijos}
             defaultValue={valor('broker')}
             error={e.broker}
           />
@@ -108,7 +112,12 @@ export function FormularioCuenta({
             placeholder="Ej.: JustMarkets-Live"
             required
             maxLength={80}
-            ayuda="Aparece en el correo que te envió el broker al abrir la cuenta."
+            ayuda={
+              datosFijos
+                ? undefined
+                : 'Aparece en el correo que te envió el broker al abrir la cuenta.'
+            }
+            readOnly={datosFijos}
             defaultValue={valor('servidor')}
             error={e.servidor}
           />
@@ -121,9 +130,19 @@ export function FormularioCuenta({
             placeholder="Ej.: 50213847"
             required
             maxLength={16}
+            readOnly={datosFijos}
             defaultValue={valor('numero')}
             error={e.numero}
           />
+          {datosFijos ? (
+            <p className="text-sm text-ceniza">
+              Tu licencia está vigente: para cambiar el broker, el servidor o el número,{' '}
+              <Enlace href="/panel/soporte?nuevo=1&tema=LICENCIA" className="text-sm">
+                abre un ticket
+              </Enlace>{' '}
+              y lo cambiamos por ti.
+            </p>
+          ) : null}
           <CampoContrasena
             etiqueta="Contraseña operativa"
             name="contrasenaOperativa"

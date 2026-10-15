@@ -20,7 +20,15 @@ import { llamarApi } from '@/lib/api';
 import { conceptoOrden, ESTADO_ORDEN_VISIBLE, fechaCorta, fechaLarga, usd } from '@/lib/formato';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
 import { Asignacion } from '../cuentas/acciones-cuenta';
-import { Cedula, Exportar, Extender, Reactivar, Suspender } from './acciones-licencia';
+import {
+  Cedula,
+  CambiarDatosCuenta,
+  EliminarCliente,
+  Exportar,
+  Extender,
+  Reactivar,
+  Suspender,
+} from './acciones-licencia';
 
 export const metadata: Metadata = { title: 'Licencias' };
 
@@ -71,6 +79,7 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
 function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) => string }) {
   const estado = ESTADO_LICENCIA_ADMIN[ficha.estado];
   const vigente = ['ACTIVA', 'EN_GRACIA'].includes(ficha.estado);
+  const eliminado = ficha.cliente.estado === 'DELETED';
   return (
     <>
       <div className="grid justify-items-start gap-3">
@@ -91,30 +100,32 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
         ) : null}
       </div>
 
-      <Seccion titulo="Contacto">
-        <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-6 gap-y-1 text-[15px]">
-          <dt className="text-ceniza">Cédula</dt>
-          <dd>
-            <Cedula cliente={ficha.cliente.id} final={ficha.cliente.cedulaFinal} />
-          </dd>
-          <dt className="text-ceniza">Correo</dt>
-          <dd className="flex min-h-11 items-center [overflow-wrap:anywhere]">
-            <a
-              href={`mailto:${ficha.cliente.correo}`}
-              className="underline decoration-white/35 underline-offset-4"
-            >
-              {ficha.cliente.correo}
-            </a>
-            {ficha.cliente.correoVerificado ? null : (
-              <span className="ml-2 text-ceniza">(sin confirmar)</span>
-            )}
-          </dd>
-          <dt className="text-ceniza">Teléfono</dt>
-          <dd className="cifra flex min-h-11 items-center">
-            {ficha.cliente.telefono ? formatearTelefono(ficha.cliente.telefono) : '—'}
-          </dd>
-        </dl>
-      </Seccion>
+      {eliminado ? null : (
+        <Seccion titulo="Contacto">
+          <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-6 gap-y-1 text-[15px]">
+            <dt className="text-ceniza">Cédula</dt>
+            <dd>
+              <Cedula cliente={ficha.cliente.id} final={ficha.cliente.cedulaFinal} />
+            </dd>
+            <dt className="text-ceniza">Correo</dt>
+            <dd className="flex min-h-11 items-center [overflow-wrap:anywhere]">
+              <a
+                href={`mailto:${ficha.cliente.correo}`}
+                className="underline decoration-white/35 underline-offset-4"
+              >
+                {ficha.cliente.correo}
+              </a>
+              {ficha.cliente.correoVerificado ? null : (
+                <span className="ml-2 text-ceniza">(sin confirmar)</span>
+              )}
+            </dd>
+            <dt className="text-ceniza">Teléfono</dt>
+            <dd className="cifra flex min-h-11 items-center">
+              {ficha.cliente.telefono ? formatearTelefono(ficha.cliente.telefono) : '—'}
+            </dd>
+          </dl>
+        </Seccion>
+      )}
 
       <Seccion titulo="Cuenta de trading">
         <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-2 text-[15px]">
@@ -136,18 +147,29 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
               : ''}
           </dd>
         </dl>
+        {eliminado ? null : (
+          <CambiarDatosCuenta
+            key={`${ficha.cuenta.numero}-${ficha.cuenta.servidor}`}
+            cuenta={ficha.cuenta.id}
+            broker={ficha.cuenta.broker}
+            servidor={ficha.cuenta.servidor}
+            numero={ficha.cuenta.numero}
+          />
+        )}
       </Seccion>
 
-      <Seccion titulo="Ajustar">
-        <Asignacion
-          cuenta={ficha.cuenta.id}
-          capitalUsdCentavos={ficha.cuenta.capitalUsdCentavos}
-          riesgo={ficha.cuenta.riesgo}
-          notas={ficha.cuenta.notas}
-        />
-      </Seccion>
+      {eliminado ? null : (
+        <Seccion titulo="Ajustar">
+          <Asignacion
+            cuenta={ficha.cuenta.id}
+            capitalUsdCentavos={ficha.cuenta.capitalUsdCentavos}
+            riesgo={ficha.cuenta.riesgo}
+            notas={ficha.cuenta.notas}
+          />
+        </Seccion>
+      )}
 
-      {ficha.vence ? (
+      {ficha.vence && !eliminado ? (
         <Seccion titulo="Extender días">
           <Extender licencia={ficha.id} />
         </Seccion>
@@ -243,6 +265,24 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
           )}
         </Seccion>
       ) : null}
+
+      {eliminado ? (
+        <Seccion titulo="Cliente eliminado">
+          <p className="text-sm text-ceniza">
+            Sus datos personales se borraron a su pedido. Quedan sus órdenes y pagos, que exige la
+            ley.
+          </p>
+        </Seccion>
+      ) : (
+        <Seccion titulo="Eliminar cliente">
+          <p className="text-sm text-ceniza">
+            Solo si el cliente lo pide. Se borran su nombre, cédula, correo, teléfono, las
+            contraseñas de sus cuentas y sus tickets; sus licencias terminan y una cuenta conectada
+            queda por desconectar. Se conservan sus órdenes y pagos. No se puede deshacer.
+          </p>
+          <EliminarCliente cliente={ficha.cliente.id} />
+        </Seccion>
+      )}
     </>
   );
 }

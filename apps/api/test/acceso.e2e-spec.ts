@@ -10,6 +10,7 @@ import { AvisosEnvio } from '../src/avisos/avisos-envio.js';
 import { CONTEXTO_SECRETO_AVISO } from '../src/avisos/avisos.service.js';
 import { Consent, Notification, User } from '../src/database/entidades/index.js';
 import { REDIS } from '../src/redis/redis.module.js';
+import { adminConSesion } from './ayudas.js';
 import { CifradoService } from '../src/seguridad/cifrado.service.js';
 import { comoLaWeb, crearApp, ipAleatoria } from './crear-app.js';
 
@@ -104,6 +105,18 @@ describe('registro', () => {
     expect(respuesta.body.codigo).toBe('DATOS_INVALIDOS');
     expect(respuesta.body.campos.contrasena).toMatch(/entre 10 y 128/);
     expect(respuesta.body.campos.aceptaRiesgo).toMatch(/aviso de riesgo/);
+  });
+
+  it('el nombre solo lleva letras: nada de dominios ni enlaces que lleguen en los correos', async () => {
+    for (const nombre of ['doctrader-pagos.com', 'Ana <b>', 'Pedro 123']) {
+      const respuesta = await comoLaWeb(app)
+        .post('/auth/registro', datosDeRegistro({ nombre }))
+        .expect(400);
+      expect(respuesta.body.campos.nombre).toMatch(/solo con letras/);
+    }
+    await comoLaWeb(app)
+      .post('/auth/registro', datosDeRegistro({ nombre: "María José O'Neill-Peña" }))
+      .expect(202);
   });
 
   it('rechaza campos que no existen', async () => {
@@ -267,21 +280,25 @@ describe('verificación del correo e ingreso', () => {
 
   it('después de 5 contraseñas equivocadas hay que esperar, aunque la sexta sea la correcta', async () => {
     const { datos } = await clienteConSesion();
+    const ip = ipAleatoria();
     for (let i = 0; i < 5; i++) {
-      await comoLaWeb(app)
+      await comoLaWeb(app, { ip })
         .post('/auth/ingresar', { correo: datos.correo, contrasena: `equivocada número ${i}` })
         .expect(401);
     }
-    const respuesta = await comoLaWeb(app)
+    const respuesta = await comoLaWeb(app, { ip })
       .post('/auth/ingresar', { correo: datos.correo, contrasena: datos.contrasena })
       .expect(429);
     expect(respuesta.body.reintentarEn).toBeGreaterThan(0);
+    // La espera es de esa IP: el dueño, desde la suya, sigue entrando.
+    await comoLaWeb(app)
+      .post('/auth/ingresar', { correo: datos.correo, contrasena: datos.contrasena })
+      .expect(200);
   });
 
   it('al llegar a 10 fallos avisa al dueño de la cuenta', async () => {
     const { datos } = await clienteConSesion();
     for (let i = 0; i < 10; i++) {
-      await redis.del(`ingreso:espera:${datos.correo}`);
       await comoLaWeb(app)
         .post('/auth/ingresar', { correo: datos.correo, contrasena: `equivocada número ${i}` })
         .expect(401);
@@ -412,6 +429,32 @@ describe('admins: segundo factor obligatorio', () => {
       .post('/auth/segundo-factor', { codigo: '000000' })
       .expect(401);
     expect(ultimo.body.codigo).toBe('SIN_SESION');
+  });
+
+  it('el límite de códigos es por usuario: muchos intentos al mismo tiempo no pasan de 10', async () => {
+    const admin = await adminConSesion(app);
+    const sesiones = await Promise.all(
+      Array.from({ length: 3 }, () =>
+        comoLaWeb(app)
+          .post('/auth/ingresar', {
+            correo: admin.usuario.email,
+            contrasena: 'contraseña de admin de pruebas',
+          })
+          .expect(200),
+      ),
+    );
+    const respuestas = await Promise.all(
+      sesiones.flatMap((s) =>
+        Array.from({ length: 10 }, () =>
+          comoLaWeb(app, { token: s.body.token as string }).post('/auth/segundo-factor', {
+            codigo: '000000',
+          }),
+        ),
+      ),
+    );
+    // 400 es "código incorrecto": solo esos llegaron a compararse.
+    expect(respuestas.filter((r) => r.status === 400).length).toBeLessThanOrEqual(10);
+    expect(respuestas.some((r) => r.body.codigo === 'DEMASIADOS_CODIGOS')).toBe(true);
   });
 
   it('un código de recuperación sirve una sola vez y avisa por correo', async () => {
