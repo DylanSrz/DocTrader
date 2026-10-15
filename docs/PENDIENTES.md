@@ -54,8 +54,10 @@
       ustedes, revisar que a los dos admins les llegue el correo con la dirección completa y cancelarla. Mientras
       está en espera, ninguna orden la usa.
 
-- [ ] **La prueba con un SMS real** (etapa 6), cuando Twilio esté listo: con un cliente nuevo, pedir la prueba
-      desde "Mis cuentas", verificar el teléfono con el SMS, aprobar la solicitud en Pagos y pagar los USD 50.
+- [ ] **Un ticket de ida y vuelta** (etapa 7): con un cliente, abrir un ticket en "Soporte" con una captura; en el
+      admin, dejar una nota interna, responder con una respuesta guardada y asignarlo. Al cliente le debe llegar el
+      correo con la respuesta; después, marcarlo resuelto y escribir otra vez para reabrirlo (llega el correo a los
+      admins). Con R2 listo, descargar la captura desde los dos lados.
 
 ## ❓ Por confirmar con Argemiro
 
@@ -80,15 +82,13 @@
 - [x] **Cloudflare Turnstile** (2026-10-15): llaves en Vercel y en la API.
 - [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
       una llave gratis del plan Demo (`COINGECKO_API_KEY` en la API de Railway) hay más consultas al mes.
-- [ ] **Twilio (SMS de la prueba, etapa 6):** crear la cuenta, un servicio de Verify (nombre "DocTraderPRO"),
-      permisos geográficos solo para Colombia y Fraud Guard en nivel estándar; recargar saldo (la cuenta de prueba
-      solo envía a números verificados). Poner `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` y
-      `TWILIO_VERIFY_SERVICE_SID` en la API de Railway. Sin ellas, la prueba queda cerrada.
-- [ ] **`TRIAL_HMAC_KEY`** (etapa 6): una llave nueva (`openssl rand -base64 32`) en la API y en el worker de
-      Railway, guardada en el gestor de contraseñas. Si se pierde o se cambia, las pruebas anteriores dejan de
-      bloquear.
-- [ ] Crear cuando se necesiten: Cloudflare R2 (archivos, etapa 7), Sentry (errores).
-      Ver `docs/DECISIONES-TECNICAS.md`.
+- [ ] **Cloudflare R2 (adjuntos de soporte, etapa 7):** en Cloudflare → R2, crear un depósito privado
+      `doctrader-adjuntos` (sin acceso público ni dominio) y un token de API de R2 con permiso "Object Read & Write"
+      solo para ese depósito. Poner `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET` en la
+      API **y** en el worker de Railway (el worker borra los adjuntos sin usar). No hace falta CORS en R2: el
+      navegador sube a la API y descarga con un enlace firmado. Sin estas variables, los tickets funcionan sin
+      adjuntos. `WEB_ORIGIN` de la API debe ser la dirección exacta de la web (la subida es directa a la API).
+- [ ] Crear cuando se necesite: Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
@@ -99,13 +99,16 @@
 
 - **2026-10-15:** se retira la licencia trimestral, la semestral pasa a 6 meses sin obsequio y el nombre del dueño
   no aparece en la plataforma (va "DocTrader Pro").
+- **2026-10-15:** se quita por completo la licencia de prueba (y con ella la verificación del teléfono por SMS): ya
+  no hacen falta Twilio ni `TRIAL_HMAC_KEY`. Si llegaron a ponerse en Railway, se pueden borrar `TRIAL_HMAC_KEY` y
+  las `TWILIO_*`.
 
 Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 10 % del valor bruto, editable desde el perfil del
 socio, liquidada los 15 y 30 de cada mes ·
-licencias mensual USD 120 y semestral USD 499 (6 meses; la trimestral y el mes de obsequio se quitaron el 2026-10-15), prueba de 15 días USD 50 que se completa pagando la diferencia (la licencia cuenta desde el inicio de la prueba) ·
-la landing invita a solicitar la prueba · teléfono verificado por SMS para pedir la prueba ·
+licencias mensual USD 120 y semestral USD 499 (6 meses; la trimestral y el mes de obsequio se quitaron el 2026-10-15) · mensual → semestral antes de vencer (se
+paga el plan nuevo; los días se suman) · sin licencia de prueba (se quitó el 2026-10-15) ·
 TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase 2 · Binance Pay +
 direcciones de depósito configurables · solo cripto: USDT TRC20 y BTC · orden válida 1 hora · 3 días de gracia
 (editable) · una licencia por cuenta de trading · sin LPOA · registro con nombre, cédula, correo y teléfono ·
-una prueba por cliente y por cuenta de trading, con control antiabuso · tickets de soporte en la plataforma ·
+tickets de soporte en la plataforma ·
 verificación automática de pagos en blockchain · soporte por tickets y Telegram · dominio doctraderpro.com · correo oficial support@doctraderpro.com · propuesta de diseño 2 · servicio de copy: Social Trader Tools · JustMarkets único broker sugerido · tipografías y estilos los define el desarrollo.

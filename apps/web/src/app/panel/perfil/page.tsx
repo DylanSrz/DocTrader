@@ -49,13 +49,10 @@ async function Contenido() {
       <div className="mt-14 grid max-w-[980px] gap-7">
         <p className="max-w-[40em] text-niebla">
           Tu cédula se guarda cifrada y solo la ve el administrador. Para cambiar tu nombre, cédula,
-          correo o celular, escríbenos por <span translate="no">Telegram</span> o a{' '}
-          {landing.correoSoporte}.
+          correo o celular, abre un ticket en Soporte o escríbenos a {landing.correoSoporte}.
         </p>
         <div className="flex flex-wrap items-center gap-x-6">
-          <Enlace href={landing.enlaces.telegram} target="_blank" rel="noopener">
-            Escribir por&nbsp;<span translate="no">Telegram</span>
-          </Enlace>
+          <Enlace href="/panel/soporte?nuevo=1&tema=OTRO">Abrir un ticket</Enlace>
           <Enlace href="/recuperar" gris>
             Cambiar mi contraseña
           </Enlace>

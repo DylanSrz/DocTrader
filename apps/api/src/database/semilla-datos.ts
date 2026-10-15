@@ -57,8 +57,6 @@ const AJUSTES: Record<string, ValorJson> = {
   order_ttl_minutes: 60,
   min_confirmations: { TRON: 20, BITCOIN: 2 },
   auto_approve_payments: false,
-  'trial.require_verified_contact': true,
-  'trial.require_id_photo': false,
   'tickets.auto_close_days': 7,
   links: ENLACES_INICIALES,
   myfxbook: MYFXBOOK_INICIAL,

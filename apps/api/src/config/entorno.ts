@@ -50,23 +50,26 @@ const esquema = z.object({
   TRONGRID_API_KEY: z.string().min(1).optional(),
   TRONSCAN_API_KEY: z.string().min(1).optional(),
   /**
-   * Huellas del control de la prueba (`docs/SEGURIDAD.md` §4.4): una llave propia, distinta de las demás, que no se
-   * rota borrando la anterior. Sin ella, las solicitudes de prueba quedan cerradas.
+   * Adjuntos de soporte en Cloudflare R2, privado (`docs/DECISIONES-TECNICAS.md` §3). Sin estas variables: en
+   * desarrollo y en pruebas se guardan en una carpeta local (`ARCHIVOS_DIR`); en producción no se pueden adjuntar.
    */
-  TRIAL_HMAC_KEY: llaveBase64De32Bytes.optional(),
-  /**
-   * SMS para verificar el teléfono (Twilio Verify, `docs/DECISIONES-TECNICAS.md` §1). En desarrollo y en pruebas,
-   * sin estas variables, el código se escribe en el registro de la API; en producción, sin ellas, no se envían SMS.
-   */
-  TWILIO_ACCOUNT_SID: z
+  R2_ACCOUNT_ID: z
     .string()
-    .regex(/^AC[0-9a-f]{32}$/, 'empieza por AC')
+    .regex(/^[0-9a-f]{32}$/, 'es el identificador de la cuenta de Cloudflare (32 caracteres)')
     .optional(),
-  TWILIO_AUTH_TOKEN: z.string().min(16).optional(),
-  TWILIO_VERIFY_SERVICE_SID: z
+  R2_ACCESS_KEY_ID: z.string().min(16).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(32).optional(),
+  R2_BUCKET: z
     .string()
-    .regex(/^VA[0-9a-f]{32}$/, 'empieza por VA')
+    .regex(
+      /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/,
+      'nombre de depósito de R2 (minúsculas, números y guiones)',
+    )
     .optional(),
+  /** Carpeta de los adjuntos en desarrollo (sin R2). */
+  ARCHIVOS_DIR: z.string().min(1).optional(),
+  /** Dirección pública de la API: los enlaces de descarga locales (desarrollo, sin R2) apuntan aquí. */
+  API_PUBLIC_URL: z.url().default('http://localhost:4000'),
 });
 
 export type Entorno = z.infer<typeof esquema>;

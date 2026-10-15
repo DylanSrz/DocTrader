@@ -78,10 +78,6 @@ export class TradingAccount {
   @Column({ name: 'risk_level', type: 'varchar', length: 8, nullable: true })
   riskLevel: NivelRiesgo | null;
 
-  /** Durante la prueba no se pueden cambiar broker, servidor ni número. */
-  @Column({ name: 'locked_until', type: 'timestamptz', nullable: true })
-  lockedUntil: Date | null;
-
   @Column({ name: 'internal_notes', type: 'text', nullable: true, select: false })
   internalNotes: string | null;
 

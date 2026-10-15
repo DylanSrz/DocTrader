@@ -9,6 +9,7 @@ import { AvisosModule } from './avisos/avisos.module.js';
 import { VencimientoLicencias } from './licencias/vencimiento-licencias.js';
 import { VencimientoOrdenes } from './licencias/vencimiento-ordenes.js';
 import { PagosModule } from './pagos/pagos.module.js';
+import { SoporteModule } from './soporte/soporte.module.js';
 import { COLA_MANTENIMIENTO } from './worker/latido.js';
 import { MantenimientoProcessor } from './worker/mantenimiento.processor.js';
 import { ProgramarTrabajos } from './worker/programar-trabajos.js';
@@ -19,6 +20,7 @@ import { ProgramarTrabajos } from './worker/programar-trabajos.js';
     BaseModule,
     AvisosModule,
     PagosModule,
+    SoporteModule,
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService<Entorno, true>) => ({

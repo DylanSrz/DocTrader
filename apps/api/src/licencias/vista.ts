@@ -47,13 +47,10 @@ export function vistaCuenta(
     conexion: cuenta.connectionStatus,
     capitalRecomendadoUsdCentavos: cuenta.recommendedCapitalUsdCents,
     riesgo: cuenta.riskLevel,
-    bloqueadaHasta: cuenta.lockedUntil,
     creadaEn: cuenta.createdAt,
     licencia: {
       id: licencia.id,
       estado: licencia.status,
-      esPrueba: licencia.isTrial,
-      inicioPrueba: licencia.trialStartedAt,
       plan: plan ? vistaPlan(plan) : null,
       inicio: licencia.startsAt,
       fin: licencia.endsAt,
@@ -90,11 +87,7 @@ export function vistaOrden(
   licencia: License,
   confirmacionesNecesarias: number,
 ) {
-  const vence = vencimientoSiSeAprueba(
-    orden.type,
-    { finActual: licencia.endsAt, inicioPrueba: licencia.trialStartedAt },
-    plan,
-  );
+  const vence = vencimientoSiSeAprueba(orden.type, { finActual: licencia.endsAt }, plan);
   return {
     id: orden.id,
     numero: orden.number,

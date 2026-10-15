@@ -20,8 +20,8 @@ export function limpiarTexto(texto: string): string {
 }
 
 /**
- * Forma normalizada para comparar cuentas: minúsculas, sin espacios ni guiones (`docs/CONTEXTO.md`, "Control de
- * la prueba"). "Just Markets-Live" y "justmarketslive" son el mismo servidor.
+ * Forma normalizada para comparar cuentas: minúsculas, sin espacios ni guiones. "Just Markets-Live" y
+ * "justmarketslive" son el mismo servidor.
  */
 export function normalizarParaComparar(texto: string): string {
   return texto

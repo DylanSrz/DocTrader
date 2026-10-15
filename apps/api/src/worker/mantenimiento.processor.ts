@@ -3,15 +3,19 @@ import { Inject, Logger } from '@nestjs/common';
 import type { Job } from 'bullmq';
 import type { Redis } from 'ioredis';
 import { AjustesAdminService } from '../admin/ajustes-admin.service.js';
+import { ArchivosService } from '../archivos/archivos.service.js';
 import { AvisosEnvio } from '../avisos/avisos-envio.js';
 import { VencimientoLicencias } from '../licencias/vencimiento-licencias.js';
 import { VencimientoOrdenes } from '../licencias/vencimiento-ordenes.js';
 import { VerificacionPagos } from '../pagos/verificacion-pagos.service.js';
 import { REDIS } from '../redis/redis.module.js';
+import { SoporteService } from '../soporte/soporte.service.js';
 import {
   CLAVE_LATIDO_WORKER,
   COLA_MANTENIMIENTO,
   TRABAJO_ACTIVAR_DIRECCIONES,
+  TRABAJO_BORRAR_ARCHIVOS,
+  TRABAJO_CERRAR_TICKETS,
   TRABAJO_ENVIAR_AVISOS,
   TRABAJO_ESTADOS_LICENCIA,
   TRABAJO_EXPIRAR_ORDENES,
@@ -22,7 +26,8 @@ import {
 /**
  * Trabajos de mantenimiento: el latido (prueba que el worker está vivo), el envío de correos pendientes y el
  * vencimiento de las órdenes de pago, la verificación de los pagos en la blockchain, los estados de las licencias y
- * la activación de las direcciones de depósito que cumplieron sus 24 horas.
+ * la activación de las direcciones de depósito que cumplieron sus 24 horas, el cierre de los tickets resueltos y el
+ * borrado de los adjuntos que nadie usó.
  */
 @Processor(COLA_MANTENIMIENTO)
 export class MantenimientoProcessor extends WorkerHost {
@@ -35,6 +40,8 @@ export class MantenimientoProcessor extends WorkerHost {
     private readonly pagos: VerificacionPagos,
     private readonly licencias: VencimientoLicencias,
     private readonly ajustes: AjustesAdminService,
+    private readonly soporte: SoporteService,
+    private readonly archivos: ArchivosService,
   ) {
     super();
   }
@@ -58,6 +65,12 @@ export class MantenimientoProcessor extends WorkerHost {
         return;
       case TRABAJO_ACTIVAR_DIRECCIONES:
         await this.ajustes.activarDirecciones();
+        return;
+      case TRABAJO_CERRAR_TICKETS:
+        await this.soporte.cerrarResueltos();
+        return;
+      case TRABAJO_BORRAR_ARCHIVOS:
+        await this.archivos.borrarVencidos();
         return;
       default:
         this.logger.warn(`Trabajo desconocido en ${COLA_MANTENIMIENTO}: ${job.name}`);

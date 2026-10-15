@@ -96,3 +96,5 @@ Confirmado después de la reunión:
 - Completar la prueba a semestral lleva el mes de obsequio; la licencia cuenta desde el inicio de la prueba.
 - La landing mantiene la invitación a solicitar la prueba debajo de los precios.
 - El teléfono se verifica por **SMS** para pedir la prueba.
+
+**2026-10-15:** la licencia de prueba se quitó (y con ella la verificación por SMS y la invitación de la landing).

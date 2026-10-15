@@ -7,3 +7,5 @@ export const TRABAJO_EXPIRAR_ORDENES = 'expirar-ordenes';
 export const TRABAJO_VERIFICAR_PAGOS = 'verificar-pagos';
 export const TRABAJO_ESTADOS_LICENCIA = 'estados-licencia';
 export const TRABAJO_ACTIVAR_DIRECCIONES = 'activar-direcciones';
+export const TRABAJO_CERRAR_TICKETS = 'cerrar-tickets';
+export const TRABAJO_BORRAR_ARCHIVOS = 'borrar-archivos';

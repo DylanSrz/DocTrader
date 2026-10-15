@@ -612,7 +612,18 @@ export class AccesoService {
 
   async datosDeSesion(sesion: SesionActiva) {
     const usuario = await this.fuente.getRepository(User).findOneByOrFail({ id: sesion.usuarioId });
+    // Para el punto de la pestaña Soporte: respuestas que el cliente no ha atendido, o tickets sin responder (admins).
+    const [{ soporte }] =
+      sesion.estado === ESTADO_SESION.COMPLETA
+        ? ((await this.fuente.query(
+            usuario.role === ROL.ADMIN
+              ? `SELECT count(*)::int AS soporte FROM tickets WHERE status = 'ABIERTO'`
+              : `SELECT count(*)::int AS soporte FROM tickets WHERE user_id = $1 AND status = 'RESPONDIDO'`,
+            usuario.role === ROL.ADMIN ? [] : [usuario.id],
+          )) as { soporte: number }[])
+        : [{ soporte: 0 }];
     return {
+      soporte,
       estado: sesion.estado,
       expiraEn: sesion.expiraEn,
       confirmadaHasta: sesion.confirmadaHasta,

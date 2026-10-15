@@ -371,9 +371,9 @@ describe('operación del admin', () => {
           p.precioUsdCentavos,
         ]),
       );
-      expect(precios).toEqual({ MENSUAL: 12_000, SEMESTRAL: 49_900, PRUEBA: 5_000 });
+      expect(precios).toEqual({ MENSUAL: 12_000, SEMESTRAL: 49_900 });
 
-      const cuerpo = { ...precios, MENSUAL: 13_000, diasPrueba: 15 };
+      const cuerpo = { ...precios, MENSUAL: 13_000 };
       await otro.web.put('/admin/ajustes/precios', cuerpo).expect(403);
       await otro.confirmar();
       await otro.web.put('/admin/ajustes/precios', cuerpo).expect(200);
@@ -383,13 +383,7 @@ describe('operación del admin', () => {
           .precioUsdCentavos,
       ).toBe(13_000);
 
-      // La prueba no puede costar lo mismo que el plan mensual.
-      const caro = await otro.web
-        .put('/admin/ajustes/precios', { ...cuerpo, PRUEBA: 13_000 })
-        .expect(400);
-      expect(caro.body.campos.PRUEBA).toBeDefined();
-
-      await otro.web.put('/admin/ajustes/precios', { ...precios, diasPrueba: 15 }).expect(200);
+      await otro.web.put('/admin/ajustes/precios', precios).expect(200);
       const auditoria = await fuente
         .getRepository(AuditLog)
         .findOneByOrFail({ action: 'ajustes.precios', actorId: otro.usuario.id });

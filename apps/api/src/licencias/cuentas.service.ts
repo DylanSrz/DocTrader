@@ -212,25 +212,6 @@ export class CuentasService {
         if (cambios.length === 0 && !soloForma) return;
 
         const cambiaIdentidad = cambios.some((c) => ['broker', 'servidor', 'numero'].includes(c));
-        // Con una solicitud de prueba en curso tampoco: se revisó con estos datos y con ellos se registra.
-        const [solicitud] = cambiaIdentidad
-          ? ((await m.query(
-              `SELECT 1 FROM trial_requests r JOIN licenses l ON l.trading_account_id = r.trading_account_id
-                WHERE r.trading_account_id = $1 AND r.status IN ('PENDIENTE', 'APROBADA')
-                  AND l.status IN ('PENDIENTE_PAGO', 'PRUEBA')`,
-              [cuenta.id],
-            )) as unknown[])
-          : [];
-        if (
-          cambiaIdentidad &&
-          (solicitud || (cuenta.lockedUntil && cuenta.lockedUntil > new Date()))
-        ) {
-          throw errorApi(
-            HttpStatus.CONFLICT,
-            'CUENTA_BLOQUEADA',
-            'Durante la prueba no se pueden cambiar el broker, el servidor ni el número de la cuenta.',
-          );
-        }
         const clave = this.huellaCuenta(datos.broker, datos.servidor, datos.numero);
         if (cambiaIdentidad) await this.exigirCuentaLibre(m, clave, sesion.usuarioId, cuenta.id);
 

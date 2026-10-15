@@ -390,7 +390,6 @@ function ventajas(plan: PlanPublico, siguientes: PlanPublico[]): string[] {
 
 function Precios({ planes }: { planes: PlanPublico[] }) {
   const publicos = planes.filter((p) => p.publico && p.meses !== null);
-  const prueba = planes.find((p) => !p.publico && p.dias !== null);
   const destacado = publicos.at(-1);
   return (
     <Seccion id="precios">
@@ -460,17 +459,6 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
         })}
       </div>
 
-      {prueba ? (
-        <div className="mt-[clamp(56px,7vw,96px)] grid max-w-[980px] items-center gap-x-12 gap-y-4 min-[961px]:grid-cols-[minmax(0,1fr)_auto]">
-          <p className="text-niebla">
-            <strong className="font-normal text-blanco">¿Quieres probar primero?</strong> Pide{' '}
-            {prueba.dias}&nbsp;días de prueba por USD&nbsp;{dolares(prueba.precioUsdCentavos)}. Si
-            te gusta, pagas solo la diferencia del plan que elijas y tus {prueba.dias}&nbsp;días
-            cuentan dentro de él. La prueba es una sola vez por persona y por cuenta de trading.
-          </p>
-          <Enlace href="/registro?plan=prueba">Solicitar prueba</Enlace>
-        </div>
-      ) : null}
       <p className="mt-7 text-sm text-ceniza">Pagas con USDT (Tron) o Bitcoin. Sin devoluciones.</p>
     </Seccion>
   );

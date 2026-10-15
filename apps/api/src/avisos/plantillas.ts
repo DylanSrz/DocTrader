@@ -19,9 +19,10 @@ export const PLANTILLA = {
   CUENTA_CONECTADA: 'cuenta-conectada',
   LICENCIA_EXTENDIDA: 'licencia-extendida',
   DIRECCION_DEPOSITO: 'direccion-deposito',
-  PRUEBA_SOLICITADA: 'prueba-solicitada',
-  PRUEBA_APROBADA: 'prueba-aprobada',
-  PRUEBA_RECHAZADA: 'prueba-rechazada',
+  TICKET_NUEVO: 'ticket-nuevo',
+  TICKET_REABIERTO: 'ticket-reabierto',
+  TICKET_RESPONDIDO: 'ticket-respondido',
+  TICKET_RESUELTO: 'ticket-resuelto',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -258,35 +259,43 @@ export function renderizar(
         boton: { texto: 'Ver las direcciones', url: `${web}/admin/ajustes#direcciones` },
         despues: ['Este aviso les llega a los dos administradores.'],
       });
-    case PLANTILLA.PRUEBA_SOLICITADA:
+    case PLANTILLA.TICKET_NUEVO:
+    case PLANTILLA.TICKET_REABIERTO: {
+      const nuevo = plantilla === PLANTILLA.TICKET_NUEVO;
       return armar({
-        asunto: `Solicitud de prueba: ${datos.cliente}`,
+        asunto: `${nuevo ? 'Ticket nuevo' : 'Ticket reabierto'} ${datos.numero}: ${datos.asunto}`,
         saludo,
         parrafos: [
-          `${datos.cliente} pidió la prueba para la cuenta ${datos.cuenta}. ${datos.senales}`,
-          'Revísala en Pagos, en "Solicitudes de prueba", y apruébala o recházala.',
+          nuevo
+            ? `${datos.cliente} abrió el ticket ${datos.numero} (${datos.tema}): "${datos.asunto}".`
+            : `${datos.cliente} volvió a abrir el ticket ${datos.numero} (${datos.tema}): "${datos.asunto}". Dice que el problema sigue.`,
+          'Respóndelo desde Soporte en el panel: al cliente le llega tu respuesta por correo.',
         ],
-        boton: { texto: 'Revisar la solicitud', url: `${web}/admin/pagos#pruebas` },
+        boton: { texto: 'Ver el ticket', url: `${web}/admin/soporte?ticket=${datos.numero}` },
       });
-    case PLANTILLA.PRUEBA_APROBADA:
+    }
+    case PLANTILLA.TICKET_RESPONDIDO:
       return armar({
-        asunto: 'Aprobamos tu prueba de DocTraderPRO',
+        asunto: `Te respondimos: ${datos.asunto} (ticket ${datos.numero})`,
         saludo,
         parrafos: [
-          `Aprobamos tu prueba de ${datos.dias} días para la cuenta de trading ${datos.cuenta}. Para empezar, paga la orden de USD ${datos.precio} desde tu panel, en USDT o BTC.`,
-          'Apenas verifiquemos el pago, conectamos la cuenta y te avisamos. Los días de la prueba cuentan desde que aprobamos el pago.',
+          `Respondimos tu ticket ${datos.numero}, "${datos.asunto}":`,
+          ...(datos.mensaje ?? '').split(/\n{2,}/).filter((p) => p.trim()),
         ],
-        boton: { texto: 'Pagar la prueba', url: `${web}/panel/prueba` },
+        boton: { texto: 'Ver y responder', url: `${web}/panel/soporte?ticket=${datos.numero}` },
+        despues: [
+          'Para que tu respuesta quede en el ticket, escríbela desde tu panel. Si ya se resolvió, puedes marcarlo como resuelto allí mismo.',
+        ],
       });
-    case PLANTILLA.PRUEBA_RECHAZADA:
+    case PLANTILLA.TICKET_RESUELTO:
       return armar({
-        asunto: 'No pudimos aprobar tu prueba',
+        asunto: `Resolvimos tu ticket ${datos.numero}`,
         saludo,
         parrafos: [
-          `Revisamos tu solicitud de prueba y no la pudimos aprobar. Motivo: ${datos.motivo}`,
-          'Puedes comprar una licencia mensual o semestral desde tu panel. Si crees que es un error, responde este correo.',
+          `Marcamos como resuelto tu ticket ${datos.numero}, "${datos.asunto}".`,
+          `Si el problema sigue, escríbenos en el mismo ticket desde tu panel antes del ${datos.cierre} y lo abrimos de nuevo. Después de esa fecha se cierra solo.`,
         ],
-        boton: { texto: 'Ir a mi panel', url: `${web}/panel` },
+        boton: { texto: 'Ver el ticket', url: `${web}/panel/soporte?ticket=${datos.numero}` },
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);

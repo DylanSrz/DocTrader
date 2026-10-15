@@ -6,11 +6,9 @@ import { CuerpoLateral, Lateral, PieLateral, useCerrarLateral } from '@/componen
 import { Aviso, BotonEnviar, Campo } from '@/components/ui';
 import {
   aprobarPago,
-  aprobarPrueba,
   cambiarAprobacionAutomatica,
   type EstadoPago,
   rechazarPago,
-  rechazarPrueba,
   verificarPago,
 } from '../acciones';
 
@@ -19,8 +17,6 @@ const aprobarPagoConAviso = conAviso(aprobarPago);
 const rechazarPagoConAviso = conAviso(rechazarPago);
 const verificarPagoConAviso = conAviso(verificarPago);
 const cambiarAprobacionAutomaticaConAviso = conAviso(cambiarAprobacionAutomatica);
-const aprobarPruebaConAviso = conAviso(aprobarPrueba);
-const rechazarPruebaConAviso = conAviso(rechazarPrueba);
 
 /** Al terminar bien, dentro del panel lateral: se cierra. */
 function useAlTerminar(estado: EstadoPago, alTerminar?: () => void) {
@@ -233,100 +229,5 @@ export function AprobacionAutomatica({ activa }: { activa: boolean }) {
       ) : null}
       <MensajeError estado={estado} />
     </form>
-  );
-}
-
-/**
- * Aprobar una solicitud de prueba. Sin señales, la píldora; con señales, "Aprobar de todos modos", que pide
- * confirmar.
- */
-export function AprobarPrueba({
-  solicitud,
-  cliente,
-  conSenales,
-}: {
-  solicitud: string;
-  cliente: string;
-  conSenales: boolean;
-}) {
-  const [estado, accion] = useActionState(aprobarPruebaConAviso, {} as EstadoPago);
-  return (
-    <form
-      action={accion}
-      className="contents"
-      onSubmit={(evento) => {
-        if (
-          conSenales &&
-          !window.confirm(
-            `La solicitud de ${cliente} tiene señales. ¿Las revisaste y quieres aprobarla de todos modos?`,
-          )
-        ) {
-          evento.preventDefault();
-        }
-      }}
-    >
-      <input type="hidden" name="solicitud" value={solicitud} />
-      <input type="hidden" name="cliente" value={cliente} />
-      <BotonEnviar
-        variante={conSenales ? 'enlace' : 'pildora'}
-        enviando="Aprobando…"
-        className={conSenales ? 'text-ceniza hover:text-blanco' : undefined}
-      >
-        {conSenales ? 'Aprobar de todos modos' : 'Aprobar prueba'}
-      </BotonEnviar>
-      <MensajeError estado={estado} />
-    </form>
-  );
-}
-
-function FormularioRechazoPrueba({ solicitud }: { solicitud: string }) {
-  const [estado, accion] = useActionState(rechazarPruebaConAviso, {} as EstadoPago);
-  const cerrar = useCerrarLateral();
-  useAlTerminar(estado, cerrar);
-  return (
-    <form action={accion} className="grid min-h-0 grid-rows-[1fr_auto]">
-      <CuerpoLateral>
-        <input type="hidden" name="solicitud" value={solicitud} />
-        {estado.error ? <Aviso>{estado.error}</Aviso> : null}
-        <div className="grid gap-2">
-          <label htmlFor={`motivo-prueba-${solicitud}`} className="text-[15px] text-blanco">
-            Motivo. Se lo enviamos al cliente por correo.
-          </label>
-          <textarea
-            id={`motivo-prueba-${solicitud}`}
-            name="motivo"
-            rows={4}
-            maxLength={300}
-            required
-            placeholder="Ej.: la cuenta de trading ya tuvo una prueba con otro titular."
-            className="w-full resize-y rounded-[20px] bg-campo px-5 py-3.5 text-base text-blanco placeholder:text-white/35 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none"
-          />
-        </div>
-        <p className="text-sm text-ceniza">
-          Rechazarla no la cuenta como usada: el cliente puede comprar una licencia normal.
-        </p>
-      </CuerpoLateral>
-      <PieLateral>
-        <BotonEnviar enviando="Rechazando…">Rechazar solicitud</BotonEnviar>
-      </PieLateral>
-    </form>
-  );
-}
-
-/** Rechazar una solicitud de prueba con motivo, en el panel lateral. */
-export function RechazarPrueba({
-  solicitud,
-  cliente,
-  principal,
-}: {
-  solicitud: string;
-  cliente: string;
-  /** Con señales, rechazar es la acción sugerida: enlace blanco en vez de gris. */
-  principal: boolean;
-}) {
-  return (
-    <Lateral titulo={`Rechazar la prueba de ${cliente}`} boton="Rechazar" gris={!principal}>
-      <FormularioRechazoPrueba solicitud={solicitud} />
-    </Lateral>
   );
 }

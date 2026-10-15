@@ -27,11 +27,7 @@ import type { ContextoCliente, SesionActiva } from '../sesiones/sesiones.service
 export const ESPERA_DIRECCION_MS = 24 * 60 * 60_000;
 
 /** Los planes cuyo precio se edita en el panel. La trimestral ya no se vende. */
-const PLANES_EDITABLES: CodigoPlan[] = [
-  CODIGO_PLAN.MENSUAL,
-  CODIGO_PLAN.SEMESTRAL,
-  CODIGO_PLAN.PRUEBA,
-];
+const PLANES_EDITABLES: CodigoPlan[] = [CODIGO_PLAN.MENSUAL, CODIGO_PLAN.SEMESTRAL];
 
 const VALIDA: Record<Red, (direccion: string) => boolean> = {
   TRON: direccionTronValida,
@@ -41,8 +37,6 @@ const VALIDA: Record<Red, (direccion: string) => boolean> = {
 export interface Precios {
   MENSUAL: number;
   SEMESTRAL: number;
-  PRUEBA: number;
-  diasPrueba: number;
 }
 
 export interface AjustesOperacion {
@@ -74,7 +68,9 @@ export class AjustesAdminService {
       m.getRepository(Plan).find({ order: { rank: 'ASC' } }),
       leerAjustes(m),
       m.query(
-        `SELECT key, value FROM settings WHERE key IN ('links', 'myfxbook', 'support_email', 'faq')`,
+        `SELECT key, value FROM settings
+          WHERE key IN ('links', 'myfxbook', 'support_email', 'faq', 'tickets.auto_close_days')
+         UNION ALL SELECT 'respuestas', to_jsonb(count(*)) FROM saved_replies`,
       ) as Promise<{ key: string; value: unknown }[]>,
       m.query(
         `SELECT d.id, d.currency, d.network, d.address, d.status, d.activates_at, d.created_at,
@@ -96,7 +92,6 @@ export class AjustesAdminService {
       >,
     ]);
     const valor = new Map(otros.map((o) => [o.key, o.value]));
-    const prueba = planes.find((p) => p.code === CODIGO_PLAN.PRUEBA);
     // La dirección que reciben las órdenes nuevas de cada red: la activa más reciente.
     const enUso = new Map<Red, string>();
     for (const d of [...direcciones].sort(
@@ -114,7 +109,6 @@ export class AjustesAdminService {
           dias: p.durationDays,
           precioUsdCentavos: p.priceUsdCents,
         })),
-      diasPrueba: prueba?.durationDays ?? 15,
       diasGracia: ajustes.diasGracia,
       minutosOrden: ajustes.minutosOrden,
       confirmaciones: ajustes.confirmaciones,
@@ -123,6 +117,11 @@ export class AjustesAdminService {
       myfxbook: (valor.get('myfxbook') as CifrasMyfxbook | undefined) ?? null,
       correoSoporte: (valor.get('support_email') as string | undefined) ?? null,
       preguntas: Array.isArray(valor.get('faq')) ? (valor.get('faq') as unknown[]).length : 0,
+      diasCierreTickets:
+        typeof valor.get('tickets.auto_close_days') === 'number'
+          ? (valor.get('tickets.auto_close_days') as number)
+          : 7,
+      respuestasGuardadas: Number(valor.get('respuestas') ?? 0),
       direcciones: direcciones.map((d) => ({
         id: d.id,
         moneda: d.currency,
@@ -143,41 +142,17 @@ export class AjustesAdminService {
       const planes = await m.getRepository(Plan).find();
       const antes: Record<string, number | null> = {};
       const despues: Record<string, number | null> = {};
-      for (const codigo of [CODIGO_PLAN.MENSUAL, CODIGO_PLAN.SEMESTRAL, CODIGO_PLAN.PRUEBA]) {
+      for (const codigo of [CODIGO_PLAN.MENSUAL, CODIGO_PLAN.SEMESTRAL] as const) {
         const plan = planes.find((p) => p.code === codigo);
-        const nuevo = precios[codigo as 'MENSUAL' | 'SEMESTRAL' | 'PRUEBA'];
+        const nuevo = precios[codigo];
         if (!plan || plan.priceUsdCents === nuevo) continue;
         antes[codigo] = plan.priceUsdCents;
         despues[codigo] = nuevo;
         await m.getRepository(Plan).update({ id: plan.id }, { priceUsdCents: nuevo });
       }
-      const prueba = planes.find((p) => p.code === CODIGO_PLAN.PRUEBA);
-      if (prueba && prueba.durationDays !== precios.diasPrueba) {
-        antes.diasPrueba = prueba.durationDays;
-        despues.diasPrueba = precios.diasPrueba;
-        await m.getRepository(Plan).update({ id: prueba.id }, { durationDays: precios.diasPrueba });
-      }
-      await this.validarPrecios(m);
       if (Object.keys(despues).length === 0) return;
       await this.registrar(m, quien, 'ajustes.precios', 'plans', { antes, despues });
     });
-  }
-
-  /** La prueba no puede costar lo mismo o más que el plan más barato: la diferencia para completarla sería cero. */
-  private async validarPrecios(m: EntityManager) {
-    const planes = await m.getRepository(Plan).find({ where: { isActive: true } });
-    const prueba = planes.find((p) => p.code === CODIGO_PLAN.PRUEBA);
-    const masBarato = Math.min(
-      ...planes.filter((p) => p.code !== CODIGO_PLAN.PRUEBA).map((p) => p.priceUsdCents),
-    );
-    if (prueba && prueba.priceUsdCents >= masBarato) {
-      throw errorApi(
-        HttpStatus.BAD_REQUEST,
-        'PRECIO_PRUEBA',
-        'La prueba debe costar menos que el plan mensual: el cliente la completa pagando la diferencia.',
-        { campos: { PRUEBA: 'Debe ser menor que el precio mensual.' } },
-      );
-    }
   }
 
   /** Días de gracia, vigencia de la orden y confirmaciones mínimas. */

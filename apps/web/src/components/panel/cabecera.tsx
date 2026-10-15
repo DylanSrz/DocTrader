@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { salir } from '@/app/acciones-cuenta';
 import { Marca } from '@/components/marca';
 import { obtenerSesion } from '@/lib/sesion';
-import { ListaPestanas, Pestanas } from './pestanas';
+import { ListaPestanas, type Pestana, Pestanas } from './pestanas';
 
 async function Usuario() {
   const sesion = await obtenerSesion();
@@ -21,25 +21,33 @@ async function Usuario() {
   );
 }
 
+/** Las pestañas con lo pendiente de soporte, que viene con la sesión (una sola consulta por petición). */
+async function PestanasConAvisos({ pestanas }: { pestanas: Pestana[] }) {
+  const sesion = await obtenerSesion();
+  const soporte = pestanas.find((p) => p.aviso);
+  return (
+    <Pestanas
+      pestanas={pestanas}
+      avisos={soporte && sesion ? { [soporte.href]: sesion.soporte } : undefined}
+    />
+  );
+}
+
 /**
  * Barra de los paneles: logo, pestañas en mayúsculas (la activa en blanco con un triángulo naranja debajo) y el
  * nombre con "Salir". Igual a la del prototipo del panel del cliente.
  */
-export function Cabecera({
-  pestanas,
-}: {
-  pestanas: { href: string; texto: string; tambien?: string[] }[];
-}) {
+export function Cabecera({ pestanas }: { pestanas: Pestana[] }) {
   return (
     <header className="pt-[calc(env(safe-area-inset-top,0px)+14px)]">
-      <div className="contenedor grid min-h-16 grid-cols-[auto_1fr_auto] items-center gap-x-6 max-md:grid-cols-[1fr_auto]">
+      <div className="contenedor grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-6 max-md:grid-cols-[minmax(0,1fr)_auto]">
         <Marca />
         <nav
           aria-label="Panel"
-          className="justify-self-center overflow-x-auto max-md:col-span-2 max-md:row-start-2 max-md:justify-self-start"
+          className="max-w-full min-w-0 justify-self-center overflow-x-auto overscroll-x-contain [scrollbar-width:none] max-md:col-span-2 max-md:row-start-2 max-md:justify-self-start [&::-webkit-scrollbar]:hidden"
         >
           <Suspense fallback={<ListaPestanas pestanas={pestanas} />}>
-            <Pestanas pestanas={pestanas} />
+            <PestanasConAvisos pestanas={pestanas} />
           </Suspense>
         </nav>
         <Suspense fallback={<span className="min-h-11" />}>

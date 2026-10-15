@@ -3,24 +3,22 @@ import { usd } from '@/lib/formato';
 
 /**
  * Ventas del mes como pictograma: un triángulo por licencia vendida, apilados por día (propuesta 2, "La gráfica de
- * ventas"). Colores validados sobre negro; la prueba va vacía para distinguirse por la forma y no solo por el
- * color. Cada día lleva su detalle en un `<title>` y la misma información está en la tabla de abajo.
+ * ventas"). Colores validados sobre negro. Cada día lleva su detalle en un `<title>` y la misma información está
+ * en la tabla de abajo.
  */
 
 const COLOR: Record<CodigoPlan, string> = {
   SEMESTRAL: '#D17A0C',
   TRIMESTRAL: '#4A88D8',
   MENSUAL: '#C0589A',
-  PRUEBA: '#969430',
 };
 const NOMBRE: Record<CodigoPlan, string> = {
   SEMESTRAL: 'semestral',
   TRIMESTRAL: 'trimestral',
   MENSUAL: 'mensual',
-  PRUEBA: 'prueba',
 };
 /** Orden de la pila: los planes largos abajo. */
-const ORDEN: CodigoPlan[] = ['SEMESTRAL', 'TRIMESTRAL', 'MENSUAL', 'PRUEBA'];
+const ORDEN: CodigoPlan[] = ['SEMESTRAL', 'TRIMESTRAL', 'MENSUAL'];
 
 const MESES = [
   'enero',
@@ -76,11 +74,7 @@ export function GraficaVentas({
         {leyenda.map((plan) => (
           <li key={plan} className="inline-flex items-center gap-2">
             <svg viewBox="0 0 12 11" aria-hidden="true" className="h-[11px] w-3">
-              {plan === 'PRUEBA' ? (
-                <path d="M6 1.6 10.4 9.5H1.6Z" fill="none" stroke={COLOR[plan]} strokeWidth="1.4" />
-              ) : (
-                <path d="M6 1 11 10H1Z" fill={COLOR[plan]} />
-              )}
+              <path d="M6 1 11 10H1Z" fill={COLOR[plan]} />
             </svg>
             {NOMBRE[plan].charAt(0).toUpperCase() + NOMBRE[plan].slice(1)}
           </li>
@@ -110,17 +104,7 @@ export function GraficaVentas({
                 <rect x={(d - 1) * paso} y={-6} width={paso} height={base + 6} fill="transparent" />
                 {ventas.map((plan, i) => {
                   const y = base - (i + 1) * (lado + 2);
-                  return plan === 'PRUEBA' ? (
-                    <path
-                      key={i}
-                      d={triangulo(x + 1, y + 1, lado - 2)}
-                      fill="none"
-                      stroke={COLOR[plan]}
-                      strokeWidth={1.5}
-                    />
-                  ) : (
-                    <path key={i} d={triangulo(x, y, lado)} fill={COLOR[plan]} />
-                  );
+                  return <path key={i} d={triangulo(x, y, lado)} fill={COLOR[plan]} />;
                 })}
                 {etiqueta ? (
                   <text

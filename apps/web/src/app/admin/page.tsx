@@ -57,7 +57,7 @@ async function Contenido() {
   }
   const { pendientes, ventas, cuentas, actividad } = respuesta.datos;
   const total =
-    pendientes.pagos + pendientes.pruebas + pendientes.porConectar + pendientes.porDesconectar;
+    pendientes.pagos + pendientes.tickets + pendientes.porConectar + pendientes.porDesconectar;
   const mes = MESES[ventas.calendario.mes - 1] ?? '';
   const anterior = MESES[(ventas.calendario.mes + 10) % 12] ?? '';
 
@@ -69,10 +69,10 @@ async function Contenido() {
       ir: 'Ir a pagos',
     },
     {
-      n: pendientes.pruebas,
-      texto: pendientes.pruebas === 1 ? 'prueba por aprobar' : 'pruebas por aprobar',
-      href: '/admin/pagos#pruebas',
-      ir: 'Ver solicitudes',
+      n: pendientes.tickets,
+      texto: pendientes.tickets === 1 ? 'ticket sin responder' : 'tickets sin responder',
+      href: '/admin/soporte',
+      ir: 'Ir a soporte',
     },
     {
       n: pendientes.porConectar,
@@ -114,12 +114,16 @@ async function Contenido() {
               ? 'Empieza por los pagos: un cliente no puede conectarse hasta que apruebes el suyo.'
               : pendientes.porConectar > 0
                 ? 'Hay cuentas que ya pagaron y esperan su conexión en Social Trader Tools.'
-                : 'Todo al día. Aquí aparecen los pagos y las cuentas que requieren algo de ti.'}
+                : pendientes.tickets > 0
+                  ? 'Hay clientes esperando respuesta en soporte.'
+                  : 'Todo al día. Aquí aparecen los pagos, las cuentas y los tickets que requieren algo de ti.'}
           </p>
           {pendientes.pagos > 0 ? (
             <Pildora href="/admin/pagos">Revisar pagos</Pildora>
           ) : pendientes.porConectar > 0 ? (
             <Pildora href="/admin/cuentas">Conectar cuentas</Pildora>
+          ) : pendientes.tickets > 0 ? (
+            <Pildora href="/admin/soporte">Responder tickets</Pildora>
           ) : null}
         </div>
 

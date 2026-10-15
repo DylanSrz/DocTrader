@@ -1,6 +1,5 @@
 import {
   aplicarPorcentaje,
-  CODIGO_PLAN,
   ESTADO_CONEXION,
   ESTADO_LICENCIA,
   ESTADO_ORDEN,
@@ -27,7 +26,6 @@ import {
 } from '../database/entidades/index.js';
 import { leerAjustes } from '../licencias/ajustes.js';
 import { conexionAlActivar } from '../licencias/conexion.js';
-import { datoBilletera, HuellasPrueba } from '../prueba/huellas.js';
 import { errorApi } from '../seguridad/errores.js';
 
 /** Quién decide: un admin (con su IP y navegador, para la auditoría) o el sistema, con la aprobación automática. */
@@ -44,8 +42,6 @@ function noRevisable(numero: string) {
 
 /**
  * Las fechas que deja un pago aprobado (`docs/MODELO-DATOS.md` §4.1):
- * - PRUEBA: desde hoy, por los días del plan, sin gracia; la licencia queda "en prueba".
- * - COMPLETAR_PRUEBA: el plan cuenta desde el inicio de la prueba (los 15 días hacen parte del plan).
  * - RENOVACION o CAMBIO_DE_PLAN con la licencia activa o en gracia: se suma al vencimiento actual (los días de
  *   gracia cuentan como usados). Si ya venció o nunca se pagó, desde hoy.
  */
@@ -56,36 +52,6 @@ export function fechasAlAprobar(
   diasGracia: number,
   ahora: Date,
 ): { inicio: Date; fin: Date; cambios: Partial<License> } {
-  if (tipo === TIPO_ORDEN.PRUEBA) {
-    const fin = finDePeriodo(ahora, plan);
-    return {
-      inicio: ahora,
-      fin,
-      cambios: {
-        status: ESTADO_LICENCIA.PRUEBA,
-        isTrial: true,
-        trialStartedAt: ahora,
-        startsAt: ahora,
-        endsAt: fin,
-        graceEndsAt: fin,
-      },
-    };
-  }
-  if (tipo === TIPO_ORDEN.COMPLETAR_PRUEBA) {
-    const inicio = licencia.trialStartedAt ?? licencia.startsAt ?? ahora;
-    const fin = finDePeriodo(inicio, plan);
-    return {
-      inicio,
-      fin,
-      cambios: {
-        status: fin > ahora ? ESTADO_LICENCIA.ACTIVA : ESTADO_LICENCIA.VENCIDA,
-        isTrial: false,
-        startsAt: inicio,
-        endsAt: fin,
-        graceEndsAt: sumarDias(fin, diasGracia),
-      },
-    };
-  }
   const continua =
     (tipo === TIPO_ORDEN.RENOVACION || tipo === TIPO_ORDEN.CAMBIO_DE_PLAN) &&
     (licencia.status === ESTADO_LICENCIA.ACTIVA || licencia.status === ESTADO_LICENCIA.EN_GRACIA) &&
@@ -97,7 +63,6 @@ export function fechasAlAprobar(
     fin,
     cambios: {
       status: ESTADO_LICENCIA.ACTIVA,
-      isTrial: false,
       startsAt: continua ? (licencia.startsAt ?? inicio) : inicio,
       endsAt: fin,
       graceEndsAt: sumarDias(fin, diasGracia),
@@ -116,7 +81,6 @@ export class AprobacionPagos {
     @InjectDataSource() private readonly fuente: DataSource,
     private readonly auditoria: AuditoriaService,
     private readonly avisos: AvisosService,
-    private readonly huellas: HuellasPrueba,
   ) {}
 
   async aprobar(numero: string, decisor: Decisor, forzar = false): Promise<void> {
@@ -186,15 +150,9 @@ export class AprobacionPagos {
         .getRepository(TradingAccount)
         .findOneByOrFail({ id: orden.tradingAccountId });
       const conexion = conexionAlActivar(cuenta.connectionStatus);
-      await m.getRepository(TradingAccount).update(
-        { id: cuenta.id },
-        {
-          connectionStatus: conexion,
-          // Durante la prueba no se cambian el broker, el servidor ni el número (`docs/CONTEXTO.md`).
-          lockedUntil: orden.type === TIPO_ORDEN.PRUEBA ? fin : null,
-        },
-      );
-      if (orden.type === TIPO_ORDEN.PRUEBA) await this.registrarBilleteras(m, orden);
+      await m
+        .getRepository(TradingAccount)
+        .update({ id: cuenta.id }, { connectionStatus: conexion });
 
       const cliente = await m.getRepository(User).findOneByOrFail({ id: orden.userId });
       await this.avisos.encolar(m, {
@@ -204,10 +162,7 @@ export class AprobacionPagos {
         datos: {
           nombre: cliente.fullName.split(' ')[0] ?? cliente.fullName,
           orden: orden.number,
-          plan:
-            plan.code === CODIGO_PLAN.PRUEBA
-              ? `de prueba de ${plan.durationDays ?? 15} días`
-              : plan.name.toLowerCase(),
+          plan: plan.name.toLowerCase(),
           cuenta: cuenta.accountNumber,
           vence: fechaSinHora(fin),
           conectar: conexion === ESTADO_CONEXION.CONECTADA ? 'no' : 'si',
@@ -251,24 +206,6 @@ export class AprobacionPagos {
       });
       await this.registrar(m, decisor, 'pago.rechazado', orden, { motivo });
     });
-  }
-
-  /**
-   * La billetera que pagó la prueba entra al registro de huellas: si paga otra prueba, el admin ve la señal
-   * (`docs/CONTEXTO.md`, "Control de la prueba").
-   */
-  private async registrarBilleteras(m: EntityManager, orden: PaymentOrder) {
-    if (!this.huellas.disponible || !orden.senderAddresses?.length) return;
-    const [solicitud] = (await m.query(
-      `SELECT id FROM trial_requests WHERE payment_order_id = $1`,
-      [orden.id],
-    )) as { id: string }[];
-    if (!solicitud) return;
-    await this.huellas.registrar(
-      m,
-      solicitud.id,
-      orden.senderAddresses.map((d) => datoBilletera(orden.network, d)),
-    );
   }
 
   private async bloquearOrden(m: EntityManager, numero: string) {

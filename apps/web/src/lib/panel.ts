@@ -36,13 +36,10 @@ export interface CuentaVista {
   conexion: EstadoConexion;
   capitalRecomendadoUsdCentavos: number | null;
   riesgo: NivelRiesgo | null;
-  bloqueadaHasta: string | null;
   creadaEn: string;
   licencia: {
     id: string;
     estado: EstadoLicencia;
-    esPrueba: boolean;
-    inicioPrueba: string | null;
     plan: PlanVista | null;
     inicio: string | null;
     fin: string | null;
@@ -108,25 +105,4 @@ export async function leerPanel<T>(ruta: string): Promise<T> {
   if (respuesta.ok) return respuesta.datos;
   if (respuesta.estado === 401) redirect('/ingresar');
   throw new Error(respuesta.error.mensaje);
-}
-
-export interface EstadoPrueba {
-  disponible: boolean;
-  precioUsdCentavos: number | null;
-  dias: number | null;
-  correoVerificado: boolean;
-  telefono: string | null;
-  telefonoVerificado: boolean;
-  cuentas: { id: string; numero: string; broker: string; servidor: string }[];
-  solicitud: {
-    id: string;
-    estado: 'BLOQUEADA' | 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
-    cuentaId: string;
-    cuenta: { numero: string; broker: string };
-    motivos: string[];
-    motivoRechazo: string | null;
-    creadaEn: string;
-    decididaEn: string | null;
-    orden: { numero: string; estado: EstadoOrden } | null;
-  } | null;
 }

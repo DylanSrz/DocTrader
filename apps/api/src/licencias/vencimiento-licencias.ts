@@ -4,7 +4,7 @@ import type { DataSource } from 'typeorm';
 
 /**
  * Trabajo del worker (cada 5 minutos, `docs/MODELO-DATOS.md` §5): una licencia activa que llegó a su vencimiento
- * entra en gracia, y una en gracia que llegó al fin de la gracia vence (la de prueba vence sin gracia). Al vencer, una cuenta conectada pasa a
+ * entra en gracia, y una en gracia que llegó al fin de la gracia vence. Al vencer, una cuenta conectada pasa a
  * "por desconectar" y una que nunca se conectó deja de estar "por conectar".
  */
 @Injectable()
@@ -19,10 +19,9 @@ export class VencimientoLicencias {
         `UPDATE licenses SET status = 'EN_GRACIA', updated_at = now()
           WHERE status = 'ACTIVA' AND ends_at <= now() RETURNING id`,
       )) as [unknown[], number];
-      // La prueba no tiene gracia: al terminar sus días vence (`docs/MODELO-DATOS.md` §6, regla 2).
       const [vencidas] = (await m.query(
         `UPDATE licenses SET status = 'VENCIDA', updated_at = now()
-          WHERE (status = 'EN_GRACIA' AND grace_ends_at <= now()) OR (status = 'PRUEBA' AND ends_at <= now())
+          WHERE status = 'EN_GRACIA' AND grace_ends_at <= now()
           RETURNING trading_account_id`,
       )) as [{ trading_account_id: string }[], number];
       if (vencidas.length > 0) {

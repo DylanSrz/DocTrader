@@ -79,24 +79,10 @@ cada periodo manualmente. Si renueva antes de vencer, los días nuevos se suman 
 
 5.4. **Cambio a un plan más largo:** antes de vencer, una licencia mensual puede pasarse a semestral. Se paga el precio completo del plan nuevo y sus días se suman al vencimiento actual.
 
-## 6. Licencia de prueba
+## 6. Sin licencia de prueba
 
-6.1. La licencia de prueba dura **15 días** y cuesta **USD 50**. No se compra directamente: el Cliente la solicita
-desde su panel y DocTraderPRO decide si la aprueba.
-
-6.2. Para solicitarla, el Cliente debe tener su correo y su teléfono verificados.
-
-6.3. **Se da una sola vez por persona y por cuenta de trading.** No se aprueba si la cédula, la cuenta de trading, el
-correo o el teléfono ya estuvieron ligados a una prueba, aunque sea con otro registro. El titular de la cuenta de
-trading debe ser el mismo Cliente, y durante la prueba no se puede cambiar la cuenta.
-
-6.4. **Completar la prueba:** hasta el último día de la prueba, el Cliente puede pasarla a cualquier plan pagando solo
-la diferencia (hoy USD 70 para mensual y USD 449 para semestral). En ese caso, la licencia
-cuenta desde el día en que empezó la prueba. Si la prueba vence sin
-completarse, para continuar el Cliente compra una licencia nueva al precio completo.
-
-6.5. Si DocTraderPRO detecta que una persona intentó obtener más de una prueba (con datos falsos, registros
-duplicados o cuentas de terceros), puede rechazar la solicitud o cancelar la prueba sin devolución.
+6.1. DocTraderPRO no ofrece licencias de prueba. Para conocer el Software, el Cliente puede empezar con el plan
+mensual y, antes de que venza, pasarlo al semestral (numeral 5.4).
 
 ## 7. Pagos
 
@@ -129,7 +115,7 @@ desconexiones que dependan del Cliente o de su broker.
 y por tratarse de un servicio digital que se activa a solicitud suya, no aplica el derecho de retracto del artículo
 47 de la Ley 1480 de 2011, en los términos de las excepciones de esa norma.
 
-8.3. La licencia de prueba existe para que el Cliente conozca el Software antes de comprar un periodo más largo.
+8.3. Para conocer el Software antes de comprar un periodo largo, el Cliente puede empezar con el plan mensual.
 
 ## 9. Vencimiento y desconexión
 
@@ -180,7 +166,7 @@ renunciar.
 ## 13. Suspensión y terminación
 
 13.1. DocTraderPRO puede suspender o cancelar una licencia, sin devolución, si el Cliente incumple estos términos, da
-datos falsos, intenta abusar de la prueba, comparte su licencia, usa fondos de origen ilícito o pone en riesgo la
+datos falsos, comparte su licencia, usa fondos de origen ilícito o pone en riesgo la
 seguridad de la plataforma.
 
 13.2. El Cliente puede dejar de usar el Software cuando quiera. Basta con no renovar o con cambiar la contraseña de

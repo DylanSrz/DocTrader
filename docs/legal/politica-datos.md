@@ -41,22 +41,20 @@ doctraderpro.com, en su panel de clientes y en los canales oficiales de DocTrade
 | Pagos | Órdenes, montos, moneda, red, identificador de la transacción (hash) y dirección de la billetera que envía | Al pagar |
 | Soporte | Mensajes, archivos adjuntos y respuestas | Al abrir o responder un ticket |
 | Técnicos y de seguridad | Dirección IP, tipo de navegador y dispositivo, identificador del dispositivo guardado en el navegador, fecha y hora de ingreso | Al usar la plataforma |
-| Foto del documento (opcional) | Imagen de la cédula | Solo si se pide para aprobar una prueba |
 
 DocTraderPRO **no pide datos sensibles** (salud, origen racial, orientación política o religiosa, datos biométricos)
-y no los trata. La foto del documento, cuando se pida, se usa solo para comparar el nombre y el número; no se hace
-reconocimiento facial.
+y no los trata.
 
 La plataforma no está dirigida a menores de 18 años y no trata sus datos a sabiendas.
 
 ## 5. Para qué usamos los datos
 
-1. Crear y administrar la cuenta del cliente y verificar su correo y su teléfono.
+1. Crear y administrar la cuenta del cliente y verificar su correo.
 2. Vender, activar, renovar y controlar las licencias del Software.
 3. Conectar y desconectar las cuentas de trading del Software. Las contraseñas de la cuenta de trading se usan **solo
    para esto**.
 4. Verificar los pagos en la blockchain y llevar el registro de órdenes y ventas.
-5. **Prevenir el fraude**, en especial que una misma persona o cuenta de trading obtenga más de una licencia de prueba
+5. **Prevenir el fraude**, por ejemplo que una misma cuenta de trading o una misma cédula se registren dos veces
    (ver el numeral 6).
 6. Enviar avisos de servicio: órdenes, pagos, vencimientos, conexión de la cuenta y respuestas de soporte.
 7. Atender solicitudes de soporte, consultas y reclamos.
@@ -64,15 +62,11 @@ La plataforma no está dirigida a menores de 18 años y no trata sus datos a sab
 9. Cumplir obligaciones legales, contables y tributarias, y atender requerimientos de autoridades.
 10. Enviar novedades del servicio, solo si el Titular lo acepta por separado. Puede cancelarlas cuando quiera.
 
-## 6. Registro para el control de la licencia de prueba
+## 6. Datos cifrados para prevenir el fraude
 
-La licencia de prueba se da una sola vez por persona y por cuenta de trading. Para hacer cumplir esa regla,
-DocTraderPRO guarda una **huella cifrada** (un código generado con una clave secreta, que no permite leer el dato
-original) de la cédula, la cuenta de trading, el correo, el teléfono, el dispositivo y la billetera que pagó cada
-prueba.
-
-Esas huellas se conservan **aunque el cliente elimine su cuenta**, mientras exista el programa de pruebas, porque su
-única finalidad es evitar que la regla se salte borrando el registro. No se usan para ninguna otra cosa.
+Para evitar que una misma cédula o una misma cuenta de trading se registren dos veces, DocTraderPRO guarda una
+**huella cifrada** de esos datos (un código generado con una clave secreta, que no permite leer el dato original) y
+la compara al registrar uno nuevo. Las huellas se borran con el dato al que pertenecen y no se usan para nada más.
 
 ## 7. Autorización
 
@@ -84,8 +78,7 @@ esta política. DocTraderPRO conserva la prueba de esa autorización (fecha, hor
 DocTraderPRO **no vende ni alquila** datos personales. Los comparte solo con:
 
 - **Proveedores tecnológicos que actúan como Encargados**, con quienes hay obligaciones de confidencialidad y
-  seguridad: alojamiento de la plataforma y la base de datos, envío de correos, envío de SMS y almacenamiento de
-  archivos. Algunos están en Estados Unidos u otros países, por lo que puede haber **transmisión internacional** de
+  seguridad: alojamiento de la plataforma y la base de datos, envío de correos y almacenamiento de archivos. Algunos están en Estados Unidos u otros países, por lo que puede haber **transmisión internacional** de
   datos a países con un nivel adecuado de protección según la Superintendencia de Industria y Comercio.
 - **El servicio de copia de operaciones** (hoy, Social Trader Tools), que recibe los datos de la cuenta de trading
   necesarios para conectarla al Software.
@@ -99,11 +92,9 @@ Las consultas a la blockchain se hacen con datos que ya son públicos en la red 
 |---|---|
 | Cuenta del cliente | Mientras esté activa. Si el cliente pide eliminarla, se borra salvo lo que deba conservarse por ley |
 | Contraseñas de la cuenta de trading | Hasta 90 días después de desconectar la cuenta si no se renueva; luego se borran y el cliente las vuelve a ingresar si regresa |
-| Foto del documento | Hasta 30 días después de decidir la solicitud de prueba |
 | Órdenes, pagos y ventas | El tiempo que exijan las normas contables y tributarias |
 | Tickets de soporte | 2 años después de cerrados |
 | Registros técnicos y de seguridad | 12 meses; el registro de auditoría de acciones de administradores, 5 años |
-| Huellas del control de la prueba | Mientras exista el programa de pruebas (numeral 6) |
 
 ## 10. Derechos del Titular
 
@@ -159,7 +150,7 @@ Esta política rige desde [fecha de publicación]. Las bases de datos se conserv
 
 > ☐ Autorizo a DocTraderPRO a tratar mis datos personales (identificación, contacto, cuenta de trading, pagos y datos
 > técnicos) para crear mi cuenta, gestionar mis licencias, conectar mi cuenta de trading, verificar mis pagos, prevenir
-> el fraude en la licencia de prueba y enviarme avisos del servicio, según la
+> el fraude y enviarme avisos del servicio, según la
 > [Política de tratamiento de datos](#). Sé que puedo conocer, actualizar, rectificar y suprimir mis datos escribiendo
 > a support@doctraderpro.com.
 >

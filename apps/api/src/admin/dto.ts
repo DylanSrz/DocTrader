@@ -91,16 +91,6 @@ export class PreciosDto {
   @Min(100, precio('semestral'))
   @Max(10_000_000, precio('semestral'))
   SEMESTRAL: number;
-
-  @IsInt(precio('de la prueba'))
-  @Min(100, precio('de la prueba'))
-  @Max(10_000_000, precio('de la prueba'))
-  PRUEBA: number;
-
-  @IsInt({ message: 'Escribe los días de la prueba.' })
-  @Min(1, { message: 'La prueba dura al menos 1 día.' })
-  @Max(60, { message: 'La prueba dura como máximo 60 días.' })
-  diasPrueba: number;
 }
 
 export class OperacionDto {

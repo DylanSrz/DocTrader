@@ -23,16 +23,16 @@
 
 - Cada entorno tiene sus propias llaves y secretos. Nunca se copian datos reales de producción a otro entorno.
 - En desarrollo y pruebas, los pagos se verifican en las **redes de prueba** de Tron (Nile) y Bitcoin (testnet o
-  signet), y Twilio usa números de prueba.
+  signet).
 
 ## 3. Pruebas automáticas
 
 | Tipo | Qué cubre | Herramienta |
 |---|---|---|
-| **Reglas de negocio** | Fechas de licencia (meses de calendario, obsequio, completar la prueba, renovar en gracia), precios y diferencias, comisión, normalización de correo, teléfono y cuenta, huellas HMAC | Vitest en `packages/shared` |
-| **API** | Permisos (un cliente no ve lo de otro; un cliente no entra a rutas de admin), registro e ingreso, pagos (hash repetido, aprobar dos veces al mismo tiempo, monto incompleto), control de la prueba, cifrado | Vitest + Supertest contra una base de datos de prueba (NestJS 12 trae Vitest) |
+| **Reglas de negocio** | Fechas de licencia (meses de calendario, obsequio, renovar en gracia), precios, comisión, normalización de correo, teléfono y cuenta, huellas HMAC | Vitest en `packages/shared` |
+| **API** | Permisos (un cliente no ve lo de otro; un cliente no entra a rutas de admin), registro e ingreso, pagos (hash repetido, aprobar dos veces al mismo tiempo, monto incompleto), cifrado | Vitest + Supertest contra una base de datos de prueba (NestJS 12 trae Vitest) |
 | **Verificadores de blockchain** | Respuestas grabadas de TronGrid y mempool.space (pago correcto, monto incompleto, otra dirección, sin confirmaciones, proveedor caído) | Vitest con respuestas grabadas |
-| **De punta a punta** | Registro → agregar cuenta → orden → reportar hash → aprobar → por conectar → conectada; solicitud de prueba → aprobación → completarla; ticket de ida y vuelta | Playwright |
+| **De punta a punta** | Registro → agregar cuenta → orden → reportar hash → aprobar → por conectar → conectada; ticket de ida y vuelta | Playwright |
 | **Accesibilidad y diseño** | Sin desbordes a 320, 390, 768, 1024 y 1440 px; foco visible; contraste | Playwright + axe |
 
 **Integración continua** (GitHub Actions) en cada pull request: lint, revisión de tipos, pruebas, búsqueda de
@@ -40,8 +40,7 @@ secretos (gitleaks), análisis de código (CodeQL) y revisión de dependencias (
 
 ## 4. Etapas
 
-Cada etapa deja algo que se puede usar y probar. El orden respeta las dependencias: no hay pagos sin cuentas, ni
-prueba sin pagos.
+Cada etapa deja algo que se puede usar y probar. El orden respeta las dependencias: no hay pagos sin cuentas.
 
 ### Etapa 0 — Base del proyecto ✅ (2026-10-14)
 - Monorepo, Docker Compose de desarrollo, integración continua y despliegue a pruebas.
@@ -103,8 +102,8 @@ prueba sin pagos.
     de datos impide una cuenta de trading en dos clientes, más de una orden abierta por licencia y un hash repetido
     en la misma red.
   - **Cuentas:** agregar (contraseñas cifradas, cada cuenta nace con su licencia por pagar), editar (si estaba
-    conectada vuelve a "por conectar" y se avisa por correo; en prueba no se cambian broker, servidor ni número) y
-    quitar (solo sin licencia en curso ni conexión; las contraseñas se borran).
+    conectada vuelve a "por conectar" y se avisa por correo) y quitar (solo sin licencia en curso ni conexión; las
+    contraseñas se borran).
   - **Órdenes:** el tipo sale del estado de la licencia (nueva, renovación o cambio de plan); copian el precio del
     plan y la dirección activa y valen una hora. En BTC el precio se fija con Binance y se compara con CoinGecko
     (si difieren más de 1 %, no se crea la orden y se avisa a los admins). Una orden nueva reemplaza a la pendiente;
@@ -115,7 +114,7 @@ prueba sin pagos.
   - 45 pruebas de `shared`, 34 unitarias de la API y 75 de punta a punta; recorrido en el navegador (registro,
     cuenta, orden en USDT, cambio a BTC con el precio real, reporte del hash) sin desbordes a 320, 390 y 1440 px.
   - **Queda para la etapa 4:** verificar el hash en la blockchain y aprobar o rechazar el pago (hasta entonces, una
-    orden reportada espera). La prueba de 15 días y completarla llegan en la etapa 6.
+    orden reportada espera). La prueba de 15 días llegó en la etapa 6 y se retiró el 2026-10-15.
 
 ### Etapa 4 — Verificación y aprobación de pagos ✅ (2026-10-15)
 - Worker con BullMQ: verificadores de Tron y Bitcoin con proveedor de respaldo, confirmaciones y reintentos.
@@ -162,65 +161,67 @@ prueba sin pagos.
     capital recomendado y nivel de riesgo (los ve el cliente); "Marcar como conectada" (correo al cliente). Las que
     esperan la aprobación del pago aparecen aparte. Por desconectar: gracia terminada o suspendida, con "Marcar como
     desconectada". Una cuenta que ya estuvo conectada y vuelve (cambió sus datos) se marca distinto.
-  - **Licencias:** filtros con conteos (todas, activas, vence en 7 días, en gracia, vencidas, pendientes, en prueba,
+  - **Licencias:** filtros con conteos (todas, activas, vence en 7 días, en gracia, vencidas, pendientes y
     suspendidas), búsqueda por nombre, correo o cuenta, y exportar a CSV (pide el código; nunca lleva contraseñas
     ni cédulas; queda en la auditoría). La ficha (panel lateral) trae contacto con la cédula enmascarada ("Ver
     completa" queda en la auditoría), la cuenta, capital, riesgo y notas internas, extender días con motivo (correo
     al cliente), periodos, pagos, otras cuentas del cliente y suspender (segundo clic) o quitar la suspensión.
-  - **Ajustes:** precios (la prueba debe costar menos que el mensual) y duración de la prueba; días de gracia,
-    vigencia de la orden y confirmaciones (ambos con el código de la app); la aprobación automática; direcciones de
-    depósito; enlaces de la página y correo de soporte; cifras de Myfxbook. Los cambios de la página pública se ven
-    al instante.
+  - **Ajustes:** precios; días de gracia, vigencia de la orden y confirmaciones (ambos con el código de la app); la
+    aprobación automática; direcciones de depósito; enlaces de la página y correo de soporte; cifras de Myfxbook.
+    Los cambios de la página pública se ven al instante.
   - **Direcciones de depósito:** se validan con su checksum (Tron y Bitcoin: 1…, 3…, bc1q… y bc1p…); entran "en
     espera" 24 horas y les llega un correo a los dos admins con la dirección completa; cualquiera la cancela sin
     código (salida de emergencia); el worker las activa al cumplir las 24 horas; desactivar y reactivar piden el
     código. Las órdenes nuevas usan la activa más reciente de cada red.
   - 103 pruebas de punta a punta (19 nuevas) y recorrido en el navegador a 390 y 1440 px.
 
-### Etapa 6 — Licencia de prueba ✅ (2026-10-15)
-- Verificación del teléfono por SMS (Twilio Verify) con límites y protección contra fraude.
-- Solicitud con bloqueos y señales, registro de huellas, aprobación del admin y orden de USD 50.
-- Completar la prueba pagando la diferencia; bloqueo de cambios de la cuenta durante la prueba.
-- **Hecho cuando:** las pruebas automáticas confirman que la misma cédula, cuenta, correo o teléfono no pueden pedir
-  una segunda prueba, aunque se registren de nuevo.
-- **Resultado:**
-  - **Panel del cliente, "Prueba"** (`/panel/prueba`): tres pasos (correo, teléfono por SMS y cuenta de trading) y
-    el estado de la solicitud (en revisión, aprobada con "Pagar la prueba", rechazada con el motivo o bloqueada
-    con lo que coincidió). "Mis cuentas" invita a pedirla mientras el cliente no haya pedido ninguna, da prioridad
-    a la prueba aprobada y, en prueba, muestra los días y "Completar" a cada plan con la diferencia y hasta cuándo
-    queda.
-  - **SMS:** Twilio Verify (genera, envía y valida el código; sin librería, por HTTP). Límites: 3 por teléfono por
-    hora, 5 por día, 10 por IP por hora y 8 intentos de código cada 15 minutos; Turnstile antes de cada envío. En
-    desarrollo el código se escribe en el registro de la API; en producción, sin Twilio, la prueba queda cerrada.
-  - **Bloqueos:** cédula, cuenta (broker + servidor + número normalizados), correo (canónico) y teléfono que ya
-    tuvieron prueba, comparados con huellas HMAC (`TRIAL_HMAC_KEY`) que sobreviven al borrado del cliente. La
-    solicitud bloqueada se guarda para el admin y el cliente ve el motivo.
-  - **Señales** (no bloquean): número de cuenta usado en otro broker, mismo dispositivo, misma IP, titular
-    parecido, número de cuenta parecido, rechazos o bloqueos anteriores del mismo cliente; y, al revisar el pago,
-    billetera de origen que ya pagó otra prueba.
-  - **Admin, Pagos → "Solicitudes de prueba":** cada solicitud con sus señales; sin señales, "Aprobar prueba"; con
-    señales, "Rechazar" (motivo por correo) primero y "Aprobar de todos modos". Las bloqueadas de 30 días. "Hoy"
-    cuenta las pruebas por aprobar. Correo a los admins con cada solicitud.
-  - **Al aprobar la solicitud:** las huellas entran al registro y el cliente recibe un correo para pagar. **Al
-    aprobar el pago de USD 50:** la licencia queda "en prueba" por 15 días sin gracia, la cuenta por conectar y
-    bloqueada (sin cambiar broker, servidor ni número). **Completar:** paga la diferencia (USD 70 o 449) y el plan
-    cuenta desde el inicio de la prueba. Al terminar los 15 días sin completarla, vence y pasa a por desconectar.
-  - 109 pruebas de punta a punta (6 nuevas: el recorrido completo, los bloqueos aunque se registren de nuevo con
-    los mismos datos, las señales, el rechazo, el límite de SMS y el vencimiento) y recorrido en el navegador.
-  - **Falta:** crear la cuenta de Twilio y probar un SMS real (ver `PENDIENTES.md`). La foto de la cédula
-    (opcional, apagada) llega con los archivos de la etapa 7.
+### Etapa 6 — Licencia de prueba ✅ (2026-10-15) — retirada el 2026-10-15
+- Se construyó y se quitó el mismo día, por decisión del cliente: prueba de 15 días por USD 50 solo con solicitud
+  aprobada por el admin, verificación del teléfono por SMS (Twilio Verify), control antiabuso con huellas HMAC
+  (`TRIAL_HMAC_KEY`) que sobrevivían al borrado del cliente, bloqueo de la cuenta durante la prueba y completarla
+  pagando la diferencia. Nunca se pudo pedir en producción (no hubo Twilio).
+- **Retiro:** la migración `1792800000000-quitar-prueba` borra sus tablas, el plan, los estados, los tipos de orden
+  y de periodo, las columnas y los ajustes (detalle en `MODELO-DATOS.md` §3.5) y publica los términos y la política
+  de datos sin la prueba. Para conocer el software, el cliente empieza con el mensual y puede pasar al semestral
+  antes de que venza.
 
-### Etapa 7 — Soporte
+### Etapa 7 — Soporte ✅ (2026-10-15)
 - Tickets del cliente con adjuntos en R2, bandeja del admin con filtros, asignación, prioridad, notas internas y
   respuestas guardadas; cierre automático.
 - **Hecho cuando:** un ticket va y vuelve entre cliente y admin con adjuntos y correos.
+- **Resultado:**
+  - **Panel del cliente, "Soporte"** (`/panel/soporte`): el titular dice si hay respuesta nueva ("Respondimos tu
+    ticket.") y la pestaña lleva un punto naranja. Lista de tickets con estado, asunto, tema y fecha; panel lateral
+    con el hilo, la respuesta con adjuntos y "Mi problema ya se resolvió". En uno resuelto, escribir lo abre de
+    nuevo; uno cerrado ya no recibe mensajes. Abrir un ticket: tema, cuenta u orden relacionada, asunto, mensaje y
+    adjuntos (`?nuevo=1&tema=…&cuenta=…` lo abre desde otras vistas). El equipo firma siempre "DocTrader Pro".
+  - **Admin, "Soporte"** (`/admin/soporte`): cuántos esperan respuesta, cuánto lleva el más antiguo y el promedio de
+    la primera respuesta de la semana; filtros (sin responder, abiertos, resueltos, todos) y por tema; cada ticket
+    con su espera (en naranja pasadas 4 horas) y a quién está asignado. Panel lateral con el cliente, la cuenta u
+    orden, asignación y prioridad (se guardan al elegir), el hilo con las **notas internas** en verde limón,
+    respuestas guardadas (se agregan al texto) y "Marcar como resuelto". La pestaña y "Hoy" cuentan los sin
+    responder. **Respuestas guardadas** en `/admin/respuestas` (4 iniciales) y, en Ajustes, los días de cierre.
+  - **Correos:** a los admins con cada ticket nuevo o reabierto; al cliente con cada respuesta (con el texto) y al
+    resolverlo (con la fecha de cierre). Las notas internas no envían nada.
+  - **Adjuntos:** imágenes (JPG, PNG, WEBP) o PDF, hasta 5 por mensaje y 10 MB cada uno. El navegador los sube
+    **directo a la API** con una ficha firmada de 30 minutos (las funciones de Vercel no aceptan más de 4,5 MB);
+    la API revisa el tipo por el contenido, vuelve a codificar las imágenes (sin metadatos ni ubicación) y los
+    guarda con nombre aleatorio en R2. La descarga pasa por la web, que revisa el permiso y redirige a un enlace
+    firmado de 5 minutos, siempre como descarga. Sin R2 en producción, los tickets funcionan solo con texto.
+  - **Worker:** cada hora cierra los resueltos que pasaron sus días (7, editable) y borra los adjuntos que nadie
+    usó en 24 horas.
+  - 113 pruebas de punta a punta (4 nuevas: el ticket de ida y vuelta con adjuntos, notas y correos; los adjuntos
+    falsos, rotos, grandes o con metadatos; los permisos entre clientes; asignar, prioridad, respuestas y ajustes) y
+    recorrido en el navegador a 1440 y 390 px.
+  - **Falta:** crear el depósito de R2 y sus llaves, y probar un adjunto real en producción (ver `PENDIENTES.md`).
+    Revisión antivirus de los PDF: pendiente (`SEGURIDAD.md` §7).
 
 ### Etapa 8 — Automatizaciones y socio
 - Correos con Resend (plantillas con la marca), recordatorios, gracia, vencimiento y alertas a los admins.
 - Perfil del socio: % de comisión, liquidaciones del 15 y fin de mes e historial.
 - Trabajos de borrado según la política de datos.
-- **Hecho cuando:** una licencia de prueba recorre todo su ciclo en pruebas (con fechas aceleradas) y llegan todos
-  los correos, una sola vez cada uno.
+- **Hecho cuando:** una licencia mensual recorre todo su ciclo en pruebas (con fechas aceleradas: recordatorios,
+  gracia, vencimiento y renovación) y llegan todos los correos, una sola vez cada uno.
 
 ### Etapa 9 — Endurecimiento y lanzamiento
 - Revisión de seguridad completa contra `SEGURIDAD.md`, Sentry, monitor de disponibilidad, copias de seguridad y una
@@ -242,10 +243,9 @@ prueba sin pagos.
 
 **Cuentas y seguridad**
 - [ ] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación.
-- [ ] Segundo factor en Vercel, Railway, Resend, Twilio, Cloudflare, Sentry, GitHub y Hostinger.
+- [ ] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger.
 - [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido.
 - [ ] Copia de seguridad restaurada con éxito al menos una vez.
-- [ ] Permisos geográficos de Twilio solo para los países donde se vende.
 
 **Funcionamiento**
 - [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.

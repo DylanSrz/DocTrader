@@ -16,7 +16,7 @@ export type Lectura =
       pagos: { direccion: string; unidades: bigint }[];
       /** En Tron: llegaron transferencias de otro token (otra moneda). */
       otraMoneda: boolean;
-      /** Billetera(s) de origen, para la señal del control de la prueba. */
+      /** Billetera(s) de origen; quedan con el pago para consultarlas después. */
       remitentes: string[];
     };
 

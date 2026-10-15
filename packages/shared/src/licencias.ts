@@ -1,7 +1,6 @@
 import { TZDate } from '@date-fns/tz';
 import { differenceInCalendarDays } from 'date-fns';
 import {
-  CODIGO_PLAN,
   type CodigoPlan,
   ESTADO_LICENCIA,
   type EstadoLicencia,
@@ -16,7 +15,7 @@ type DuracionPlan = Pick<DefinicionPlan, 'durationMonths' | 'bonusMonths' | 'dur
 /** Una licencia "vence pronto" cuando le quedan estos días o menos (no es un estado: es para la pantalla). */
 export const DIAS_VENCE_PRONTO = 7;
 
-/** Fin de un periodo: inicio + meses del plan + mes de obsequio, o + días en la prueba. */
+/** Fin de un periodo: inicio + meses del plan + mes de obsequio (o + días, si el plan se mide en días). */
 export function finDePeriodo(inicio: Date, plan: DuracionPlan): Date {
   if (plan.durationMonths !== null) {
     return sumarMeses(inicio, plan.durationMonths + plan.bonusMonths);
@@ -46,15 +45,13 @@ export type ResultadoTipoOrden =
  * Qué tipo de orden crea el cliente al elegir un plan para una licencia (`docs/MODELO-DATOS.md` §4.1):
  * - sin pagar o vencida → licencia NUEVA;
  * - activa o en gracia → a un plan más largo es CAMBIO_DE_PLAN; al mismo o a uno más corto, RENOVACION.
- *   En los dos casos los días se suman al vencimiento actual;
- * - en prueba → COMPLETAR_PRUEBA: se paga la diferencia y la licencia cuenta desde el inicio de la prueba.
- * La prueba misma no se compra aquí: se pide, el admin la aprueba y se paga con su propia orden.
+ *   En los dos casos los días se suman al vencimiento actual.
  */
 export function tipoDeOrden(
   licencia: { estado: EstadoLicencia; rangoPlan: number | null },
   planNuevo: { code: CodigoPlan; rank: number; isPublic: boolean },
 ): ResultadoTipoOrden {
-  if (planNuevo.code === CODIGO_PLAN.PRUEBA || !planNuevo.isPublic) {
+  if (!planNuevo.isPublic) {
     return { error: 'PLAN_NO_DISPONIBLE' };
   }
   switch (licencia.estado) {
@@ -69,8 +66,6 @@ export function tipoDeOrden(
             ? TIPO_ORDEN.CAMBIO_DE_PLAN
             : TIPO_ORDEN.RENOVACION,
       };
-    case ESTADO_LICENCIA.PRUEBA:
-      return { tipo: TIPO_ORDEN.COMPLETAR_PRUEBA };
     case ESTADO_LICENCIA.SUSPENDIDA:
       return { error: 'LICENCIA_SUSPENDIDA' };
   }
@@ -79,17 +74,13 @@ export function tipoDeOrden(
 /**
  * Hasta cuándo quedaría la licencia si se aprueba una orden. En una licencia nueva la fecha depende del día en que
  * se apruebe el pago, así que se devuelve `null`; en una renovación o un cambio de plan los días se suman al
- * vencimiento actual (también en la gracia: esos días cuentan como usados). Al completar la prueba, el plan cuenta
- * desde el día en que empezó la prueba.
+ * vencimiento actual (también en la gracia: esos días cuentan como usados).
  */
 export function vencimientoSiSeAprueba(
   tipo: TipoOrden,
-  licencia: { finActual: Date | null; inicioPrueba?: Date | null },
+  licencia: { finActual: Date | null },
   plan: DuracionPlan,
 ): Date | null {
-  if (tipo === TIPO_ORDEN.COMPLETAR_PRUEBA && licencia.inicioPrueba) {
-    return finDePeriodo(licencia.inicioPrueba, plan);
-  }
   if (
     (tipo === TIPO_ORDEN.RENOVACION || tipo === TIPO_ORDEN.CAMBIO_DE_PLAN) &&
     licencia.finActual
@@ -160,7 +151,6 @@ export const FILTROS_LICENCIAS = [
   'gracia',
   'vencidas',
   'pendientes',
-  'prueba',
   'suspendidas',
 ] as const;
 export type FiltroLicencias = (typeof FILTROS_LICENCIAS)[number];
@@ -172,7 +162,6 @@ export const NOMBRE_FILTRO_LICENCIAS: Record<FiltroLicencias, string> = {
   gracia: 'En gracia',
   vencidas: 'Vencidas',
   pendientes: 'Pendientes de pago',
-  prueba: 'En prueba',
   suspendidas: 'Suspendidas',
 };
 

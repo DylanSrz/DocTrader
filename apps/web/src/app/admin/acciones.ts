@@ -166,35 +166,3 @@ export async function cambiarAprobacionAutomatica(
     aviso: activa ? 'Aprobación automática encendida.' : 'Aprobación automática apagada.',
   };
 }
-
-/** Aprobar una solicitud de prueba: el cliente puede pagar su orden y sus datos entran al registro de pruebas. */
-export async function aprobarPrueba(previo: EstadoPago, datos: FormData): Promise<EstadoPago> {
-  const id = texto(datos, 'solicitud');
-  const respuesta = await llamarApi(`/admin/pruebas/${encodeURIComponent(id)}/aprobar`, {
-    metodo: 'POST',
-    token: await token(),
-  });
-  if (!respuesta.ok) return { error: respuesta.error.mensaje };
-  revalidatePath('/admin', 'layout');
-  return {
-    listo: (previo.listo ?? 0) + 1,
-    aviso: `Prueba de ${texto(datos, 'cliente')} aprobada. Le avisamos para que pague.`,
-  };
-}
-
-/** Rechazar una solicitud de prueba con un motivo, que le llega al cliente por correo. */
-export async function rechazarPrueba(previo: EstadoPago, datos: FormData): Promise<EstadoPago> {
-  const id = texto(datos, 'solicitud');
-  const motivo = texto(datos, 'motivo').trim();
-  if (motivo.length < 5) return { error: 'Escribe el motivo: le llega al cliente por correo.' };
-  const respuesta = await llamarApi(`/admin/pruebas/${encodeURIComponent(id)}/rechazar`, {
-    metodo: 'POST',
-    cuerpo: { motivo: motivo.slice(0, 300) },
-    token: await token(),
-  });
-  if (!respuesta.ok) {
-    return { error: respuesta.error.campos?.motivo ?? respuesta.error.mensaje };
-  }
-  revalidatePath('/admin', 'layout');
-  return { listo: (previo.listo ?? 0) + 1, aviso: 'Solicitud rechazada. Le avisamos al cliente.' };
-}

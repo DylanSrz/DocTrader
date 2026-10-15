@@ -24,7 +24,7 @@ describe('sumarMeses', () => {
 });
 
 describe('sumarDias', () => {
-  it('una prueba de 15 días desde el 3 de octubre termina el 18', () => {
+  it('15 días desde el 3 de octubre terminan el 18', () => {
     expect(sumarDias(bogota('2026-10-03T09:00:00'), 15)).toEqual(bogota('2026-10-18T09:00:00'));
   });
 });
