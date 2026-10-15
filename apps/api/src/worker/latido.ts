@@ -4,3 +4,5 @@ export const COLA_MANTENIMIENTO = 'mantenimiento';
 export const TRABAJO_LATIDO = 'latido';
 export const TRABAJO_ENVIAR_AVISOS = 'enviar-avisos';
 export const TRABAJO_EXPIRAR_ORDENES = 'expirar-ordenes';
+export const TRABAJO_VERIFICAR_PAGOS = 'verificar-pagos';
+export const TRABAJO_ESTADOS_LICENCIA = 'estados-licencia';

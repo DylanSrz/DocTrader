@@ -4,8 +4,10 @@ import type { Queue } from 'bullmq';
 import {
   COLA_MANTENIMIENTO,
   TRABAJO_ENVIAR_AVISOS,
+  TRABAJO_ESTADOS_LICENCIA,
   TRABAJO_EXPIRAR_ORDENES,
   TRABAJO_LATIDO,
+  TRABAJO_VERIFICAR_PAGOS,
 } from './latido.js';
 
 /** Registra los trabajos periódicos. `upsertJobScheduler` no duplica nada si el worker se reinicia. */
@@ -30,6 +32,17 @@ export class ProgramarTrabajos implements OnApplicationBootstrap {
       TRABAJO_EXPIRAR_ORDENES,
       { every: 60_000 },
       { name: TRABAJO_EXPIRAR_ORDENES, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    // Los pagos reportados se miran en la blockchain cada 30 segundos hasta que tengan sus confirmaciones.
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_VERIFICAR_PAGOS,
+      { every: 30_000 },
+      { name: TRABAJO_VERIFICAR_PAGOS, opts: { removeOnComplete: true, removeOnFail: 100 } },
+    );
+    await this.mantenimiento.upsertJobScheduler(
+      TRABAJO_ESTADOS_LICENCIA,
+      { every: 5 * 60_000 },
+      { name: TRABAJO_ESTADOS_LICENCIA, opts: { removeOnComplete: true, removeOnFail: 100 } },
     );
   }
 }

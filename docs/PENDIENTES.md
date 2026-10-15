@@ -40,6 +40,13 @@
       enlace (ver `docs/DECISIONES-TECNICAS.md`, §5).
 - [x] **Redes:** Telegram https://t.me/+cdmWH_xLubdhMDhh · Instagram https://www.instagram.com/doctraderproiasystem/
 
+## 🧪 Por probar en producción
+
+- [ ] **Un pago real de punta a punta** (etapa 4): con una cuenta de cliente de prueba, crear una orden mensual,
+      enviar el monto exacto en USDT (Tron) a la dirección de la orden, reportar el hash y ver que en "Pagos" del
+      admin queda **verificado** a los pocos minutos (20 confirmaciones). Aprobarlo y revisar que la licencia quede
+      activa por un mes. El dinero llega a la cuenta de Binance de cobro.
+
 ## ❓ Por confirmar con Argemiro
 
 - [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual

@@ -1,0 +1,57 @@
+{
+  "txid": "f9f48d36d73b6a3c485ae14086fc564193c08c2d469e417012db279d40a61d76",
+  "version": 1,
+  "locktime": 0,
+  "vin": [
+    {
+      "txid": "d89d6dc31714a79b84af7f68e64eae8cbbda4626e3d7f9efc1e2621ee3478ca0",
+      "vout": 11,
+      "prevout": {
+        "scriptpubkey_type": "p2pkh",
+        "scriptpubkey_address": "1EKMGKpPRVkehBsdVvk1UEx8pkBY43sQQK",
+        "value": 100264
+      },
+      "is_coinbase": false,
+      "sequence": 4294967295
+    },
+    {
+      "txid": "956055127efcc9c8ca6220626ee73281d5e3ac418e3df5c05ef23ff289d18755",
+      "vout": 0,
+      "prevout": {
+        "scriptpubkey_type": "p2pkh",
+        "scriptpubkey_address": "13KLaZAYRwTJ9Dt8PWHKgxUQe47XBQKP6V",
+        "value": 409315
+      },
+      "is_coinbase": false,
+      "sequence": 4294967295
+    },
+    {
+      "txid": "25bda9b512481903ea52461427c4a8c1dd9cb021897faeafcde4c09fb3c37fa9",
+      "vout": 37,
+      "prevout": {
+        "scriptpubkey_type": "p2pkh",
+        "scriptpubkey_address": "1KgFidaWWdDUDG2UNW1mW8Rh1mXUahKzDX",
+        "value": 428410
+      },
+      "is_coinbase": false,
+      "sequence": 4294967295
+    }
+  ],
+  "vout": [
+    {
+      "scriptpubkey_type": "v0_p2wpkh",
+      "scriptpubkey_address": "bc1qgzrva028eym96uax90j28qj3aqhh3dy8gk6qvp",
+      "value": 13020741
+    }
+  ],
+  "size": 8892,
+  "weight": 35568,
+  "sigops": 0,
+  "fee": 249704,
+  "status": {
+    "confirmed": true,
+    "block_height": 827397,
+    "block_hash": "000000000000000000025e0d54e0e7651740ef08d226bd65d77fb28592cced4b",
+    "block_time": 1706230254
+  }
+}
