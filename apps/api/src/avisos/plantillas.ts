@@ -33,6 +33,7 @@ export const PLANTILLA = {
   CUENTA_POR_DESCONECTAR: 'cuenta-por-desconectar',
   COMISION_CAMBIADA: 'comision-cambiada',
   COMISION_LIQUIDADA: 'comision-liquidada',
+  CUENTA_ELIMINADA: 'cuenta-eliminada',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -431,6 +432,16 @@ export function renderizar(
             : 'Cuando se pague, márquenlo como pagado en el perfil del socio con la referencia del pago.',
         ],
         boton: { texto: 'Ver el perfil del socio', url: `${web}/admin/socio` },
+      });
+    case PLANTILLA.CUENTA_ELIMINADA:
+      return armar({
+        asunto: 'Eliminamos tu cuenta de DocTraderPRO',
+        saludo,
+        parrafos: [
+          'Como lo pediste, eliminamos tu cuenta de DocTraderPRO: tus datos personales, las contraseñas de tus cuentas de trading y tus tickets de soporte.',
+          'Conservamos solo el registro de tus pagos (órdenes, montos y fechas), porque la ley nos exige guardarlo. Tus licencias terminaron y, si alguna cuenta estaba conectada, la desconectamos del copy trading en las próximas horas.',
+          'Si quieres volver, puedes registrarte de nuevo cuando quieras.',
+        ],
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);

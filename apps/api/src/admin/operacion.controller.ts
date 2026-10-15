@@ -15,6 +15,7 @@ import {
 import { Cliente, ConfirmacionReciente, Roles, SesionActual } from '../sesiones/decoradores.js';
 import type { ContextoCliente, SesionActiva } from '../sesiones/sesiones.service.js';
 import { AjustesAdminService } from './ajustes-admin.service.js';
+import { ClientesAdminService } from './clientes-admin.service.js';
 import { CuentasAdminService } from './cuentas-admin.service.js';
 import {
   AsignacionDto,
@@ -93,7 +94,10 @@ export class AdminCuentasController {
 @Roles(ROL.ADMIN)
 @Controller('admin')
 export class AdminLicenciasController {
-  constructor(private readonly licencias: LicenciasAdminService) {}
+  constructor(
+    private readonly licencias: LicenciasAdminService,
+    private readonly clientes: ClientesAdminService,
+  ) {}
 
   @Get('licencias')
   listar(@Query() dto: ListaLicenciasDto) {
@@ -161,6 +165,19 @@ export class AdminLicenciasController {
     @Cliente() cliente: ContextoCliente,
   ) {
     return this.licencias.verCedula(id, sesion, cliente);
+  }
+
+  /** Eliminar la cuenta de un cliente que lo pidió: no se puede deshacer, por eso exige el segundo factor. */
+  @Post('clientes/:id/eliminar')
+  @HttpCode(HttpStatus.OK)
+  @ConfirmacionReciente()
+  eliminar(
+    @Param('id', uuid) id: string,
+    @Body() dto: MotivoDto,
+    @SesionActual() sesion: SesionActiva,
+    @Cliente() cliente: ContextoCliente,
+  ) {
+    return this.clientes.eliminar(id, dto.motivo.trim(), sesion, cliente);
   }
 }
 

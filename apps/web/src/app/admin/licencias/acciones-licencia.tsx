@@ -8,6 +8,7 @@ import {
   type EstadoCedula,
   type EstadoExportacion,
   type EstadoOperacion,
+  eliminarCliente,
   exportarLicencias,
   extenderLicencia,
   reactivarLicencia,
@@ -18,6 +19,7 @@ import {
 const suspenderLicenciaConAviso = conAviso(suspenderLicencia);
 const reactivarLicenciaConAviso = conAviso(reactivarLicencia);
 const extenderLicenciaConAviso = conAviso(extenderLicencia);
+const eliminarClienteConAviso = conAviso(eliminarCliente);
 const clasesTexto =
   'w-full resize-y rounded-[20px] bg-campo px-5 py-3.5 text-base text-blanco placeholder:text-white/35 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none';
 
@@ -133,6 +135,66 @@ export function Suspender({ licencia }: { licencia: string }) {
           className="text-error decoration-current/40"
         >
           Sí, suspender
+        </BotonEnviar>
+        <button
+          type="button"
+          onClick={() => setConfirmando(false)}
+          className="inline-flex min-h-11 items-center text-sm text-ceniza underline decoration-white/35 underline-offset-[6px] hover:text-blanco"
+        >
+          Cancelar
+        </button>
+      </div>
+      <ErrorOperacion estado={estado} />
+    </form>
+  );
+}
+
+/**
+ * Eliminar la cuenta del cliente que lo pidió. No se puede deshacer: pide un segundo clic, el motivo (queda en la
+ * auditoría) y el código de la app.
+ */
+export function EliminarCliente({ cliente }: { cliente: string }) {
+  const [estado, accion] = useActionState(eliminarClienteConAviso, {} as EstadoOperacion);
+  const [confirmando, setConfirmando] = useState(false);
+  useAlListo(estado, () => setConfirmando(false));
+  if (!confirmando) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirmando(true)}
+        className="inline-flex min-h-11 items-center text-sm text-error underline decoration-current/40 underline-offset-[6px] hover:decoration-current"
+      >
+        Eliminar cliente
+      </button>
+    );
+  }
+  return (
+    <form action={accion} className="grid w-full justify-items-start gap-4">
+      <input type="hidden" name="cliente" value={cliente} />
+      <div className="grid w-full gap-2">
+        <label htmlFor={`motivo-eli-${cliente}`} className="text-[15px] text-blanco">
+          Cómo lo pidió (por ejemplo, el número del ticket)
+        </label>
+        <textarea
+          id={`motivo-eli-${cliente}`}
+          name="motivo"
+          rows={2}
+          required
+          minLength={LIMITES_ADMIN.motivo.minimo}
+          maxLength={LIMITES_ADMIN.motivo.maximo}
+          defaultValue={estado.valores?.motivo}
+          autoFocus
+          className={clasesTexto}
+        />
+      </div>
+      <CampoCodigo estado={estado} accion="eliminar al cliente" />
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <BotonEnviar
+          variante="enlace"
+          enviando="Eliminando…"
+          className="text-error decoration-current/40"
+        >
+          Sí, eliminar para siempre
         </BotonEnviar>
         <button
           type="button"
