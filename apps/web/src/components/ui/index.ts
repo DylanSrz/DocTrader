@@ -1,4 +1,8 @@
+export { Aviso } from './aviso';
+export { BotonEnviar } from './boton-enviar';
 export { Campo } from './campo';
+export { CampoContrasena } from './campo-contrasena';
+export { Casilla } from './casilla';
 export { cx } from './cx';
 export { Enlace } from './enlace';
 export { Estado } from './estado';

@@ -52,6 +52,18 @@ control total del servidor, no podría mover el dinero de Argemiro.
   segundo factor, o cambian los datos de su cuenta de trading.
 - **CSRF:** además de `SameSite`, la API rechaza peticiones que cambian datos si el encabezado `Origin` no es
   `https://doctraderpro.com`.
+- **Cómo quedó construido (etapa 1):**
+  - El navegador nunca habla con la API. La cookie de sesión (`__Host-sesion`, `HttpOnly`, `Secure`,
+    `SameSite=Lax`) es del dominio de la web; su servidor llama a la API con el token en `Authorization` y firma
+    cada petición con `PROXY_SECRET`. Sin ese secreto la API responde 404 (salvo `/salud`). Así la API no es
+    alcanzable desde afuera y las cookies no son de terceros.
+  - El CSRF lo cubre Next.js: sus acciones del servidor solo aceptan peticiones cuyo `Origin` coincide con el sitio.
+  - Redis guarda la huella (HMAC) del token, no el token. Al pasar el segundo factor o activarlo, la sesión cambia
+    de token.
+  - Un código de la app no se acepta dos veces; después de 5 códigos equivocados se cierra la sesión a medias.
+  - Los enlaces de los correos llevan el secreto después de `#`, que el navegador no envía a ningún servidor, y el
+    correo se confirma con un botón (los lectores de correo que abren enlaces solos no lo confirman).
+  - Registro y recuperar contraseña responden igual exista o no el correo; si ya existe, se le avisa al dueño.
 
 ## 4. Cifrado de datos
 
@@ -148,7 +160,10 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 
 - **Cloudflare Turnstile** (gratis, sin imágenes molestas) en registro, recuperar contraseña, solicitud de prueba,
   envío de SMS y en el ingreso después de varios fallos.
-- **Límites de velocidad** con `@nestjs/throttler` y Redis en toda la API, más estrictos en ingreso, registro y SMS.
+- **Límites de velocidad** con Redis en toda la API (600 peticiones cada 5 minutos por IP), más estrictos en ingreso
+  (30 cada 15 minutos por IP), registro (5 por hora por IP), correos (10 por hora por IP y 3 por hora por cuenta) y
+  SMS. Se hizo un limitador propio de ventana fija en vez de `@nestjs/throttler`, porque las reglas por cuenta
+  (correo) no son por ruta.
 - **SMS:** máximo 3 códigos por teléfono por hora y 5 por día, y límite por IP. En Twilio, permisos geográficos solo
   para los países donde se vende (al inicio, Colombia) y protección contra fraude de SMS activada, para evitar que
   bots generen mensajes que cobran a la cuenta.
@@ -168,8 +183,12 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 ## 11. Encabezados y configuración web
 
 - `Strict-Transport-Security` (HSTS) con un año de duración.
-- `Content-Security-Policy` estricta con nonces en Next.js; el único script de terceros es Turnstile. El widget de
-  Myfxbook es una imagen: se permiten sus dominios de imágenes (`widgets.myfxbook.com` y `widget.mfbcdn.net`).
+- `Content-Security-Policy` estricta; el único script de terceros es Turnstile. El widget de Myfxbook es una imagen:
+  se permiten sus dominios de imágenes (`widgets.myfxbook.com` y `widget.mfbcdn.net`).
+  - **Decisión (2026-10-14):** sin nonces por ahora. Con nonces todas las páginas pasan a ser dinámicas y se pierde
+    el prerenderizado de la landing; React escapa todo lo que muestra y la web no inserta HTML de usuarios. Se
+    permite `'unsafe-inline'` en scripts solo del propio sitio, y se reemplaza por la integridad de subrecursos (SRI)
+    de Next cuando deje de ser experimental.
 - `frame-ancestors 'none'` (nadie puede meter la plataforma en un iframe), `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` sin cámara, micrófono ni ubicación.
 - CORS de la API abierto solo para `https://doctraderpro.com`.

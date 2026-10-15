@@ -52,9 +52,16 @@
 ## 🔧 Accesos técnicos (cuando empecemos)
 
 - [x] **Titular de las cuentas de servicio:** se crean con el correo de Dylan; los pagos los cubre Argemiro.
-- [ ] Crear las cuentas: Vercel (web), Railway o Render (API, worker, PostgreSQL y Redis), Resend (correos),
-      Twilio (SMS), Cloudflare (archivos y Turnstile), Sentry (errores). Ver `docs/DECISIONES-TECNICAS.md`.
-- [ ] Verificar doctraderpro.com en Resend (registros DNS en Hostinger).
+- [x] Vercel (web) y Railway (API, worker, PostgreSQL y Redis) creados y funcionando (2026-10-14).
+- [ ] **Resend (ya hace falta, etapa 1 hecha):** crear la cuenta, verificar doctraderpro.com (registros DNS en
+      Hostinger) y poner `RESEND_API_KEY` en el worker de Railway. Hasta entonces, los correos de verificación y de
+      recuperar contraseña quedan en cola y nadie puede confirmar su correo ni crear su primera contraseña (tampoco
+      los admins).
+- [ ] **Cloudflare Turnstile:** crear el sitio en Cloudflare (gratis) y poner `NEXT_PUBLIC_TURNSTILE_SITE_KEY` en
+      Vercel y `TURNSTILE_SECRET` en la API. Mientras no exista, el registro y recuperar contraseña funcionan sin el
+      desafío (los límites de velocidad sí funcionan).
+- [ ] Crear cuando se necesiten: Twilio (SMS, etapa 6), Cloudflare R2 (archivos, etapa 7), Sentry (errores).
+      Ver `docs/DECISIONES-TECNICAS.md`.
 - [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.

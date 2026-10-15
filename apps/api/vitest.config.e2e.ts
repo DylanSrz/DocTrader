@@ -21,6 +21,10 @@ export default defineConfig({
       REDIS_URL: process.env.TEST_REDIS_URL ?? 'redis://localhost:6379/1',
       WEB_ORIGIN: 'http://localhost:3000',
       AUDIT_HMAC_KEY: Buffer.alloc(32, 42).toString('base64'),
+      DATA_ENCRYPTION_KEY: Buffer.alloc(32, 43).toString('base64'),
+      LOOKUP_HMAC_KEY: Buffer.alloc(32, 44).toString('base64'),
+      PROXY_SECRET: 'secreto-de-pruebas-de-la-web-0123456789',
+      HIBP_ACTIVO: 'false',
     },
   },
 });

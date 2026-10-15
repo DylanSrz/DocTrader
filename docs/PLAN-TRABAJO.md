@@ -50,16 +50,30 @@ prueba sin pagos.
 - **Hecho cuando:** la web y la API vacías se despliegan solas en pruebas y las pruebas corren en cada pull request.
 - **Resultado:** monorepo con NestJS 12, Next.js 16, Tailwind 4 y TypeORM; Docker Compose; migración inicial (usuarios,
   socio, planes, ajustes, direcciones y auditoría encadenada que la base de datos no deja cambiar); semilla; worker con
-  latido; `/salud`; sistema de diseño (`/sistema`) y página temporal; Dependabot; GitHub Actions, CodeQL y gitleaks listos en `docs/ci/` (falta copiarlos a `.github/workflows/`).
-  28 pruebas unitarias y 14 de punta a punta. **Falta el despliegue automático a pruebas**, que necesita las cuentas
-  de Vercel y Railway (configuración lista en el `README.md`).
+  latido; `/salud`; sistema de diseño (`/sistema`) y página temporal; GitHub Actions, CodeQL, gitleaks y Dependabot.
+  28 pruebas unitarias y 14 de punta a punta. **Desplegado** (2026-10-14): web en Vercel, API y worker en Railway, cada
+  uno se actualiza solo al fusionar en `main` (direcciones en el `README.md`).
 
-### Etapa 1 — Cuentas y acceso
+### Etapa 1 — Cuentas y acceso ✅ (2026-10-14)
 - Registro con nombre, cédula, correo y teléfono, casillas de términos, datos y riesgo, y Turnstile.
 - Verificación del correo, ingreso, recuperar contraseña, sesiones en Redis y aviso de dispositivo nuevo.
 - Segundo factor obligatorio para admins y confirmación reciente para acciones delicadas.
 - Roles, límites de velocidad, encabezados de seguridad.
 - **Hecho cuando:** un cliente se registra y entra; un admin entra con segundo factor; las pruebas de permisos pasan.
+- **Resultado:**
+  - **API:** registro (cédula cifrada, autorizaciones con versión, IP y navegador), verificación del correo, ingreso
+    con espera creciente desde 5 fallos y Turnstile y aviso al dueño desde 10, sesiones en Redis con duración por rol,
+    segundo factor con app (QR, código que no se repite, 10 códigos de recuperación), confirmación reciente,
+    recuperar contraseña, lista de sesiones para cerrarlas, aviso de navegador nuevo, roles y límites de velocidad.
+    Solo atiende a la web (secreto compartido); el resto responde 404.
+  - **Correos:** bandeja de salida en la base de datos y el worker los envía (Resend, Mailpit o consola), con
+    reintentos y sin dejar los enlaces guardados después de enviarlos.
+  - **Web:** registro, ingreso en dos pasos, confirmar correo, recuperar y restablecer contraseña, configurar el
+    segundo factor, panel del cliente y del admin (provisionales, con la sección de seguridad), textos legales y
+    política de contenido (CSP).
+  - 46 pruebas de punta a punta de la API y recorrido completo en el navegador (escritorio y celular).
+  - **Falta para usarla con clientes reales:** Resend verificado (sin él no salen los correos) y Turnstile
+    (`docs/PENDIENTES.md`).
 
 ### Etapa 2 — Página pública
 - Landing de la propuesta 2 con planes y precios desde la base de datos, preguntas frecuentes, Myfxbook y broker.

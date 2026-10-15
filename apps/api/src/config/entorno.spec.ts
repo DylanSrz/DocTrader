@@ -4,6 +4,8 @@ const valido = {
   DATABASE_URL: 'postgres://u:p@localhost:5432/db',
   REDIS_URL: 'redis://localhost:6379',
   AUDIT_HMAC_KEY: Buffer.alloc(32, 1).toString('base64'),
+  DATA_ENCRYPTION_KEY: Buffer.alloc(32, 2).toString('base64'),
+  LOOKUP_HMAC_KEY: Buffer.alloc(32, 3).toString('base64'),
 };
 
 describe('validarEntorno', () => {
@@ -20,6 +22,19 @@ describe('validarEntorno', () => {
 
   it('rechaza una llave de auditoría que no tiene 32 bytes', () => {
     expect(() => validarEntorno({ ...valido, AUDIT_HMAC_KEY: 'corta' })).toThrow(/AUDIT_HMAC_KEY/);
+  });
+
+  it('pide las llaves de cifrado y de búsqueda', () => {
+    expect(() => validarEntorno({ ...valido, DATA_ENCRYPTION_KEY: undefined })).toThrow(
+      /DATA_ENCRYPTION_KEY/,
+    );
+    expect(() => validarEntorno({ ...valido, LOOKUP_HMAC_KEY: 'corta' })).toThrow(
+      /LOOKUP_HMAC_KEY/,
+    );
+  });
+
+  it('rechaza un secreto de la web demasiado corto', () => {
+    expect(() => validarEntorno({ ...valido, PROXY_SECRET: 'corto' })).toThrow(/PROXY_SECRET/);
   });
 
   it('rechaza una base de datos que no es Postgres', () => {

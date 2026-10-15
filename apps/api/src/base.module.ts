@@ -5,8 +5,9 @@ import { AuditoriaModule } from './auditoria/auditoria.module.js';
 import { type Entorno, validarEntorno } from './config/entorno.js';
 import { opcionesBaseDeDatos } from './database/data-source.js';
 import { RedisModule } from './redis/redis.module.js';
+import { SeguridadModule } from './seguridad/seguridad.module.js';
 
-/** Lo que comparten la API y el worker: configuración, base de datos, Redis y auditoría. */
+/** Lo que comparten la API y el worker: configuración, base de datos, Redis, auditoría y seguridad. */
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +29,7 @@ import { RedisModule } from './redis/redis.module.js';
     }),
     RedisModule,
     AuditoriaModule,
+    SeguridadModule,
   ],
 })
 export class BaseModule {}

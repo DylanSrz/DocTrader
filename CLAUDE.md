@@ -6,7 +6,7 @@ Plataforma web para vender licencias del software de copy trading **Doc Trader P
 - Información pendiente por recibir: `docs/PENDIENTES.md`
 - Documento de requerimientos formal (RN, RF, RNF, HU, alcance): https://claude.ai/code/artifact/12e017f5-308d-45a5-bf40-89b2d4b6f121
 
-Estado: **construcción** (desde el 2026-10-14). Etapa 0 (base del proyecto) hecha; sigue la etapa 1 de
+Estado: **construcción** (desde el 2026-10-14). Etapas 0 (base) y 1 (cuentas y acceso) hechas; sigue la etapa 2 de
 `docs/PLAN-TRABAJO.md`. Cómo correr el proyecto y convenciones de código: `README.md`.
 
 Reglas clave:

@@ -17,6 +17,27 @@ const esquema = z.object({
   REDIS_URL: z.url({ protocol: /^rediss?$/ }),
   WEB_ORIGIN: z.url().default('http://localhost:3000'),
   AUDIT_HMAC_KEY: llaveBase64De32Bytes,
+  /** Cifrado por campo (cédula, segundo factor, enlaces en la bandeja de salida). `docs/SEGURIDAD.md` §4. */
+  DATA_ENCRYPTION_KEY: llaveBase64De32Bytes,
+  /** HMAC para buscar datos cifrados sin descifrarlos (cédula repetida) y para guardar hashes de enlaces. */
+  LOOKUP_HMAC_KEY: llaveBase64De32Bytes,
+  /**
+   * Secreto compartido con la web. Solo la web (su servidor) habla con la API: sin este secreto, la API no
+   * responde. Obligatorio en producción (lo revisa `configurarApp`).
+   */
+  PROXY_SECRET: z.string().min(32, 'debe tener al menos 32 caracteres').optional(),
+  /** Cloudflare Turnstile. Sin secreto, el desafío no se pide (solo en desarrollo, o mientras se crea la cuenta). */
+  TURNSTILE_SECRET: z.string().min(1).optional(),
+  /** Revisar contraseñas filtradas en Have I Been Pwned (por rango, la contraseña nunca sale del servidor). */
+  HIBP_ACTIVO: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((valor) => valor === 'true'),
+  /** Correos: Resend en producción; Mailpit en desarrollo; si no hay ninguno, se escriben en el registro. */
+  RESEND_API_KEY: z.string().min(1).optional(),
+  MAILPIT_URL: z.url().optional(),
+  MAIL_FROM: z.string().default('DocTraderPRO <notificaciones@doctraderpro.com>'),
+  MAIL_REPLY_TO: z.email().default('support@doctraderpro.com'),
 });
 
 export type Entorno = z.infer<typeof esquema>;
