@@ -11,7 +11,7 @@ import { type Landing, obtenerLanding, type PlanPublico } from '@/lib/publico';
 export const metadata: Metadata = {
   title: { absolute: 'DocTraderPRO · Licencia de software de copy trading' },
   description:
-    'Doc Trader Pro AI replica en tu cuenta cada operación del sistema de Argemiro, en el broker que tú elijas. Tu dinero nunca sale de tu cuenta y el historial lo audita Myfxbook.',
+    'Doc Trader Pro AI replica en tu cuenta cada operación del sistema DocTrader Pro, en el broker que tú elijas. Tu dinero nunca sale de tu cuenta y el historial lo audita Myfxbook.',
 };
 
 /*
@@ -105,7 +105,7 @@ function Hero() {
       <div className="grid justify-items-start gap-[30px]">
         <Etiqueta>Licencia de software de copy trading</Etiqueta>
         <h1 id="t-hero" className="text-display">
-          Tu cuenta, conectada al sistema de Argemiro.
+          Tu cuenta, conectada al sistema DocTrader Pro.
         </h1>
         <p className="max-w-[34em] text-blanco">
           <NoTraducir>Doc Trader Pro AI</NoTraducir> replica en tu cuenta cada operación del
@@ -234,7 +234,7 @@ function ComoFunciona({ broker }: { broker: Landing['enlaces']['broker'] }) {
           rel="noopener sponsored"
           className="inline-flex min-h-11 items-center text-sm text-ceniza underline decoration-white/35 underline-offset-[6px] hover:text-blanco hover:decoration-current"
         >
-          ¿No sabes qué broker elegir? Yo uso&nbsp;<NoTraducir>{broker.name}</NoTraducir>
+          ¿No sabes qué broker elegir? Te sugerimos&nbsp;<NoTraducir>{broker.name}</NoTraducir>
         </a>
       ),
     },
@@ -243,7 +243,7 @@ function ComoFunciona({ broker }: { broker: Landing['enlaces']['broker'] }) {
       texto: 'Con USDT o Bitcoin. Revisamos tu pago directamente en la blockchain.',
     },
     {
-      titulo: 'Argemiro conecta tu cuenta',
+      titulo: 'Conectamos tu cuenta',
       texto:
         'Te avisamos por correo cuando quede conectada. Desde ahí, cada operación del sistema se replica en tu cuenta.',
     },
@@ -338,7 +338,7 @@ function Resultados({ myfxbook }: { myfxbook: Landing['myfxbook'] }) {
       <div className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-2">
         {asOf ? (
           <p className="inline-flex items-center gap-2.5 text-sm text-senal before:size-[7px] before:rounded-full before:bg-current">
-            Cifras de la cuenta de Argemiro al {fechaLarga.format(new Date(asOf))}.{pendientes}
+            Cifras de la cuenta de DocTrader Pro al {fechaLarga.format(new Date(asOf))}.{pendientes}
           </p>
         ) : null}
         <Enlace href={myfxbook.url} target="_blank" rel="noopener" gris>
@@ -407,7 +407,15 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
         </p>
       </DosColumnas>
 
-      <div className="mt-[clamp(56px,7vw,96px)] grid gap-[clamp(40px,5vw,80px)] min-[961px]:grid-cols-3">
+      <div
+        className={cx(
+          'mt-[clamp(56px,7vw,96px)] grid gap-[clamp(40px,5vw,80px)]',
+          // Dos planes ocupan dos columnas (sin la tercera vacía); tres, las tres.
+          publicos.length >= 3
+            ? 'min-[961px]:grid-cols-3'
+            : 'max-w-[980px] min-[961px]:grid-cols-2',
+        )}
+      >
         {publicos.map((plan, i) => {
           const meses = (plan.meses ?? 0) + plan.mesesObsequio;
           const ruta = `/registro?plan=${plan.codigo.toLowerCase()}`;

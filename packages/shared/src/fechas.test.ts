@@ -8,7 +8,7 @@ describe('sumarMeses', () => {
     expect(sumarMeses(bogota('2026-10-03T10:00:00'), 1)).toEqual(bogota('2026-11-03T10:00:00'));
   });
 
-  it('completar una prueba del 3 de octubre a semestral (6 + 1) llega al 3 de mayo', () => {
+  it('del 3 de octubre, 7 meses llegan al 3 de mayo', () => {
     expect(sumarMeses(bogota('2026-10-03T00:00:00'), 7)).toEqual(bogota('2027-05-03T00:00:00'));
   });
 

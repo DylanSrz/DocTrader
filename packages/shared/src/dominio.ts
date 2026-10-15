@@ -139,7 +139,7 @@ export const ESTADO_SESION = {
 } as const;
 export type EstadoSesion = ValorDe<typeof ESTADO_SESION>;
 
-/** Nivel de riesgo que Argemiro asigna a cada cuenta de trading. */
+/** Nivel de riesgo que el admin asigna a cada cuenta de trading. */
 export const NIVEL_RIESGO = { BAJO: 'BAJO', MEDIO: 'MEDIO', ALTO: 'ALTO' } as const;
 export type NivelRiesgo = ValorDe<typeof NIVEL_RIESGO>;
 

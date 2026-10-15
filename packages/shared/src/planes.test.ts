@@ -9,16 +9,17 @@ import {
 const precio = (code: string) => PLANES_INICIALES.find((p) => p.code === code)!.priceUsdCents;
 
 describe('planes iniciales', () => {
-  it('tienen los precios acordados con Argemiro', () => {
+  it('tienen los precios acordados: mensual, semestral y la prueba (sin trimestral desde el 2026-10-15)', () => {
+    expect(PLANES_INICIALES.map((p) => p.code)).toEqual(['MENSUAL', 'SEMESTRAL', 'PRUEBA']);
     expect(precio('MENSUAL')).toBe(12_000);
-    expect(precio('TRIMESTRAL')).toBe(31_900);
     expect(precio('SEMESTRAL')).toBe(49_900);
     expect(precio('PRUEBA')).toBe(5_000);
   });
 
-  it('la semestral dura 6 meses más 1 de obsequio', () => {
+  it('la semestral dura 6 meses, sin mes de obsequio', () => {
     const semestral = PLANES_INICIALES.find((p) => p.code === 'SEMESTRAL')!;
-    expect(semestral.durationMonths! + semestral.bonusMonths).toBe(7);
+    expect(semestral.durationMonths).toBe(6);
+    expect(semestral.bonusMonths).toBe(0);
   });
 
   it('la prueba no se compra directo', () => {
@@ -27,10 +28,9 @@ describe('planes iniciales', () => {
 });
 
 describe('diferenciaParaCompletar', () => {
-  it('cobra USD 70, 269 o 449 según el plan', () => {
+  it('cobra USD 70 o 449 según el plan', () => {
     const prueba = precio('PRUEBA');
     expect(diferenciaParaCompletar(precio('MENSUAL'), prueba)).toBe(7_000);
-    expect(diferenciaParaCompletar(precio('TRIMESTRAL'), prueba)).toBe(26_900);
     expect(diferenciaParaCompletar(precio('SEMESTRAL'), prueba)).toBe(44_900);
   });
 });
@@ -38,15 +38,18 @@ describe('diferenciaParaCompletar', () => {
 describe('precio por mes', () => {
   const plan = (code: string) => PLANES_INICIALES.find((p) => p.code === code)!;
 
-  it('el semestral dura 7 meses con el obsequio y la prueba no se mide en meses', () => {
-    expect(mesesTotales(plan('SEMESTRAL'))).toBe(7);
+  it('el semestral dura 6 meses y la prueba no se mide en meses', () => {
+    expect(mesesTotales(plan('SEMESTRAL'))).toBe(6);
     expect(mesesTotales(plan('PRUEBA'))).toBeNull();
   });
 
-  it('da los equivalentes de la landing: 120, 106 y 71 dólares al mes', () => {
+  it('cuenta el obsequio si un plan lo tiene', () => {
+    expect(mesesTotales({ durationMonths: 6, bonusMonths: 1 })).toBe(7);
+  });
+
+  it('da los equivalentes de la landing: 120 y 83 dólares al mes', () => {
     expect(dolaresPorMes(plan('MENSUAL'))).toBe(120);
-    expect(dolaresPorMes(plan('TRIMESTRAL'))).toBe(106);
-    expect(dolaresPorMes(plan('SEMESTRAL'))).toBe(71);
+    expect(dolaresPorMes(plan('SEMESTRAL'))).toBe(83);
     expect(dolaresPorMes(plan('PRUEBA'))).toBeNull();
   });
 });

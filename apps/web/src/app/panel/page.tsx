@@ -21,6 +21,14 @@ export const metadata: Metadata = { title: 'Mis cuentas' };
 
 const hora = new Intl.DateTimeFormat('es-CO', { timeStyle: 'short', timeZone: ZONA_HORARIA });
 
+/** "mensual por USD 120 o semestral por USD 499", con los planes a la venta. */
+function listaPrecios(planes: PlanVista[]): string {
+  const partes = planes.map((p) => `${p.nombre.toLowerCase()} por ${usd(p.precioUsdCentavos)}`);
+  return partes.length > 1
+    ? `${partes.slice(0, -1).join(', ')} o ${partes.at(-1)}`
+    : (partes[0] ?? '');
+}
+
 function opcionesDePlanes(planes: PlanVista[]): PlanOpcion[] {
   return planes.map((p) => ({
     codigo: p.codigo,
@@ -117,8 +125,7 @@ function Titular({
 
   if (cuentas.length === 0) {
     titulo = `Hola, ${nombre}. Agrega tu primera cuenta de trading.`;
-    texto =
-      'Cada cuenta lleva su propia licencia: mensual por USD 120, trimestral por USD 319 o semestral por USD 499, que trae 6 meses más 1 de obsequio.';
+    texto = `Cada cuenta lleva su propia licencia: ${listaPrecios(planes)}.`;
     accion = (
       <Lateral titulo="Agregar cuenta de trading" boton="Agregar cuenta" variante="pildora">
         <FormularioCuenta planes={opciones} titularSugerido={nombreCompleto} />
@@ -193,7 +200,7 @@ function Titular({
   } else if (porConectar) {
     titulo = 'Tu cuenta está por conectar.';
     texto =
-      'Recibimos tus datos y tu pago. Argemiro conectará la cuenta al copy trading y te avisaremos por correo.';
+      'Recibimos tus datos y tu pago. Conectaremos la cuenta al copy trading y te avisaremos por correo.';
   } else {
     titulo = cuentas.length === 1 ? 'Tu cuenta está al día.' : 'Tus cuentas están al día.';
     const proxima = cuentas
@@ -212,12 +219,15 @@ function Titular({
   );
 }
 
-function Leyenda() {
+function Leyenda({ conObsequio }: { conObsequio: boolean }) {
   const items = [
     { texto: 'Día usado', fill: 'none', stroke: 'var(--color-ceniza)', opacidad: 0.45 },
     { texto: 'Día restante', fill: 'none', stroke: 'var(--color-llama)' },
     { texto: 'Hoy', fill: 'var(--color-llama)', stroke: 'var(--color-llama)' },
-    { texto: 'Mes de obsequio', fill: 'none', stroke: 'var(--color-senal)' },
+    // Solo las licencias viejas de 6 + 1 tienen mes de obsequio (la semestral es de 6 meses desde el 2026-10-15).
+    ...(conObsequio
+      ? [{ texto: 'Mes de obsequio', fill: 'none', stroke: 'var(--color-senal)' }]
+      : []),
   ];
   return (
     <ul
@@ -283,7 +293,7 @@ function TarjetaCuenta({
   } else if (licencia.estado === 'SUSPENDIDA') {
     nota = 'La licencia está suspendida. Escríbenos a soporte si tienes dudas.';
   } else if (cuenta.conexion === 'POR_CONECTAR') {
-    nota = 'Recibimos tus datos. Argemiro conectará la cuenta y te avisaremos por correo.';
+    nota = 'Recibimos tus datos. Conectaremos la cuenta y te avisaremos por correo.';
   } else if (licencia.estado === 'ACTIVA' && t && t.quedan <= DIAS_VENCE_PRONTO) {
     nota = `Si vence, tienes ${dias(diasGracia)} de gracia con la cuenta conectada.`;
   }
@@ -420,7 +430,13 @@ async function Contenido() {
                 : `${cuentas.length} cuentas, una licencia cada una`}
             </h2>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              {cuentas.some((c) => c.licencia.inicio) ? <Leyenda /> : null}
+              {cuentas.some((c) => c.licencia.inicio) ? (
+                <Leyenda
+                  conObsequio={cuentas.some((c) =>
+                    c.licencia.periodos.some((p) => p.mesesObsequio > 0),
+                  )}
+                />
+              ) : null}
               <Lateral titulo="Agregar cuenta de trading" boton="Agregar cuenta">
                 <FormularioCuenta planes={opciones} titularSugerido={sesion.usuario.nombre} />
               </Lateral>
@@ -450,14 +466,7 @@ async function Contenido() {
               ¿Quieres conectar otra cuenta?
             </h2>
             <p className="max-w-[36em] text-niebla">
-              Cada cuenta de trading lleva su propia licencia:{' '}
-              {planes.map((p, i) => (
-                <span key={p.codigo}>
-                  {i > 0 ? (i === planes.length - 1 ? ' o ' : ', ') : ''}
-                  {p.nombre.toLowerCase()} por {usd(p.precioUsdCentavos)}
-                </span>
-              ))}
-              .
+              Cada cuenta de trading lleva su propia licencia: {listaPrecios(planes)}.
             </p>
           </section>
         ) : null}

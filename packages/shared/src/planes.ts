@@ -5,7 +5,7 @@ export interface DefinicionPlan {
   name: string;
   /** Meses que se pagan; nulo en la prueba, que se mide en días. */
   durationMonths: number | null;
-  /** Meses de obsequio que se suman (el semestral trae 1). */
+  /** Meses de obsequio que se suman (hoy ningún plan trae; el semestral traía 1 hasta el 2026-10-15). */
   bonusMonths: number;
   durationDays: number | null;
   priceUsdCents: number;
@@ -14,7 +14,10 @@ export interface DefinicionPlan {
   isPublic: boolean;
 }
 
-/** Planes con los que arranca la plataforma (decisiones del 2026-10-12). Los precios se editan desde el admin. */
+/**
+ * Planes con los que arranca la plataforma (decisiones del 2026-10-12 y 2026-10-15: sin trimestral y la semestral sin
+ * mes de obsequio). Los precios se editan desde el admin.
+ */
 export const PLANES_INICIALES: readonly DefinicionPlan[] = [
   {
     code: CODIGO_PLAN.MENSUAL,
@@ -27,20 +30,10 @@ export const PLANES_INICIALES: readonly DefinicionPlan[] = [
     isPublic: true,
   },
   {
-    code: CODIGO_PLAN.TRIMESTRAL,
-    name: 'Trimestral',
-    durationMonths: 3,
-    bonusMonths: 0,
-    durationDays: null,
-    priceUsdCents: 31_900,
-    rank: 2,
-    isPublic: true,
-  },
-  {
     code: CODIGO_PLAN.SEMESTRAL,
     name: 'Semestral',
     durationMonths: 6,
-    bonusMonths: 1,
+    bonusMonths: 0,
     durationDays: null,
     priceUsdCents: 49_900,
     rank: 3,
@@ -69,7 +62,7 @@ export function diferenciaParaCompletar(
   return precioPlanCentavos - precioPruebaCentavos;
 }
 
-/** Meses que dura un plan, contando el obsequio (el semestral dura 7). Nulo en la prueba. */
+/** Meses que dura un plan, contando el obsequio si lo tiene. Nulo en la prueba. */
 export function mesesTotales(plan: Pick<DefinicionPlan, 'durationMonths' | 'bonusMonths'>) {
   return plan.durationMonths === null ? null : plan.durationMonths + plan.bonusMonths;
 }

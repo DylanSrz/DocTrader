@@ -42,8 +42,8 @@
 
 ## ❓ Por confirmar con Argemiro
 
-- [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual o
-      trimestral (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
+- [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
+      (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
       prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.
 
 ## ⚖️ Legal
@@ -73,9 +73,12 @@
 
 ## ✅ Resuelto (resumen)
 
+- **2026-10-15:** se retira la licencia trimestral, la semestral pasa a 6 meses sin obsequio y el nombre del dueño
+  no aparece en la plataforma (va "DocTrader Pro").
+
 Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 10 % del valor bruto, editable desde el perfil del
 socio, liquidada los 15 y 30 de cada mes ·
-licencias mensual USD 120, trimestral USD 319, semestral USD 499 (6 + 1), prueba de 15 días USD 50 que se completa pagando la diferencia (a semestral, con el mes de obsequio; la licencia cuenta desde el inicio de la prueba) ·
+licencias mensual USD 120 y semestral USD 499 (6 meses; la trimestral y el mes de obsequio se quitaron el 2026-10-15), prueba de 15 días USD 50 que se completa pagando la diferencia (la licencia cuenta desde el inicio de la prueba) ·
 la landing invita a solicitar la prueba · teléfono verificado por SMS para pedir la prueba ·
 TRM oficial redondeada a 1.000 pesos · sin devoluciones · pasarela COP en fase 2 · Binance Pay +
 direcciones de depósito configurables · solo cripto: USDT TRC20 y BTC · orden válida 1 hora · 3 días de gracia

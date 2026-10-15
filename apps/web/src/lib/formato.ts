@@ -60,7 +60,7 @@ export function nombreRed(red: Red): string {
   return NOMBRE_RED[red];
 }
 
-/** "Trimestral, 3 meses" o "Semestral, 6 meses + 1 de obsequio". */
+/** "Mensual, 1 mes", "Semestral, 6 meses" (o "+ 1 de obsequio" si el plan lo trae). */
 export function describirPlan(plan: {
   nombre: string;
   meses: number | null;
@@ -82,7 +82,7 @@ export const NOMBRE_TIPO_ORDEN: Record<TipoOrden, string> = {
   COMPLETAR_PRUEBA: 'Completar la prueba con',
 };
 
-/** "Licencia trimestral", "Renovación mensual", "Cambio a semestral". */
+/** "Licencia mensual", "Renovación mensual", "Cambio a semestral". */
 export function conceptoOrden(tipo: TipoOrden, nombrePlan: string): string {
   return `${NOMBRE_TIPO_ORDEN[tipo]} ${nombrePlan.toLowerCase()}`;
 }

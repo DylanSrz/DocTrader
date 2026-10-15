@@ -1,5 +1,5 @@
 /**
- * Preguntas frecuentes de la landing. Argemiro las edita desde el panel; estas son las del lanzamiento (las del
+ * Preguntas frecuentes de la landing. Los admins las editan desde el panel; estas son las del lanzamiento (las del
  * prototipo de la propuesta 2). Las respuestas son Markdown sencillo: párrafos, **negrita** y [enlaces](url).
  */
 export interface PreguntaFrecuente {
@@ -21,12 +21,12 @@ export const PREGUNTAS_INICIALES: readonly PreguntaFrecuente[] = [
   {
     pregunta: '¿Qué broker puedo usar?',
     respuesta:
-      'El que prefieras, siempre que sea compatible con el copiado. Si no tienes uno, yo uso [JustMarkets](https://one.justmarkets.link/a/5vmbn05zda). Es un enlace de referido.',
+      'El que prefieras, siempre que sea compatible con el copiado. Si no tienes uno, te sugerimos [JustMarkets](https://one.justmarkets.link/a/5vmbn05zda). Es un enlace de referido.',
   },
   {
     pregunta: '¿Cuánto capital necesito?',
     respuesta:
-      'Argemiro te recomienda un capital y un nivel de riesgo para cada cuenta. Los ves en tu panel después de agregarla.',
+      'DocTrader Pro te recomienda un capital y un nivel de riesgo para cada cuenta. Los ves en tu panel después de agregarla.',
   },
   {
     pregunta: '¿Cómo pago?',
@@ -61,7 +61,7 @@ export const ENLACES_INICIALES = {
 };
 
 /**
- * Cuenta de Argemiro en Myfxbook y las cifras que muestra la landing (ajuste `myfxbook`). Solo la ganancia
+ * Cuenta de DocTrader Pro en Myfxbook y las cifras que muestra la landing (ajuste `myfxbook`). Solo la ganancia
  * mientras el historial esté incompleto (ver docs/PENDIENTES.md).
  */
 export const MYFXBOOK_INICIAL = {

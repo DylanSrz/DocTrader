@@ -35,17 +35,18 @@ import type { ValorJson } from './entidades/setting.entity.js';
 
 const ADMINS = [
   { fullName: 'Dylan', email: 'dylansrz96@gmail.com', socioConComisionBp: 1_000 },
-  { fullName: 'Argemiro', email: 'doctraderproiasystem@gmail.com', socioConComisionBp: null },
+  // El dueño no quiere su nombre en la plataforma (2026-10-15): su cuenta se llama como la marca.
+  { fullName: 'DocTrader Pro', email: 'doctraderproiasystem@gmail.com', socioConComisionBp: null },
 ] as const;
 
 /**
  * Correos que fueron de admin por error y ya no lo son. La cuenta queda borrada, sin contraseña, sin segundo
  * factor y sin enlaces pendientes, para que nadie con acceso a ese buzón pueda tomarla.
- * 2026-10-15: el correo de admin de Argemiro era doctraderproiasystem@gmail.com, no doctraderpro@gmail.com.
+ * 2026-10-15: el correo de admin del dueño era doctraderproiasystem@gmail.com, no doctraderpro@gmail.com.
  */
 const ADMINS_RETIRADOS = ['doctraderpro@gmail.com'] as const;
 
-/** Direcciones de la cuenta de Binance de Argemiro (2026-10-14), con checksum comprobado. */
+/** Direcciones de la cuenta de Binance del dueño (2026-10-14), con checksum comprobado. */
 const DIRECCIONES = [
   { currency: MONEDA.USDT, network: RED.TRON, address: 'TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x' },
   { currency: MONEDA.BTC, network: RED.BITCOIN, address: '1H8xfingRtsTvhnf4PosyhXvacXdGVWea1' },
@@ -62,7 +63,7 @@ const AJUSTES: Record<string, ValorJson> = {
   links: ENLACES_INICIALES,
   myfxbook: MYFXBOOK_INICIAL,
   support_email: CORREO_SOPORTE,
-  // Preguntas frecuentes de la landing: Argemiro las edita desde el panel.
+  // Preguntas frecuentes de la landing: los admins las editan desde el panel.
   faq: PREGUNTAS_INICIALES.map((p) => ({ ...p })),
 };
 

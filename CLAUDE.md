@@ -14,10 +14,10 @@ Reglas clave:
 - Se vende una **licencia de uso de software**, nunca "servicio de trading" ni rentabilidad garantizada.
 - **Una licencia por cada cuenta de trading.** Pagos **manuales y no recurrentes** (periodos prepagados + recordatorios).
 - Precios en USD, editables desde el admin. Sin devoluciones.
-  Mensual: 1 mes, USD 120. Trimestral: 3 meses, USD 319. Semestral: **7 meses (6 + 1 de obsequio, cupón automático)**, USD 499.
-  Mensual → trimestral o semestral, y trimestral → semestral, antes de vencer (se paga el plan nuevo; los días se suman).
+  Mensual: 1 mes, USD 120. Semestral: **6 meses**, USD 499 (desde el 2026-10-15 no hay trimestral ni mes de obsequio).
+  Mensual → semestral antes de vencer (se paga el plan nuevo; los días se suman).
   Prueba de **15 días** (USD 50), solo bajo solicitud aprobada por el admin; se completa a cualquier plan pagando la
-  **diferencia** (USD 70, 269 o 449) hasta el último día de la prueba; la licencia cuenta desde el inicio de la prueba.
+  **diferencia** (USD 70 o 449) hasta el último día de la prueba; la licencia cuenta desde el inicio de la prueba.
   **Una prueba por cliente y por cuenta de trading**, con control antiabuso (ver `docs/CONTEXTO.md`, "Control de la prueba"); para pedirla, correo y teléfono verificados (**SMS**).
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.
 - **Solo cripto** por ahora y **solo dos redes**: USDT (Tron TRC20) y BTC (Bitcoin). USDC (BNB Smart Chain) se quitó el
@@ -31,6 +31,8 @@ Reglas clave:
 - **No hay LPOA**: con licencia pagada y datos completos, la cuenta pasa a "por conectar".
 - La conexión de cuentas al copy trading es **manual** (la hace Argemiro en **Social Trader Tools**); la plataforma gestiona pagos,
   licencias, datos de cuenta (contraseñas cifradas) y listas "por conectar" / "por desconectar".
+- **El nombre del dueño (Argemiro) no aparece en ninguna parte de la plataforma** (textos, correos, panel): se dice
+  "DocTrader Pro" o se habla en plural ("conectamos tu cuenta"). Su usuario admin se llama "DocTrader Pro".
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
 - Titular: **DocTraderPRO, Barranquilla, Colombia**. Textos legales (borradores) en `docs/legal/`; plan de seguridad en

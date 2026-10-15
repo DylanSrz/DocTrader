@@ -67,18 +67,14 @@ describe('página pública', () => {
     expect(planes.map((p: { codigo: string }) => p.codigo)).toEqual([
       'PRUEBA',
       'MENSUAL',
-      'TRIMESTRAL',
       'SEMESTRAL',
     ]);
-    expect(planes.find((p: { codigo: string }) => p.codigo === 'TRIMESTRAL')).toMatchObject({
-      precioUsdCentavos: 31_900,
-      meses: 3,
-      dolaresPorMes: 106,
-      publico: true,
-    });
     expect(planes.find((p: { codigo: string }) => p.codigo === 'SEMESTRAL')).toMatchObject({
-      mesesObsequio: 1,
-      dolaresPorMes: 71,
+      precioUsdCentavos: 49_900,
+      meses: 6,
+      mesesObsequio: 0,
+      dolaresPorMes: 83,
+      publico: true,
     });
     expect(preguntas).toHaveLength(8);
     expect(myfxbook.figures.gainPercent).toBe('246.68');
@@ -119,20 +115,23 @@ describe('textos legales desde el panel', () => {
     expect(respuesta.body.codigo).toBe('CONFIRMACION_REQUERIDA');
   });
 
-  it('publica la versión 2, la página pública la muestra y los registros nuevos la aceptan', async () => {
+  it('publica una versión nueva, la página pública la muestra y los registros nuevos la aceptan', async () => {
+    // Otras pruebas pueden haber publicado versiones antes: se cuenta desde la vigente.
+    const anterior = (await comoLaWeb(app).get('/publico/legal/terminos').expect(200)).body
+      .version as number;
     await confirmar(token);
     const texto =
       '## 1. Quiénes somos\n\nTérminos nuevos de la licencia, versión de prueba. '.repeat(3);
     const publicada = await comoLaWeb(app, { token })
       .post('/admin/legal/TERMS', { contenido: texto })
       .expect(201);
-    expect(publicada.body.version).toBe(2);
+    expect(publicada.body.version).toBe(anterior + 1);
 
     const publica = await comoLaWeb(app).get('/publico/legal/terminos').expect(200);
-    expect(publica.body.version).toBe(2);
+    expect(publica.body.version).toBe(anterior + 1);
 
     const lista = await comoLaWeb(app, { token }).get('/admin/legal').expect(200);
-    expect(lista.body.map((d: { version: number }) => d.version)).toEqual([2, 1, 1]);
+    expect(lista.body.map((d: { version: number }) => d.version)).toEqual([anterior + 1, 1, 1]);
 
     const correo = `nuevo.cliente.${Date.now()}@correo.co`;
     await comoLaWeb(app)
@@ -153,7 +152,7 @@ describe('textos legales desde el panel', () => {
       type: 'TERMS',
     });
     expect(terminos.legalDocumentId).toBe(publicada.body.id);
-    expect(terminos.documentVersion).toBe('2');
+    expect(terminos.documentVersion).toBe(String(anterior + 1));
   });
 
   it('no publica un texto igual al vigente', async () => {
