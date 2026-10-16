@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { CodigoQr } from '@/components/panel/codigo-qr';
 import { Copiar } from '@/components/panel/copiar';
 import { CancelarOrden, ReportarPago, SelectorRed } from '@/components/panel/ordenes';
 import { Refrescar } from '@/components/panel/refrescar';
@@ -94,6 +95,16 @@ function Pago({ orden }: { orden: OrdenVista }) {
           </strong>{' '}
           Si envías por otra red, el pago se pierde y no lo podemos recuperar.
         </p>
+        <figure className="mt-2 flex items-center gap-5">
+          <CodigoQr
+            texto={orden.direccion}
+            etiqueta={`Código QR de la dirección de depósito en ${nombreRed(orden.red)}`}
+          />
+          <figcaption className="max-w-[16em] text-sm text-ceniza">
+            ¿Pagas desde otro celular? Escanea este código con tu billetera o con Binance. Lleva
+            solo la dirección: el monto lo escribes tú.
+          </figcaption>
+        </figure>
       </div>
 
       <ReportarPago numero={orden.numero} />

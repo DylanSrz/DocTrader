@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { CopiarCorreo } from '@/components/landing/copiar-correo';
+import { EnlacePanel } from '@/components/landing/enlace-panel';
 import { Particulas } from '@/components/landing/particulas';
 import { Marca } from '@/components/marca';
 import { Enlace, Etiqueta, Pildora, cx } from '@/components/ui';
@@ -81,12 +82,7 @@ function Barra() {
             ))}
           </ul>
           {/* En celular no cabe: queda en el pie de la página. */}
-          <Link
-            href="/ingresar"
-            className="hidden min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco min-[520px]:inline-flex"
-          >
-            Ingresar
-          </Link>
+          <EnlacePanel className="hidden min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco min-[520px]:inline-flex" />
           <Pildora href="#precios" className="gap-0 px-[18px] sm:px-[22px]">
             Comprar<span className="hidden sm:inline">&nbsp;licencia</span>
           </Pildora>
@@ -552,9 +548,7 @@ function Pie({ datos }: { datos: Landing }) {
               </a>
             </li>
             <li>
-              <Link className={claseEnlace} href="/ingresar">
-                Ingresar
-              </Link>
+              <EnlacePanel className={claseEnlace} />
             </li>
             <li>
               <CopiarCorreo correo={datos.correoSoporte} />
