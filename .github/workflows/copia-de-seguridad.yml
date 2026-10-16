@@ -102,7 +102,7 @@ jobs:
           nombre="doctrader-$(date -u +%Y-%m-%d).dump.gpg"
           printf '%s' "$CLAVE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
             --symmetric --cipher-algo AES256 --output "copia/$nombre" copia/doctrader.dump
-          shred -u copia/doctrader.dump
+          sudo shred -u copia/doctrader.dump
           echo "ARCHIVO=$nombre" >> "$GITHUB_ENV"
 
       - name: Guardar en R2 y borrar las de más de 30 días
