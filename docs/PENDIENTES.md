@@ -126,16 +126,13 @@
 - [ ] **Base de datos con permisos separados (etapa 9, `SEGURIDAD.md` §12):** hoy la API usa el usuario dueño de las
       tablas. Lo ideal es un usuario sin permisos de administrador para la API y el worker, y el dueño solo para las
       migraciones. Se puede hacer después del lanzamiento.
-- [ ] **Dominio propio (2026-10-16):** en Hostinger ya quedaron `doctraderpro.com` (A 76.76.21.21) y `www` (CNAME
-      cname.vercel-dns.com) apuntando a Vercel, y `api.doctraderpro.com` (CNAME) a la API de Railway, ya verificado. El
-      correo de Hostinger (MX, SPF, DKIM) y el de Resend no se tocaron. Falta:
-  - [ ] Vercel → proyecto `doc_trader_pro` → Settings → Domains: agregar `doctraderpro.com` (producción) y
-        `www.doctraderpro.com` con redirección 308 a `doctraderpro.com` (el conector no tiene permiso).
-  - [ ] Vercel → Environment Variables: `API_URL` = `https://api.doctraderpro.com` y redesplegar.
-  - [ ] Railway (lo hace Claude cuando la web responda en el dominio): `WEB_ORIGIN` = `https://doctraderpro.com` en
-        la API y el worker.
-  - [ ] Cloudflare → Turnstile → el widget: agregar `doctraderpro.com` a los dominios permitidos.
-  - [ ] UptimeRobot: cambiar las dos direcciones.
+- [x] **Dominio propio (2026-10-16):** la web vive en `https://www.doctraderpro.com` (`doctraderpro.com` redirige
+      ahí, 308) y la API en `https://api.doctraderpro.com`. DNS en Hostinger con los registros que recomienda Vercel
+      (A 216.198.79.1 y CNAME de `www`) y el CNAME de `api` a Railway; el correo de Hostinger y Resend no se tocaron.
+      `WEB_ORIGIN` = `https://www.doctraderpro.com` en la API y el worker; `API_URL` de Vercel apunta al dominio nuevo y
+      Turnstile ya lo acepta.
+  - [ ] UptimeRobot: cambiar las dos direcciones a `https://api.doctraderpro.com/salud` y
+        `https://www.doctraderpro.com`.
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
 - [x] Correo de admin de Argemiro: doctraderproiasystem@gmail.com (2026-10-15; antes se registró por error doctraderpro@gmail.com, que la semilla retira).

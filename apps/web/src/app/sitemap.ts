@@ -1,7 +1,7 @@
 import { DOCUMENTOS_LEGALES } from '@doctrader/shared';
 import type { MetadataRoute } from 'next';
 
-const SITIO = process.env.SITIO_URL ?? 'https://doctraderpro.com';
+const SITIO = process.env.SITIO_URL ?? 'https://www.doctraderpro.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

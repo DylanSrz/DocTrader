@@ -102,7 +102,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (red privada de Railway) |
    | `DATABASE_SSL` | `false` (la red privada no usa SSL) |
    | `REDIS_URL` | `${{Redis.REDIS_URL}}` |
-   | `WEB_ORIGIN` | El dominio de Vercel (después, `https://doctraderpro.com`) |
+   | `WEB_ORIGIN` | La dirección de la web: `https://www.doctraderpro.com` (`doctraderpro.com` redirige ahí) |
    | `AUDIT_HMAC_KEY` | Una llave nueva: `openssl rand -base64 32`. Guárdala en el gestor de contraseñas: si se pierde, la auditoría vieja ya no se puede verificar |
    | `DATA_ENCRYPTION_KEY` | Otra llave nueva (`openssl rand -base64 32`). Cifra cédulas y segundos factores: **si se pierde, esos datos no se recuperan** |
    | `LOOKUP_HMAC_KEY` | Otra llave nueva (`openssl rand -base64 32`). Para buscar cédulas repetidas sin descifrarlas |

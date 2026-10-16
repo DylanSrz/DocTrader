@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://doctraderpro.com'),
+  metadataBase: new URL(process.env.SITIO_URL ?? 'https://www.doctraderpro.com'),
   title: {
     default: 'DocTraderPRO — Licencia de software de copy trading',
     template: '%s · DocTraderPRO',
