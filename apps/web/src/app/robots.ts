@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const SITIO = process.env.SITIO_URL ?? 'https://doctraderpro.com';
+const SITIO = process.env.SITIO_URL ?? 'https://www.doctraderpro.com';
 
 /** Los paneles y las páginas de acceso no se indexan; la landing y los textos legales sí. */
 export default function robots(): MetadataRoute.Robots {

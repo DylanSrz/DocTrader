@@ -51,7 +51,7 @@ control total del servidor, no podría mover el dinero de Argemiro.
 - **Avisos por correo** al usuario cuando: ingresa desde un dispositivo nuevo, cambia la contraseña, el correo o el
   segundo factor, o cambian los datos de su cuenta de trading.
 - **CSRF:** además de `SameSite`, la API rechaza peticiones que cambian datos si el encabezado `Origin` no es
-  `https://doctraderpro.com`.
+  `https://www.doctraderpro.com`.
 - **Cómo quedó construido (etapa 1):**
   - El navegador nunca habla con la API. La cookie de sesión (`__Host-sesion`, `HttpOnly`, `Secure`,
     `SameSite=Lax`) es del dominio de la web; su servidor llama a la API con el token en `Authorization` y firma
@@ -207,7 +207,7 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
     de Next cuando deje de ser experimental.
 - `frame-ancestors 'none'` (nadie puede meter la plataforma en un iframe), `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin` y `Permissions-Policy` sin cámara, micrófono ni ubicación.
-- CORS de la API abierto solo para `https://doctraderpro.com`.
+- CORS de la API abierto solo para `https://www.doctraderpro.com` (la web; `doctraderpro.com` redirige ahí).
 
 ## 12. Base de datos, copias y auditoría
 
