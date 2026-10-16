@@ -62,6 +62,26 @@ async function Contenido() {
         <Seguridad sesion={sesion} />
       </div>
       <section
+        aria-labelledby="t-mis-datos"
+        className="mt-[clamp(96px,12vw,168px)] grid max-w-[980px] justify-items-start gap-5"
+      >
+        <h2 id="t-mis-datos" className="text-medio">
+          Tus datos
+        </h2>
+        <p className="max-w-[40em] text-niebla">
+          Descarga una copia de lo que guardamos de ti: perfil, autorizaciones, cuentas de trading,
+          licencias, pagos y tickets. No incluye las contraseñas de tus cuentas ni tu cédula
+          completa; esa la pides en un ticket.
+        </p>
+        <a
+          href="/panel/perfil/mis-datos"
+          download
+          className="inline-flex min-h-11 items-center text-sm font-normal text-blanco underline decoration-white/35 decoration-1 underline-offset-[6px] transition-colors duration-200 hover:decoration-current"
+        >
+          Descargar mis datos
+        </a>
+      </section>
+      <section
         aria-labelledby="t-eliminar"
         className="mt-[clamp(96px,12vw,168px)] grid max-w-[980px] justify-items-start gap-5"
       >
