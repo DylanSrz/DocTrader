@@ -67,7 +67,7 @@ la misma cuenta de Cloudflare que Turnstile.
     imágenes se limpian con `sharp`.
 - Para verlo, la API entrega un enlace firmado que vence en 5 minutos, solo si el usuario tiene permiso. La web
   redirige a él (tampoco puede responder más de 4,5 MB).
-- Un segundo depósito, separado, guarda la copia semanal cifrada de la base de datos (ver `SEGURIDAD.md`).
+- Un segundo depósito, separado, guarda la copia diaria cifrada de la base de datos (ver `SEGURIDAD.md`).
 
 ## 4. Servicios y costo mensual estimado
 

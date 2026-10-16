@@ -105,19 +105,15 @@
 - [x] **Sentry (etapa 9, 2026-10-15):** organización `dylansrz`, proyectos `doctrader-api` (API y worker) y
       `doctrader-web`. `SENTRY_DSN` ya está en la API y el worker de Railway (empieza a reportar con el próximo
       despliegue que traiga el código de la etapa 9).
-  - [ ] Falta `SENTRY_DSN` en Vercel (proyecto `doc_trader_pro`, Production y Preview) con el DSN de
-        `doctrader-web` (Sentry → Settings → Projects → doctrader-web → Client Keys). El conector no tuvo permiso.
 - [ ] **Monitor de disponibilidad (etapa 9):** Sentry no acepta monitores en `*.railway.app` (límite del dominio
       compartido): crearlo cuando la API tenga su dominio propio (por ejemplo `api.doctraderpro.com`), en Sentry
       (Uptime, proyecto `doctrader-api`) o en UptimeRobot/Better Stack, revisando cada 5 minutos `https://<api>/salud`
       (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo a los dos admins.
-- [ ] **Copias de seguridad (etapa 9):** el depósito de R2 `doctrader-copias` ya existe (2026-10-15) y el flujo
-      semanal está en el repositorio. Falta (no hay conector con permiso para esto):
-  - [ ] Railway → Postgres → pestaña Backups: activar las copias Daily y Weekly.
-  - [ ] Cloudflare → R2 → Manage API tokens: un token "Object Read & Write" solo para `doctrader-copias`.
-  - [ ] GitHub → Settings → Secrets → Actions: los 6 secretos (ver README, "Copias de seguridad"). La URL es la
-        `DATABASE_PUBLIC_URL` del Postgres de Railway; `BACKUP_R2_BUCKET` = `doctrader-copias`.
-  - [ ] Actions → "Copia de seguridad" → Run workflow, y revisar que la restauración pase.
+- [x] **Copias de seguridad (etapa 9, 2026-10-16):** copia **diaria** propia (`.github/workflows/copia-de-seguridad.yml`,
+      3:17 a. m. de Colombia) en el depósito de R2 `doctrader-copias`, cifrada y guardada 30 días. La primera corrió
+      el 2026-10-16 y la restauración de prueba pasó (11 migraciones, 2 admins, 3 textos legales). El plan Hobby de
+      Railway no permite programar copias del volumen; pasar a Pro (USD 20/mes) es opcional.
+  - [x] Sentry en Vercel (`SENTRY_DSN` de `doctrader-web`), 2026-10-16.
 - [x] **Correo del dominio (2026-10-15):** Resend tiene `doctraderpro.com` verificado (región sa-east-1); DKIM
       (`resend._domainkey`), SPF y MX de rebote en `send.` están publicados; DMARC existe con `p=none`.
   - [ ] Tras dos semanas sin problemas en los reportes, subir DMARC en Hostinger a
