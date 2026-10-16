@@ -105,10 +105,9 @@
 - [x] **Sentry (etapa 9, 2026-10-15):** organización `dylansrz`, proyectos `doctrader-api` (API y worker) y
       `doctrader-web`. `SENTRY_DSN` ya está en la API y el worker de Railway (empieza a reportar con el próximo
       despliegue que traiga el código de la etapa 9).
-- [ ] **Monitor de disponibilidad (etapa 9):** Sentry no acepta monitores en `*.railway.app` (límite del dominio
-      compartido): crearlo cuando la API tenga su dominio propio (por ejemplo `api.doctraderpro.com`), en Sentry
-      (Uptime, proyecto `doctrader-api`) o en UptimeRobot/Better Stack, revisando cada 5 minutos `https://<api>/salud`
-      (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo a los dos admins.
+- [x] **Monitor de disponibilidad (etapa 9, 2026-10-16):** UptimeRobot revisa cada 5 minutos `/salud` de la API
+      (palabra `"estado":"ok"`) y la web, con alerta por correo a los dos admins. Al pasar a `doctraderpro.com` y
+      `api.doctraderpro.com`, cambiar las dos direcciones en UptimeRobot.
 - [x] **Copias de seguridad (etapa 9, 2026-10-16):** copia **diaria** propia (`.github/workflows/copia-de-seguridad.yml`,
       3:17 a. m. de Colombia) en el depósito de R2 `doctrader-copias`, cifrada y guardada 30 días. La primera corrió
       el 2026-10-16 y la restauración de prueba pasó (11 migraciones, 2 admins, 3 textos legales). El plan Hobby de
@@ -125,7 +124,7 @@
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
 - [x] Correo de admin de Argemiro: doctraderproiasystem@gmail.com (2026-10-15; antes se registró por error doctraderpro@gmail.com, que la semilla retira).
-- [ ] Segundo factor y gestor de contraseñas compartido para las cuentas de servicio (ver `docs/SEGURIDAD.md`).
+- [x] Segundo factor en las cuentas de servicio (2026-10-16). Falta el gestor de contraseñas compartido con Argemiro (ver `docs/SEGURIDAD.md`).
 
 ## ✅ Resuelto (resumen)
 

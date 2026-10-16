@@ -298,7 +298,7 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 
 **Cuentas y seguridad**
 - [ ] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación.
-- [ ] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger.
+- [x] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger (2026-10-16).
 - [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido.
 - [x] Copia de seguridad restaurada con éxito al menos una vez (2026-10-16; el flujo diario la restaura y la revisa solo).
 
@@ -307,7 +307,7 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
       correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
 - [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.
 - [ ] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook.
-- [ ] Monitor de disponibilidad y alertas activos.
+- [x] Monitor de disponibilidad y alertas activos (2026-10-16; actualizar direcciones al pasar al dominio propio).
 - [ ] Revisión en celular (iPhone y Android) y en escritorio.
 
 ## 6. Después del lanzamiento
