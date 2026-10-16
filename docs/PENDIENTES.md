@@ -98,7 +98,7 @@
       su verificación automática. Para que sea automática:
   - [ ] Argemiro crea en Binance (Perfil → Gestión de API) una llave **solo de lectura** ("Enable Reading"; sin
         operar ni retirar). Se ponen `BINANCE_API_KEY` y `BINANCE_API_SECRET` en el worker de Railway, nunca en el chat.
-  - [ ] Mover el worker de Railway a una región de Europa (Settings → Regions): Binance no responde desde EE. UU.
+  - [x] Worker movido a Europa (Amsterdam) el 2026-10-16: Binance no responde desde EE. UU.
   - [ ] Registrar a mano el pago de prueba DTP-000001 (Pagos → Órdenes expiradas → Registrar pago).
 - [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
       una llave gratis del plan Demo (`COINGECKO_API_KEY` en la API de Railway) hay más consultas al mes.
@@ -126,7 +126,16 @@
 - [ ] **Base de datos con permisos separados (etapa 9, `SEGURIDAD.md` §12):** hoy la API usa el usuario dueño de las
       tablas. Lo ideal es un usuario sin permisos de administrador para la API y el worker, y el dueño solo para las
       migraciones. Se puede hacer después del lanzamiento.
-- [ ] Acceso al DNS de doctraderpro.com en Hostinger para apuntar la web (Vercel) y `api.` (Railway o Render).
+- [ ] **Dominio propio (2026-10-16):** en Hostinger ya quedaron `doctraderpro.com` (A 76.76.21.21) y `www` (CNAME
+      cname.vercel-dns.com) apuntando a Vercel, y `api.doctraderpro.com` (CNAME) a la API de Railway, ya verificado. El
+      correo de Hostinger (MX, SPF, DKIM) y el de Resend no se tocaron. Falta:
+  - [ ] Vercel → proyecto `doc_trader_pro` → Settings → Domains: agregar `doctraderpro.com` (producción) y
+        `www.doctraderpro.com` con redirección 308 a `doctraderpro.com` (el conector no tiene permiso).
+  - [ ] Vercel → Environment Variables: `API_URL` = `https://api.doctraderpro.com` y redesplegar.
+  - [ ] Railway (lo hace Claude cuando la web responda en el dominio): `WEB_ORIGIN` = `https://doctraderpro.com` en
+        la API y el worker.
+  - [ ] Cloudflare → Turnstile → el widget: agregar `doctraderpro.com` a los dominios permitidos.
+  - [ ] UptimeRobot: cambiar las dos direcciones.
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
 - [x] Correo de admin de Argemiro: doctraderproiasystem@gmail.com (2026-10-15; antes se registró por error doctraderpro@gmail.com, que la semilla retira).

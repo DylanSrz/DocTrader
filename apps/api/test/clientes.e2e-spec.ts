@@ -210,3 +210,59 @@ describe('eliminar un cliente', () => {
     expect(nuevo.usuario.id).not.toBe(cliente.usuario.id);
   });
 });
+
+describe('descargar mis datos', () => {
+  it('el cliente baja una copia de sus datos, sin contraseñas, notas internas ni cédula completa', async () => {
+    const cliente = await clienteConSesion(app);
+    const admin = await adminConSesion(app);
+    const datos = datosCuenta();
+    const cuenta = await cliente.web.post('/cuentas', datos).expect(201);
+    const numero = await reportar(cliente, cuenta.body.id as string);
+    await admin.web.post(`/admin/pagos/${numero}/aprobar`, {}).expect(200);
+    const ticket = await cliente.web
+      .post('/soporte', {
+        tema: 'CONEXION',
+        asunto: 'No veo operaciones',
+        mensaje: 'Mi cuenta no muestra operaciones desde ayer.',
+      })
+      .expect(201);
+    await admin.web
+      .post(`/admin/soporte/${ticket.body.numero}/mensajes`, {
+        mensaje: 'Nota secreta para el equipo.',
+        interna: true,
+      })
+      .expect(200);
+    await admin.web
+      .post(`/admin/soporte/${ticket.body.numero}/mensajes`, {
+        mensaje: 'Ya la revisamos, quedó conectada.',
+      })
+      .expect(200);
+
+    const { body } = await cliente.web.get('/privacidad/mis-datos').expect(200);
+    expect(body.perfil).toMatchObject({
+      correo: cliente.correo,
+      cedula: expect.stringMatching(/^\*+\d{4}$/),
+    });
+    expect(body.cuentasDeTrading).toEqual([
+      expect.objectContaining({ numero: datos.numero, broker: 'JustMarkets' }),
+    ]);
+    expect(body.licencias[0]).toMatchObject({ cuenta: datos.numero, estado: 'ACTIVA' });
+    expect(body.pagos[0]).toMatchObject({ orden: numero, estado: 'APROBADA' });
+    expect(body.tickets[0].mensajes.map((m: { de: string }) => m.de)).toEqual([
+      'Tú',
+      'DocTrader Pro',
+    ]);
+    expect(body.autorizaciones.length).toBeGreaterThan(0);
+    const texto = JSON.stringify(body);
+    expect(texto).not.toContain('Nota secreta');
+    expect(texto).not.toContain(datos.contrasenaOperativa);
+    expect(texto).not.toContain(datos.contrasenaInversor);
+
+    const [registro] = (await fuente.query(
+      `SELECT 1 FROM audit_log WHERE action = 'datos.descargados' AND actor_id = $1`,
+      [cliente.usuario.id],
+    )) as unknown[];
+    expect(registro).toBeDefined();
+    await comoLaWeb(app).get('/privacidad/mis-datos').expect(401);
+  });
+});

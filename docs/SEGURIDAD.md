@@ -168,9 +168,11 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 - Casilla de autorización en el registro y prueba guardada (fecha, IP, versión de la política).
 - Plazos de borrado automáticos según `docs/legal/politica-datos.md`, ejecutados por el worker.
 - El cliente pide que se elimine su cuenta desde su perfil (abre un ticket) y un admin la elimina desde su ficha,
-  con el segundo factor: se anonimizan sus datos y se conservan las órdenes y los pagos (etapa 9). Descargar sus
-  datos desde el perfil sigue pendiente; mientras tanto se entregan por solicitud (Ley 1581, consultas en 10 días
-  hábiles).
+  con el segundo factor: se anonimizan sus datos y se conservan las órdenes y los pagos (etapa 9).
+- "Descargar mis datos" en Mi perfil (2026-10-16, derecho de acceso de la Ley 1581): un archivo JSON con perfil,
+  autorizaciones, cuentas, licencias, pagos, tickets y dispositivos. No incluye las contraseñas de las cuentas, las
+  notas internas de los admins ni la cédula completa (se pide por ticket, así una sesión robada no la entrega).
+  Límite de 5 descargas por hora y registro en la auditoría (`datos.descargados`).
 - Nunca se usan datos reales de producción en desarrollo.
 
 ## 9. Abuso y bots
