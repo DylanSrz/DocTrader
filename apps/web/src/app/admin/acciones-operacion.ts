@@ -513,3 +513,24 @@ export async function marcarComisionPagada(
   revalidatePath('/admin/socio');
   return listo(previo, `Quincena del ${texto(datos, 'periodo')} marcada como pagada.`);
 }
+
+// ── Pagos ───────────────────────────────────────────────────────────────────────────────────────────
+
+/** Registrar a mano el pago de una orden pendiente o vencida y aprobarlo (pide el código de la app). */
+export async function registrarPagoManual(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const numero = texto(datos, 'numero');
+  const referencia = texto(datos, 'referencia').trim();
+  const r = await operar(datos, (t) =>
+    llamarApi(`/admin/pagos/${encodeURIComponent(numero)}/manual`, {
+      metodo: 'POST',
+      cuerpo: { motivo: texto(datos, 'motivo').trim(), ...(referencia ? { referencia } : {}) },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin', 'layout');
+  return listo(previo, `Pago ${numero} registrado y aprobado. La licencia ya está activa.`);
+}

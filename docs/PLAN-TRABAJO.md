@@ -275,14 +275,14 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
   - **Monitoreo:** Sentry en la API, el worker y el servidor de la web, activo solo con `SENTRY_DSN` y sin datos
     personales. Alertas a los dos admins: pagos sin verificar después de una hora, más de 50 ingresos fallidos en una
     hora, trabajos del worker que fallan (una vez al día por trabajo) y la auditoría alterada.
-  - **Copias de seguridad:** flujo semanal que copia, restaura en un Postgres vacío, revisa, cifra y guarda en R2 30
+  - **Copias de seguridad:** flujo diario que copia, restaura en un Postgres vacío, revisa, cifra y guarda en R2 30
     días (`.github/workflows/copia-de-seguridad.yml`), además de las copias de Railway.
   - **Limpieza para el lanzamiento:** `node apps/api/dist/database/limpiar.js` (README, "Limpieza antes del
     lanzamiento").
   - 119 pruebas de punta a punta (6 nuevas: eliminar un cliente, un hash ajeno no sirve, montos distintos, el límite
     de códigos en paralelo, el nombre del registro y las alertas).
   - **Falta (operación, ver `PENDIENTES.md`):** cuenta de Sentry, monitor de disponibilidad, activar las copias en
-    Railway y los secretos de la copia semanal, DNS en Hostinger con DMARC, la lista del §5 y el lanzamiento suave.
+    Railway y los secretos de la copia diaria, DNS en Hostinger con DMARC, la lista del §5 y el lanzamiento suave.
 
 ## 5. Lista para el día del lanzamiento
 
@@ -298,16 +298,16 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 
 **Cuentas y seguridad**
 - [ ] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación.
-- [ ] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger.
+- [x] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger (2026-10-16).
 - [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido.
-- [ ] Copia de seguridad restaurada con éxito al menos una vez (el flujo semanal la restaura y la revisa solo).
+- [x] Copia de seguridad restaurada con éxito al menos una vez (2026-10-16; el flujo diario la restaura y la revisa solo).
 
 **Funcionamiento**
 - [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
       correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
 - [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.
 - [ ] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook.
-- [ ] Monitor de disponibilidad y alertas activos.
+- [x] Monitor de disponibilidad y alertas activos (2026-10-16; actualizar direcciones al pasar al dominio propio).
 - [ ] Revisión en celular (iPhone y Android) y en escritorio.
 
 ## 6. Después del lanzamiento

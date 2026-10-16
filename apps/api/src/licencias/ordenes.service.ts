@@ -3,7 +3,7 @@ import {
   ESTADO_VERIFICACION,
   MONEDA,
   NOMBRE_RED,
-  normalizarHash,
+  interpretarReferencia,
   RED_DE_MONEDA,
   tipoDeOrden,
 } from '@doctrader/shared';
@@ -202,10 +202,10 @@ export class OrdenesService {
     cliente: ContextoCliente,
   ) {
     await this.limites.exigir(LIMITES.reportesPorUsuario, sesion.usuarioId);
-    const hash = normalizarHash(hashEscrito);
+    const hash = interpretarReferencia(hashEscrito);
     if (!hash) {
       throw errorDeCampos({
-        hash: 'Pega el código completo de la transacción: son 64 letras y números.',
+        hash: 'Pega el hash completo de la transacción (64 letras y números) o, si pagaste desde tu cuenta de Binance, el número de la transferencia (Txid).',
       });
     }
     await this.fuente

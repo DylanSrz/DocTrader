@@ -211,7 +211,7 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 
 - Usuario de base de datos de la app **sin permisos de administrador**; otro usuario solo para migraciones.
 - **Copias de seguridad:** las automáticas del proveedor (diarias, con restauración a un momento si el plan lo
-  permite) más una copia cifrada semanal en un almacenamiento distinto, guardada 30 días.
+  permite) más una copia cifrada diaria en un almacenamiento distinto, guardada 30 días.
   **Restauración de prueba una vez al mes** (operación): una copia que nunca se ha restaurado no es una copia.
 - **Auditoría que no se puede editar:** la app solo puede insertar en la tabla de auditoría (sin permisos de cambiar
   ni borrar), y cada registro lleva el hash del anterior, para detectar si alguien la alteró.

@@ -1,6 +1,7 @@
 import {
   type CodigoPlan,
   deUnidadesBase,
+  describirReferencia,
   enlaceExplorador,
   ESTADO_ORDEN,
   type EstadoOrden,
@@ -105,7 +106,7 @@ export function vistaOrden(
     precioBtcUsd: orden.btcUsdRate,
     creadaEn: orden.createdAt,
     expiraEn: orden.expiresAt,
-    hash: orden.txHash,
+    hash: orden.txHash ? describirReferencia(orden.txHash) : null,
     enlaceExplorador: orden.txHash ? enlaceExplorador(orden.network, orden.txHash) : null,
     reportadaEn: orden.reportedAt,
     verificacion: orden.verificationStatus,

@@ -118,6 +118,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `TURNSTILE_SECRET` | Clave secreta de Cloudflare Turnstile (cuando exista la cuenta) |
    | `COINGECKO_API_KEY` | Opcional: llave gratis de CoinGecko (plan Demo) para comparar el precio de BTC con más consultas |
    | `TRONGRID_API_KEY`, `TRONSCAN_API_KEY` | Opcionales, también en el worker: llaves gratis de TronGrid y Tronscan para verificar pagos en Tron con más consultas |
+   | `BINANCE_API_KEY`, `BINANCE_API_SECRET` | Opcionales, en el worker: llave de **solo lectura** de la cuenta de Binance de cobro, para verificar los pagos entre cuentas de Binance (sin hash). Sin ellas, esos pagos se revisan a mano. El worker debe correr fuera de Estados Unidos |
 
 5. Revisar `https://<dominio-de-la-api>/salud`: debe responder `"estado":"ok"` y, al minuto, mostrar el latido del
    worker. Sin el secreto de la web, cualquier otra ruta responde 404, salvo `/archivos/subir`: la subida de
@@ -131,9 +132,9 @@ build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabo
 
 ### Copias de seguridad
 
-- **Railway:** activar en el servicio de Postgres, pestaña **Backups**, las copias programadas del volumen (diarias)
-  y, si el plan lo permite, la recuperación a un momento dado (PITR).
-- **Copia semanal fuera de Railway** (`.github/workflows/copia-de-seguridad.yml`): los lunes a las 3:17 a. m. de
+- **Railway:** el plan Hobby no permite programar copias del volumen. Con el plan Pro se pueden activar en Postgres →
+  **Backups** (y la recuperación a un momento dado); es opcional, porque la copia diaria de abajo ya cubre esto.
+- **Copia diaria fuera de Railway** (`.github/workflows/copia-de-seguridad.yml`): todos los días a las 3:17 a. m. de
   Colombia copia la base de datos, la **restaura en un Postgres vacío y la revisa**, la cifra (AES-256 con una frase) y
   la guarda en un depósito privado de R2, 30 días. Se puede correr a mano desde Actions → "Copia de seguridad" → *Run
   workflow*. Necesita estos secretos del repositorio (Settings → Secrets and variables → Actions); sin ellos avisa y no
@@ -141,7 +142,7 @@ build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabo
 
   | Secreto | Valor |
   |---|---|
-  | `BACKUP_DATABASE_URL` | La URL pública de Postgres en Railway (`DATABASE_PUBLIC_URL`) |
+  | `BACKUP_DATABASE_URL` | La URL pública de Postgres en Railway (`DATABASE_PUBLIC_URL`), copiada ya resuelta (sin `${{…}}`) |
   | `BACKUP_PASSPHRASE` | Una frase larga (`openssl rand -base64 32`). Guárdala en el gestor de contraseñas: **sin ella las copias no se abren** |
   | `BACKUP_R2_ACCOUNT_ID`, `BACKUP_R2_ACCESS_KEY_ID`, `BACKUP_R2_SECRET_ACCESS_KEY`, `BACKUP_R2_BUCKET` | Un depósito de R2 privado **solo para copias** (`doctrader-copias`) y un token de R2 con lectura y escritura solo en él |
 

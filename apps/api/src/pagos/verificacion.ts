@@ -37,6 +37,8 @@ export interface OrdenAVerificar {
   unidades: bigint;
   creadaEn: Date;
   reportadaEn: Date;
+  /** Se reportó el número de una transferencia interna de Binance, no un hash. */
+  interna?: boolean;
 }
 
 /** Diferencia de relojes aceptada entre el servidor y la blockchain para el chequeo de la fecha. */
@@ -62,9 +64,13 @@ export function evaluar(
     return {
       estado: vencida ? ESTADO_VERIFICACION.NO_COINCIDE : ESTADO_VERIFICACION.SIN_VERIFICAR,
       chequeos: [],
-      nota: vencida
-        ? `No encontramos la transacción en la red ${red}. Puede ser de otra red o el código está mal.`
-        : `La transacción todavía no aparece en la red ${red}. Volvemos a mirar en un momento.`,
+      nota: orden.interna
+        ? vencida
+          ? 'No encontramos esa transferencia en el historial de depósitos de Binance. El número puede estar mal.'
+          : 'La transferencia todavía no aparece en el historial de Binance. Volvemos a mirar en un momento.'
+        : vencida
+          ? `No encontramos la transacción en la red ${red}. Puede ser de otra red o el código está mal.`
+          : `La transacción todavía no aparece en la red ${red}. Volvemos a mirar en un momento.`,
       recibido: null,
       confirmaciones: null,
       hora: null,
@@ -76,7 +82,16 @@ export function evaluar(
   const recibido = lectura.pagos
     .filter((p) => p.direccion === orden.direccion)
     .reduce((suma, p) => suma + p.unidades, 0n);
-  const chequeos: Chequeo[] = [{ clave: 'HASH', estado: 'OK', texto: 'El hash no se había usado' }];
+  const interna = lectura.interna === true;
+  const chequeos: Chequeo[] = [
+    {
+      clave: 'HASH',
+      estado: 'OK',
+      texto: interna
+        ? 'El número de la transferencia de Binance no se había usado'
+        : 'El hash no se había usado',
+    },
+  ];
 
   let destino: Chequeo;
   if (!lectura.exitosa) {
@@ -85,7 +100,9 @@ export function evaluar(
     destino = {
       clave: 'DESTINO',
       estado: 'OK',
-      texto: `Llegó a la dirección de la orden, en ${orden.moneda} por ${red}`,
+      texto: interna
+        ? `Llegó a la dirección de la orden, en ${orden.moneda}, por transferencia interna de Binance`
+        : `Llegó a la dirección de la orden, en ${orden.moneda} por ${red}`,
     };
   } else if (lectura.otraMoneda) {
     destino = {
@@ -128,7 +145,11 @@ export function evaluar(
   chequeos.push({
     clave: 'CONFIRMACIONES',
     estado: confirmaciones >= minimoConfirmaciones ? 'OK' : 'ESPERA',
-    texto: `${Math.min(confirmaciones, minimoConfirmaciones)} de ${minimoConfirmaciones} confirmaciones`,
+    texto: interna
+      ? confirmaciones >= minimoConfirmaciones
+        ? 'Binance ya la acreditó (no necesita confirmaciones)'
+        : 'Binance todavía la está procesando'
+      : `${Math.min(confirmaciones, minimoConfirmaciones)} de ${minimoConfirmaciones} confirmaciones`,
   });
 
   let estado: EstadoVerificacion;

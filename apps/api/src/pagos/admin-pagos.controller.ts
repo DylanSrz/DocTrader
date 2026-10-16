@@ -1,19 +1,21 @@
 import {
+  describirReferencia,
   enlaceExplorador,
   ESTADO_ORDEN,
   deUnidadesBase,
+  LIMITES_ADMIN,
   ROL,
   type Moneda,
 } from '@doctrader/shared';
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 import type { DataSource } from 'typeorm';
 import { AuditoriaService } from '../auditoria/auditoria.service.js';
 import { leerAjustes } from '../licencias/ajustes.js';
 import { errorApi } from '../seguridad/errores.js';
-import { Cliente, Roles, SesionActual } from '../sesiones/decoradores.js';
+import { Cliente, ConfirmacionReciente, Roles, SesionActual } from '../sesiones/decoradores.js';
 import type { ContextoCliente, SesionActiva } from '../sesiones/sesiones.service.js';
 import { AprobacionPagos, type Decisor } from './aprobacion.service.js';
 import { VerificacionPagos } from './verificacion-pagos.service.js';
@@ -28,6 +30,19 @@ export class RechazarDto {
   @IsString()
   @Length(5, 500, { message: 'Escribe el motivo (entre 5 y 500 caracteres): le llega al cliente.' })
   motivo: string;
+}
+
+export class PagoManualDto {
+  @IsString()
+  @Length(LIMITES_ADMIN.motivo.minimo, LIMITES_ADMIN.motivo.maximo, {
+    message: `Escribe cómo se verificó el pago (entre ${LIMITES_ADMIN.motivo.minimo} y ${LIMITES_ADMIN.motivo.maximo} caracteres).`,
+  })
+  motivo: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  referencia?: string;
 }
 
 export class AprobacionAutomaticaDto {
@@ -123,7 +138,7 @@ export class AdminPagosController {
           : null,
         montoUsdCentavos: o.amount_usd_cents,
         direccion: o.deposit_address,
-        hash: o.tx_hash,
+        hash: o.tx_hash ? describirReferencia(o.tx_hash) : null,
         enlaceExplorador: o.tx_hash ? enlaceExplorador(o.network, o.tx_hash) : null,
         confirmaciones: o.confirmations,
         confirmacionesNecesarias: ajustes.confirmaciones[o.network],
@@ -169,6 +184,27 @@ export class AdminPagosController {
     @Cliente() cliente: ContextoCliente,
   ) {
     await this.aprobacion.rechazar(numero, dto.motivo.trim(), this.decisor(sesion, cliente));
+    return { ok: true };
+  }
+
+  /**
+   * Registrar a mano el pago de una orden pendiente o vencida (por ejemplo, venció mientras el cliente pagaba) y
+   * aprobarlo. Acción delicada: exige el segundo factor reciente.
+   */
+  @Post(':numero/manual')
+  @HttpCode(HttpStatus.OK)
+  @ConfirmacionReciente()
+  async manual(
+    @Param('numero') numero: string,
+    @Body() dto: PagoManualDto,
+    @SesionActual() sesion: SesionActiva,
+    @Cliente() cliente: ContextoCliente,
+  ) {
+    await this.aprobacion.registrarManual(
+      numero,
+      { motivo: dto.motivo.trim(), referencia: dto.referencia },
+      this.decisor(sesion, cliente),
+    );
     return { ok: true };
   }
 

@@ -18,6 +18,8 @@ export type Lectura =
       otraMoneda: boolean;
       /** Billetera(s) de origen; quedan con el pago para consultarlas después. */
       remitentes: string[];
+      /** Transferencia entre cuentas de Binance: no está en la blockchain ni tiene confirmaciones. */
+      interna?: boolean;
     };
 
 /** El proveedor no respondió o respondió algo que no se entiende: se reintenta, nunca se aprueba así. */

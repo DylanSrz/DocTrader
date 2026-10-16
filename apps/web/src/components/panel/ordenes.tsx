@@ -202,14 +202,14 @@ export function ReportarPago({ numero }: { numero: string }) {
       <input type="hidden" name="numero" value={numero} />
       {estado.mensaje && !estado.campos ? <Aviso>{estado.mensaje}</Aviso> : null}
       <Campo
-        etiqueta="Código de la transacción (hash)"
+        etiqueta="Código de la transacción"
         name="hash"
         autoComplete="off"
         autoCapitalize="none"
         spellCheck={false}
-        placeholder="Ej.: 7f3a9c…e21b"
+        placeholder="Ej.: 7f3a9c…e21b o Off-chain Transfer 421231346716"
         maxLength={200}
-        ayuda="Lo encuentras en tu billetera o exchange, en el detalle del envío."
+        ayuda="Está en el detalle del envío. Desde una billetera u otro exchange es el hash (64 letras y números). Desde tu cuenta de Binance, Binance muestra un Txid como «Off-chain Transfer 421231346716»: pégalo tal cual."
         defaultValue={estado.valores?.hash}
         error={estado.campos?.hash}
       />

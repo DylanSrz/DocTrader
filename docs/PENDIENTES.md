@@ -94,6 +94,12 @@
 - [x] Vercel (web) y Railway (API, worker, PostgreSQL y Redis) creados y funcionando (2026-10-14).
 - [x] **Resend** (2026-10-15): dominio doctraderpro.com verificado y `RESEND_API_KEY` en el worker de Railway.
 - [x] **Cloudflare Turnstile** (2026-10-15): llaves en Vercel y en la API.
+- [ ] **Pagos desde Binance sin hash (2026-10-16):** construido el reporte con el número de transferencia interna y
+      su verificación automática. Para que sea automática:
+  - [ ] Argemiro crea en Binance (Perfil → Gestión de API) una llave **solo de lectura** ("Enable Reading"; sin
+        operar ni retirar). Se ponen `BINANCE_API_KEY` y `BINANCE_API_SECRET` en el worker de Railway, nunca en el chat.
+  - [ ] Mover el worker de Railway a una región de Europa (Settings → Regions): Binance no responde desde EE. UU.
+  - [ ] Registrar a mano el pago de prueba DTP-000001 (Pagos → Órdenes expiradas → Registrar pago).
 - [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
       una llave gratis del plan Demo (`COINGECKO_API_KEY` en la API de Railway) hay más consultas al mes.
 - [x] **Cloudflare R2 (adjuntos de soporte, etapa 7, 2026-10-15):** en Cloudflare → R2, crear un depósito privado
@@ -105,19 +111,14 @@
 - [x] **Sentry (etapa 9, 2026-10-15):** organización `dylansrz`, proyectos `doctrader-api` (API y worker) y
       `doctrader-web`. `SENTRY_DSN` ya está en la API y el worker de Railway (empieza a reportar con el próximo
       despliegue que traiga el código de la etapa 9).
-  - [ ] Falta `SENTRY_DSN` en Vercel (proyecto `doc_trader_pro`, Production y Preview) con el DSN de
-        `doctrader-web` (Sentry → Settings → Projects → doctrader-web → Client Keys). El conector no tuvo permiso.
-- [ ] **Monitor de disponibilidad (etapa 9):** Sentry no acepta monitores en `*.railway.app` (límite del dominio
-      compartido): crearlo cuando la API tenga su dominio propio (por ejemplo `api.doctraderpro.com`), en Sentry
-      (Uptime, proyecto `doctrader-api`) o en UptimeRobot/Better Stack, revisando cada 5 minutos `https://<api>/salud`
-      (debe decir `"estado":"ok"`) y la página de inicio de la web, con alerta por correo a los dos admins.
-- [ ] **Copias de seguridad (etapa 9):** el depósito de R2 `doctrader-copias` ya existe (2026-10-15) y el flujo
-      semanal está en el repositorio. Falta (no hay conector con permiso para esto):
-  - [ ] Railway → Postgres → pestaña Backups: activar las copias Daily y Weekly.
-  - [ ] Cloudflare → R2 → Manage API tokens: un token "Object Read & Write" solo para `doctrader-copias`.
-  - [ ] GitHub → Settings → Secrets → Actions: los 6 secretos (ver README, "Copias de seguridad"). La URL es la
-        `DATABASE_PUBLIC_URL` del Postgres de Railway; `BACKUP_R2_BUCKET` = `doctrader-copias`.
-  - [ ] Actions → "Copia de seguridad" → Run workflow, y revisar que la restauración pase.
+- [x] **Monitor de disponibilidad (etapa 9, 2026-10-16):** UptimeRobot revisa cada 5 minutos `/salud` de la API
+      (palabra `"estado":"ok"`) y la web, con alerta por correo a los dos admins. Al pasar a `doctraderpro.com` y
+      `api.doctraderpro.com`, cambiar las dos direcciones en UptimeRobot.
+- [x] **Copias de seguridad (etapa 9, 2026-10-16):** copia **diaria** propia (`.github/workflows/copia-de-seguridad.yml`,
+      3:17 a. m. de Colombia) en el depósito de R2 `doctrader-copias`, cifrada y guardada 30 días. La primera corrió
+      el 2026-10-16 y la restauración de prueba pasó (11 migraciones, 2 admins, 3 textos legales). El plan Hobby de
+      Railway no permite programar copias del volumen; pasar a Pro (USD 20/mes) es opcional.
+  - [x] Sentry en Vercel (`SENTRY_DSN` de `doctrader-web`), 2026-10-16.
 - [x] **Correo del dominio (2026-10-15):** Resend tiene `doctraderpro.com` verificado (región sa-east-1); DKIM
       (`resend._domainkey`), SPF y MX de rebote en `send.` están publicados; DMARC existe con `p=none`.
   - [ ] Tras dos semanas sin problemas en los reportes, subir DMARC en Hostinger a
@@ -129,7 +130,7 @@
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
 - [x] Correo de admin de Argemiro: doctraderproiasystem@gmail.com (2026-10-15; antes se registró por error doctraderpro@gmail.com, que la semilla retira).
-- [ ] Segundo factor y gestor de contraseñas compartido para las cuentas de servicio (ver `docs/SEGURIDAD.md`).
+- [x] Segundo factor en las cuentas de servicio (2026-10-16). Falta el gestor de contraseñas compartido con Argemiro (ver `docs/SEGURIDAD.md`).
 
 ## ✅ Resuelto (resumen)
 

@@ -52,6 +52,12 @@ const esquema = z.object({
   TRONGRID_API_KEY: z.string().min(1).optional(),
   TRONSCAN_API_KEY: z.string().min(1).optional(),
   /**
+   * Pagos entre cuentas de Binance (no pasan por la blockchain): se verifican en el historial de depósitos de la cuenta
+   * de cobro con una llave de API de **solo lectura**. Sin ellas, esos pagos quedan para revisión manual.
+   */
+  BINANCE_API_KEY: z.string().min(1).optional(),
+  BINANCE_API_SECRET: z.string().min(1).optional(),
+  /**
    * Adjuntos de soporte en Cloudflare R2, privado (`docs/DECISIONES-TECNICAS.md` §3). Sin estas variables: en
    * desarrollo y en pruebas se guardan en una carpeta local (`ARCHIVOS_DIR`); en producción no se pueden adjuntar.
    */

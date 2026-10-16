@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { claveDeCuenta, normalizarHash } from './cuentas.js';
+import {
+  claveDeCuenta,
+  describirReferencia,
+  enlaceExplorador,
+  interpretarReferencia,
+  normalizarHash,
+} from './cuentas.js';
 import {
   calendarioLicencia,
   diasRestantes,
@@ -135,5 +141,26 @@ describe('calendarioLicencia', () => {
     expect(filas).toHaveLength(1);
     expect(filas[0]!.dias).toHaveLength(15);
     expect(filas[0]!.dias.filter((d) => d === 'usado')).toHaveLength(7);
+  });
+});
+
+describe('referencias de pago', () => {
+  it('acepta el hash o el número de una transferencia interna de Binance', () => {
+    expect(interpretarReferencia('a'.repeat(64))).toBe('a'.repeat(64));
+    expect(interpretarReferencia('Off-chain Transfer 421231346716')).toBe('binance:421231346716');
+    expect(interpretarReferencia(' 421231346716 ')).toBe('binance:421231346716');
+    expect(interpretarReferencia('Offchain transfer #421 231 346 716')).toBe(
+      'binance:421231346716',
+    );
+    expect(interpretarReferencia('12345')).toBeNull();
+    expect(interpretarReferencia('abc')).toBeNull();
+  });
+
+  it('solo los hashes tienen enlace al explorador', () => {
+    expect(enlaceExplorador('TRON', 'a'.repeat(64))).toContain('tronscan.org');
+    expect(enlaceExplorador('TRON', 'binance:421231346716')).toBeNull();
+    expect(describirReferencia('binance:421231346716')).toBe(
+      'Transferencia interna de Binance 421231346716',
+    );
   });
 });
