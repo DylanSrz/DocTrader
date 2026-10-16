@@ -194,6 +194,26 @@ function Verificacion({ orden }: { orden: OrdenVista }) {
   );
 }
 
+/** El enlace o la nota de la última columna del historial. */
+function Comprobante({ orden: o }: { orden: OrdenVista }) {
+  if (o.enlaceExplorador)
+    return (
+      <Enlace href={o.enlaceExplorador} target="_blank" rel="noopener" gris>
+        Ver en el explorador
+      </Enlace>
+    );
+  if (o.estado === 'PENDIENTE')
+    return (
+      <Enlace href={`/panel/pagos?orden=${o.numero}`} gris>
+        Pagar
+      </Enlace>
+    );
+  if (o.estado === 'EXPIRADA')
+    return <small className="text-[13px] text-ceniza">No se pagó dentro de la hora</small>;
+  if (o.motivoRechazo) return <small className="text-[13px] text-ceniza">{o.motivoRechazo}</small>;
+  return null;
+}
+
 function Historial({ ordenes }: { ordenes: OrdenVista[] }) {
   return (
     <section aria-labelledby="t-historial" className="mt-[clamp(96px,12vw,168px)]">
@@ -203,86 +223,103 @@ function Historial({ ordenes }: { ordenes: OrdenVista[] }) {
       {ordenes.length === 0 ? (
         <p className="text-niebla">Todavía no tienes pagos.</p>
       ) : (
-        <div
-          tabIndex={0}
-          role="region"
-          aria-labelledby="t-historial"
-          className="relative -mx-2 overflow-x-auto px-2"
-        >
-          <table className="w-full min-w-[760px] border-collapse text-[15px]">
-            <thead>
-              <tr className="text-left text-[13px] text-ceniza">
-                <th scope="col" className="pr-4 pb-3.5 font-normal">
-                  Fecha
-                </th>
-                <th scope="col" className="pr-4 pb-3.5 font-normal">
-                  Concepto
-                </th>
-                <th scope="col" className="pr-4 pb-3.5 font-normal">
-                  Pagado con
-                </th>
-                <th scope="col" className="pr-4 pb-3.5 text-right font-normal">
-                  Monto
-                </th>
-                <th scope="col" className="pr-4 pb-3.5 font-normal">
-                  Estado
-                </th>
-                <th scope="col" className="pb-3.5 font-normal">
-                  <span className="sr-only">Comprobante</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {ordenes.map((o) => {
-                const estado = ESTADO_ORDEN_VISIBLE[o.estado];
-                return (
-                  <tr key={o.numero} className="align-top">
-                    <td className="py-[18px] pr-4 whitespace-nowrap">
-                      {fechaCorta(o.creadaEn)}
-                      <small className="block text-[13px] text-ceniza">{o.numero}</small>
-                    </td>
-                    <td className="py-[18px] pr-4">
-                      {conceptoOrden(o.tipo, o.plan.nombre)}
-                      <small className="block text-[13px] text-ceniza">
-                        Cuenta {o.cuenta.numero}
-                      </small>
-                    </td>
-                    <td className="py-[18px] pr-4">
-                      {o.moneda}
-                      <small className="block text-[13px] text-ceniza">{nombreRed(o.red)}</small>
-                    </td>
-                    <td className="cifra py-[18px] pr-4 text-right">
-                      {montoCripto(o.monto, o.moneda)}
-                      <small className="block text-[13px] text-ceniza">
-                        {usd(o.montoUsdCentavos)}
-                      </small>
-                    </td>
-                    <td className="py-[18px] pr-4">
-                      <Estado tono={estado.tono}>{estado.texto}</Estado>
-                    </td>
-                    <td className="py-[18px]">
-                      {o.enlaceExplorador ? (
-                        <Enlace href={o.enlaceExplorador} target="_blank" rel="noopener" gris>
-                          Ver en el explorador
-                        </Enlace>
-                      ) : o.estado === 'PENDIENTE' ? (
-                        <Enlace href={`/panel/pagos?orden=${o.numero}`} gris>
-                          Pagar
-                        </Enlace>
-                      ) : o.estado === 'EXPIRADA' ? (
-                        <small className="text-[13px] text-ceniza">
-                          No se pagó dentro de la hora
+        <>
+          {/* En celular, una tarjeta por pago: la tabla no cabe y esconde el monto y el estado. */}
+          <ul className="grid gap-8 sm:hidden">
+            {ordenes.map((o) => {
+              const estado = ESTADO_ORDEN_VISIBLE[o.estado];
+              return (
+                <li key={o.numero} className="grid justify-items-start gap-2 text-[15px]">
+                  <div className="flex w-full flex-wrap items-center justify-between gap-2">
+                    <span className="text-[13px] text-ceniza">
+                      {fechaCorta(o.creadaEn)} · {o.numero}
+                    </span>
+                    <Estado tono={estado.tono}>{estado.texto}</Estado>
+                  </div>
+                  <p>
+                    {conceptoOrden(o.tipo, o.plan.nombre)}
+                    <small className="block text-[13px] text-ceniza">
+                      Cuenta {o.cuenta.numero}
+                    </small>
+                  </p>
+                  <p className="cifra">
+                    {montoCripto(o.monto, o.moneda)}{' '}
+                    <small className="text-[13px] text-ceniza">
+                      {usd(o.montoUsdCentavos)} · {nombreRed(o.red)}
+                    </small>
+                  </p>
+                  <Comprobante orden={o} />
+                </li>
+              );
+            })}
+          </ul>
+          <div
+            tabIndex={0}
+            role="region"
+            aria-labelledby="t-historial"
+            className="relative -mx-2 overflow-x-auto px-2 max-sm:hidden"
+          >
+            <table className="w-full min-w-[760px] border-collapse text-[15px]">
+              <thead>
+                <tr className="text-left text-[13px] text-ceniza">
+                  <th scope="col" className="pr-4 pb-3.5 font-normal">
+                    Fecha
+                  </th>
+                  <th scope="col" className="pr-4 pb-3.5 font-normal">
+                    Concepto
+                  </th>
+                  <th scope="col" className="pr-4 pb-3.5 font-normal">
+                    Pagado con
+                  </th>
+                  <th scope="col" className="pr-4 pb-3.5 text-right font-normal">
+                    Monto
+                  </th>
+                  <th scope="col" className="pr-4 pb-3.5 font-normal">
+                    Estado
+                  </th>
+                  <th scope="col" className="pb-3.5 font-normal">
+                    <span className="sr-only">Comprobante</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {ordenes.map((o) => {
+                  const estado = ESTADO_ORDEN_VISIBLE[o.estado];
+                  return (
+                    <tr key={o.numero} className="align-top">
+                      <td className="py-[18px] pr-4 whitespace-nowrap">
+                        {fechaCorta(o.creadaEn)}
+                        <small className="block text-[13px] text-ceniza">{o.numero}</small>
+                      </td>
+                      <td className="py-[18px] pr-4">
+                        {conceptoOrden(o.tipo, o.plan.nombre)}
+                        <small className="block text-[13px] text-ceniza">
+                          Cuenta {o.cuenta.numero}
                         </small>
-                      ) : o.motivoRechazo ? (
-                        <small className="text-[13px] text-ceniza">{o.motivoRechazo}</small>
-                      ) : null}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                      <td className="py-[18px] pr-4">
+                        {o.moneda}
+                        <small className="block text-[13px] text-ceniza">{nombreRed(o.red)}</small>
+                      </td>
+                      <td className="cifra py-[18px] pr-4 text-right">
+                        {montoCripto(o.monto, o.moneda)}
+                        <small className="block text-[13px] text-ceniza">
+                          {usd(o.montoUsdCentavos)}
+                        </small>
+                      </td>
+                      <td className="py-[18px] pr-4">
+                        <Estado tono={estado.tono}>{estado.texto}</Estado>
+                      </td>
+                      <td className="py-[18px]">
+                        <Comprobante orden={o} />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );

@@ -22,7 +22,8 @@ function desde(fecha: string): string {
 function Dato({ etiqueta, valor, copiar }: { etiqueta: string; valor: string; copiar?: string }) {
   return (
     <>
-      <dt className="text-ceniza">{etiqueta}</dt>
+      {/* En celular la etiqueta va encima: así el dato y "Copiar" caben en una línea. */}
+      <dt className="text-ceniza max-sm:mt-3 max-sm:text-[13px]">{etiqueta}</dt>
       <dd className="flex min-h-11 flex-wrap items-center gap-x-4 gap-y-1">
         <span id={copiar} className="text-blanco [overflow-wrap:anywhere]" translate="no">
           {valor}
@@ -68,7 +69,7 @@ function PorConectar({ cuenta, principal }: { cuenta: CuentaDeTrabajo; principal
         </div>
       </div>
       <div className="grid justify-items-start gap-6">
-        <dl className="grid w-full grid-cols-[minmax(0,10.5rem)_minmax(0,1fr)] items-center gap-x-6 text-[15px]">
+        <dl className="grid w-full grid-cols-[minmax(0,10.5rem)_minmax(0,1fr)] items-center gap-x-6 text-[15px] max-sm:grid-cols-1">
           <Dato etiqueta="Titular" valor={cuenta.titular} />
           <Dato etiqueta="Broker" valor={cuenta.broker} />
           <Dato etiqueta="Servidor" valor={cuenta.servidor} copiar={`servidor-${cuenta.id}`} />

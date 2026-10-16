@@ -188,7 +188,7 @@ export function AprobacionAutomatica({ activa }: { activa: boolean }) {
           onClick={() => {
             if (!activa) setPidiendoCodigo(true);
           }}
-          className="relative h-7 w-12 shrink-0 rounded-full bg-campo-foco transition-colors duration-200 aria-checked:bg-llama"
+          className="relative h-7 w-12 shrink-0 rounded-full bg-campo-foco transition-colors duration-200 before:absolute before:-inset-2 before:content-[''] aria-checked:bg-llama"
         >
           <span
             aria-hidden="true"
