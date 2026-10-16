@@ -1,6 +1,6 @@
 # Pendientes — información por recibir
 
-> Actualizado: 2026-10-15. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
+> Actualizado: 2026-10-16. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
 
 ## ⏳ En espera
 
@@ -54,7 +54,7 @@
       ustedes, revisar que a los dos admins les llegue el correo con la dirección completa y cancelarla. Mientras
       está en espera, ninguna orden la usa.
 
-- [ ] **Un ticket de ida y vuelta** (etapa 7): con un cliente, abrir un ticket en "Soporte" con una captura; en el
+- [ ] **Un ticket de ida y vuelta** (etapa 7; el 2026-10-16 ya se probó en `www` crear un ticket con adjunto): con un cliente, abrir un ticket en "Soporte" con una captura; en el
       admin, dejar una nota interna, responder con una respuesta guardada y asignarlo. Al cliente le debe llegar el
       correo con la respuesta; después, marcarlo resuelto y escribir otra vez para reabrirlo (llega el correo a los
       admins). Con R2 listo, descargar la captura desde los dos lados.
@@ -62,8 +62,8 @@
       bienvenida al confirmar el correo y, a los admins, "pago verificado por aprobar" y "venta". Los recordatorios
       (7, 3 y 1 día), "tu licencia venció" y "desconectaremos la cuenta" llegan solos con las fechas reales; se
       probaron con fechas aceleradas.
-- [ ] **Socio** (etapa 8): entrar a "Socio" con la cuenta de Dylan, revisar el porcentaje (10 %) y, el 16 de
-      octubre, que aparezca la quincena del 1 al 15 liquidada (con su correo a los dos admins).
+- [x] **Socio** (etapa 8): el 16 de octubre el worker liquidó la quincena del 1 al 15 (1 venta, comisión USD 24).
+      Falta solo mirarla en "Socio" y confirmar que llegó el correo a los dos admins.
 
 ## ❓ Por confirmar con Argemiro
 
@@ -96,8 +96,8 @@
 - [x] **Cloudflare Turnstile** (2026-10-15): llaves en Vercel y en la API.
 - [ ] **Pagos desde Binance sin hash (2026-10-16):** construido el reporte con el número de transferencia interna y
       su verificación automática. Para que sea automática:
-  - [ ] Argemiro crea en Binance (Perfil → Gestión de API) una llave **solo de lectura** ("Enable Reading"; sin
-        operar ni retirar). Se ponen `BINANCE_API_KEY` y `BINANCE_API_SECRET` en el worker de Railway, nunca en el chat.
+  - [x] Argemiro crea en Binance (Perfil → Gestión de API) una llave **solo de lectura** ("Enable Reading"; sin
+        operar ni retirar). Se ponen `BINANCE_API_KEY` y `BINANCE_API_SECRET` en el worker de Railway, nunca en el chat. Puestas el 2026-10-16.
   - [x] Worker movido a Europa (Amsterdam) el 2026-10-16: Binance no responde desde EE. UU.
   - [ ] Registrar a mano el pago de prueba DTP-000001 (Pagos → Órdenes expiradas → Registrar pago).
 - [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
@@ -134,6 +134,8 @@
   - [ ] UptimeRobot: cambiar las dos direcciones a `https://api.doctraderpro.com/salud` y
         `https://www.doctraderpro.com`.
 - [x] **Direcciones de depósito** (2026-10-14; solo dos redes): USDT TRC20 `TLNeQNuQ9tsZweb8cvZaghNpJkX3KE7G4x` y BTC `1H8xfingRtsTvhnf4PosyhXvacXdGVWea1`.
+      Desde el 2026-10-16 la pantalla de pago muestra su código QR (generado con la dirección de la orden; coincide
+      con los QR de Binance que envió Argemiro).
 - [x] Correo de admin de Dylan: dylansrz96@gmail.com.
 - [x] Correo de admin de Argemiro: doctraderproiasystem@gmail.com (2026-10-15; antes se registró por error doctraderpro@gmail.com, que la semilla retira).
 - [x] Segundo factor en las cuentas de servicio (2026-10-16). Falta el gestor de contraseñas compartido con Argemiro (ver `docs/SEGURIDAD.md`).

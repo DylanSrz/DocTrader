@@ -281,8 +281,15 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
     lanzamiento").
   - 119 pruebas de punta a punta (6 nuevas: eliminar un cliente, un hash ajeno no sirve, montos distintos, el límite
     de códigos en paralelo, el nombre del registro y las alertas).
-  - **Falta (operación, ver `PENDIENTES.md`):** cuenta de Sentry, monitor de disponibilidad, activar las copias en
-    Railway y los secretos de la copia diaria, DNS en Hostinger con DMARC, la lista del §5 y el lanzamiento suave.
+- **Después (2026-10-16):**
+  - **Operación lista:** Sentry (API, worker y web), monitor de disponibilidad (UptimeRobot), copia diaria cifrada en
+    R2 con restauración de prueba, dominio propio (`www.doctraderpro.com` y `api.doctraderpro.com`) con DNS en
+    Hostinger y DMARC en `none`, y el worker en Europa para leer Binance.
+  - **Pagos de Binance sin hash:** el cliente reporta el número de la transferencia interna y se verifica con una
+    llave de Binance solo de lectura (ya puesta); el admin también puede registrar un pago a mano.
+  - **Cambio de cuenta por ticket**, **descargar mis datos** (perfil del cliente), **QR de la dirección** en la
+    pantalla de pago y **"Mi panel"** en la landing con la sesión iniciada.
+  - **Falta:** la lista del §5 y el lanzamiento suave.
 
 ## 5. Lista para el día del lanzamiento
 
@@ -307,11 +314,10 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
       correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
 - [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.
 - [ ] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook.
-- [x] Monitor de disponibilidad y alertas activos (2026-10-16; actualizar direcciones al pasar al dominio propio).
+- [x] Monitor de disponibilidad y alertas activos (2026-10-16; falta cambiar sus direcciones al dominio propio).
 - [ ] Revisión en celular (iPhone y Android) y en escritorio.
 
 ## 6. Después del lanzamiento
 
 - Binance Pay Merchant cuando Binance lo apruebe.
-- Segunda verificación con el historial de depósitos de Binance (llave solo de lectura).
 - Fase 2 (`CONTEXTO.md` §7): pagos en pesos, referidos, cupones, avisos por Telegram o WhatsApp y versión en inglés.
