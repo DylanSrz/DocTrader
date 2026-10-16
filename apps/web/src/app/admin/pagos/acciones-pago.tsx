@@ -1,7 +1,8 @@
 'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { conAviso } from '@/components/admin/operacion';
+import { LIMITES_ADMIN } from '@doctrader/shared';
+import { CampoCodigo, conAviso, ErrorOperacion, useAlListo } from '@/components/admin/operacion';
 import { CuerpoLateral, Lateral, PieLateral, useCerrarLateral } from '@/components/panel/lateral';
 import { Aviso, BotonEnviar, Campo } from '@/components/ui';
 import {
@@ -11,12 +12,14 @@ import {
   rechazarPago,
   verificarPago,
 } from '../acciones';
+import { type EstadoOperacion, registrarPagoManual } from '../acciones-operacion';
 
 // El aviso sale desde la acción: al aprobar, el pago sale de la lista y su efecto ya no correría.
 const aprobarPagoConAviso = conAviso(aprobarPago);
 const rechazarPagoConAviso = conAviso(rechazarPago);
 const verificarPagoConAviso = conAviso(verificarPago);
 const cambiarAprobacionAutomaticaConAviso = conAviso(cambiarAprobacionAutomatica);
+const registrarPagoManualConAviso = conAviso(registrarPagoManual);
 
 /** Al terminar bien, dentro del panel lateral: se cierra. */
 function useAlTerminar(estado: EstadoPago, alTerminar?: () => void) {
@@ -52,7 +55,7 @@ export function AprobarPago({ numero, forzar }: { numero: string; forzar: boolea
         if (
           forzar &&
           !window.confirm(
-            `El pago ${numero} no pasó la verificación. ¿Lo revisaste en el explorador y quieres aprobarlo de todos modos?`,
+            `El pago ${numero} no pasó la verificación. ¿Lo revisaste (en el explorador o en Binance) y quieres aprobarlo de todos modos?`,
           )
         ) {
           evento.preventDefault();
@@ -229,5 +232,67 @@ export function AprobacionAutomatica({ activa }: { activa: boolean }) {
       ) : null}
       <MensajeError estado={estado} />
     </form>
+  );
+}
+
+function FormularioPagoManual({ numero }: { numero: string }) {
+  const [estado, accion] = useActionState(registrarPagoManualConAviso, {} as EstadoOperacion);
+  const cerrar = useCerrarLateral();
+  useAlListo(estado, cerrar);
+  const v = estado.valores ?? {};
+  return (
+    <form action={accion} className="grid min-h-0 grid-rows-[1fr_auto]">
+      <CuerpoLateral>
+        <input type="hidden" name="numero" value={numero} />
+        <p className="text-sm text-niebla">
+          Solo si confirmaste que el dinero llegó completo (por ejemplo, en Binance → Historial de
+          depósitos). La licencia queda activa como con cualquier pago aprobado y queda registrado
+          quién lo hizo.
+        </p>
+        <div className="grid gap-2">
+          <label htmlFor={`motivo-manual-${numero}`} className="text-[15px] text-blanco">
+            Cómo lo verificaste
+          </label>
+          <textarea
+            id={`motivo-manual-${numero}`}
+            name="motivo"
+            rows={3}
+            required
+            minLength={LIMITES_ADMIN.motivo.minimo}
+            maxLength={LIMITES_ADMIN.motivo.maximo}
+            defaultValue={v.motivo}
+            placeholder="Ej.: pagó desde Binance; revisado en el historial de depósitos."
+            aria-invalid={estado.campos?.motivo ? true : undefined}
+            className="w-full resize-y rounded-[20px] bg-campo px-5 py-3.5 text-base text-blanco placeholder:text-white/35 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none"
+          />
+        </div>
+        <Campo
+          etiqueta="Hash o número de transferencia de Binance (opcional)"
+          name="referencia"
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          maxLength={200}
+          placeholder="Ej.: Off-chain Transfer 421231346716"
+          ayuda="Si lo tienes, escríbelo: así nadie puede usarlo en otra orden."
+          defaultValue={v.referencia}
+          error={estado.campos?.referencia}
+        />
+        <CampoCodigo estado={estado} accion="registrar el pago" />
+        <ErrorOperacion estado={estado} />
+      </CuerpoLateral>
+      <PieLateral>
+        <BotonEnviar enviando="Registrando…">Registrar y aprobar</BotonEnviar>
+      </PieLateral>
+    </form>
+  );
+}
+
+/** Registrar a mano el pago de una orden vencida, en el panel lateral. */
+export function RegistrarPagoManual({ numero, cliente }: { numero: string; cliente: string }) {
+  return (
+    <Lateral titulo={`Registrar el pago de ${cliente}`} boton="Registrar pago" gris>
+      <FormularioPagoManual numero={numero} />
+    </Lateral>
   );
 }

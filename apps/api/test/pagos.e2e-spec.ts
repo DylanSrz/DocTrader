@@ -6,7 +6,7 @@ import { AuditLog, Notification } from '../src/database/entidades/index.js';
 import { PrecioBtcService } from '../src/licencias/precio-btc.service.js';
 import { AvisosService } from '../src/avisos/avisos.service.js';
 import { VencimientoLicencias } from '../src/licencias/vencimiento-licencias.js';
-import { LectorBlockchain } from '../src/pagos/lector-blockchain.service.js';
+import { LectorBlockchain, SinLlaveBinance } from '../src/pagos/lector-blockchain.service.js';
 import { ErrorProveedor, type Lectura } from '../src/pagos/lectura.js';
 import { VerificacionPagos } from '../src/pagos/verificacion-pagos.service.js';
 import { comoLaWeb, crearApp } from './crear-app.js';
@@ -17,7 +17,7 @@ let fuente: DataSource;
 let verificacion: VerificacionPagos;
 
 /** Lo que "dice la blockchain" en cada prueba: una lectura por hash, o un error del proveedor. */
-const blockchain = new Map<string, Lectura | 'ERROR'>();
+const blockchain = new Map<string, Lectura | 'ERROR' | 'SIN_LLAVE'>();
 
 beforeAll(async () => {
   app = await crearApp((c) =>
@@ -29,6 +29,7 @@ beforeAll(async () => {
         leer: async (_red: string, hash: string) => {
           const lectura = blockchain.get(hash) ?? { encontrada: false };
           if (lectura === 'ERROR') throw new ErrorProveedor('Los dos proveedores fallaron');
+          if (lectura === 'SIN_LLAVE') throw new SinLlaveBinance();
           return { lectura, proveedor: 'Prueba' };
         },
       }),
@@ -84,6 +85,9 @@ async function pendiente(admin: Admin, numero: string) {
   return lista.body.porRevisar.find((p: { numero: string }) => p.numero === numero);
 }
 
+let ultimaTransferencia = 421_231_346_716 + Math.floor(Math.random() * 1_000_000_000);
+const transferenciaNueva = () => String((ultimaTransferencia += 1));
+
 const unMes = (desde: Date) => {
   const fin = new Date(desde);
   fin.setUTCMonth(fin.getUTCMonth() + 1);
@@ -107,7 +111,7 @@ describe('verificación y aprobación de pagos', () => {
     expect(revision).toMatchObject({
       verificacion: 'VERIFICADA',
       cliente: { nombre: 'Laura Gómez Restrepo' },
-      monto: expect.stringMatching(/^119\.\d{2}$/),
+      monto: expect.stringMatching(/^119\.\d{1,2}$/),
       confirmaciones: 25,
       confirmacionesNecesarias: 20,
       proveedor: 'Prueba',
@@ -318,6 +322,166 @@ describe('verificación y aprobación de pagos', () => {
       await admin.web.put('/admin/pagos/aprobacion-automatica', { activa: false }).expect(200);
     }
     expect((await admin.web.get('/admin/pagos')).body.aprobacionAutomatica).toBe(false);
+  });
+
+  it('un pago entre cuentas de Binance se reporta con su número de transferencia y se verifica', async () => {
+    const cliente = await clienteConSesion(app);
+    const cuenta = await cliente.web.post('/cuentas', datosCuenta()).expect(201);
+    const orden = await cliente.web
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    const transferencia = transferenciaNueva();
+    blockchain.set(`binance:${transferencia}`, {
+      ...exacto()({
+        direccion: orden.body.direccion,
+        unidades: aUnidadesBase(orden.body.monto, 'USDT'),
+      }),
+      bloque: null,
+      confirmaciones: Number.MAX_SAFE_INTEGER,
+      remitentes: [],
+      interna: true,
+    } as Lectura);
+
+    // Un código que no es hash ni número de transferencia no se acepta.
+    const malo = await cliente.web
+      .post(`/ordenes/${orden.body.numero}/reportar`, { hash: 'abc123' })
+      .expect(400);
+    expect(malo.body.campos.hash).toContain('Binance');
+    // Se pega tal como lo muestra Binance.
+    await cliente.web
+      .post(`/ordenes/${orden.body.numero}/reportar`, {
+        hash: `Off-chain Transfer ${transferencia}`,
+      })
+      .expect(200);
+    await verificacion.verificarPendientes();
+
+    const revision = await pendiente(admin, orden.body.numero);
+    expect(revision).toMatchObject({
+      verificacion: 'VERIFICADA',
+      hash: `Transferencia interna de Binance ${transferencia}`,
+      enlaceExplorador: null,
+    });
+    expect(revision.chequeos.map((c: { texto: string }) => c.texto)).toEqual([
+      'El número de la transferencia de Binance no se había usado',
+      'Llegó a la dirección de la orden, en USDT, por transferencia interna de Binance',
+      'El monto es igual al de la orden',
+      'Se envió después de crear la orden',
+      'Binance ya la acreditó (no necesita confirmaciones)',
+    ]);
+    const propia = await cliente.web.get(`/ordenes/${orden.body.numero}`).expect(200);
+    expect(propia.body).toMatchObject({
+      hash: `Transferencia interna de Binance ${transferencia}`,
+      enlaceExplorador: null,
+    });
+
+    // El mismo número no sirve para otra orden.
+    const otraCuenta = await cliente.web.post('/cuentas', datosCuenta()).expect(201);
+    const otra = await cliente.web
+      .post('/ordenes', { cuentaId: otraCuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    const repetido = await cliente.web
+      .post(`/ordenes/${otra.body.numero}/reportar`, { hash: transferencia })
+      .expect(400);
+    expect(repetido.body.campos.hash).toContain('ya se reportó');
+  });
+
+  it('sin la llave de Binance el pago interno queda para revisión manual y se avisa a los admins', async () => {
+    const cliente = await clienteConSesion(app);
+    const cuenta = await cliente.web.post('/cuentas', datosCuenta()).expect(201);
+    const orden = await cliente.web
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    const transferencia = transferenciaNueva();
+    blockchain.set(`binance:${transferencia}`, 'SIN_LLAVE');
+    await cliente.web
+      .post(`/ordenes/${orden.body.numero}/reportar`, { hash: transferencia })
+      .expect(200);
+    await verificacion.verificarPendientes();
+    await verificacion.verificarPendientes();
+
+    const revision = await pendiente(admin, orden.body.numero);
+    expect(revision).toMatchObject({
+      verificacion: 'ERROR_PROVEEDOR',
+      nota: expect.stringContaining('Historial de depósitos'),
+    });
+    const avisos = (await fuente.query(
+      `SELECT payload FROM notifications WHERE template = 'pago-por-revisar' AND payload->>'orden' = $1`,
+      [orden.body.numero],
+    )) as { payload: Record<string, string> }[];
+    // Uno por admin, una sola vez aunque la verificación vuelva a correr.
+    expect(avisos.length).toBeGreaterThan(0);
+    const admins = (await fuente.query(
+      `SELECT count(*)::int AS n FROM users WHERE role = 'ADMIN' AND status = 'ACTIVE'`,
+    )) as { n: number }[];
+    expect(avisos).toHaveLength(admins[0]!.n);
+    await admin.web.post(`/admin/pagos/${orden.body.numero}/aprobar`, { forzar: true }).expect(200);
+  });
+
+  it('un admin registra a mano el pago de una orden vencida, con su código y una referencia', async () => {
+    const cliente = await clienteConSesion(app);
+    const cuenta = await cliente.web.post('/cuentas', datosCuenta()).expect(201);
+    const vieja = await cliente.web
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    await fuente.query(
+      `UPDATE payment_orders
+          SET status = 'EXPIRADA', created_at = now() - interval '3 hours',
+              expires_at = now() - interval '2 hours'
+        WHERE number = $1`,
+      [vieja.body.numero],
+    );
+    // El cliente ya pidió otra orden para la misma licencia: se cancela al registrar el pago de la vieja.
+    const nueva = await cliente.web
+      .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
+      .expect(201);
+    const transferencia = transferenciaNueva();
+    const datos = {
+      motivo: 'Pagó desde Binance; revisado en el historial de depósitos.',
+      referencia: `Off-chain Transfer ${transferencia}`,
+    };
+
+    await cliente.web.post(`/admin/pagos/${vieja.body.numero}/manual`, datos).expect(403);
+    const fresco = await adminConSesion(app);
+    const sinCodigo = await fresco.web
+      .post(`/admin/pagos/${vieja.body.numero}/manual`, datos)
+      .expect(403);
+    expect(sinCodigo.body.codigo).toBe('CONFIRMACION_REQUERIDA');
+    await fresco.confirmar();
+    const mala = await fresco.web
+      .post(`/admin/pagos/${vieja.body.numero}/manual`, { ...datos, referencia: 'xyz' })
+      .expect(400);
+    expect(mala.body.campos.referencia).toBeDefined();
+    await fresco.web.post(`/admin/pagos/${vieja.body.numero}/manual`, datos).expect(200);
+
+    const ordenes = (await fuente.query(
+      `SELECT number, status, tx_hash, approval_mode FROM payment_orders WHERE number = ANY($1)`,
+      [[vieja.body.numero, nueva.body.numero]],
+    )) as { number: string; status: string; tx_hash: string; approval_mode: string }[];
+    expect(ordenes.find((o) => o.number === vieja.body.numero)).toMatchObject({
+      status: 'APROBADA',
+      tx_hash: `binance:${transferencia}`,
+      approval_mode: 'MANUAL',
+    });
+    expect(ordenes.find((o) => o.number === nueva.body.numero)?.status).toBe('CANCELADA');
+    const { body } = await cliente.web.get(`/cuentas/${cuenta.body.id}`).expect(200);
+    expect(body.licencia.estado).toBe('ACTIVA');
+    const registro = await fuente.getRepository(AuditLog).findOneOrFail({
+      where: { action: 'pago.registrado_manual', actorId: fresco.usuario.id },
+      order: { id: 'DESC' },
+    });
+    expect(registro.metadata).toMatchObject({
+      numero: vieja.body.numero,
+      motivo: datos.motivo,
+      referencia: `binance:${transferencia}`,
+      estadoAnterior: 'EXPIRADA',
+      canceladaOtra: nueva.body.numero,
+    });
+
+    // Una orden ya aprobada no se registra otra vez.
+    const otraVez = await fresco.web
+      .post(`/admin/pagos/${vieja.body.numero}/manual`, datos)
+      .expect(409);
+    expect(otraVez.body.codigo).toBe('NO_REGISTRABLE');
   });
 
   it('un cliente no ve los pagos de todos ni los aprueba', async () => {

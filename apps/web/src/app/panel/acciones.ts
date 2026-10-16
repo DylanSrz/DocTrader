@@ -1,5 +1,6 @@
 'use server';
 
+import { interpretarReferencia } from '@doctrader/shared';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { llamarApi, type ErrorApi } from '@/lib/api';
@@ -160,9 +161,11 @@ export async function crearOrden(_previo: EstadoPanel, datos: FormData): Promise
 export async function reportarPago(previo: EstadoPanel, datos: FormData): Promise<EstadoPanel> {
   const numero = texto(datos, 'numero');
   const hash = texto(datos, 'hash').trim();
-  if (hash.length < 40) {
+  if (!interpretarReferencia(hash)) {
     return {
-      campos: { hash: 'Pega el código completo de la transacción: son 64 letras y números.' },
+      campos: {
+        hash: 'Pega el hash completo de la transacción (64 letras y números) o, si pagaste desde tu cuenta de Binance, el número de la transferencia (Txid).',
+      },
       valores: { hash },
     };
   }

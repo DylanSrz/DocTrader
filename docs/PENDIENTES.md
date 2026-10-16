@@ -94,6 +94,12 @@
 - [x] Vercel (web) y Railway (API, worker, PostgreSQL y Redis) creados y funcionando (2026-10-14).
 - [x] **Resend** (2026-10-15): dominio doctraderpro.com verificado y `RESEND_API_KEY` en el worker de Railway.
 - [x] **Cloudflare Turnstile** (2026-10-15): llaves en Vercel y en la API.
+- [ ] **Pagos desde Binance sin hash (2026-10-16):** construido el reporte con el número de transferencia interna y
+      su verificación automática. Para que sea automática:
+  - [ ] Argemiro crea en Binance (Perfil → Gestión de API) una llave **solo de lectura** ("Enable Reading"; sin
+        operar ni retirar). Se ponen `BINANCE_API_KEY` y `BINANCE_API_SECRET` en el worker de Railway, nunca en el chat.
+  - [ ] Mover el worker de Railway a una región de Europa (Settings → Regions): Binance no responde desde EE. UU.
+  - [ ] Registrar a mano el pago de prueba DTP-000001 (Pagos → Órdenes expiradas → Registrar pago).
 - [ ] **CoinGecko (opcional):** el precio de BTC sale de Binance y se compara con CoinGecko. Funciona sin llave; con
       una llave gratis del plan Demo (`COINGECKO_API_KEY` en la API de Railway) hay más consultas al mes.
 - [x] **Cloudflare R2 (adjuntos de soporte, etapa 7, 2026-10-15):** en Cloudflare → R2, crear un depósito privado

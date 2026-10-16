@@ -33,10 +33,21 @@ como principal y CoinGecko (plan Demo gratis, 10.000 consultas al mes) como resp
 **Detectar pagos sin hash** (si el cliente no lo reporta): TronGrid lista las transferencias TRC20 de una dirección y
 mempool.space lista las transacciones de una dirección.
 
-**Direcciones de Binance:** las de cobro son de la cuenta de Binance de Argemiro. La verificación sigue siendo en la
-blockchain pública. Más adelante, como segunda confirmación opcional, se puede consultar el historial de depósitos de
-Binance con una llave de API **solo de lectura**, limitada a la IP del servidor: confirma que el dinero quedó
-acreditado en la cuenta. No es necesario para lanzar.
+**Direcciones de Binance:** las de cobro son de la cuenta de Binance de Argemiro. Un pago desde la blockchain se
+verifica en la blockchain pública. Pero si el cliente envía **desde su propia cuenta de Binance**, Binance no usa la
+blockchain: mueve el saldo por dentro y da un número ("Off-chain Transfer 421231346716") en vez de hash (lo vimos en
+el primer pago real, 2026-10-15). Desde el 2026-10-16:
+
+- El cliente reporta ese número en el mismo campo del hash; se guarda como `binance:<número>` en `tx_hash` (el índice
+  único impide usarlo dos veces).
+- El worker lo busca en el historial de depósitos de la cuenta de cobro (`GET /sapi/v1/capital/deposit/hisrec`), con
+  una llave de API **solo de lectura** (`BINANCE_API_KEY` y `BINANCE_API_SECRET`), y hace los mismos chequeos:
+  destino, moneda, monto exacto, fecha y número sin usar. Una transferencia interna no tiene confirmaciones.
+- `api.binance.com` no responde a servidores en Estados Unidos (451): el worker corre en una región de Europa.
+- Sin llave, el pago queda "para revisión manual", se avisa a los admins y lo aprueban de todos modos tras mirarlo en
+  Binance.
+- Para casos que no encajan (la orden venció mientras el cliente pagaba), el admin puede **registrar el pago a mano**
+  desde "Órdenes expiradas" en Pagos, con motivo, referencia opcional y su código; queda en la auditoría.
 
 **Billetera de origen** (se guarda con la orden; era una señal del control de la prueba, retirado el 2026-10-15): en
 Tron es el remitente del evento de transferencia. En Bitcoin una transacción puede tener varias entradas; se guardan

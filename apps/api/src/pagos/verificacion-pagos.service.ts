@@ -1,4 +1,10 @@
-import { ESTADO_ORDEN, ESTADO_VERIFICACION, formatearUsd, type Moneda } from '@doctrader/shared';
+import {
+  ESTADO_ORDEN,
+  ESTADO_VERIFICACION,
+  esTransferenciaBinance,
+  formatearUsd,
+  type Moneda,
+} from '@doctrader/shared';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { type DataSource, In } from 'typeorm';
@@ -7,7 +13,7 @@ import { PLANTILLA } from '../avisos/plantillas.js';
 import { PaymentOrder, Plan, User } from '../database/entidades/index.js';
 import { leerAjustes } from '../licencias/ajustes.js';
 import { AprobacionPagos } from './aprobacion.service.js';
-import { LectorBlockchain } from './lector-blockchain.service.js';
+import { LectorBlockchain, SinLlaveBinance } from './lector-blockchain.service.js';
 import { ErrorProveedor } from './lectura.js';
 import { evaluar, type ResultadoVerificacion } from './verificacion.js';
 
@@ -61,9 +67,25 @@ export class VerificacionPagos {
     if (orden.verificationStatus !== ESTADO_VERIFICACION.VERIFICADA) {
       let lectura;
       try {
-        lectura = await this.lector.leer(orden.network, orden.txHash);
+        lectura = await this.lector.leer(orden.network, orden.txHash, {
+          moneda: orden.currency as Moneda,
+          creadaEn: orden.createdAt,
+        });
       } catch (error) {
         if (!(error instanceof ErrorProveedor)) throw error;
+        if (error instanceof SinLlaveBinance) {
+          // Sin llave no hay forma de verificarlo: se avisa una sola vez a los admins para que lo revisen a mano.
+          await this.avisarRevision(orden, {
+            estado: ESTADO_VERIFICACION.ERROR_PROVEEDOR,
+            chequeos: [],
+            nota: error.message,
+            recibido: null,
+            confirmaciones: null,
+            hora: null,
+            bloque: null,
+            remitentes: [],
+          });
+        }
         // Sin proveedores no se sabe nada nuevo: se conserva lo último que se supo y se reintenta.
         await this.fuente.query(
           `UPDATE payment_orders
@@ -74,7 +96,11 @@ export class VerificacionPagos {
             WHERE id = $1 AND status = 'REPORTADA'`,
           [
             orden.id,
-            JSON.stringify({ error: error.message, revisadaEn: new Date().toISOString() }),
+            JSON.stringify({
+              error: error.message,
+              nota: error instanceof SinLlaveBinance ? error.message : null,
+              revisadaEn: new Date().toISOString(),
+            }),
           ],
         );
         return;
@@ -88,6 +114,7 @@ export class VerificacionPagos {
           unidades: BigInt(orden.amountBaseUnits),
           creadaEn: orden.createdAt,
           reportadaEn: orden.reportedAt ?? orden.createdAt,
+          interna: esTransferenciaBinance(orden.txHash),
         },
         lectura.lectura,
         ajustes.confirmaciones[orden.network],

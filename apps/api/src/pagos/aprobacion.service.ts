@@ -6,13 +6,15 @@ import {
   ESTADO_VERIFICACION,
   finDePeriodo,
   formatearUsd,
+  interpretarReferencia,
+  PREFIJO_MANUAL,
   sumarDias,
   TIPO_ORDEN,
   type TipoOrden,
 } from '@doctrader/shared';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import type { DataSource, EntityManager } from 'typeorm';
+import { type DataSource, type EntityManager, In, Not, QueryFailedError } from 'typeorm';
 import { AuditoriaService } from '../auditoria/auditoria.service.js';
 import { AvisosService, primerNombre } from '../avisos/avisos.service.js';
 import { fechaSinHora } from '../avisos/fecha.js';
@@ -27,7 +29,7 @@ import {
 } from '../database/entidades/index.js';
 import { leerAjustes } from '../licencias/ajustes.js';
 import { conexionAlActivar } from '../licencias/conexion.js';
-import { errorApi } from '../seguridad/errores.js';
+import { errorApi, errorDeCampos } from '../seguridad/errores.js';
 
 /** Quién decide: un admin (con su IP y navegador, para la auditoría) o el sistema, con la aprobación automática. */
 export type Decisor =
@@ -85,114 +87,206 @@ export class AprobacionPagos {
   ) {}
 
   async aprobar(numero: string, decisor: Decisor, forzar = false): Promise<void> {
-    await this.fuente.transaction(async (m) => {
-      const orden = await this.bloquearOrden(m, numero);
-      const verificada = orden.verificationStatus === ESTADO_VERIFICACION.VERIFICADA;
-      if (decisor.tipo === 'SISTEMA' && !verificada) throw noRevisable(numero);
-      if (orden.verificationStatus === ESTADO_VERIFICACION.ESPERANDO_CONFIRMACIONES && !forzar) {
-        throw errorApi(
-          HttpStatus.CONFLICT,
-          'ESPERANDO_CONFIRMACIONES',
-          'El pago todavía no tiene todas las confirmaciones. Apruébalo cuando las complete.',
+    await this.fuente.transaction((m) => this.aprobarEn(m, numero, decisor, forzar));
+  }
+
+  /**
+   * Registrar a mano el pago de una orden pendiente o vencida y aprobarlo, en una sola transacción. Es para pagos que
+   * el cliente no pudo reportar (por ejemplo, la orden venció mientras pagaba). Lo hace un admin con su código; el
+   * motivo y la referencia quedan en la auditoría. Si la licencia tiene otra orden pendiente, se cancela para que no
+   * se pague dos veces.
+   */
+  async registrarManual(
+    numero: string,
+    datos: { motivo: string; referencia?: string },
+    decisor: Decisor & { tipo: 'ADMIN' },
+  ): Promise<void> {
+    const escrita = datos.referencia?.trim() ?? '';
+    const referencia = escrita ? interpretarReferencia(escrita) : null;
+    if (escrita && !referencia) {
+      throw errorDeCampos({
+        referencia:
+          'Escribe el hash (64 letras y números) o el número de la transferencia de Binance, o déjalo vacío.',
+      });
+    }
+    await this.fuente
+      .transaction(async (m) => {
+        const orden = await m
+          .getRepository(PaymentOrder)
+          .createQueryBuilder('o')
+          .setLock('pessimistic_write')
+          .where('o.number = :numero', { numero })
+          .getOne();
+        if (!orden) {
+          throw errorApi(HttpStatus.NOT_FOUND, 'NO_ENCONTRADA', 'No encontramos esa orden.');
+        }
+        if (orden.status !== ESTADO_ORDEN.PENDIENTE && orden.status !== ESTADO_ORDEN.EXPIRADA) {
+          throw errorApi(
+            HttpStatus.CONFLICT,
+            'NO_REGISTRABLE',
+            orden.status === ESTADO_ORDEN.REPORTADA
+              ? 'El cliente ya reportó este pago: apruébalo desde la lista de pagos por revisar.'
+              : 'Solo se registra a mano el pago de una orden pendiente o vencida.',
+          );
+        }
+        const otra = await m.getRepository(PaymentOrder).findOne({
+          where: {
+            licenseId: orden.licenseId,
+            status: In([ESTADO_ORDEN.PENDIENTE, ESTADO_ORDEN.REPORTADA]),
+            id: Not(orden.id),
+          },
+        });
+        if (otra?.status === ESTADO_ORDEN.REPORTADA) {
+          throw errorApi(
+            HttpStatus.CONFLICT,
+            'OTRA_EN_REVISION',
+            `Esta licencia tiene otro pago en revisión (${otra.number}). Revísalo primero.`,
+          );
+        }
+        if (otra) {
+          await m
+            .getRepository(PaymentOrder)
+            .update({ id: otra.id }, { status: ESTADO_ORDEN.CANCELADA });
+        }
+        await m.getRepository(PaymentOrder).update(
+          { id: orden.id },
+          {
+            status: ESTADO_ORDEN.REPORTADA,
+            txHash: referencia ?? `${PREFIJO_MANUAL}${orden.number}`,
+            reportedAt: new Date(),
+            verificationDetail: { nota: `Registrado a mano: ${datos.motivo}` },
+          },
         );
-      }
-      if (!verificada && !forzar) {
-        throw errorApi(
-          HttpStatus.CONFLICT,
-          'NO_VERIFICADO',
-          'Este pago no pasó la verificación. Si lo revisaste en el explorador, apruébalo de todos modos.',
-        );
-      }
-      const licencia = await m
-        .getRepository(License)
-        .createQueryBuilder('l')
-        .setLock('pessimistic_write')
-        .where('l.id = :id', { id: orden.licenseId })
-        .getOneOrFail();
-      const plan = await m.getRepository(Plan).findOneByOrFail({ id: orden.planId });
-      const ajustes = await leerAjustes(m);
-      const ahora = new Date();
-      const { inicio, fin, cambios } = fechasAlAprobar(
-        orden.type,
-        licencia,
-        plan,
-        ajustes.diasGracia,
-        ahora,
+        await this.registrar(m, decisor, 'pago.registrado_manual', orden, {
+          motivo: datos.motivo,
+          referencia,
+          estadoAnterior: orden.status,
+          canceladaOtra: otra?.number ?? null,
+        });
+        await this.aprobarEn(m, numero, decisor, true);
+      })
+      .catch((error: unknown) => {
+        if (
+          error instanceof QueryFailedError &&
+          (error.driverError as { constraint?: string }).constraint ===
+            'payment_orders_hash_por_red'
+        ) {
+          throw errorDeCampos({ referencia: 'Esa referencia ya está registrada en otra orden.' });
+        }
+        throw error;
+      });
+  }
+
+  private async aprobarEn(
+    m: EntityManager,
+    numero: string,
+    decisor: Decisor,
+    forzar: boolean,
+  ): Promise<void> {
+    const orden = await this.bloquearOrden(m, numero);
+    const verificada = orden.verificationStatus === ESTADO_VERIFICACION.VERIFICADA;
+    if (decisor.tipo === 'SISTEMA' && !verificada) throw noRevisable(numero);
+    if (orden.verificationStatus === ESTADO_VERIFICACION.ESPERANDO_CONFIRMACIONES && !forzar) {
+      throw errorApi(
+        HttpStatus.CONFLICT,
+        'ESPERANDO_CONFIRMACIONES',
+        'El pago todavía no tiene todas las confirmaciones. Apruébalo cuando las complete.',
       );
-
-      await m.getRepository(LicensePeriod).insert({
-        licenseId: licencia.id,
-        paymentOrderId: orden.id,
-        planId: plan.id,
-        kind: orden.type,
-        periodStart: inicio,
-        periodEnd: fin,
-        bonusMonths: plan.bonusMonths,
-      });
-      await m.getRepository(License).update({ id: licencia.id }, { planId: plan.id, ...cambios });
-
-      const [socio] = (await m.query(
-        `SELECT commission_bp FROM partner_profiles ORDER BY created_at LIMIT 1`,
-      )) as { commission_bp: number }[];
-      const porcentaje = socio?.commission_bp ?? 0;
-      await m.getRepository(PaymentOrder).update(
-        { id: orden.id },
-        {
-          status: ESTADO_ORDEN.APROBADA,
-          decidedBy: decisor.tipo === 'ADMIN' ? decisor.id : null,
-          decidedAt: ahora,
-          approvalMode: decisor.tipo === 'ADMIN' ? 'MANUAL' : 'AUTO',
-          commissionBp: porcentaje,
-          commissionUsdCents: aplicarPorcentaje(orden.amountUsdCents, porcentaje),
-        },
+    }
+    if (!verificada && !forzar) {
+      throw errorApi(
+        HttpStatus.CONFLICT,
+        'NO_VERIFICADO',
+        'Este pago no pasó la verificación. Si lo revisaste en el explorador, apruébalo de todos modos.',
       );
+    }
+    const licencia = await m
+      .getRepository(License)
+      .createQueryBuilder('l')
+      .setLock('pessimistic_write')
+      .where('l.id = :id', { id: orden.licenseId })
+      .getOneOrFail();
+    const plan = await m.getRepository(Plan).findOneByOrFail({ id: orden.planId });
+    const ajustes = await leerAjustes(m);
+    const ahora = new Date();
+    const { inicio, fin, cambios } = fechasAlAprobar(
+      orden.type,
+      licencia,
+      plan,
+      ajustes.diasGracia,
+      ahora,
+    );
 
-      const cuenta = await m
-        .getRepository(TradingAccount)
-        .findOneByOrFail({ id: orden.tradingAccountId });
-      const conexion = conexionAlActivar(cuenta.connectionStatus);
-      await m
-        .getRepository(TradingAccount)
-        .update({ id: cuenta.id }, { connectionStatus: conexion });
+    await m.getRepository(LicensePeriod).insert({
+      licenseId: licencia.id,
+      paymentOrderId: orden.id,
+      planId: plan.id,
+      kind: orden.type,
+      periodStart: inicio,
+      periodEnd: fin,
+      bonusMonths: plan.bonusMonths,
+    });
+    await m.getRepository(License).update({ id: licencia.id }, { planId: plan.id, ...cambios });
 
-      const cliente = await m.getRepository(User).findOneByOrFail({ id: orden.userId });
-      await this.avisos.encolar(m, {
-        usuarioId: cliente.id,
-        correo: cliente.email,
-        plantilla: PLANTILLA.PAGO_APROBADO,
-        datos: {
-          nombre: cliente.fullName.split(' ')[0] ?? cliente.fullName,
-          orden: orden.number,
-          plan: plan.name.toLowerCase(),
-          cuenta: cuenta.accountNumber,
-          vence: fechaSinHora(fin),
-          conectar: conexion === ESTADO_CONEXION.CONECTADA ? 'no' : 'si',
-        },
-        clave: `pago-aprobado:${orden.id}`,
-      });
-      const quien =
-        decisor.tipo === 'ADMIN'
-          ? `${primerNombre((await m.getRepository(User).findOneByOrFail({ id: decisor.id })).fullName)} aprobó`
-          : 'La aprobación automática aprobó';
-      await this.avisos.avisarAdmins(m, PLANTILLA.VENTA_APROBADA, {
-        clave: `venta:${orden.id}`,
-        datos: {
-          quien,
-          orden: orden.number,
-          plan: plan.name.toLowerCase(),
-          cliente: cliente.fullName,
-          cuenta: cuenta.accountNumber,
-          monto: formatearUsd(orden.amountUsdCents),
-          conectar: conexion === ESTADO_CONEXION.POR_CONECTAR ? 'si' : 'no',
-        },
-      });
-      await this.registrar(m, decisor, 'pago.aprobado', orden, {
-        modo: decisor.tipo === 'ADMIN' ? 'MANUAL' : 'AUTO',
-        forzado: forzar && !verificada,
-        verificacion: orden.verificationStatus,
-        periodo: { inicio: inicio.toISOString(), fin: fin.toISOString() },
-        comisionBp: porcentaje,
-      });
+    const [socio] = (await m.query(
+      `SELECT commission_bp FROM partner_profiles ORDER BY created_at LIMIT 1`,
+    )) as { commission_bp: number }[];
+    const porcentaje = socio?.commission_bp ?? 0;
+    await m.getRepository(PaymentOrder).update(
+      { id: orden.id },
+      {
+        status: ESTADO_ORDEN.APROBADA,
+        decidedBy: decisor.tipo === 'ADMIN' ? decisor.id : null,
+        decidedAt: ahora,
+        approvalMode: decisor.tipo === 'ADMIN' ? 'MANUAL' : 'AUTO',
+        commissionBp: porcentaje,
+        commissionUsdCents: aplicarPorcentaje(orden.amountUsdCents, porcentaje),
+      },
+    );
+
+    const cuenta = await m
+      .getRepository(TradingAccount)
+      .findOneByOrFail({ id: orden.tradingAccountId });
+    const conexion = conexionAlActivar(cuenta.connectionStatus);
+    await m.getRepository(TradingAccount).update({ id: cuenta.id }, { connectionStatus: conexion });
+
+    const cliente = await m.getRepository(User).findOneByOrFail({ id: orden.userId });
+    await this.avisos.encolar(m, {
+      usuarioId: cliente.id,
+      correo: cliente.email,
+      plantilla: PLANTILLA.PAGO_APROBADO,
+      datos: {
+        nombre: cliente.fullName.split(' ')[0] ?? cliente.fullName,
+        orden: orden.number,
+        plan: plan.name.toLowerCase(),
+        cuenta: cuenta.accountNumber,
+        vence: fechaSinHora(fin),
+        conectar: conexion === ESTADO_CONEXION.CONECTADA ? 'no' : 'si',
+      },
+      clave: `pago-aprobado:${orden.id}`,
+    });
+    const quien =
+      decisor.tipo === 'ADMIN'
+        ? `${primerNombre((await m.getRepository(User).findOneByOrFail({ id: decisor.id })).fullName)} aprobó`
+        : 'La aprobación automática aprobó';
+    await this.avisos.avisarAdmins(m, PLANTILLA.VENTA_APROBADA, {
+      clave: `venta:${orden.id}`,
+      datos: {
+        quien,
+        orden: orden.number,
+        plan: plan.name.toLowerCase(),
+        cliente: cliente.fullName,
+        cuenta: cuenta.accountNumber,
+        monto: formatearUsd(orden.amountUsdCents),
+        conectar: conexion === ESTADO_CONEXION.POR_CONECTAR ? 'si' : 'no',
+      },
+    });
+    await this.registrar(m, decisor, 'pago.aprobado', orden, {
+      modo: decisor.tipo === 'ADMIN' ? 'MANUAL' : 'AUTO',
+      forzado: forzar && !verificada,
+      verificacion: orden.verificationStatus,
+      periodo: { inicio: inicio.toISOString(), fin: fin.toISOString() },
+      comisionBp: porcentaje,
     });
   }
 

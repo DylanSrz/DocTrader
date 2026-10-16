@@ -118,6 +118,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `TURNSTILE_SECRET` | Clave secreta de Cloudflare Turnstile (cuando exista la cuenta) |
    | `COINGECKO_API_KEY` | Opcional: llave gratis de CoinGecko (plan Demo) para comparar el precio de BTC con más consultas |
    | `TRONGRID_API_KEY`, `TRONSCAN_API_KEY` | Opcionales, también en el worker: llaves gratis de TronGrid y Tronscan para verificar pagos en Tron con más consultas |
+   | `BINANCE_API_KEY`, `BINANCE_API_SECRET` | Opcionales, en el worker: llave de **solo lectura** de la cuenta de Binance de cobro, para verificar los pagos entre cuentas de Binance (sin hash). Sin ellas, esos pagos se revisan a mano. El worker debe correr fuera de Estados Unidos |
 
 5. Revisar `https://<dominio-de-la-api>/salud`: debe responder `"estado":"ok"` y, al minuto, mostrar el latido del
    worker. Sin el secreto de la web, cualquier otra ruta responde 404, salvo `/archivos/subir`: la subida de

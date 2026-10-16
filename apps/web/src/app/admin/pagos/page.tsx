@@ -6,7 +6,13 @@ import { Enlace, Estado, Etiqueta, Triangulo, cx } from '@/components/ui';
 import { llamarApi } from '@/lib/api';
 import { conceptoOrden, fechaCorta, montoCripto, nombreRed, usd } from '@/lib/formato';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
-import { AprobacionAutomatica, AprobarPago, RechazarPago, VerificarPago } from './acciones-pago';
+import {
+  AprobacionAutomatica,
+  AprobarPago,
+  RechazarPago,
+  RegistrarPagoManual,
+  VerificarPago,
+} from './acciones-pago';
 
 export const metadata: Metadata = { title: 'Pagos' };
 
@@ -130,7 +136,7 @@ function Pago({ pago }: { pago: PagoAdmin }) {
         ) : null}
         {pago.hash ? (
           <p className="grid w-full gap-1 text-sm text-ceniza">
-            Hash
+            Código reportado
             <code className="font-sans text-[15px] break-all text-niebla">{pago.hash}</code>
             {pago.enlaceExplorador ? (
               <Enlace href={pago.enlaceExplorador} target="_blank" rel="noopener" gris>
@@ -169,7 +175,7 @@ function Pago({ pago }: { pago: PagoAdmin }) {
           </ul>
         ) : null}
         {pago.nota ? <p className="max-w-[34em] text-[15px] text-niebla">{pago.nota}</p> : null}
-        {pago.error ? (
+        {pago.error && !pago.nota ? (
           <p className="max-w-[34em] text-sm text-ceniza">
             Los proveedores de la blockchain no respondieron la última vez. Seguimos intentando.
           </p>
@@ -336,7 +342,12 @@ async function Contenido() {
         titulo="Órdenes expiradas esta semana"
         id="t-expiradas"
         pagos={expiradas}
-        ultima={() => <span className="text-niebla">No reportó un pago dentro de la hora</span>}
+        ultima={(p) => (
+          <span className="grid justify-items-start gap-1">
+            <span className="text-niebla">No reportó un pago dentro de la hora</span>
+            <RegistrarPagoManual numero={p.numero} cliente={p.cliente.nombre} />
+          </span>
+        )}
       />
 
       {/* Las verificaciones del worker van llegando: la vista se actualiza sola. */}
