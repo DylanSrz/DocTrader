@@ -353,6 +353,7 @@ export async function guardarPrecios(
     }),
   );
   if (!r.ok) return r.estado;
+  // La landing y los términos leen los precios de esta misma etiqueta: se rearman solos con los nuevos.
   updateTag(ETIQUETA_LANDING);
   revalidatePath('/admin/ajustes');
   return listo(previo, 'Precios guardados. Aplican a las órdenes nuevas.');

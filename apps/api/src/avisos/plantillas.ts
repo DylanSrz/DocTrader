@@ -3,6 +3,8 @@
  * cambian los fondos oscuros), un solo botón naranja y el aviso antiphishing en el pie.
  */
 
+import { CORREO_SOPORTE } from '@doctrader/shared';
+
 export const PLANTILLA = {
   VERIFICAR_CORREO: 'verificar-correo',
   YA_REGISTRADO: 'ya-registrado',
@@ -68,6 +70,14 @@ const PIE =
   'DocTraderPRO nunca te pedirá tu contraseña ni tus códigos por correo, chat o teléfono. ' +
   'Si tienes dudas, responde este correo o escríbenos a support@doctraderpro.com.';
 
+/** Texto escapado con el correo de soporte como enlace `mailto:` (en el HTML del correo). */
+function conEnlaceDeSoporte(texto: string): string {
+  return escapar(texto).replaceAll(
+    CORREO_SOPORTE,
+    `<a href="mailto:${CORREO_SOPORTE}" style="color:inherit">${CORREO_SOPORTE}</a>`,
+  );
+}
+
 function armar({ asunto, saludo, parrafos, boton, despues = [] }: Contenido): CorreoListo {
   const texto = [
     saludo,
@@ -81,7 +91,7 @@ function armar({ asunto, saludo, parrafos, boton, despues = [] }: Contenido): Co
   ].join('\n');
 
   const p = (contenido: string) =>
-    `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;color:#1a1a1a">${escapar(contenido)}</p>`;
+    `<p style="margin:0 0 16px;font-size:16px;line-height:1.55;color:#1a1a1a">${conEnlaceDeSoporte(contenido)}</p>`;
   const html = `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapar(asunto)}</title></head>
 <body style="margin:0;padding:0;background:#f4f4f2">
@@ -100,7 +110,7 @@ ${
 ${despues.map(p).join('\n')}
 </td></tr>
 <tr><td style="padding:16px 32px 32px;font-family:Inter,Helvetica,Arial,sans-serif;border-top:1px solid #eee">
-<p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#6b6b6b">${escapar(PIE)}</p>
+<p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#6b6b6b">${conEnlaceDeSoporte(PIE)}</p>
 <p style="margin:0;font-size:13px;color:#6b6b6b">DocTraderPRO · Barranquilla, Colombia</p>
 </td></tr></table></td></tr></table></body></html>`;
 
@@ -371,7 +381,9 @@ export function renderizar(
         parrafos: [
           verificado
             ? `El pago de la orden ${datos.orden} (${datos.cliente}, licencia ${datos.plan}, ${datos.monto}) pasó la verificación en la blockchain. Falta que lo apruebes.`
-            : `El pago de la orden ${datos.orden} (${datos.cliente}, licencia ${datos.plan}, ${datos.monto}) no pasó la verificación: ${datos.motivo}.`,
+            : datos.estado === 'POR_CONFIRMAR'
+              ? `El pago de la orden ${datos.orden} (${datos.cliente}, licencia ${datos.plan}, ${datos.monto}) coincide en la blockchain, pero ${datos.motivo.charAt(0).toLowerCase()}${datos.motivo.slice(1)}.`
+              : `El pago de la orden ${datos.orden} (${datos.cliente}, licencia ${datos.plan}, ${datos.monto}) no pasó la verificación: ${datos.motivo}.`,
           verificado
             ? 'Al aprobarlo, la licencia se activa y al cliente le llega el correo.'
             : 'Revísalo en el explorador antes de aprobarlo o rechazarlo.',

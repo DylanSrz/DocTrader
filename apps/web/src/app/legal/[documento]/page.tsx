@@ -1,9 +1,9 @@
-import { DOCUMENTOS_LEGALES, type TipoDocumentoLegal } from '@doctrader/shared';
+import { DOCUMENTOS_LEGALES, sustituirPrecios, type TipoDocumentoLegal } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Etiqueta } from '@/components/ui';
 import { markdownAHtml } from '@/lib/markdown';
-import { obtenerTextoLegal } from '@/lib/publico';
+import { obtenerLanding, obtenerTextoLegal } from '@/lib/publico';
 
 /**
  * Textos legales: la versión vigente que se publicó desde el panel (`legal_documents`). Quedan en caché y se
@@ -33,7 +33,9 @@ export async function generateMetadata({
 export default async function DocumentoLegal({ params }: PageProps<'/legal/[documento]'>) {
   const tipo = tipoDeRuta((await params).documento);
   if (!tipo) notFound();
-  const texto = await obtenerTextoLegal(tipo);
+  const [texto, { planes }] = await Promise.all([obtenerTextoLegal(tipo), obtenerLanding()]);
+  // Los precios salen de la tabla de planes (la misma de la landing y del pago), no del texto publicado.
+  const contenido = sustituirPrecios(texto.contenido, planes);
   return (
     <article className="grid max-w-[46rem] gap-10">
       <div className="grid gap-6">
@@ -44,7 +46,7 @@ export default async function DocumentoLegal({ params }: PageProps<'/legal/[docu
         <h1 className="text-grande">{DOCUMENTOS_LEGALES[tipo].titulo}</h1>
       </div>
       {/* Markdown del panel de admin, convertido sin HTML (ver lib/markdown.ts). */}
-      <div className="prosa" dangerouslySetInnerHTML={{ __html: markdownAHtml(texto.contenido) }} />
+      <div className="prosa" dangerouslySetInnerHTML={{ __html: markdownAHtml(contenido) }} />
     </article>
   );
 }

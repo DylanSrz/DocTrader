@@ -64,12 +64,9 @@ Software**, no una recomendación de inversión.
 
 ## 5. Planes y precios
 
-5.1. Los planes vigentes a la fecha de esta versión son:
+5.1. Los planes y precios vigentes son los que se publican en la plataforma:
 
-| Plan | Duración | Precio |
-|---|---|---|
-| Mensual | 1 mes | USD 120 |
-| Semestral | 6 meses | USD 499 |
+{{precios}}
 
 5.2. Los precios están en dólares estadounidenses (USD). DocTraderPRO puede cambiarlos en cualquier momento; el
 cambio aplica solo a compras y renovaciones posteriores.

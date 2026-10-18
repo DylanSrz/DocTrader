@@ -9,7 +9,7 @@ import {
 import type { Lectura } from './lectura.js';
 
 /** Los cinco chequeos de cada pago (`docs/CONTEXTO.md`, "Pagos"). */
-export type ClaveChequeo = 'HASH' | 'DESTINO' | 'MONTO' | 'FECHA' | 'CONFIRMACIONES';
+export type ClaveChequeo = 'HASH' | 'DESTINO' | 'MONTO' | 'FECHA' | 'CONFIRMACIONES' | 'UNICO';
 export type EstadoChequeo = 'OK' | 'FALLA' | 'ESPERA';
 
 export interface Chequeo {
@@ -39,6 +39,11 @@ export interface OrdenAVerificar {
   reportadaEn: Date;
   /** Se reportó el número de una transferencia interna de Binance, no un hash. */
   interna?: boolean;
+  /**
+   * Órdenes de otros clientes por el mismo monto y la misma red que estaban abiertas cuando se envió el pago (las
+   * cuenta el servicio con la hora de la transacción). Si hay alguna, el pago pudo ser de cualquiera.
+   */
+  otrasConMismoMonto?: number;
 }
 
 /** Diferencia de relojes aceptada entre el servidor y la blockchain para el chequeo de la fecha. */
@@ -119,8 +124,8 @@ export function evaluar(
   }
   chequeos.push(destino);
 
-  // Exacto: cada orden abierta tiene un monto distinto, y es lo que liga el pago a su orden. Uno mayor puede ser el
-  // pago de otra persona; lo revisa un admin (ve los remitentes) y lo aprueba a mano si corresponde.
+  // Exacto: es lo que se le pidió al cliente. Uno mayor puede ser el pago de otra persona; lo revisa un admin (ve los
+  // remitentes) y lo aprueba a mano si corresponde.
   const montoOk = recibido === orden.unidades;
   const montoMayor = recibido > orden.unidades;
   chequeos.push({
@@ -152,6 +157,20 @@ export function evaluar(
       : `${Math.min(confirmaciones, minimoConfirmaciones)} de ${minimoConfirmaciones} confirmaciones`,
   });
 
+  // En USDT se cobra el precio exacto, así que dos clientes pueden pagar lo mismo a la misma hora: nadie debe poder
+  // reportar como suyo el pago de otro. Si había otra orden igual abierta, un admin confirma quién lo envió.
+  const compartido = montoOk && (orden.otrasConMismoMonto ?? 0) > 0;
+  if (compartido) {
+    chequeos.push({
+      clave: 'UNICO',
+      estado: 'FALLA',
+      texto:
+        orden.otrasConMismoMonto === 1
+          ? 'Otro cliente tenía una orden abierta por el mismo monto a esa hora: confirma con el cliente (captura del envío) antes de aprobar'
+          : `Otros ${orden.otrasConMismoMonto} clientes tenían órdenes abiertas por el mismo monto a esa hora: confirma con el cliente (captura del envío) antes de aprobar`,
+    });
+  }
+
   let estado: EstadoVerificacion;
   if (destino.estado === 'FALLA' || fecha.estado === 'FALLA' || montoMayor) {
     estado = ESTADO_VERIFICACION.NO_COINCIDE;
@@ -159,6 +178,8 @@ export function evaluar(
     estado = ESTADO_VERIFICACION.MONTO_INCOMPLETO;
   } else if (chequeos.some((c) => c.estado === 'ESPERA')) {
     estado = ESTADO_VERIFICACION.ESPERANDO_CONFIRMACIONES;
+  } else if (compartido) {
+    estado = ESTADO_VERIFICACION.POR_CONFIRMAR;
   } else {
     estado = ESTADO_VERIFICACION.VERIFICADA;
   }

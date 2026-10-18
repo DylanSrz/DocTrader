@@ -18,15 +18,6 @@ export function correoCanonico(correo: string): string {
 }
 
 /**
- * Cédula sin puntos, espacios ni guiones, en mayúsculas. Acepta cédula de ciudadanía o de extranjería (solo
- * dígitos) y pasaporte (letras y dígitos). Devuelve `null` si no tiene una forma razonable.
- */
-export function normalizarCedula(cedula: string): string | null {
-  const limpia = cedula.replace(/[\s.-]/g, '').toUpperCase();
-  return /^[0-9A-Z]{5,15}$/.test(limpia) ? limpia : null;
-}
-
-/**
  * Teléfono en formato internacional E.164 (`+573001234567`). Si no trae indicativo, se asume Colombia.
  * Devuelve `null` si el número no es válido.
  */
@@ -38,6 +29,21 @@ export function normalizarTelefono(telefono: string): string | null {
 /** Reglas de contraseña de `docs/SEGURIDAD.md` §2: largo mínimo, sin reglas raras de composición. */
 export const CONTRASENA_MINIMO = 10;
 export const CONTRASENA_MAXIMO = 128;
+
+/**
+ * La política de contraseñas como lista de requisitos, para mostrarla mientras se escribe. Son los mismos que exige
+ * la API (largo mínimo y máximo); que no esté filtrada solo se puede revisar al enviar.
+ */
+export function requisitosContrasena(contrasena: string): { texto: string; cumple: boolean }[] {
+  const largo = contrasena.length;
+  return [
+    { texto: `Al menos ${CONTRASENA_MINIMO} caracteres`, cumple: largo >= CONTRASENA_MINIMO },
+    {
+      texto: `Como máximo ${CONTRASENA_MAXIMO} caracteres`,
+      cumple: largo > 0 && largo <= CONTRASENA_MAXIMO,
+    },
+  ];
+}
 
 /** Un teléfono guardado (`+573001234567`) como se lee: "+57 300 1234567". */
 export function formatearTelefono(e164: string): string {

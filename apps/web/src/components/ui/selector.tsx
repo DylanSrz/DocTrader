@@ -26,7 +26,7 @@ export function Selector({
           aria-invalid={error ? true : undefined}
           aria-describedby={idError}
           {...select}
-          className="min-h-[52px] w-full cursor-pointer appearance-none rounded-pildora bg-campo py-3.5 pr-12 pl-5 text-base font-normal text-blanco transition-[background-color,box-shadow] duration-200 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none aria-invalid:shadow-[0_0_0_1.5px_var(--color-error)] [&>option]:bg-[#111]"
+          className="min-h-[52px] w-full cursor-pointer appearance-none rounded-pildora bg-campo py-3.5 pr-12 pl-5 text-base font-normal text-blanco transition-[background-color,box-shadow] duration-200 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none aria-invalid:shadow-[0_0_0_1.5px_var(--color-error)]"
         >
           {children}
         </select>

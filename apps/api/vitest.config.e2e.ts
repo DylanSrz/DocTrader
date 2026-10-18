@@ -10,6 +10,7 @@ export default defineConfig({
     root: './',
     include: ['test/**/*.e2e-spec.ts'],
     globalSetup: ['./test/preparar-base.ts'],
+    setupFiles: ['./test/sin-ordenes-ajenas.ts'],
     fileParallelism: false,
     hookTimeout: 60_000,
     env: {

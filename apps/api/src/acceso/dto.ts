@@ -22,9 +22,28 @@ export class RegistroDto {
   })
   nombre: string;
 
+  /** País que expidió el documento (ISO 3166-1, dos letras). Sin él se asume Colombia (formularios de antes). */
+  @IsOptional()
   @IsString()
-  @Length(5, 20, { message: 'Escribe tu número de cédula.' })
-  cedula: string;
+  @Length(2, 2)
+  documentoPais?: string;
+
+  /** Tipo de documento (`TIPO_DOCUMENTO`). Sin él se asume cédula de ciudadanía (formularios de antes). */
+  @IsOptional()
+  @IsString()
+  @MaxLength(16)
+  documentoTipo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(40, { message: 'Escribe el número de tu documento.' })
+  documento?: string;
+
+  /** Nombre de antes del número de documento; se acepta mientras se actualiza la web. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  cedula?: string;
 
   @IsEmail({}, { message: 'Escribe un correo válido.' })
   @MaxLength(254)

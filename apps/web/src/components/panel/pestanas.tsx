@@ -8,9 +8,12 @@ import { type Ref, useEffect, useRef } from 'react';
 export function Pestanas({
   pestanas,
   avisos,
+  vertical = false,
 }: {
   pestanas: Pestana[];
   avisos?: Record<string, number>;
+  /** En el menú de celular y tablet: una debajo de otra, grandes. */
+  vertical?: boolean;
 }) {
   const ruta = usePathname();
   // La pestaña activa es la de la ruta más larga que coincide (/admin/legal/terminos → /admin/legal).
@@ -27,7 +30,15 @@ export function Pestanas({
     if (!actual || !barra || barra.scrollWidth <= barra.clientWidth) return;
     barra.scrollTo({ left: actual.offsetLeft - (barra.clientWidth - actual.offsetWidth) / 2 });
   }, [activa]);
-  return <ListaPestanas ref={lista} pestanas={pestanas} activa={activa} avisos={avisos} />;
+  return (
+    <ListaPestanas
+      ref={lista}
+      pestanas={pestanas}
+      activa={activa}
+      avisos={avisos}
+      vertical={vertical}
+    />
+  );
 }
 
 export type Pestana = {
@@ -47,12 +58,40 @@ export function ListaPestanas({
   activa,
   avisos,
   ref,
+  vertical = false,
 }: {
   pestanas: Pestana[];
   activa?: string;
   avisos?: Record<string, number>;
   ref?: Ref<HTMLUListElement>;
+  vertical?: boolean;
 }) {
+  if (vertical) {
+    return (
+      <ul ref={ref} className="grid gap-1">
+        {pestanas.map((p) => (
+          <li key={p.href}>
+            <Link
+              href={p.href}
+              aria-current={p.href === activa ? 'page' : undefined}
+              className="flex min-h-14 items-center gap-3 text-[28px] leading-none tracking-[-0.03em] text-ceniza transition-colors duration-200 hover:text-blanco aria-[current=page]:text-blanco"
+            >
+              <span
+                aria-hidden="true"
+                className={
+                  p.href === activa
+                    ? 'size-0 border-y-[6px] border-l-[9px] border-y-transparent border-l-llama'
+                    : 'w-[9px]'
+                }
+              />
+              {p.texto}
+              <Aviso pestana={p} n={avisos?.[p.href] ?? 0} />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    );
+  }
   return (
     <ul ref={ref} className="flex gap-[clamp(16px,3vw,40px)]">
       {pestanas.map((p) => (

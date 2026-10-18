@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { Aviso, BotonEnviar, CampoContrasena, Enlace, Pildora } from '@/components/ui';
+import { Aviso, BotonEnviar, ContrasenaNueva, Enlace, Pildora } from '@/components/ui';
 import type { EstadoFormulario } from '@/lib/formulario';
 import { restablecer } from '../acciones';
 import { useTokenDelEnlace } from '../token-del-enlace';
@@ -42,15 +42,11 @@ export function FormularioRestablecer() {
           </Enlace>
         </Aviso>
       ) : null}
-      <CampoContrasena
+      <ContrasenaNueva
+        key={estado.envio ?? 0}
         etiqueta="Contraseña nueva"
-        name="contrasena"
-        autoComplete="new-password"
-        required
-        minLength={10}
-        maxLength={128}
         autoFocus
-        error={estado.campos?.contrasena}
+        errores={estado.campos}
       />
       <BotonEnviar enviando="Guardando…" disabled={!token} className="justify-self-start">
         Guardar contraseña

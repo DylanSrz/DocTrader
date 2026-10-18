@@ -106,6 +106,9 @@ export class VerificacionPagos {
         return;
       }
 
+      const otrasConMismoMonto = lectura.lectura.encontrada
+        ? await this.otrasConMismoMonto(orden, lectura.lectura.hora)
+        : 0;
       const resultado = evaluar(
         {
           direccion: orden.depositAddress,
@@ -115,6 +118,7 @@ export class VerificacionPagos {
           creadaEn: orden.createdAt,
           reportadaEn: orden.reportedAt ?? orden.createdAt,
           interna: esTransferenciaBinance(orden.txHash),
+          otrasConMismoMonto,
         },
         lectura.lectura,
         ajustes.confirmaciones[orden.network],
@@ -142,6 +146,7 @@ export class VerificacionPagos {
         ],
       );
       const terminal =
+        resultado.estado === ESTADO_VERIFICACION.POR_CONFIRMAR ||
         resultado.estado === ESTADO_VERIFICACION.MONTO_INCOMPLETO ||
         resultado.estado === ESTADO_VERIFICACION.NO_COINCIDE ||
         (resultado.estado === ESTADO_VERIFICACION.VERIFICADA && !ajustes.aprobacionAutomatica);
@@ -154,6 +159,26 @@ export class VerificacionPagos {
         this.logger.error(`No se pudo aprobar solo ${orden.number}: ${(error as Error).message}`);
       });
     }
+  }
+
+  /**
+   * Cuántas órdenes de otros clientes, por el mismo monto y la misma red, pudieron ser las dueñas de este pago: creadas
+   * antes de enviarlo (con la tolerancia del reloj), vencidas hace menos de una hora (un pago puede llegar tarde) y
+   * sin un pago propio reportado (pendientes o vencidas sin reportar; las reportadas, aprobadas, rechazadas o
+   * canceladas ya tienen su hash o se descartaron). Sin la hora (aún sin bloque) se cuenta desde la creación de esta
+   * orden; se vuelve a contar en cada revisión hasta que quede verificada.
+   */
+  private async otrasConMismoMonto(orden: PaymentOrder, hora: Date | null): Promise<number> {
+    const momento = hora ?? orden.createdAt;
+    const filas = (await this.fuente.query(
+      `SELECT count(*)::int AS n FROM payment_orders
+        WHERE network = $1 AND amount_base_units = $2 AND user_id <> $3 AND id <> $4
+          AND status IN ('PENDIENTE', 'EXPIRADA') AND tx_hash IS NULL
+          AND created_at <= $5::timestamptz + interval '2 minutes'
+          AND expires_at + interval '1 hour' >= $5::timestamptz`,
+      [orden.network, orden.amountBaseUnits, orden.userId, orden.id, momento],
+    )) as { n: number }[];
+    return filas[0]?.n ?? 0;
   }
 
   /** Avisa a los admins que un pago espera su decisión: verificado, o con un problema que hay que mirar a mano. */

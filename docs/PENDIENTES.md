@@ -67,6 +67,13 @@
 
 ## ❓ Por confirmar con Argemiro
 
+- [ ] **Pagos en USDT "por confirmar"** (2026-10-18): con el precio exacto, si otro cliente tenía una orden abierta
+      por el mismo monto cuando llegó el pago, el pago no se aprueba solo: hay que pedirle al cliente la captura del
+      envío y usar "Aprobar de todos modos". Con pocos clientes pasará poco; si molesta, se puede volver a los
+      centavos de diferencia.
+- [ ] **Documentos de otros países** (2026-10-18): se admiten Colombia, Argentina, México, Estados Unidos, Reino Unido
+      y 22 países más con pasaporte o documento nacional. ¿Falta algún país o documento?
+
 - [x] **Aceptar de nuevo los textos legales** (2026-10-15): no hace falta. Los clientes de hoy son de prueba y, antes
       de salir a producción, se limpia la base de datos (todo menos los admins): todos los clientes se registran de
       nuevo con los textos vigentes.

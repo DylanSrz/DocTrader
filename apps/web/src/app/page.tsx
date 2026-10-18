@@ -5,6 +5,7 @@ import { CopiarCorreo } from '@/components/landing/copiar-correo';
 import { EnlacePanel } from '@/components/landing/enlace-panel';
 import { Particulas } from '@/components/landing/particulas';
 import { Marca } from '@/components/marca';
+import { MenuMovil } from '@/components/menu-movil';
 import { Enlace, Etiqueta, Pildora, cx } from '@/components/ui';
 import { markdownAHtml } from '@/lib/markdown';
 import { type Landing, obtenerLanding, type PlanPublico } from '@/lib/publico';
@@ -59,34 +60,61 @@ export default async function Inicio() {
   );
 }
 
+const SECCIONES = [
+  ['#como-funciona', 'Cómo funciona'],
+  ['#precios', 'Precios'],
+  ['#preguntas', 'Preguntas'],
+] as const;
+
 function Barra() {
   return (
     <header className="relative z-10 pt-[calc(env(safe-area-inset-top,0px)+22px)]">
       <div className="contenedor flex items-center justify-between gap-6">
         <Marca />
-        <nav aria-label="Principal" className="flex items-center gap-[clamp(16px,3vw,40px)]">
-          <ul className="hidden gap-[clamp(20px,3vw,36px)] min-[961px]:flex">
-            {[
-              ['#como-funciona', 'Cómo funciona'],
-              ['#precios', 'Precios'],
-              ['#preguntas', 'Preguntas'],
-            ].map(([href, texto]) => (
-              <li key={href}>
-                <a
-                  href={href}
-                  className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco"
-                >
-                  {texto}
-                </a>
-              </li>
-            ))}
-          </ul>
-          {/* En celular no cabe: queda en el pie de la página. */}
-          <EnlacePanel className="hidden min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco min-[520px]:inline-flex" />
+        <div className="flex items-center gap-[clamp(12px,3vw,40px)]">
+          {/* Escritorio: las secciones e "Ingresar" en la barra. Celular y tablet: en el menú de tres líneas. */}
+          <nav
+            aria-label="Principal"
+            className="hidden items-center gap-[clamp(16px,3vw,40px)] min-[961px]:flex"
+          >
+            <ul className="flex gap-[clamp(20px,3vw,36px)]">
+              {SECCIONES.map(([href, texto]) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco"
+                  >
+                    {texto}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <EnlacePanel className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco" />
+          </nav>
           <Pildora href="#precios" className="gap-0 px-[18px] sm:px-[22px]">
             Comprar<span className="hidden sm:inline">&nbsp;licencia</span>
           </Pildora>
-        </nav>
+          <MenuMovil etiqueta="Menú principal" cabecera={<Marca />} className="min-[961px]:hidden">
+            <nav aria-label="Principal">
+              <ul className="grid gap-1">
+                {SECCIONES.map(([href, texto]) => (
+                  <li key={href}>
+                    <a
+                      href={href}
+                      className="flex min-h-14 items-center text-[28px] leading-none tracking-[-0.03em] text-blanco"
+                    >
+                      {texto}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <div className="grid justify-items-start gap-4 border-t border-white/10 pt-6">
+              <EnlacePanel className="inline-flex min-h-11 items-center text-[17px] text-blanco underline decoration-white/35 underline-offset-[6px]" />
+              <Pildora href="#precios">Comprar licencia</Pildora>
+            </div>
+          </MenuMovil>
+        </div>
       </div>
     </header>
   );
@@ -413,7 +441,8 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
       >
         {publicos.map((plan, i) => {
           const meses = (plan.meses ?? 0) + plan.mesesObsequio;
-          const ruta = `/registro?plan=${plan.codigo.toLowerCase()}`;
+          // La ruta decide según la sesión: panel con la compra abierta, ingresar o registro.
+          const ruta = `/comprar/${plan.codigo.toLowerCase()}`;
           return (
             <article
               key={plan.codigo}
@@ -446,9 +475,13 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
                 ))}
               </ul>
               {plan === destacado ? (
-                <Pildora href={ruta}>Comprar {plan.nombre.toLowerCase()}</Pildora>
+                <Pildora href={ruta} nativo>
+                  Comprar {plan.nombre.toLowerCase()}
+                </Pildora>
               ) : (
-                <Enlace href={ruta}>Comprar {plan.nombre.toLowerCase()}</Enlace>
+                <Enlace href={ruta} nativo>
+                  Comprar {plan.nombre.toLowerCase()}
+                </Enlace>
               )}
             </article>
           );

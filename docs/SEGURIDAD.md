@@ -129,15 +129,26 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 - Montos en unidades enteras de cada moneda (sin decimales flotantes): USDT en Tron usa 6 decimales y BTC 8.
 - Índice único por red y hash en la base de datos: un hash no se puede usar en dos órdenes, ni siquiera con dos
   peticiones al mismo tiempo.
-- **Monto único por orden** (etapa 9): todas las órdenes usan la misma dirección de depósito, así que el monto es lo
-  que liga un pago a su orden. Cada orden abierta de una red tiene un monto distinto (unos centavos o satoshis menos
-  que el precio, elegido al azar con un candado por red) y la verificación exige el monto exacto. Sin esto, cualquier
-  cliente podía reportar como suyo el hash del pago de otro. Un monto mayor queda para revisión manual.
+- **Pagos que otro cliente pudo enviar** (etapa 9, cambiado el 2026-10-18): todas las órdenes usan la misma
+  dirección de depósito, así que alguien podría reportar como suyo el hash del pago de otro.
+  - **USDT:** desde el 2026-10-18 se cobra el **precio exacto** (USD 125 → 125 USDT), porque los clientes enviaban la
+    cifra redonda y los centavos de diferencia hacían fallar la verificación. Como el monto ya no distingue a quién
+    pertenece el pago, la verificación cuenta las órdenes de **otros** clientes por el mismo monto y red que pudieron
+    ser las dueñas del pago (pendientes o vencidas sin reportar, creadas antes del envío y vencidas hace menos de una
+    hora). Si hay alguna, el pago queda **"por confirmar"** (`POR_CONFIRMAR`): no se aprueba solo ni con "Aprobar";
+    un admin confirma con el cliente (captura del envío) y usa "Aprobar de todos modos".
+  - **BTC:** el monto sale de la cotización y nunca es redondo; cada orden abierta pide unos satoshis menos (de 1 a
+    999, al azar con un candado por red), distintos de las demás. La verificación exige el monto exacto.
+  - Un monto mayor queda para revisión manual.
 - Aprobar un pago bloquea la fila de la orden en una transacción, para que no se apruebe dos veces.
 - Los trabajos del worker son idempotentes: si se repiten, no duplican licencias ni días.
 - La aprobación automática (apagada por defecto) solo aprueba órdenes verificadas con todas las confirmaciones.
 - Si el proveedor de la blockchain no responde, la orden queda "por verificar" y se reintenta; nunca se aprueba sin
   verificar.
+- **Turnstile** (registro y otros formularios públicos): el token se valida en la API con `siteverify` (éxito y que se
+  haya resuelto en el dominio de la web); si Cloudflare no responde, no pasa. Los errores de consola
+  "Refused to connect to 'data:,'" vienen del **iframe de Cloudflare** y de su propia política (no de la nuestra): no
+  afectan el desafío y no se agrega `data:` a nuestra `connect-src` (2026-10-18).
 
 ## 7. Entradas de datos y archivos
 

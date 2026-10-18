@@ -31,6 +31,13 @@ export class User {
   @Column({ name: 'cedula_last4', type: 'char', length: 4, nullable: true })
   cedulaLast4: string | null;
 
+  /** País que expidió el documento (`cedula_*` guarda su número, de cualquier tipo). */
+  @Column({ name: 'document_country', type: 'char', length: 2, nullable: true })
+  documentCountry: string | null;
+
+  @Column({ name: 'document_type', type: 'varchar', length: 16, nullable: true })
+  documentType: string | null;
+
   @Column({ type: 'citext', unique: true })
   email: string;
 

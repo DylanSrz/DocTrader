@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { textoPublicoDeBorrador } from './legal.js';
+import { textoPublicoDeBorrador, sustituirPrecios } from './legal.js';
 
 describe('textoPublicoDeBorrador', () => {
   const borrador = [
@@ -27,5 +27,46 @@ describe('textoPublicoDeBorrador', () => {
 
   it('deja intacto un texto sin esas partes', () => {
     expect(textoPublicoDeBorrador('## 1. Algo\n\nTexto.')).toBe('## 1. Algo\n\nTexto.');
+  });
+});
+
+describe('sustituirPrecios', () => {
+  const planes = [
+    {
+      codigo: 'MENSUAL',
+      nombre: 'Mensual',
+      meses: 1,
+      mesesObsequio: 0,
+      precioUsdCentavos: 12_500,
+      publico: true,
+    },
+    {
+      codigo: 'SEMESTRAL',
+      nombre: 'Semestral',
+      meses: 6,
+      mesesObsequio: 0,
+      precioUsdCentavos: 49_900,
+      publico: true,
+    },
+    {
+      codigo: 'TRIMESTRAL',
+      nombre: 'Trimestral',
+      meses: 3,
+      mesesObsequio: 0,
+      precioUsdCentavos: 31_900,
+      publico: false,
+    },
+  ];
+
+  it('arma la tabla con los planes a la venta y sus precios actuales', () => {
+    expect(sustituirPrecios('Planes:\n\n{{precios}}\n\nFin.', planes)).toBe(
+      'Planes:\n\n| Plan | Duración | Precio |\n|---|---|---|\n| Mensual | 1 mes | USD 125 |\n| Semestral | 6 meses | USD 499 |\n\nFin.',
+    );
+  });
+
+  it('pone el precio de un plan y deja el marcador de uno que no existe', () => {
+    expect(sustituirPrecios('Cuesta {{precio:MENSUAL}}; {{precio:ANUAL}}.', planes)).toBe(
+      'Cuesta USD 125; {{precio:ANUAL}}.',
+    );
   });
 });

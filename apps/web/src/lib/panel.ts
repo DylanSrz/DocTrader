@@ -93,6 +93,8 @@ export interface Perfil {
   correo: string;
   telefono: string | null;
   cedulaUltimos4: string | null;
+  documentoPais: string | null;
+  documentoTipo: string | null;
   clienteDesde: string;
   segundoFactor: boolean;
 }

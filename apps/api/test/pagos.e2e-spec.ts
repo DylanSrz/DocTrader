@@ -111,7 +111,8 @@ describe('verificación y aprobación de pagos', () => {
     expect(revision).toMatchObject({
       verificacion: 'VERIFICADA',
       cliente: { nombre: 'Laura Gómez Restrepo' },
-      monto: expect.stringMatching(/^119\.\d{1,2}$/),
+      // En USDT se cobra el precio exacto: USD 120 son 120 USDT.
+      monto: '120',
       confirmaciones: 25,
       confirmacionesNecesarias: 20,
       proveedor: 'Prueba',
@@ -199,7 +200,8 @@ describe('verificación y aprobación de pagos', () => {
     const trampa = await atacante.web
       .post('/ordenes', { cuentaId: ajena.body.id, plan: 'MENSUAL', moneda: 'USDT' })
       .expect(201);
-    expect(trampa.body.monto).not.toBe(orden.body.monto);
+    // En USDT las dos órdenes piden el precio exacto: el monto ya no distingue a quién pertenece el pago.
+    expect(trampa.body.monto).toBe(orden.body.monto);
 
     // La víctima paga su monto exacto; el atacante ve el hash en la blockchain y lo reporta primero.
     const hash = hashNuevo();
@@ -213,9 +215,10 @@ describe('verificación y aprobación de pagos', () => {
     await atacante.web.post(`/ordenes/${trampa.body.numero}/reportar`, { hash }).expect(200);
     await verificacion.verificarPendientes();
     const revision = await pendiente(admin, trampa.body.numero);
-    // El monto de la víctima no es el de la trampa: queda menor (incompleto) o mayor (no coincide), nunca verificado.
-    expect(['MONTO_INCOMPLETO', 'NO_COINCIDE']).toContain(revision.verificacion);
-    expect(revision.chequeos.find((c: { clave: string }) => c.clave === 'MONTO')).toMatchObject({
+    // La víctima tenía una orden abierta por el mismo monto: el pago queda por confirmar, nunca verificado, y no se
+    // aprueba sin que un admin confirme quién lo envió.
+    expect(revision.verificacion).toBe('POR_CONFIRMAR');
+    expect(revision.chequeos.find((c: { clave: string }) => c.clave === 'UNICO')).toMatchObject({
       estado: 'FALLA',
     });
     await admin.web.post(`/admin/pagos/${trampa.body.numero}/aprobar`, {}).expect(409);

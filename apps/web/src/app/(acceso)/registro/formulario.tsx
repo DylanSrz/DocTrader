@@ -3,7 +3,15 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 import { Turnstile } from '@/components/turnstile';
-import { Aviso, BotonEnviar, Campo, CampoContrasena, Casilla, Enlace } from '@/components/ui';
+import {
+  Aviso,
+  BotonEnviar,
+  Campo,
+  CampoDocumento,
+  Casilla,
+  ContrasenaNueva,
+  Enlace,
+} from '@/components/ui';
 import { type EstadoRegistro, registrar } from '../acciones';
 
 function EnlaceLegal({ href, children }: { href: string; children: string }) {
@@ -49,17 +57,11 @@ export function FormularioRegistro() {
         defaultValue={v.nombre}
         error={e.nombre}
       />
-      <Campo
-        etiqueta="Cédula"
-        name="cedula"
-        inputMode="text"
-        autoComplete="off"
-        required
-        maxLength={20}
-        ayuda="Solo una cuenta por persona. Si eres extranjero, escribe tu cédula de extranjería o pasaporte."
-        defaultValue={v.cedula}
-        error={e.cedula}
-      />
+      {/*
+        React reinicia el formulario después de cada envío: con la `key` estos campos (que llevan su estado) se vuelven
+        a armar con lo que devolvió el servidor, y la lista de tipos nunca queda de otro país.
+      */}
+      <CampoDocumento key={`documento-${estado.envio ?? 0}`} valores={v} errores={e} />
       <Campo
         etiqueta="Correo"
         name="correo"
@@ -85,16 +87,7 @@ export function FormularioRegistro() {
         defaultValue={v.telefono}
         error={e.telefono}
       />
-      <CampoContrasena
-        etiqueta="Contraseña"
-        name="contrasena"
-        autoComplete="new-password"
-        required
-        minLength={10}
-        maxLength={128}
-        ayuda="Al menos 10 caracteres. Una frase corta funciona bien."
-        error={e.contrasena}
-      />
+      <ContrasenaNueva key={`contrasena-${estado.envio ?? 0}`} errores={e} />
 
       <fieldset className="grid gap-1">
         <legend className="sr-only">Autorizaciones</legend>

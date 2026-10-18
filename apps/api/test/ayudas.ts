@@ -20,6 +20,8 @@ export async function clienteConSesion(
   datos: {
     nombre?: string;
     cedula?: string;
+    documentoPais?: string;
+    documentoTipo?: string;
     correo?: string;
     telefono?: string;
     dispositivo?: string;
@@ -32,7 +34,9 @@ export async function clienteConSesion(
   await comoLaWeb(app)
     .post('/auth/registro', {
       nombre: datos.nombre ?? 'Laura Gómez Restrepo',
-      cedula: datos.cedula ?? id.slice(-10),
+      documentoPais: datos.documentoPais ?? 'CO',
+      documentoTipo: datos.documentoTipo ?? 'CC',
+      documento: datos.cedula ?? `1${id.slice(-9)}`,
       correo,
       telefono: datos.telefono ?? `32${id.slice(-8)}`,
       contrasena,

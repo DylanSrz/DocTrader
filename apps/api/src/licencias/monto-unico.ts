@@ -3,21 +3,23 @@ import type { Red } from '@doctrader/shared';
 import type { EntityManager } from 'typeorm';
 
 /**
- * Cuánto se descuenta, en unidades base, para que cada orden abierta tenga un monto distinto: de 0,01 a 0,99 USDT, o
- * de 1 a 999 satoshis (menos de un dólar). Siempre se descuenta: el cliente nunca paga más que el precio.
+ * Cuánto se descuenta en Bitcoin, en satoshis, para que cada orden abierta tenga un monto distinto (de 1 a 999
+ * satoshis, menos de un dólar). Siempre se descuenta: el cliente nunca paga más que el precio.
  */
-export const RANGO_DESCUENTO: Record<Red, { minimo: number; maximo: number; paso: bigint }> = {
-  TRON: { minimo: 1, maximo: 99, paso: 10_000n },
-  BITCOIN: { minimo: 1, maximo: 999, paso: 1n },
-};
+export const RANGO_DESCUENTO_BTC = { minimo: 1, maximo: 999 } as const;
 
 /**
- * El monto de una orden nueva, distinto del de todas las órdenes abiertas (pendientes o reportadas) de la misma red
- * (`docs/SEGURIDAD.md` §6). Todas las órdenes usan la misma dirección de depósito, y la verificación exige el monto
- * exacto: así nadie puede reportar como suyo el hash del pago de otro cliente. Corre dentro de la transacción de la
- * orden, con un candado por red para que dos órdenes al mismo tiempo no elijan el mismo monto.
+ * El monto de una orden nueva, en unidades base.
+ *
+ * - **USDT (Tron):** el precio exacto (USD 125 → 125 USDT), sin centavos de diferencia: el cliente envía la cifra
+ *   que ve en los precios. Como dos órdenes pueden pedir el mismo monto, la verificación marca "por confirmar" el pago
+ *   que otro cliente también pudo enviar (`pagos/verificacion-pagos.service.ts`, `docs/SEGURIDAD.md` §6).
+ * - **BTC:** el monto ya sale de la cotización y nunca es redondo; se le descuentan de 1 a 999 satoshis para que sea
+ *   distinto del de las demás órdenes abiertas, con un candado por red para que dos órdenes al mismo tiempo no elijan
+ *   el mismo.
  */
-export async function montoUnico(m: EntityManager, red: Red, unidades: bigint): Promise<bigint> {
+export async function montoDeOrden(m: EntityManager, red: Red, unidades: bigint): Promise<bigint> {
+  if (red === 'TRON') return unidades;
   await m.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [`monto-orden:${red}`]);
   const filas = (await m.query(
     `SELECT amount_base_units FROM payment_orders
@@ -25,10 +27,9 @@ export async function montoUnico(m: EntityManager, red: Red, unidades: bigint): 
     [red],
   )) as { amount_base_units: string }[];
   const usados = new Set(filas.map((f) => f.amount_base_units));
-  const { minimo, maximo, paso } = RANGO_DESCUENTO[red];
   const libres: bigint[] = [];
-  for (let n = minimo; n <= maximo; n++) {
-    const candidato = unidades - BigInt(n) * paso;
+  for (let n = RANGO_DESCUENTO_BTC.minimo; n <= RANGO_DESCUENTO_BTC.maximo; n++) {
+    const candidato = unidades - BigInt(n);
     if (!usados.has(candidato.toString())) libres.push(candidato);
   }
   if (libres.length === 0) {

@@ -1,7 +1,18 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { Aviso, BotonEnviar, Campo, Casilla, Enlace, Pildora } from '@/components/ui';
+import {
+  Aviso,
+  BotonAccion,
+  BotonEnviar,
+  Campo,
+  Casilla,
+  copiarTexto,
+  descargarContenido,
+  Enlace,
+  Pildora,
+  useEstadoAccion,
+} from '@/components/ui';
 import { type EstadoSegundoFactor, segundoFactor } from './acciones';
 
 /** Configurar la app de autenticación en tres pasos: empezar, escanear el QR y guardar los códigos. */
@@ -98,13 +109,8 @@ function CodigosDeRecuperacion({ codigos, inicio }: { codigos: string[]; inicio:
   const [guardados, setGuardados] = useState(false);
   const textoPlano = `Códigos de recuperación de DocTraderPRO\nCada uno sirve una sola vez.\n\n${codigos.join('\n')}\n`;
 
-  function descargar() {
-    const enlace = document.createElement('a');
-    enlace.href = URL.createObjectURL(new Blob([textoPlano], { type: 'text/plain' }));
-    enlace.download = 'doctraderpro-codigos-de-recuperacion.txt';
-    enlace.click();
-    URL.revokeObjectURL(enlace.href);
-  }
+  const [descarga, setDescarga] = useEstadoAccion();
+  const [copia, setCopia] = useEstadoAccion();
 
   return (
     <div className="grid gap-6">
@@ -123,20 +129,41 @@ function CodigosDeRecuperacion({ codigos, inicio }: { codigos: string[]; inicio:
         ))}
       </ol>
       <div className="flex flex-wrap gap-x-8">
-        <button
-          type="button"
-          onClick={descargar}
-          className="inline-flex min-h-11 items-center text-sm text-blanco underline decoration-white/35 underline-offset-[6px] hover:decoration-current"
-        >
-          Descargar como archivo
-        </button>
-        <button
-          type="button"
-          onClick={() => navigator.clipboard?.writeText(textoPlano)}
-          className="inline-flex min-h-11 items-center text-sm text-blanco underline decoration-white/35 underline-offset-[6px] hover:decoration-current"
-        >
-          Copiar
-        </button>
+        <BotonAccion
+          variante="enlace"
+          estado={descarga}
+          textos={{
+            normal: 'Descargar como archivo',
+            procesando: 'Preparando…',
+            exito: 'Archivo descargado',
+            error: 'No se pudo descargar: cópialos',
+          }}
+          onClick={() =>
+            setDescarga(
+              descargarContenido(
+                textoPlano,
+                'doctraderpro-codigos-de-recuperacion.txt',
+                'text/plain;charset=utf-8',
+              )
+                ? 'exito'
+                : 'error',
+            )
+          }
+        />
+        <BotonAccion
+          variante="enlace"
+          estado={copia}
+          textos={{
+            normal: 'Copiar',
+            procesando: 'Copiando…',
+            exito: '¡Copiados!',
+            error: 'No se copiaron: selecciónalos',
+          }}
+          onClick={async () => {
+            setCopia('procesando');
+            setCopia((await copiarTexto(textoPlano)) ? 'exito' : 'error');
+          }}
+        />
       </div>
       <Casilla checked={guardados} onChange={(e) => setGuardados(e.currentTarget.checked)}>
         Ya guardé mis códigos en un lugar seguro.

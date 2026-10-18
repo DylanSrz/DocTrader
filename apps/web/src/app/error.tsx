@@ -1,5 +1,6 @@
 'use client';
 
+import { CorreoSoporte } from '@/components/correo-soporte';
 import { PantallaAviso } from '@/components/pantalla-aviso';
 import { Enlace, Pildora } from '@/components/ui';
 
@@ -14,7 +15,12 @@ export default function ErrorDePagina({
     <PantallaAviso
       etiqueta="Algo falló"
       titulo="No pudimos cargar esta página."
-      texto="Fue un error nuestro, no tuyo. Intenta de nuevo en un momento; si sigue pasando, escríbenos a support@doctraderpro.com."
+      texto={
+        <>
+          Fue un error nuestro, no tuyo. Intenta de nuevo en un momento; si sigue pasando,
+          escríbenos a <CorreoSoporte />.
+        </>
+      }
     >
       <Pildora onClick={() => reset()}>Intentar de nuevo</Pildora>
       <Enlace href="/" gris>

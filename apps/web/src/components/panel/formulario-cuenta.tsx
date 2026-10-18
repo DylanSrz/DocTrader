@@ -44,6 +44,7 @@ export function FormularioCuenta({
   titularSugerido,
   sePuedeQuitar = false,
   datosFijos = false,
+  planInicial,
 }: {
   cuenta?: { id: string; titular: string; broker: string; servidor: string; numero: string };
   planes?: PlanOpcion[];
@@ -51,6 +52,8 @@ export function FormularioCuenta({
   sePuedeQuitar?: boolean;
   /** Con la licencia vigente, el broker, el servidor y el número solo se cambian por ticket. */
   datosFijos?: boolean;
+  /** El plan elegido de entrada (la compra que se pidió desde la landing). */
+  planInicial?: string;
 }) {
   const editar = Boolean(cuenta);
   const [estado, accion] = useActionState(editar ? editarCuenta : agregarCuenta, {} as EstadoPanel);
@@ -175,7 +178,7 @@ export function FormularioCuenta({
                     type="radio"
                     name="plan"
                     value={plan.codigo}
-                    defaultChecked={(v.plan ?? 'SEMESTRAL') === plan.codigo}
+                    defaultChecked={(v.plan ?? planInicial ?? 'SEMESTRAL') === plan.codigo}
                   />
                   <span className="text-[15px]">
                     {plan.nombre}
