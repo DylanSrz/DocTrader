@@ -54,9 +54,11 @@ erDiagram
 | `role` | enum `ADMIN`, `CLIENT` | |
 | `status` | enum `ACTIVE`, `SUSPENDED`, `DELETED` | |
 | `full_name` | text | |
-| `cedula_enc` | bytea | Cifrada |
-| `cedula_hmac` | bytea, **único** | Sobre la cédula solo con dígitos |
-| `cedula_last4` | char(4) | Para mostrarla enmascarada |
+| `document_country` | char(2) | País que expidió el documento (ISO 3166-1). Los clientes de antes del 2026-10-18: `CO` |
+| `document_type` | varchar | Tipo (`TIPO_DOCUMENTO` en `@doctrader/shared`: `CC`, `CE`, `PA`, `PPT`, `PEP`, `CD`, `SC`, `DNI`, `INE`, `CURP`, `LIC`). Los de antes: `CC` |
+| `cedula_enc` | bytea | Número del documento (de cualquier tipo), cifrado |
+| `cedula_hmac` | bytea, **único** | Huella de país + tipo + número; la cédula colombiana conserva la de antes (solo el número) |
+| `cedula_last4` | char(4) | Para mostrarlo enmascarado |
 | `email` | citext, **único** | El que escribió el cliente |
 | `email_canonical` | citext, **único** | Minúsculas; en Gmail sin puntos ni lo que va después de "+". Evita dos cuentas con el mismo correo |
 | `email_verified_at` | timestamptz | |
@@ -315,6 +317,7 @@ stateDiagram-v2
 | `SIN_VERIFICAR` | Aún no se consulta |
 | `ESPERANDO_CONFIRMACIONES` | Todo coincide, faltan confirmaciones; el worker vuelve a mirar |
 | `VERIFICADA` | Los cinco chequeos pasaron |
+| `POR_CONFIRMAR` | Todo coincide, pero otro cliente tenía una orden abierta por el mismo monto: un admin confirma quién pagó (`SEGURIDAD.md` §6) |
 | `MONTO_INCOMPLETO` | Llegó menos de lo pedido |
 | `NO_COINCIDE` | Otra dirección, otra moneda, hash ya usado o transacción anterior a la orden |
 | `ERROR_PROVEEDOR` | Fallaron los dos proveedores; se reintenta. Nunca se aprueba sola así |

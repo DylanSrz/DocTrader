@@ -289,6 +289,13 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
     llave de Binance solo de lectura (ya puesta); el admin también puede registrar un pago a mano.
   - **Cambio de cuenta por ticket**, **descargar mis datos** (perfil del cliente), **QR de la dirección** en la
     pantalla de pago y **"Mi panel"** en la landing con la sesión iniciada.
+  - **Auditoría del 2026-10-18** (11 puntos): USDT con el precio exacto y pagos "por confirmar" cuando otro cliente
+    pudo enviarlos; registro con país, tipo y número de documento (clientes de varios países); precios de los términos
+    tomados de los planes (`{{precios}}`); menú de tres líneas en celular y tablet; correo de soporte siempre como
+    enlace; listas desplegables legibles (las opciones de un grupo salían blanco sobre blanco); contraseña con
+    confirmación y requisitos en vivo; Turnstile revisado (el error de `data:` es del iframe de Cloudflare) y con
+    chequeo del dominio; "Comprar" desde la landing con sesión abre la compra en el panel; copiar y descargar con
+    estados de procesando, listo y error.
   - **Falta:** la lista del §5 y el lanzamiento suave.
 
 ## 5. Lista para el día del lanzamiento

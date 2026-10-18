@@ -12,7 +12,7 @@ export default function Registro() {
       texto={
         <p>
           Con tu cuenta registras tus cuentas de trading y compras una licencia para cada una. Tu
-          cédula se guarda cifrada y solo la ve el administrador.
+          documento de identidad se guarda cifrado y solo lo ve el administrador.
         </p>
       }
     >

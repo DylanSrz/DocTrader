@@ -3,7 +3,7 @@
 import { LIMITES_ADMIN } from '@doctrader/shared';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { CampoCodigo, conAviso, ErrorOperacion, useAlListo } from '@/components/admin/operacion';
-import { BotonEnviar, Campo } from '@/components/ui';
+import { BotonEnviar, Campo, descargarContenido, useEstadoAccion } from '@/components/ui';
 import {
   type EstadoCedula,
   type EstadoExportacion,
@@ -327,14 +327,14 @@ export function Reactivar({ licencia }: { licencia: string }) {
  */
 export function Exportar({ filtro, q }: { filtro: string; q: string }) {
   const [estado, accion] = useActionState(exportarLicencias, {} as EstadoExportacion);
+  const [descarga, setDescarga] = useEstadoAccion();
   useEffect(() => {
     if (!estado.csv || !estado.nombre) return;
-    const url = URL.createObjectURL(new Blob([estado.csv], { type: 'text/csv;charset=utf-8' }));
-    const enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = estado.nombre;
-    enlace.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setDescarga(
+      descargarContenido(estado.csv, estado.nombre, 'text/csv;charset=utf-8') ? 'exito' : 'error',
+    );
+    // setDescarga cambia en cada render; la descarga depende solo de un archivo nuevo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estado.csv, estado.nombre, estado.listo]);
   return (
     <form action={accion} className="grid justify-items-start gap-3">
@@ -348,6 +348,13 @@ export function Exportar({ filtro, q }: { filtro: string; q: string }) {
       >
         Exportar CSV
       </BotonEnviar>
+      <p aria-live="polite" className="text-sm">
+        {descarga === 'exito' ? (
+          <span className="text-senal">Listo: el archivo CSV se descargó.</span>
+        ) : descarga === 'error' ? (
+          <span className="text-error">No se pudo descargar el archivo. Intenta de nuevo.</span>
+        ) : null}
+      </p>
       <ErrorOperacion estado={estado} />
     </form>
   );

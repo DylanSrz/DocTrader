@@ -27,7 +27,10 @@ export function EditorLegal({
         <p className="text-sm text-ceniza">
           Títulos con <span className="text-blanco">##</span>, listas con{' '}
           <span className="text-blanco">-</span>, negrita con{' '}
-          <span className="text-blanco">**texto**</span>. El HTML no se muestra.
+          <span className="text-blanco">**texto**</span>. El HTML no se muestra. Para los precios
+          usa <span className="text-blanco">{'{{precios}}'}</span> (la tabla de planes) o{' '}
+          <span className="text-blanco">{'{{precio:MENSUAL}}'}</span>: se llenan con los precios de
+          Ajustes y cambian solos.
         </p>
         <textarea
           id="contenido"

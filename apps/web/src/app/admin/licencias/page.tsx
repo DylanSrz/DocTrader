@@ -4,6 +4,8 @@ import {
   type FiltroLicencias,
   formatearTelefono,
   NOMBRE_FILTRO_LICENCIAS,
+  nombreDocumento,
+  nombrePais,
 } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -103,7 +105,16 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
       {eliminado ? null : (
         <Seccion titulo="Contacto">
           <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-6 gap-y-1 text-[15px]">
-            <dt className="text-ceniza">Cédula</dt>
+            <dt className="text-ceniza">
+              {ficha.cliente.documentoPais && ficha.cliente.documentoTipo
+                ? nombreDocumento(ficha.cliente.documentoPais, ficha.cliente.documentoTipo)
+                : 'Documento'}
+              {ficha.cliente.documentoPais && ficha.cliente.documentoPais !== 'CO' ? (
+                <small className="block text-[13px]">
+                  {nombrePais(ficha.cliente.documentoPais)}
+                </small>
+              ) : null}
+            </dt>
             <dd>
               <Cedula cliente={ficha.cliente.id} final={ficha.cliente.cedulaFinal} />
             </dd>

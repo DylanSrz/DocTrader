@@ -25,7 +25,8 @@ Reglas clave:
   Cada hash reportado se **verifica automáticamente en la blockchain** (destino, moneda, monto, fecha,
   confirmaciones, hash no repetido) antes de que el admin apruebe; aprobación automática opcional (apagada).
   Binance Pay Merchant está en trámite; se integra cuando Binance lo apruebe.
-  Orden de pago válida 1 hora. Pasarela en pesos: fase 2.
+  Orden de pago válida 1 hora. En USDT se cobra el precio exacto (USD 125 → 125 USDT); en BTC, según la cotización.
+  Pasarela en pesos: fase 2.
 - Vencida la licencia: **3 días de gracia** (editable en admin) y luego pasa a "por desconectar".
 - **No hay LPOA**: con licencia pagada y datos completos, la cuenta pasa a "por conectar".
 - La conexión de cuentas al copy trading es **manual** (la hace Argemiro en **Social Trader Tools**); la plataforma gestiona pagos,
@@ -39,7 +40,7 @@ Reglas clave:
   modelo de datos y estados en `docs/MODELO-DATOS.md`; etapas, entornos, pruebas y lista de lanzamiento en
   `docs/PLAN-TRABAJO.md`.
   Admins: Dylan (dylansrz96@gmail.com) y Argemiro (doctraderproiasystem@gmail.com). Cuentas de servicio a nombre de Dylan; las paga Argemiro.
-- Registro con nombre, **cédula**, correo y teléfono. Correo oficial: **support@doctraderpro.com** (contacto y Reply-To).
+- Registro con nombre, **documento de identidad** (país que lo expidió, tipo y número; clientes de varios países), correo y teléfono. Correo oficial: **support@doctraderpro.com** (contacto y Reply-To).
   Dominio propio: **doctraderpro.com** (DNS en Hostinger); los correos automáticos
   salen por Resend desde el dominio.
   Soporte con **tickets dentro de la plataforma** (convive con Telegram https://t.me/+cdmWH_xLubdhMDhh).

@@ -97,12 +97,14 @@ function Titular({
   ahora,
   nombre,
   nombreCompleto,
+  comprar,
 }: {
   cuentas: CuentaVista[];
   planes: PlanVista[];
   ahora: Date;
   nombre: string;
   nombreCompleto: string;
+  comprar?: string;
 }) {
   let titulo: string;
   let texto: ReactNode;
@@ -128,8 +130,17 @@ function Titular({
     titulo = `Hola, ${nombre}. Agrega tu primera cuenta de trading.`;
     texto = `Cada cuenta lleva su propia licencia: ${listaPrecios(planes)}.`;
     accion = (
-      <Lateral titulo="Agregar cuenta de trading" boton="Agregar cuenta" variante="pildora">
-        <FormularioCuenta planes={opciones} titularSugerido={nombreCompleto} />
+      <Lateral
+        titulo="Agregar cuenta de trading"
+        boton="Agregar cuenta"
+        variante="pildora"
+        abiertoAlInicio={Boolean(comprar)}
+      >
+        <FormularioCuenta
+          planes={opciones}
+          titularSugerido={nombreCompleto}
+          planInicial={comprar}
+        />
       </Lateral>
     );
   } else if (enGracia[0]) {
@@ -401,7 +412,7 @@ function TarjetaCuenta({
   );
 }
 
-async function Contenido() {
+async function Contenido({ pedido }: { pedido: Promise<string | undefined> }) {
   const sesion = await requerirSesion('CLIENT');
   const [{ cuentas, planes, diasGracia }, landing] = await Promise.all([
     leerPanel<MisCuentas>('/cuentas'),
@@ -410,10 +421,15 @@ async function Contenido() {
   const ahora = new Date();
   const nombre = sesion.usuario.nombre.split(' ')[0] ?? sesion.usuario.nombre;
   const opciones = opcionesDePlanes(planes);
+  // "Comprar mensual/semestral" desde la landing: una licencia nueva es para otra cuenta de trading, así que se abre
+  // "Agregar cuenta" con ese plan. Las cuentas y licencias que ya tiene no cambian.
+  const plan = (await pedido)?.toUpperCase();
+  const comprar = opciones.some((o) => o.codigo === plan) ? plan : undefined;
 
   return (
     <>
       <Titular
+        comprar={comprar}
         cuentas={cuentas}
         planes={planes}
         ahora={ahora}
@@ -437,8 +453,16 @@ async function Contenido() {
                   )}
                 />
               ) : null}
-              <Lateral titulo="Agregar cuenta de trading" boton="Agregar cuenta">
-                <FormularioCuenta planes={opciones} titularSugerido={sesion.usuario.nombre} />
+              <Lateral
+                titulo="Agregar cuenta de trading"
+                boton="Agregar cuenta"
+                abiertoAlInicio={Boolean(comprar)}
+              >
+                <FormularioCuenta
+                  planes={opciones}
+                  titularSugerido={sesion.usuario.nombre}
+                  planInicial={comprar}
+                />
               </Lateral>
             </div>
           </div>
@@ -493,10 +517,11 @@ async function Contenido() {
   );
 }
 
-export default function MisCuentasPagina() {
+export default function MisCuentasPagina({ searchParams }: PageProps<'/panel'>) {
+  const pedido = searchParams.then((p) => (typeof p.comprar === 'string' ? p.comprar : undefined));
   return (
     <Suspense fallback={<p className="text-ceniza">Cargando tus cuentas…</p>}>
-      <Contenido />
+      <Contenido pedido={pedido} />
     </Suspense>
   );
 }

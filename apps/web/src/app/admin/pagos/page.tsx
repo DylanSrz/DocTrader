@@ -72,6 +72,7 @@ const VERIFICACION: Record<
   { texto: string; tono: 'senal' | 'llama' | 'neutro' | 'apagado' | 'error' }
 > = {
   VERIFICADA: { texto: 'Verificado', tono: 'senal' },
+  POR_CONFIRMAR: { texto: 'Confirma quién pagó', tono: 'llama' },
   ESPERANDO_CONFIRMACIONES: { texto: 'Esperando confirmaciones', tono: 'neutro' },
   SIN_VERIFICAR: { texto: 'Buscando la transacción', tono: 'neutro' },
   MONTO_INCOMPLETO: { texto: 'Monto incompleto', tono: 'error' },

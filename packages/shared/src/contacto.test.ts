@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { correoCanonico, normalizarCedula, normalizarTelefono } from './contacto.js';
+import { correoCanonico, normalizarTelefono, requisitosContrasena } from './contacto.js';
 
 describe('correoCanonico', () => {
   it('pasa a minúsculas y quita espacios', () => {
@@ -21,23 +21,6 @@ describe('correoCanonico', () => {
   });
 });
 
-describe('normalizarCedula', () => {
-  it('quita puntos, espacios y guiones', () => {
-    expect(normalizarCedula('1.234.567.890')).toBe('1234567890');
-    expect(normalizarCedula(' 72 345-678 ')).toBe('72345678');
-  });
-
-  it('acepta pasaportes con letras, en mayúsculas', () => {
-    expect(normalizarCedula('ab123456')).toBe('AB123456');
-  });
-
-  it('rechaza lo que no parece un documento', () => {
-    expect(normalizarCedula('123')).toBeNull();
-    expect(normalizarCedula('12345678901234567')).toBeNull();
-    expect(normalizarCedula('12#456')).toBeNull();
-  });
-});
-
 describe('normalizarTelefono', () => {
   it('asume Colombia si no hay indicativo', () => {
     expect(normalizarTelefono('300 123 4567')).toBe('+573001234567');
@@ -51,5 +34,14 @@ describe('normalizarTelefono', () => {
   it('rechaza números que no existen', () => {
     expect(normalizarTelefono('123')).toBeNull();
     expect(normalizarTelefono('300 123')).toBeNull();
+  });
+});
+
+describe('requisitosContrasena', () => {
+  it('sigue la política de la API: de 10 a 128 caracteres', () => {
+    expect(requisitosContrasena('').map((r) => r.cumple)).toEqual([false, false]);
+    expect(requisitosContrasena('corta').map((r) => r.cumple)).toEqual([false, true]);
+    expect(requisitosContrasena('una frase larga').map((r) => r.cumple)).toEqual([true, true]);
+    expect(requisitosContrasena('x'.repeat(129)).map((r) => r.cumple)).toEqual([true, false]);
   });
 });

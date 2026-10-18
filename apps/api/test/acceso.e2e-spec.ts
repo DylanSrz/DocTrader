@@ -173,6 +173,75 @@ describe('registro', () => {
     expect((await ultimoCorreo('pedro.gomez@gmail.com', 'ya-registrado')).aviso).not.toBeNull();
   });
 
+  it('registra el país, el tipo y el número del documento por separado, también de otros países', async () => {
+    const numero = `5${String(10_000_000 + consecutivo).slice(-8)}`;
+    const pasaporte = datosDeRegistro({
+      cedula: undefined,
+      documentoPais: 'GB',
+      documentoTipo: 'PA',
+      documento: numero,
+    });
+    await comoLaWeb(app).post('/auth/registro', pasaporte).expect(202);
+    const [usuario] = (await fuente.query(
+      `SELECT document_country, document_type, cedula_last4 FROM users WHERE email = $1`,
+      [pasaporte.correo],
+    )) as Record<string, string>[];
+    expect(usuario).toEqual({
+      document_country: 'GB',
+      document_type: 'PA',
+      cedula_last4: numero.slice(-4),
+    });
+
+    // El mismo número en otro país o tipo es otra persona; en el mismo país y tipo, no.
+    await comoLaWeb(app)
+      .post(
+        '/auth/registro',
+        datosDeRegistro({
+          cedula: undefined,
+          documentoPais: 'US',
+          documentoTipo: 'PA',
+          documento: numero,
+        }),
+      )
+      .expect(202);
+    const repetido = await comoLaWeb(app)
+      .post(
+        '/auth/registro',
+        datosDeRegistro({
+          cedula: undefined,
+          documentoPais: 'GB',
+          documentoTipo: 'PA',
+          documento: numero,
+        }),
+      )
+      .expect(409);
+    expect(repetido.body.codigo).toBe('DATOS_EN_USO');
+  });
+
+  it('valida el número según el tipo de documento y explica cómo corregirlo', async () => {
+    const conPuntos = await comoLaWeb(app)
+      .post(
+        '/auth/registro',
+        datosDeRegistro({ documentoPais: 'CO', documentoTipo: 'CC', documento: '1.020.304' }),
+      )
+      .expect(400);
+    expect(conPuntos.body.campos.documento).toMatch(/solo números/);
+    const sinTipo = await comoLaWeb(app)
+      .post(
+        '/auth/registro',
+        datosDeRegistro({ documentoPais: 'CO', documentoTipo: 'TI', documento: '1020304050' }),
+      )
+      .expect(400);
+    expect(sinTipo.body.campos.documentoTipo).toMatch(/tipo de documento/);
+    const curp = await comoLaWeb(app)
+      .post(
+        '/auth/registro',
+        datosDeRegistro({ documentoPais: 'MX', documentoTipo: 'CURP', documento: 'GORL9001' }),
+      )
+      .expect(400);
+    expect(curp.body.campos.documento).toMatch(/CURP/);
+  });
+
   it('no permite dos cuentas con la misma cédula o el mismo celular', async () => {
     const datos = datosDeRegistro();
     await comoLaWeb(app).post('/auth/registro', datos).expect(202);

@@ -12,7 +12,7 @@ export function PantallaAviso({
 }: {
   etiqueta: string;
   titulo: string;
-  texto: string;
+  texto: ReactNode;
   children: ReactNode;
 }) {
   return (

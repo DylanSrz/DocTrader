@@ -128,6 +128,8 @@ export interface Ficha {
     correoVerificado: boolean;
     telefono: string | null;
     cedulaFinal: string | null;
+    documentoPais: string | null;
+    documentoTipo: string | null;
     desde: string;
     estado: EstadoUsuario;
   };

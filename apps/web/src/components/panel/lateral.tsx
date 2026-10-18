@@ -33,17 +33,27 @@ export function Lateral({
   boton,
   variante = 'enlace',
   gris = false,
+  abiertoAlInicio = false,
   children,
 }: {
   titulo: string;
   boton: ReactNode;
   variante?: 'enlace' | 'pildora';
   gris?: boolean;
+  /** Se abre solo al cargar (por ejemplo, la compra que se pidió desde la landing con `?comprar=`). */
+  abiertoAlInicio?: boolean;
   children: ReactNode;
 }) {
   const dialogo = useRef<HTMLDialogElement>(null);
   const idTitulo = useId();
+  const router = useRouter();
   const cerrar = useCallback(() => dialogo.current?.close(), []);
+  useEffect(() => {
+    if (!abiertoAlInicio || dialogo.current?.open) return;
+    dialogo.current?.showModal();
+    // Se quita el parámetro de la URL: al recargar o volver no se abre otra vez.
+    router.replace(window.location.pathname, { scroll: false });
+  }, [abiertoAlInicio, router]);
   return (
     <>
       <button

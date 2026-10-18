@@ -3,6 +3,7 @@ export * from './dinero.js';
 export * from './fechas.js';
 export * from './planes.js';
 export * from './contacto.js';
+export * from './documentos.js';
 export * from './preguntas.js';
 export * from './legal.js';
 export * from './cuentas.js';

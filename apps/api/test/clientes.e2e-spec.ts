@@ -64,7 +64,7 @@ async function reportar(cliente: Cliente, cuentaId: string) {
 describe('eliminar un cliente', () => {
   it('anonimiza sus datos, conserva sus pagos y deja la cuenta conectada por desconectar', async () => {
     const admin = await adminConSesion(app);
-    const cedula = String(Date.now()).slice(-9);
+    const cedula = `1${String(Date.now()).slice(-9)}`;
     const correo = `se.va.${Date.now()}@correo.co`;
     const cliente = await clienteConSesion(app, { cedula, correo, nombre: 'Marta Ruiz Peña' });
 
@@ -241,7 +241,11 @@ describe('descargar mis datos', () => {
     const { body } = await cliente.web.get('/privacidad/mis-datos').expect(200);
     expect(body.perfil).toMatchObject({
       correo: cliente.correo,
-      cedula: expect.stringMatching(/^\*+\d{4}$/),
+      documento: {
+        pais: 'Colombia',
+        tipo: 'Cédula de ciudadanía',
+        numero: expect.stringMatching(/^\*+\d{4}$/),
+      },
     });
     expect(body.cuentasDeTrading).toEqual([
       expect.objectContaining({ numero: datos.numero, broker: 'JustMarkets' }),

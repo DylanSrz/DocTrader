@@ -111,6 +111,7 @@ export class ClientesAdminService {
         `UPDATE users
             SET status = 'DELETED', deleted_at = now(), full_name = $2, email = $3, email_canonical = $3,
                 email_verified_at = NULL, cedula_enc = NULL, cedula_hmac = NULL, cedula_last4 = NULL,
+                document_country = NULL, document_type = NULL,
                 phone_e164 = NULL, phone_verified_at = NULL, password_hash = NULL, totp_secret_enc = NULL,
                 totp_enabled_at = NULL, marketing_opt_in = false, updated_at = now()
           WHERE id = $1`,

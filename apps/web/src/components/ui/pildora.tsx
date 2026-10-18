@@ -12,10 +12,17 @@ const clases =
 export function Pildora(
   props:
     | (ComponentProps<'button'> & { href?: undefined })
-    | (ComponentProps<typeof Link> & { href: string }),
+    | (ComponentProps<typeof Link> & { href: string; nativo?: boolean }),
 ) {
   if (props.href !== undefined) {
-    const { className, ...resto } = props;
+    const { className, nativo, ...resto } = props;
+    // `nativo`: un enlace normal, que el servidor resuelve (por ejemplo, una ruta que redirige según la sesión).
+    if (nativo)
+      return (
+        <a href={resto.href} className={cx(clases, className)}>
+          {resto.children}
+        </a>
+      );
     return <Link {...resto} className={cx(clases, className)} />;
   }
   const { className, type = 'button', ...resto } = props;

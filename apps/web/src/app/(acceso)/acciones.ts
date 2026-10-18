@@ -1,11 +1,12 @@
 'use server';
 
-import { CONTRASENA_MAXIMO, CONTRASENA_MINIMO } from '@doctrader/shared';
+import { CONTRASENA_MAXIMO, CONTRASENA_MINIMO, validarDocumento } from '@doctrader/shared';
 import { redirect } from 'next/navigation';
 import { type ErrorApi, llamarApi } from '@/lib/api';
 import { borrarSesion, guardarSesion, identificadorDelNavegador } from '@/lib/cookies';
 import { type EstadoFormulario, texto } from '@/lib/formulario';
 import { inicioDe, tokenDeSesion } from '@/lib/sesion';
+import { tomarDestino } from '@/lib/tras-ingresar';
 
 interface Ingreso {
   token: string;
@@ -38,6 +39,18 @@ function desdeError(error: ErrorApi, previo: EstadoFormulario, valores?: Record<
   } satisfies EstadoFormulario;
 }
 
+/** La contraseña nueva y su confirmación (registro y restablecer). La API vuelve a revisar la política. */
+function revisarContrasenaNueva(datos: FormData): Record<string, string> {
+  const contrasena = texto(datos, 'contrasena');
+  const campos: Record<string, string> = {};
+  const problema = revisarContrasena(contrasena);
+  if (problema) campos.contrasena = problema;
+  if (texto(datos, 'confirmacion') !== contrasena) {
+    campos.confirmacion = 'Las contraseñas no coinciden. Escríbela igual en los dos campos.';
+  }
+  return campos;
+}
+
 function revisarContrasena(contrasena: string): string | undefined {
   if (contrasena.length < CONTRASENA_MINIMO) {
     return `Usa al menos ${CONTRASENA_MINIMO} caracteres. Una frase corta es fácil de recordar y difícil de adivinar.`;
@@ -52,7 +65,9 @@ function revisarContrasena(contrasena: string): string | undefined {
 export async function registrar(previo: EstadoRegistro, datos: FormData): Promise<EstadoRegistro> {
   const valores = {
     nombre: texto(datos, 'nombre').trim(),
-    cedula: texto(datos, 'cedula').trim(),
+    documentoPais: texto(datos, 'documentoPais').trim().toUpperCase(),
+    documentoTipo: texto(datos, 'documentoTipo').trim().toUpperCase(),
+    documento: texto(datos, 'documento').trim(),
     correo: texto(datos, 'correo').trim(),
     telefono: texto(datos, 'telefono').trim(),
     aceptaTerminos: datos.get('aceptaTerminos') === 'on' ? 'on' : '',
@@ -64,13 +79,17 @@ export async function registrar(previo: EstadoRegistro, datos: FormData): Promis
 
   const campos: Record<string, string> = {};
   if (valores.nombre.length < 3) campos.nombre = 'Escribe tu nombre completo.';
-  if (valores.cedula.length < 5) campos.cedula = 'Escribe tu número de cédula.';
+  const documento = validarDocumento(
+    valores.documentoPais,
+    valores.documentoTipo,
+    valores.documento,
+  );
+  if (!documento.ok) campos[documento.campo] = documento.mensaje;
   if (!CORREO.test(valores.correo))
     campos.correo = 'Escribe un correo válido, como nombre@gmail.com.';
   if (valores.telefono.replace(/\D/g, '').length < 7)
     campos.telefono = 'Escribe tu número de celular.';
-  const problema = revisarContrasena(contrasena);
-  if (problema) campos.contrasena = problema;
+  Object.assign(campos, revisarContrasenaNueva(datos));
   if (!valores.aceptaTerminos) campos.aceptaTerminos = 'Debes aceptar los términos de la licencia.';
   if (!valores.aceptaDatos) campos.aceptaDatos = 'Debes autorizar el tratamiento de tus datos.';
   if (!valores.aceptaRiesgo) campos.aceptaRiesgo = 'Debes leer y aceptar el aviso de riesgo.';
@@ -82,7 +101,9 @@ export async function registrar(previo: EstadoRegistro, datos: FormData): Promis
     metodo: 'POST',
     cuerpo: {
       nombre: valores.nombre,
-      cedula: valores.cedula,
+      documentoPais: valores.documentoPais,
+      documentoTipo: valores.documentoTipo,
+      documento: documento.ok ? documento.numero : valores.documento,
       correo: valores.correo,
       telefono: valores.telefono,
       contrasena,
@@ -132,7 +153,9 @@ async function continuarIngreso(ingreso: Ingreso): Promise<EstadoIngreso> {
   await guardarSesion(ingreso.token, ingreso.expiraEn);
   if (ingreso.estado === 'SEGUNDO_FACTOR_PENDIENTE') return { paso: 'codigo' };
   if (ingreso.estado === 'SEGUNDO_FACTOR_POR_CONFIGURAR') redirect('/segundo-factor');
-  redirect(inicioDe(ingreso.rol));
+  // Si venía de una compra que empezó con la sesión vencida, vuelve a ella.
+  const destino = await tomarDestino();
+  redirect(ingreso.rol === 'CLIENT' && destino ? destino : inicioDe(ingreso.rol));
 }
 
 /** Los dos pasos del ingreso en una sola acción: correo y contraseña, y luego (si aplica) el código. */
@@ -221,8 +244,8 @@ export async function restablecer(
   datos: FormData,
 ): Promise<EstadoFormulario> {
   const contrasena = texto(datos, 'contrasena');
-  const problema = revisarContrasena(contrasena);
-  if (problema) return { envio: (previo.envio ?? 0) + 1, campos: { contrasena: problema } };
+  const campos = revisarContrasenaNueva(datos);
+  if (Object.keys(campos).length > 0) return { envio: (previo.envio ?? 0) + 1, campos };
   const respuesta = await llamarApi('/auth/restablecer', {
     metodo: 'POST',
     cuerpo: { token: texto(datos, 'token'), contrasena },

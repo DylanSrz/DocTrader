@@ -108,4 +108,25 @@ Railway y Resend se confirman al crear las cuentas.
   cuenta) y envía el código que le da la página.
 - Las cifras de la landing (ganancia, caída máxima, tiempo auditado) se cargan desde el panel de admin.
 
+## 6. Documentos de identidad del registro (2026-10-18)
+
+- El registro pide **país que expidió el documento, tipo y número**, en campos separados (`users.document_country`,
+  `document_type` y el número cifrado en `cedula_enc`). Solo documentos de adultos: no hay tarjeta de identidad ni
+  registro civil.
+- Las reglas viven en `packages/shared/src/documentos.ts` (la web las usa en vivo y la API las vuelve a revisar). Para
+  admitir un país o un tipo nuevo se agrega ahí, sin tocar el registro.
+- **Colombia:** cédula de ciudadanía (3 a 10 dígitos, sin puntos), cédula de extranjería (3 a 10 dígitos), pasaporte,
+  PPT (5 a 15 dígitos), PEP (6 a 15 dígitos; dejó de ser válido en 2023, se acepta por los clientes que aún lo
+  usan), carné diplomático y salvoconducto (letras y números).
+- **Argentina:** DNI (6 a 9 dígitos). **México:** credencial del INE (clave de elector de 18 caracteres) y CURP.
+  **Estados Unidos:** pasaporte (una letra y 8 números, o 9 números) y licencia o identificación estatal.
+  **Reino Unido:** pasaporte (9 caracteres) y licencia de conducción (16 caracteres en Gran Bretaña u 8 dígitos en
+  Irlanda del Norte; los BRP ya no existen).
+- **Demás países de la lista:** pasaporte (5 a 20 letras y números) y documento nacional (4 a 20).
+- Las letras se pasan a mayúsculas; puntos, comas, espacios y guiones se rechazan con un mensaje que dice cómo
+  escribirlo. Donde el formato oficial varía, la regla es amplia a propósito: no debe rechazar un documento legítimo.
+- Por confirmar con una fuente oficial: el largo exacto del PPT y del PEP, y el formato del carné diplomático y del
+  salvoconducto (se aceptan rangos amplios mientras tanto).
+- Un mismo número en otro país o tipo es otra persona; en el mismo país y tipo no se puede registrar dos veces.
+
 Informe de costos para Argemiro: https://claude.ai/code/artifact/53c858bb-d6c6-49f5-b4d6-24418869fe86

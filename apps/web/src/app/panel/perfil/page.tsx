@@ -1,12 +1,14 @@
-import { formatearTelefono } from '@doctrader/shared';
+import { formatearTelefono, nombreDocumento, nombrePais } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { CorreoSoporte } from '@/components/correo-soporte';
 import { Seguridad } from '@/components/panel/seguridad';
 import { Enlace } from '@/components/ui';
 import { fechaLarga } from '@/lib/formato';
 import { leerPanel, type Perfil } from '@/lib/panel';
 import { obtenerLanding } from '@/lib/publico';
 import { requerirSesion } from '@/lib/sesion';
+import { DescargarMisDatos } from './descargar-mis-datos';
 
 export const metadata: Metadata = { title: 'Perfil' };
 
@@ -19,8 +21,13 @@ async function Contenido() {
   const telefono = perfil.telefono ? formatearTelefono(perfil.telefono) : '—';
   const datos = [
     {
-      dt: 'Cédula',
-      dd: perfil.cedulaUltimos4 ? `•••• ${perfil.cedulaUltimos4}` : '—',
+      dt:
+        perfil.documentoPais && perfil.documentoTipo
+          ? nombreDocumento(perfil.documentoPais, perfil.documentoTipo)
+          : 'Documento',
+      dd: perfil.cedulaUltimos4
+        ? `•••• ${perfil.cedulaUltimos4.trim()}${perfil.documentoPais && perfil.documentoPais !== 'CO' ? ` (${nombrePais(perfil.documentoPais)})` : ''}`
+        : '—',
       cifra: true,
     },
     { dt: 'Correo', dd: perfil.correo },
@@ -48,8 +55,9 @@ async function Contenido() {
       </dl>
       <div className="mt-14 grid max-w-[980px] gap-7">
         <p className="max-w-[40em] text-niebla">
-          Tu cédula se guarda cifrada y solo la ve el administrador. Para cambiar tu nombre, cédula,
-          correo o celular, abre un ticket en Soporte o escríbenos a {landing.correoSoporte}.
+          Tu documento se guarda cifrado y solo lo ve el administrador. Para cambiar tu nombre,
+          documento, correo o celular, abre un ticket en Soporte o escríbenos a{' '}
+          <CorreoSoporte correo={landing.correoSoporte} />.
         </p>
         <div className="flex flex-wrap items-center gap-x-6">
           <Enlace href="/panel/soporte?nuevo=1&tema=OTRO">Abrir un ticket</Enlace>
@@ -70,16 +78,10 @@ async function Contenido() {
         </h2>
         <p className="max-w-[40em] text-niebla">
           Descarga una copia de lo que guardamos de ti: perfil, autorizaciones, cuentas de trading,
-          licencias, pagos y tickets. No incluye las contraseñas de tus cuentas ni tu cédula
-          completa; esa la pides en un ticket.
+          licencias, pagos y tickets. No incluye las contraseñas de tus cuentas ni tu documento
+          completo; ese lo pides en un ticket.
         </p>
-        <a
-          href="/panel/perfil/mis-datos"
-          download
-          className="inline-flex min-h-11 items-center text-sm font-normal text-blanco underline decoration-white/35 decoration-1 underline-offset-[6px] transition-colors duration-200 hover:decoration-current"
-        >
-          Descargar mis datos
-        </a>
+        <DescargarMisDatos />
       </section>
       <section
         aria-labelledby="t-eliminar"

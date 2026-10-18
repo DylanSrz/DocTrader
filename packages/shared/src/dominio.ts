@@ -53,6 +53,11 @@ export const ESTADO_VERIFICACION = {
   SIN_VERIFICAR: 'SIN_VERIFICAR',
   ESPERANDO_CONFIRMACIONES: 'ESPERANDO_CONFIRMACIONES',
   VERIFICADA: 'VERIFICADA',
+  /**
+   * Todo coincide, pero otro cliente tenía una orden abierta por el mismo monto a esa hora (en USDT se cobra el precio
+   * exacto): el pago pudo ser de cualquiera de los dos. No se aprueba solo; un admin confirma quién lo envió.
+   */
+  POR_CONFIRMAR: 'POR_CONFIRMAR',
   MONTO_INCOMPLETO: 'MONTO_INCOMPLETO',
   NO_COINCIDE: 'NO_COINCIDE',
   ERROR_PROVEEDOR: 'ERROR_PROVEEDOR',

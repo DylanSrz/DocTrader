@@ -52,6 +52,18 @@
   html {
     -webkit-text-size-adjust: 100%;
   }
+  /*
+   * Las opciones de las listas desplegables las pinta el sistema: sin color propio, en Windows salían con texto
+   * blanco (heredado) sobre fondo blanco, sobre todo dentro de un grupo (<optgroup>).
+   */
+  select option,
+  select optgroup {
+    background-color: #111111;
+    color: var(--color-blanco);
+  }
+  select optgroup {
+    color: var(--color-ceniza);
+  }
   body {
     background: var(--color-vacio);
     color: var(--color-blanco);
@@ -276,6 +288,10 @@
   }
   .lateral[open] {
     transform: translateX(0);
+  }
+  /* El menú de celular y tablet usa el mismo panel lateral, más angosto. */
+  .menu-movil {
+    width: min(420px, 100vw);
   }
   @starting-style {
     .lateral[open] {

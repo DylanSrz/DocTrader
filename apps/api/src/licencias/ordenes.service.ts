@@ -16,7 +16,7 @@ import { errorApi, errorDeCampos } from '../seguridad/errores.js';
 import { LIMITES, LimitesService } from '../seguridad/limites.service.js';
 import type { ContextoCliente, SesionActiva } from '../sesiones/sesiones.service.js';
 import { leerAjustes } from './ajustes.js';
-import { montoUnico } from './monto-unico.js';
+import { montoDeOrden } from './monto-unico.js';
 import { CuentasService } from './cuentas.service.js';
 import type { NuevaOrdenDto } from './dto.js';
 import { centavosATexto, satoshisPara } from './precio-btc.js';
@@ -108,7 +108,7 @@ export class OrdenesService {
         const ajustes = await leerAjustes(m);
         const ahora = new Date();
         const montoUsd = plan.priceUsdCents;
-        const unidades = await montoUnico(
+        const unidades = await montoDeOrden(
           m,
           red,
           centavosPorBtc === null

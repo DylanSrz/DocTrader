@@ -1,11 +1,17 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { llamarApi } from '@/lib/api';
 import { tokenDeSesion } from '@/lib/sesion';
 
 /** "Descargar mis datos": la copia de los datos del cliente, como archivo JSON (Ley 1581, derecho de acceso). */
-export async function GET(peticion: NextRequest) {
+export async function GET() {
   const token = await tokenDeSesion();
-  if (!token) return NextResponse.redirect(new URL('/ingresar', peticion.url));
+  // El botón descarga con fetch: un error claro (no una redirección que llegaría como "archivo").
+  if (!token) {
+    return new NextResponse('Tu sesión terminó. Ingresa de nuevo.', {
+      status: 401,
+      headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
+    });
+  }
   const r = await llamarApi<unknown>('/privacidad/mis-datos', { token });
   if (!r.ok) {
     return new NextResponse(r.error.mensaje, {

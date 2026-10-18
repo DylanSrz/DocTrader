@@ -11,6 +11,7 @@ import { Soporte1792700000000 } from './migraciones/1792700000000-soporte.js';
 import { QuitarPrueba1792800000000 } from './migraciones/1792800000000-quitar-prueba.js';
 import { Socio1792900000000 } from './migraciones/1792900000000-socio.js';
 import { EliminarClientes1793000000000 } from './migraciones/1793000000000-eliminar-clientes.js';
+import { DocumentosYMontos1793100000000 } from './migraciones/1793100000000-documentos-y-montos.js';
 
 export const MIGRACIONES = [
   Inicial1792000000000,
@@ -24,6 +25,7 @@ export const MIGRACIONES = [
   QuitarPrueba1792800000000,
   Socio1792900000000,
   EliminarClientes1793000000000,
+  DocumentosYMontos1793100000000,
 ];
 
 /** Opciones de la base de datos, compartidas por la API, el worker y los scripts de migración y semilla. */

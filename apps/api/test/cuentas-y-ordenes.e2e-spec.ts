@@ -256,10 +256,8 @@ describe('órdenes de pago', () => {
       cuenta: { id: cuenta.body.id },
     });
     expect(orden.body.numero).toMatch(/^DTP-\d{6}$/);
-    // Unos centavos menos que el precio (de 0,01 a 0,99), distintos en cada orden abierta.
-    const monto = Number(orden.body.monto);
-    expect(monto).toBeGreaterThanOrEqual(498.01);
-    expect(monto).toBeLessThanOrEqual(498.99);
+    // En USDT se pide el precio exacto: USD 499 son 499 USDT.
+    expect(orden.body.monto).toBe('499');
     const minutos = (new Date(orden.body.expiraEn).getTime() - antes) / 60_000;
     expect(minutos).toBeGreaterThan(59);
     expect(minutos).toBeLessThanOrEqual(60.1);
@@ -291,17 +289,24 @@ describe('órdenes de pago', () => {
     expect(satoshis).toBeLessThanOrEqual(397_926);
   });
 
-  it('dos órdenes abiertas nunca tienen el mismo monto', async () => {
-    const montos = new Set<string>();
+  it('en USDT todas las órdenes piden el precio exacto; en BTC dos abiertas nunca piden lo mismo', async () => {
+    const usdt = new Set<string>();
+    const btc = new Set<string>();
     for (let i = 0; i < 6; i++) {
       const { web } = await clienteConSesion();
       const cuenta = await web.post('/cuentas', datosCuenta()).expect(201);
-      const orden = await web
+      const enUsdt = await web
         .post('/ordenes', { cuentaId: cuenta.body.id, plan: 'MENSUAL', moneda: 'USDT' })
         .expect(201);
-      montos.add(orden.body.monto as string);
+      usdt.add(enUsdt.body.monto as string);
+      const otra = await web.post('/cuentas', datosCuenta()).expect(201);
+      const enBtc = await web
+        .post('/ordenes', { cuentaId: otra.body.id, plan: 'MENSUAL', moneda: 'BTC' })
+        .expect(201);
+      btc.add(enBtc.body.monto as string);
     }
-    expect(montos.size).toBe(6);
+    expect([...usdt]).toEqual(['120']);
+    expect(btc.size).toBe(6);
   });
 
   it('cambiar de moneda o de plan reemplaza la orden pendiente', async () => {

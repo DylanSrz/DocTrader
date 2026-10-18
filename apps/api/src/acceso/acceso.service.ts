@@ -2,7 +2,8 @@ import {
   correoCanonico,
   ESTADO_SESION,
   ESTADO_USUARIO,
-  normalizarCedula,
+  claveDocumento,
+  validarDocumento,
   normalizarTelefono,
   ROL,
   TIPO_CONSENTIMIENTO,
@@ -139,9 +140,15 @@ export class AccesoService {
     const campos: Record<string, string> = {};
     const nombre = dto.nombre.trim().replace(/\s+/g, ' ');
     if (nombre.length < 3) campos.nombre = 'Escribe tu nombre completo.';
-    const cedula = normalizarCedula(dto.cedula);
-    if (!cedula)
-      campos.cedula = 'Escribe tu cédula solo con números (o letras y números si es pasaporte).';
+    const pais = (dto.documentoPais ?? 'CO').toUpperCase();
+    const tipo = (dto.documentoTipo ?? 'CC').toUpperCase();
+    const documento = validarDocumento(
+      pais,
+      tipo,
+      // El campo viejo aceptaba la cédula con puntos o espacios: se le quitan como antes.
+      dto.documento ?? dto.cedula?.replace(/[\s.,-]/g, '') ?? '',
+    );
+    if (!documento.ok) campos[documento.campo] = documento.mensaje;
     const telefono = normalizarTelefono(dto.telefono);
     if (!telefono) {
       campos.telefono =
@@ -166,7 +173,8 @@ export class AccesoService {
       return;
     }
 
-    const cedulaHmac = this.cifrado.huella(CONTEXTO.cedula, cedula!);
+    const numero = documento.ok ? documento.numero : '';
+    const cedulaHmac = this.cifrado.huella(CONTEXTO.cedula, claveDocumento(pais, tipo, numero));
     const repetido = await this.fuente
       .getRepository(User)
       .createQueryBuilder('u')
@@ -180,9 +188,11 @@ export class AccesoService {
           m.getRepository(User).create({
             role: ROL.CLIENTE,
             fullName: nombre,
-            cedulaEnc: this.cifrado.cifrar(cedula!, CONTEXTO.cedula),
+            cedulaEnc: this.cifrado.cifrar(numero, CONTEXTO.cedula),
             cedulaHmac,
-            cedulaLast4: cedula!.slice(-4),
+            cedulaLast4: numero.slice(-4),
+            documentCountry: pais,
+            documentType: tipo,
             email: dto.correo.trim(),
             emailCanonical: canonico,
             phoneE164: telefono,
@@ -690,6 +700,8 @@ export class AccesoService {
       correo: usuario.email,
       telefono: usuario.phoneE164,
       cedulaUltimos4: usuario.cedulaLast4,
+      documentoPais: usuario.documentCountry,
+      documentoTipo: usuario.documentType,
       clienteDesde: usuario.createdAt,
       segundoFactor: usuario.totpEnabledAt !== null,
     };

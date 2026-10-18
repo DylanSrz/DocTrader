@@ -293,6 +293,8 @@ export class LicenciasAdminService {
         correoVerificado: cliente.emailVerifiedAt !== null,
         telefono: cliente.phoneE164,
         cedulaFinal: cliente.cedulaLast4,
+        documentoPais: cliente.documentCountry,
+        documentoTipo: cliente.documentType,
         desde: cliente.createdAt,
         estado: cliente.status,
       },

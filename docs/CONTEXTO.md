@@ -105,8 +105,9 @@ deben reflejar esto (nunca prometer rentabilidad).
 - Automatización por API de Social Trader Tools: se evaluará en la fase 3.
 
 ### Registro y soporte
-- Registro con **nombre completo, cédula (documento de identidad nacional), correo y teléfono**.
-  La cédula es única por cliente (una persona, una cuenta en la plataforma). Se trata
+- Registro con **nombre completo, documento de identidad (país que lo expidió, tipo y número), correo y teléfono**.
+  Desde el 2026-10-18 se admiten clientes de otros países (`DECISIONES-TECNICAS.md` §6). El documento es único por
+  cliente (una persona, una cuenta en la plataforma). Se trata
   como dato personal protegido (Ley 1581 de 2012).
 - **Correo oficial: support@doctraderpro.com** (decisión del 2026-10-13). Es el
   correo de contacto público y la dirección de respuesta (Reply-To) de todos los correos que envía la plataforma.

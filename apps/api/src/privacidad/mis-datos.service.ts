@@ -3,6 +3,8 @@ import {
   describirReferencia,
   type Moneda,
   NOMBRE_TEMA,
+  nombreDocumento,
+  nombrePais,
   type TemaTicket,
 } from '@doctrader/shared';
 import { Injectable } from '@nestjs/common';
@@ -49,11 +51,14 @@ export class MisDatosService {
         email: string;
         phone_e164: string | null;
         cedula_last4: string | null;
+        document_country: string | null;
+        document_type: string | null;
         created_at: Date;
         email_verified_at: Date | null;
         totp_enabled_at: Date | null;
       }>(
-        `SELECT full_name, email, phone_e164, cedula_last4, created_at, email_verified_at, totp_enabled_at
+        `SELECT full_name, email, phone_e164, cedula_last4, document_country, document_type, created_at,
+                  email_verified_at, totp_enabled_at
              FROM users WHERE id = $1`,
       ),
       q<{
@@ -171,7 +176,16 @@ export class MisDatosService {
             correo: usuario.email,
             correoConfirmado: usuario.email_verified_at,
             telefono: usuario.phone_e164,
-            cedula: usuario.cedula_last4 ? `******${usuario.cedula_last4}` : null,
+            documento: usuario.cedula_last4
+              ? {
+                  pais: usuario.document_country ? nombrePais(usuario.document_country) : null,
+                  tipo:
+                    usuario.document_country && usuario.document_type
+                      ? nombreDocumento(usuario.document_country, usuario.document_type)
+                      : null,
+                  numero: `******${usuario.cedula_last4.trim()}`,
+                }
+              : null,
             clienteDesde: usuario.created_at,
             segundoFactorActivo: usuario.totp_enabled_at !== null,
           }

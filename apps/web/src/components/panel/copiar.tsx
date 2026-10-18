@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { BotonAccion, copiarTexto, useEstadoAccion } from '@/components/ui';
 import { avisar } from './aviso-breve';
 
 /**
- * Copia un texto (la dirección, el monto). Si el navegador no deja copiar, selecciona el texto para que la persona
- * lo copie con el teclado.
+ * Copia un texto (la dirección, el monto). El botón cambia a "¡Copiado!" solo cuando el texto quedó en el
+ * portapapeles. Si el navegador no deja copiar, lo dice y selecciona el texto para copiarlo con el teclado.
  */
 export function Copiar({
   texto,
@@ -18,7 +18,7 @@ export function Copiar({
   /** "Dirección", "Monto": para el aviso. */
   que: string;
 }) {
-  const [copiado, setCopiado] = useState(false);
+  const [estado, setEstado] = useEstadoAccion();
   const seleccionar = () => {
     const nodo = document.getElementById(idTexto);
     if (!nodo) return;
@@ -27,22 +27,29 @@ export function Copiar({
     const seleccion = window.getSelection();
     seleccion?.removeAllRanges();
     seleccion?.addRange(rango);
-    avisar(`${que} seleccionado: cópialo con tu teclado`);
   };
   return (
-    <button
-      type="button"
-      onClick={() => {
-        if (!navigator.clipboard?.writeText) return seleccionar();
-        navigator.clipboard.writeText(texto).then(() => {
-          setCopiado(true);
-          avisar(`${que} copiado`);
-          setTimeout(() => setCopiado(false), 1800);
-        }, seleccionar);
+    <BotonAccion
+      estado={estado}
+      textos={{
+        normal: 'Copiar',
+        procesando: 'Copiando…',
+        exito: '¡Copiado!',
+        error: 'No se copió',
       }}
-      className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-pildora bg-campo px-[18px] texto-menu text-blanco transition-[transform,background-color] duration-200 ease-salida select-none hover:bg-campo-foco active:scale-[0.97] motion-reduce:transition-none"
-    >
-      {copiado ? 'Copiado' : 'Copiar'}
-    </button>
+      onClick={async () => {
+        setEstado('procesando');
+        if (await copiarTexto(texto)) {
+          setEstado('exito');
+          avisar(`${que} copiado`);
+        } else {
+          setEstado('error');
+          seleccionar();
+          avisar(
+            `No pudimos copiar: ${que.toLowerCase()} quedó seleccionado, cópialo con tu teclado`,
+          );
+        }
+      }}
+    />
   );
 }

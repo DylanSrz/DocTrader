@@ -2,6 +2,7 @@ import { NOMBRE_TEMA, TEMA_TICKET } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { type ReactNode, Suspense } from 'react';
+import { CorreoSoporte } from '@/components/correo-soporte';
 import { LateralAbierto } from '@/components/panel/lateral';
 import { Hilo } from '@/components/soporte/hilo';
 import { Enlace, Estado, Etiqueta, Pildora, cx } from '@/components/ui';
@@ -130,7 +131,7 @@ async function Contenido({ parametros }: { parametros: Parametros }) {
             >
               Telegram
             </a>{' '}
-            o <span translate="no">{landing.correoSoporte}</span>
+            o <CorreoSoporte correo={landing.correoSoporte} />
           </p>
         </div>
         {tickets.length > 0 ? (

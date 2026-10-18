@@ -70,8 +70,10 @@ function Pago({ orden }: { orden: OrdenVista }) {
           {orden.precioBtcUsd
             ? `Precio fijo: ${usd(Math.round(Number(orden.precioBtcUsd)) * 100)} por BTC mientras la orden esté vigente. `
             : ''}
-          Los centavos identifican tu pago: no lo redondees. Las comisiones de la red van aparte:
-          debe llegar exactamente este monto.
+          {orden.moneda === 'BTC'
+            ? 'Los últimos decimales identifican tu pago: no lo redondees. '
+            : ''}
+          Las comisiones de la red van aparte: debe llegar exactamente este monto.
         </p>
       </div>
 
@@ -129,9 +131,15 @@ function Verificacion({ orden }: { orden: OrdenVista }) {
     },
     {
       texto: 'Llegó a la dirección de esta orden con el monto correcto',
-      ok: orden.verificacion === 'ESPERANDO_CONFIRMACIONES' || orden.verificacion === 'VERIFICADA',
+      ok:
+        orden.verificacion === 'ESPERANDO_CONFIRMACIONES' ||
+        orden.verificacion === 'VERIFICADA' ||
+        orden.verificacion === 'POR_CONFIRMAR',
     },
-    { texto: 'Tiene las confirmaciones necesarias', ok: orden.verificacion === 'VERIFICADA' },
+    {
+      texto: 'Tiene las confirmaciones necesarias',
+      ok: orden.verificacion === 'VERIFICADA' || orden.verificacion === 'POR_CONFIRMAR',
+    },
   ];
   return (
     <div className="grid gap-[18px]">
