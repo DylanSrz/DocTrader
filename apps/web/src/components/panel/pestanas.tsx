@@ -2,9 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { type Ref, useEffect, useRef } from 'react';
+import { type ReactNode, type Ref, useEffect, useRef } from 'react';
+import { Capsula, useCapsula } from '@/components/capsula';
 
-/** Pestañas del panel en mayúsculas; la activa en blanco, con un triángulo naranja debajo. */
+/**
+ * Pestañas del panel en mayúsculas. La activa va en blanco sobre la cápsula, que se desliza de una pestaña a otra al
+ * navegar (el layout no se vuelve a montar, así que la cápsula sigue viva entre rutas).
+ */
 export function Pestanas({
   pestanas,
   avisos,
@@ -23,6 +27,7 @@ export function Pestanas({
     .filter((p) => ruta === p.ruta || ruta.startsWith(`${p.ruta}/`))
     .sort((a, b) => b.ruta.length - a.ruta.length)[0]?.href;
   const lista = useRef<HTMLUListElement>(null);
+  const { posicion, animar } = useCapsula(lista, vertical ? undefined : activa);
   // En el teléfono las pestañas se desplazan de lado: la activa queda a la vista.
   useEffect(() => {
     const actual = lista.current?.querySelector<HTMLElement>('[aria-current="page"]');
@@ -37,6 +42,7 @@ export function Pestanas({
       activa={activa}
       avisos={avisos}
       vertical={vertical}
+      capsula={vertical ? null : <Capsula posicion={posicion} animar={animar} />}
     />
   );
 }
@@ -59,12 +65,14 @@ export function ListaPestanas({
   avisos,
   ref,
   vertical = false,
+  capsula = null,
 }: {
   pestanas: Pestana[];
   activa?: string;
   avisos?: Record<string, number>;
   ref?: Ref<HTMLUListElement>;
   vertical?: boolean;
+  capsula?: ReactNode;
 }) {
   if (vertical) {
     return (
@@ -74,16 +82,8 @@ export function ListaPestanas({
             <Link
               href={p.href}
               aria-current={p.href === activa ? 'page' : undefined}
-              className="flex min-h-14 items-center gap-3 text-[28px] leading-none tracking-[-0.03em] text-ceniza transition-colors duration-200 hover:text-blanco aria-[current=page]:text-blanco"
+              className="enlace-menu"
             >
-              <span
-                aria-hidden="true"
-                className={
-                  p.href === activa
-                    ? 'size-0 border-y-[6px] border-l-[9px] border-y-transparent border-l-llama'
-                    : 'w-[9px]'
-                }
-              />
               {p.texto}
               <Aviso pestana={p} n={avisos?.[p.href] ?? 0} />
             </Link>
@@ -93,13 +93,15 @@ export function ListaPestanas({
     );
   }
   return (
-    <ul ref={ref} className="flex gap-[clamp(16px,3vw,40px)]">
+    <ul ref={ref} className="relative flex items-center">
+      {capsula}
       {pestanas.map((p) => (
         <li key={p.href}>
           <Link
             href={p.href}
+            data-capsula={p.href}
             aria-current={p.href === activa ? 'page' : undefined}
-            className="relative inline-flex min-h-11 items-center texto-menu whitespace-nowrap text-ceniza transition-colors duration-200 hover:text-blanco aria-[current=page]:text-blanco aria-[current=page]:after:absolute aria-[current=page]:after:bottom-0.5 aria-[current=page]:after:left-1/2 aria-[current=page]:after:size-0 aria-[current=page]:after:-translate-x-1/2 aria-[current=page]:after:border-x-4 aria-[current=page]:after:border-b-[7px] aria-[current=page]:after:border-x-transparent aria-[current=page]:after:border-b-llama"
+            className="enlace-barra"
           >
             {p.texto}
             <Aviso pestana={p} n={avisos?.[p.href] ?? 0} />
