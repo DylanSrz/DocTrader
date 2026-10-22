@@ -23,11 +23,45 @@ export function generateStaticParams() {
   return TIPOS.map((t) => ({ documento: DOCUMENTOS_LEGALES[t].ruta }));
 }
 
+/** Resumen de cada documento: descripción para buscadores y para la vista previa al compartir el enlace. */
+const RESUMEN: Record<TipoDocumentoLegal, string> = {
+  TERMS: 'Qué incluye la licencia de DocTraderPRO, precios, pagos y renovaciones.',
+  PRIVACY: 'Qué datos guarda DocTraderPRO, para qué los usa y cómo los protege.',
+  RISK: 'Operar en mercados financieros implica riesgo de pérdida: lo que debes saber antes de empezar.',
+};
+
 export async function generateMetadata({
   params,
 }: PageProps<'/legal/[documento]'>): Promise<Metadata> {
   const tipo = tipoDeRuta((await params).documento);
-  return { title: tipo ? DOCUMENTOS_LEGALES[tipo].titulo : undefined };
+  if (!tipo) return {};
+  const { ruta, titulo } = DOCUMENTOS_LEGALES[tipo];
+  // Imagen propia de cada documento al compartirlo (public/compartir/legal-<ruta>.png, 1200 × 630).
+  const imagen = {
+    url: `/compartir/legal-${ruta}.png`,
+    width: 1200,
+    height: 630,
+    alt: `DocTraderPRO: ${titulo}`,
+  };
+  return {
+    title: titulo,
+    description: RESUMEN[tipo],
+    openGraph: {
+      type: 'article',
+      siteName: 'DocTraderPRO',
+      locale: 'es_CO',
+      url: `/legal/${ruta}`,
+      title: `${titulo} · DocTraderPRO`,
+      description: RESUMEN[tipo],
+      images: [imagen],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${titulo} · DocTraderPRO`,
+      description: RESUMEN[tipo],
+      images: [imagen],
+    },
+  };
 }
 
 export default async function DocumentoLegal({ params }: PageProps<'/legal/[documento]'>) {

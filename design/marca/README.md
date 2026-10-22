@@ -14,3 +14,5 @@
 - En la web: `apps/web/src/app/opengraph-image.png` y `twitter-image.png` (vista previa al compartir el enlace,
   1200 × 630), `apple-icon.png` (ícono en iPhone), `public/marca/icono-192.png` e `icono-512.png` (manifiesto) y
   `public/marca/logo-doctraderpro-512.png` (logo para Google en los datos estructurados).
+- Cada texto legal tiene su propia imagen para compartir: `apps/web/public/compartir/legal-<ruta>.png` (terminos, datos,
+  riesgo), con el mismo diseño y el título del documento.

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { CifraAnimada } from '@/components/landing/cifra-animada';
 import { CopiarCorreo } from '@/components/landing/copiar-correo';
 import { BarraFlotante } from '@/components/barra-flotante';
 import { EnlacePanel } from '@/components/landing/enlace-panel';
@@ -33,6 +34,9 @@ const fechaLarga = new Intl.DateTimeFormat('es-CO', {
 });
 
 const dolares = (centavos: number) => numero.format(centavos / 100);
+/** Decimales con que se muestra una cifra de Myfxbook ("246.680" → 2, "12.5" → 1), como `numero`. */
+const decimalesDe = (cifra: string) =>
+  Math.min(cifra.split('.')[1]?.replace(/0+$/, '').length ?? 0, 2);
 const NoTraducir = ({ children }: { children: ReactNode }) => (
   <span translate="no">{children}</span>
 );
@@ -331,17 +335,33 @@ function Resultados({ myfxbook }: { myfxbook: Landing['myfxbook'] }) {
     {
       etiqueta: 'Ganancia total',
       nombre: 'la ganancia total',
-      valor: gainPercent ? `+${numero.format(Number(gainPercent))} %` : null,
+      valor: gainPercent ? (
+        <CifraAnimada
+          valor={Number(gainPercent)}
+          decimales={decimalesDe(gainPercent)}
+          prefijo="+"
+          sufijo=" %"
+        />
+      ) : null,
     },
     {
       etiqueta: 'Caída máxima',
       nombre: 'la caída máxima',
-      valor: maxDrawdownPercent ? `${numero.format(Number(maxDrawdownPercent))} %` : null,
+      valor: maxDrawdownPercent ? (
+        <CifraAnimada
+          valor={Number(maxDrawdownPercent)}
+          decimales={decimalesDe(maxDrawdownPercent)}
+          sufijo=" %"
+        />
+      ) : null,
     },
     {
       etiqueta: 'Tiempo auditado',
       nombre: 'el tiempo auditado',
-      valor: anios !== null ? `${anios} ${anios === 1 ? 'año' : 'años'}` : null,
+      valor:
+        anios !== null ? (
+          <CifraAnimada valor={anios} sufijo={anios === 1 ? ' año' : ' años'} />
+        ) : null,
     },
   ];
   // "La caída máxima y el tiempo auditado vuelven cuando el historial esté completo."
@@ -423,6 +443,16 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
   const publicos = planes.filter((p) => p.publico && p.meses !== null);
   // El ahorro de cada plan se compara con pagar mes a mes el plan de un mes.
   const mensual = publicos.find((p) => p.meses === 1 && p.mesesObsequio === 0);
+  const ahorroDe = (plan: PlanPublico) =>
+    mensual && plan !== mensual
+      ? mensual.precioUsdCentavos * ((plan.meses ?? 0) + plan.mesesObsequio) -
+        plan.precioUsdCentavos
+      : 0;
+  // Se recomienda el plan con el que más se ahorra (hoy, el semestral).
+  const recomendado = publicos.reduce<PlanPublico | null>(
+    (mejor, plan) => (ahorroDe(plan) > (mejor ? ahorroDe(mejor) : 0) ? plan : mejor),
+    null,
+  );
   return (
     <Seccion id="precios">
       <DosColumnas
@@ -449,10 +479,7 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
       >
         {publicos.map((plan, i) => {
           const meses = (plan.meses ?? 0) + plan.mesesObsequio;
-          const ahorro =
-            mensual && plan !== mensual
-              ? mensual.precioUsdCentavos * meses - plan.precioUsdCentavos
-              : 0;
+          const ahorro = ahorroDe(plan);
           // La ruta decide según la sesión: panel con la compra abierta, ingresar o registro.
           const ruta = `/comprar/${plan.codigo.toLowerCase()}`;
           return (
@@ -469,6 +496,11 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
                 {plan.mesesObsequio > 0 ? (
                   <span className="inline-flex items-center rounded-full bg-senal/12 px-3 py-1.5 text-[13px] font-medium text-senal">
                     {plan.mesesObsequio === 1 ? '1 mes' : `${plan.mesesObsequio} meses`} de obsequio
+                  </span>
+                ) : null}
+                {plan === recomendado ? (
+                  <span className="inline-flex items-center rounded-full bg-llama px-3 py-1.5 text-[13px] font-semibold text-vacio">
+                    Recomendado
                   </span>
                 ) : null}
                 {ahorro > 0 ? (
