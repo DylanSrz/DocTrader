@@ -4,6 +4,7 @@ import { opcionesBaseDeDatos } from '../src/database/data-source.js';
 import { DepositAddress, PartnerProfile, Plan, User } from '../src/database/entidades/index.js';
 import { quitarPruebaDeTextosLegales } from '../src/database/migraciones/1792800000000-quitar-prueba.js';
 import { PlanesYMarca1792400000000 } from '../src/database/migraciones/1792400000000-planes-y-marca.js';
+import { TerminosReferidos1793300000000 } from '../src/database/migraciones/1793300000000-terminos-referidos.js';
 import { aplicarSemilla } from '../src/database/semilla-datos.js';
 import { registrarEnCadena, verificarCadena } from '../src/auditoria/cadena.js';
 
@@ -187,6 +188,63 @@ describe('semilla', () => {
     expect(d.content_md).toContain('## 6. Datos cifrados para prevenir el fraude');
     expect(d.content_md).toContain('verificar su correo.');
     expect(d.content_md).not.toMatch(/programa de pruebas|control de la licencia de prueba/);
+  });
+
+  it('publica la sección de referidos en los términos y la política, renumerada, una sola vez', async () => {
+    const terminos = [
+      '## 15. Enlaces de terceros y de referido',
+      '',
+      'Broker.',
+      '',
+      '## 16. Soporte y comunicaciones',
+      '',
+      '16.1. Tickets.',
+      '',
+      '## 19. Ley aplicable y controversias',
+      '',
+      '## 20. Contacto',
+      '',
+    ].join('\n');
+    const datos = [
+      '| Soporte | Mensajes, archivos adjuntos y respuestas | Al abrir o responder un ticket |',
+      '',
+      '10. Enviar novedades del servicio, solo si el Titular lo acepta por separado. Puede cancelarlas cuando quiera.',
+      '',
+      '- **Autoridades** que lo pidan en ejercicio de sus funciones legales.',
+      '',
+    ].join('\n');
+    const ultimo = async (tipo: string) =>
+      (
+        (await fuente.query(
+          `SELECT version, content_md FROM legal_documents WHERE type = $1 ORDER BY version DESC LIMIT 1`,
+          [tipo],
+        )) as { version: number; content_md: string }[]
+      )[0]!;
+    const [t0, d0] = [(await ultimo('TERMS')).version, (await ultimo('PRIVACY')).version];
+    await fuente.query(
+      `INSERT INTO legal_documents (type, version, content_md) VALUES ('TERMS', $1, $2), ('PRIVACY', $3, $4)`,
+      [t0 + 1, terminos, d0 + 1, datos],
+    );
+
+    for (let i = 0; i < 2; i++) {
+      const corredor = fuente.createQueryRunner();
+      try {
+        await new TerminosReferidos1793300000000().up(corredor);
+      } finally {
+        await corredor.release();
+      }
+    }
+
+    const t = await ultimo('TERMS');
+    expect(t.version).toBe(t0 + 2);
+    expect(t.content_md).toMatch(
+      /## 15\. Enlaces[\s\S]*## 16\. Programa de referidos[\s\S]*16\.8\.[\s\S]*## 17\. Soporte[\s\S]*17\.1\. Tickets[\s\S]*## 20\. Ley[\s\S]*## 21\. Contacto/,
+    );
+    const d = await ultimo('PRIVACY');
+    expect(d.version).toBe(d0 + 2);
+    expect(d.content_md).toContain('| Programa de referidos |');
+    expect(d.content_md).toContain('11. Administrar el programa de referidos');
+    expect(d.content_md).toMatch(/\*\*Quien invitó al Titular\*\*[\s\S]*\*\*Autoridades\*\*/);
   });
 
   it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 10 %', async () => {
