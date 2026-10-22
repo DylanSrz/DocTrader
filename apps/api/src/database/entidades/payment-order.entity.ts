@@ -122,6 +122,19 @@ export class PaymentOrder {
   @Column({ name: 'commission_payout_id', type: 'uuid', nullable: true })
   commissionPayoutId: string | null;
 
+  /** Programa de referidos: quién invitó al comprador y su comisión, fijados al aprobar (`docs/MODELO-DATOS.md`). */
+  @Column({ name: 'referrer_id', type: 'uuid', nullable: true })
+  referrerId: string | null;
+
+  @Column({ name: 'referral_bp', type: 'integer', nullable: true })
+  referralBp: number | null;
+
+  @Column({ name: 'referral_usd_cents', type: 'integer', nullable: true })
+  referralUsdCents: number | null;
+
+  @Column({ name: 'referral_payout_id', type: 'uuid', nullable: true })
+  referralPayoutId: string | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 

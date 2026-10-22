@@ -66,6 +66,13 @@ export class User {
   @Column({ name: 'marketing_opt_in', type: 'boolean', default: false })
   marketingOptIn: boolean;
 
+  /** Quién lo invitó (programa de referidos). Se fija al registrarse; solo un admin lo corrige. */
+  @Column({ name: 'referred_by', type: 'uuid', nullable: true })
+  referredBy: string | null;
+
+  @Column({ name: 'referred_at', type: 'timestamptz', nullable: true })
+  referredAt: Date | null;
+
   @Column({ name: 'deleted_at', type: 'timestamptz', nullable: true })
   deletedAt: Date | null;
 

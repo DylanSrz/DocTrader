@@ -11,6 +11,7 @@ import { PrivacidadModule } from './privacidad/privacidad.module.js';
 import { SaludModule } from './salud/salud.module.js';
 import { SesionesModule } from './sesiones/sesiones.module.js';
 import { SoporteModule } from './soporte/soporte.module.js';
+import { ReferidosModule } from './referidos/referidos.module.js';
 import { SocioModule } from './socio/socio.module.js';
 
 @Module({
@@ -27,6 +28,7 @@ import { SocioModule } from './socio/socio.module.js';
     ArchivosModule,
     SoporteModule,
     SocioModule,
+    ReferidosModule,
     PrivacidadModule,
   ],
 })

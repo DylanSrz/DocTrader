@@ -4,6 +4,7 @@ import {
   type Moneda,
   NOMBRE_TEMA,
   nombreDocumento,
+  nombreReservado,
   nombrePais,
   type TemaTicket,
 } from '@doctrader/shared';
@@ -18,8 +19,8 @@ const usd = (centavos: number) => (centavos / 100).toFixed(2);
 
 /**
  * Copia de los datos personales del cliente (derecho de acceso, Ley 1581 de 2012). Incluye lo que la plataforma guarda
- * de él: perfil, autorizaciones, cuentas de trading, licencias, pagos y tickets. No incluye las contraseñas de las
- * cuentas (cifradas; solo las ve el administrador para conectar), las notas internas de los admins ni la cédula
+ * de él: perfil, autorizaciones, cuentas de trading, licencias, pagos, tickets y referidos. No incluye las contraseñas
+ * de las cuentas (cifradas; solo las ve el administrador para conectar), las notas internas de los admins ni la cédula
  * completa: esa se pide por ticket, para que una sesión robada no la entregue.
  */
 @Injectable()
@@ -45,6 +46,7 @@ export class MisDatosService {
       tickets,
       mensajes,
       equipos,
+      [referidos],
     ] = await Promise.all([
       q<{
         full_name: string;
@@ -153,6 +155,42 @@ export class MisDatosService {
         `SELECT user_agent, last_ip, first_seen_at, last_seen_at FROM user_devices
             WHERE user_id = $1 ORDER BY last_seen_at DESC`,
       ),
+      // Programa de referidos: quién lo invitó y, si refiere, su código, su dirección, sus referidos y sus pagos.
+      // De los referidos solo va lo que el panel ya le muestra (nombre de pila e inicial).
+      q<{
+        invitado_por: string | null;
+        invitado_en: Date | null;
+        codigo: string | null;
+        direccion: string | null;
+        referidos: { nombre: string; desde: Date }[] | null;
+        comisiones: { fecha: Date; usd_cents: number }[] | null;
+        pagos:
+          | {
+              desde: string;
+              hasta: string;
+              usd_cents: number;
+              estado: string;
+              hash: string | null;
+            }[]
+          | null;
+      }>(
+        `SELECT i.full_name AS invitado_por, u.referred_at AS invitado_en, r.code AS codigo,
+                r.usdt_address AS direccion,
+                (SELECT json_agg(json_build_object('nombre', x.full_name, 'desde', x.referred_at)
+                                 ORDER BY x.referred_at)
+                   FROM users x WHERE x.referred_by = u.id AND x.status <> 'DELETED') AS referidos,
+                (SELECT json_agg(json_build_object('fecha', o.decided_at, 'usd_cents', o.referral_usd_cents)
+                                 ORDER BY o.decided_at)
+                   FROM payment_orders o WHERE o.referrer_id = u.id AND o.status = 'APROBADA') AS comisiones,
+                (SELECT json_agg(json_build_object('desde', p.period_start, 'hasta', p.period_end,
+                                   'usd_cents', p.commission_usd_cents, 'estado', p.status, 'hash', p.tx_hash)
+                                 ORDER BY p.period_start)
+                   FROM referral_payouts p WHERE p.referrer_id = u.id) AS pagos
+           FROM users u
+           LEFT JOIN users i ON i.id = u.referred_by
+           LEFT JOIN referral_profiles r ON r.user_id = u.id
+          WHERE u.id = $1`,
+      ),
     ]);
 
     const numeroCuenta = new Map(cuentas.map((c) => [c.id, c.account_number]));
@@ -250,6 +288,27 @@ export class MisDatosService {
         primeraVez: e.first_seen_at,
         ultimaVez: e.last_seen_at,
       })),
+      referidos: {
+        invitadoPor: referidos?.invitado_por ? nombreReservado(referidos.invitado_por) : null,
+        invitadoEn: referidos?.invitado_en ?? null,
+        codigo: referidos?.codigo ?? null,
+        direccionDeCobro: referidos?.direccion ?? null,
+        personasInvitadas: (referidos?.referidos ?? []).map((r) => ({
+          nombre: nombreReservado(r.nombre),
+          desde: r.desde,
+        })),
+        comisiones: (referidos?.comisiones ?? []).map((c) => ({
+          fecha: c.fecha,
+          usd: usd(c.usd_cents),
+        })),
+        pagos: (referidos?.pagos ?? []).map((p) => ({
+          desde: p.desde,
+          hasta: p.hasta,
+          usd: usd(Number(p.usd_cents)),
+          estado: p.estado,
+          hash: p.hash,
+        })),
+      },
     };
   }
 }

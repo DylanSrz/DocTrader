@@ -103,6 +103,9 @@ export class ClientesAdminService {
         unknown,
         number,
       ];
+      // Referidos: su código y su dirección de cobro se borran. Los pagos ya cerrados conservan la dirección copiada,
+      // para poder enviarlos; quien él invitó sigue registrado, sin referidor que pueda cobrar.
+      await m.query(`DELETE FROM referral_profiles WHERE user_id = $1`, [id]);
       for (const tabla of ['user_devices', 'auth_tokens', 'recovery_codes', 'notifications']) {
         await m.query(`DELETE FROM ${tabla} WHERE user_id = $1`, [id]);
       }

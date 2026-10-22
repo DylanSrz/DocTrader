@@ -28,6 +28,9 @@ export const LIMITES = {
   ticketsPorUsuario: { nombre: 'tickets', maximo: 10, ventana: 3_600 },
   mensajesPorUsuario: { nombre: 'mensajes-ticket', maximo: 60, ventana: 3_600 },
   descargasPorUsuario: { nombre: 'mis-datos', maximo: 5, ventana: 3_600 },
+  // "Te invitó: …" en el registro: un código se adivina solo probando miles, y esto lo hace inútil.
+  codigoReferidoPorIp: { nombre: 'codigo-referido', maximo: 60, ventana: 3_600 },
+  direccionCobroPorUsuario: { nombre: 'direccion-cobro', maximo: 5, ventana: 86_400 },
 } satisfies Record<string, Regla>;
 
 @Injectable()
