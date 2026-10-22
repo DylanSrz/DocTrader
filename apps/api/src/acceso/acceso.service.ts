@@ -3,6 +3,7 @@ import {
   ESTADO_SESION,
   ESTADO_USUARIO,
   claveDocumento,
+  problemaContrasena,
   validarDocumento,
   normalizarTelefono,
   ROL,
@@ -160,6 +161,8 @@ export class AccesoService {
     } catch {
       campos.correo = 'Escribe un correo válido.';
     }
+    const debil = problemaContrasena(dto.contrasena);
+    if (debil) campos.contrasena = debil;
     if (Object.keys(campos).length > 0) throw errorDeCampos(campos);
     if (await this.contrasenas.estaFiltrada(dto.contrasena)) {
       throw errorDeCampos({ contrasena: CONTRASENA_FILTRADA });
@@ -901,6 +904,8 @@ export class AccesoService {
       expiresAt: MoreThan(new Date()),
     });
     if (!vigente) throw enlaceInvalido();
+    const debil = problemaContrasena(dto.contrasena);
+    if (debil) throw errorDeCampos({ contrasena: debil });
     if (await this.contrasenas.estaFiltrada(dto.contrasena)) {
       throw errorDeCampos({ contrasena: CONTRASENA_FILTRADA });
     }

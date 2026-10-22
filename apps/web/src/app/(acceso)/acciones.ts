@@ -1,6 +1,6 @@
 'use server';
 
-import { CONTRASENA_MAXIMO, CONTRASENA_MINIMO, validarDocumento } from '@doctrader/shared';
+import { problemaContrasena, validarDocumento } from '@doctrader/shared';
 import { redirect } from 'next/navigation';
 import { type ErrorApi, llamarApi } from '@/lib/api';
 import { borrarSesion, guardarSesion, identificadorDelNavegador } from '@/lib/cookies';
@@ -43,21 +43,12 @@ function desdeError(error: ErrorApi, previo: EstadoFormulario, valores?: Record<
 function revisarContrasenaNueva(datos: FormData): Record<string, string> {
   const contrasena = texto(datos, 'contrasena');
   const campos: Record<string, string> = {};
-  const problema = revisarContrasena(contrasena);
+  const problema = problemaContrasena(contrasena);
   if (problema) campos.contrasena = problema;
   if (texto(datos, 'confirmacion') !== contrasena) {
     campos.confirmacion = 'Las contraseñas no coinciden. Escríbela igual en los dos campos.';
   }
   return campos;
-}
-
-function revisarContrasena(contrasena: string): string | undefined {
-  if (contrasena.length < CONTRASENA_MINIMO) {
-    return `Usa al menos ${CONTRASENA_MINIMO} caracteres. Una frase corta es fácil de recordar y difícil de adivinar.`;
-  }
-  if (contrasena.length > CONTRASENA_MAXIMO)
-    return `Usa como máximo ${CONTRASENA_MAXIMO} caracteres.`;
-  return undefined;
 }
 
 // ── Registro ─────────────────────────────────────────────────────────────────────────────────────────────

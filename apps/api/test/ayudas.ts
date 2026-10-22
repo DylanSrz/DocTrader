@@ -30,7 +30,7 @@ export async function clienteConSesion(
   const fuente = app.get<DataSource>(getDataSourceToken());
   const id = unico();
   const correo = datos.correo ?? `cliente.${id}@correo.co`;
-  const contrasena = 'una contraseña bien larga';
+  const contrasena = 'Una contraseña bien larga 7!';
   await comoLaWeb(app)
     .post('/auth/registro', {
       nombre: datos.nombre ?? 'Laura Gómez Restrepo',
@@ -70,7 +70,7 @@ export async function adminConSesion(app: INestApplication) {
     if (claves.length > 0) await redis.del(...claves);
   };
   const correo = `admin.${unico()}@doctraderpro.com`;
-  const contrasena = 'contraseña de admin de pruebas';
+  const contrasena = 'Contraseña de admin de pruebas 1!';
   await fuente.getRepository(User).insert({
     role: 'ADMIN',
     fullName: 'Admin de pruebas',

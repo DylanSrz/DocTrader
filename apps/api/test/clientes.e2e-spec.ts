@@ -127,7 +127,7 @@ describe('eliminar un cliente', () => {
     // Su sesión se cerró y ya no puede ingresar.
     await cliente.web.get('/cuentas').expect(401);
     await comoLaWeb(app)
-      .post('/auth/ingresar', { correo, contrasena: 'una contraseña bien larga' })
+      .post('/auth/ingresar', { correo, contrasena: 'Una contraseña bien larga 7!' })
       .expect(401);
 
     // La cuenta conectada queda por desconectar; la otra, borrada. Ninguna conserva titular ni contraseñas.

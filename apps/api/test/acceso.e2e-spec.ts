@@ -60,7 +60,7 @@ function datosDeRegistro(cambios: Record<string, unknown> = {}) {
     cedula: `1.040.${String(100_000 + consecutivo).slice(-3)}.${String(consecutivo).padStart(3, '0')}`,
     correo: `ana.perez${consecutivo}@correo.co`,
     telefono: `300 ${String(1_000_000 + consecutivo * 7).slice(-7)}`,
-    contrasena: 'una contraseña bien larga',
+    contrasena: 'Una contraseña bien larga 7!',
     aceptaTerminos: true,
     aceptaDatos: true,
     aceptaRiesgo: true,
@@ -105,6 +105,21 @@ describe('registro', () => {
     expect(respuesta.body.codigo).toBe('DATOS_INVALIDOS');
     expect(respuesta.body.campos.contrasena).toMatch(/entre 10 y 128/);
     expect(respuesta.body.campos.aceptaRiesgo).toMatch(/aviso de riesgo/);
+  });
+
+  it('exige mayúscula, minúscula, número y carácter especial en la contraseña', async () => {
+    const casos: [string, RegExp][] = [
+      ['UNA CONTRASEÑA LARGA 7!', /una letra minúscula/],
+      ['una contraseña larga 7!', /una letra mayúscula/],
+      ['Una contraseña larga!', /un número/],
+      ['Una contraseña larga 7', /un carácter especial/],
+    ];
+    for (const [contrasena, falta] of casos) {
+      const respuesta = await comoLaWeb(app)
+        .post('/auth/registro', datosDeRegistro({ contrasena }))
+        .expect(400);
+      expect(respuesta.body.campos.contrasena).toMatch(falta);
+    }
   });
 
   it('el nombre solo lleva letras: nada de dominios ni enlaces que lleguen en los correos', async () => {
@@ -389,15 +404,22 @@ describe('recuperar la contraseña', () => {
     await comoLaWeb(app).post('/auth/recuperar', { correo: datos.correo }).expect(202);
     const { secreto } = await ultimoCorreo(datos.correo, 'restablecer-contrasena');
 
-    await comoLaWeb(app)
+    // Una contraseña nueva sin mayúscula, número ni carácter especial no sirve, y el enlace sigue vigente.
+    const debil = await comoLaWeb(app)
       .post('/auth/restablecer', { token: secreto, contrasena: 'la nueva contraseña segura' })
+      .expect(400);
+    expect(debil.body.campos.contrasena).toBe(
+      'A la contraseña le falta una letra mayúscula, un número y un carácter especial (por ejemplo ! # $ % & * ?).',
+    );
+    await comoLaWeb(app)
+      .post('/auth/restablecer', { token: secreto, contrasena: 'La nueva contraseña segura 9#' })
       .expect(200);
     await comoLaWeb(app, { token }).get('/auth/sesion').expect(401);
     await comoLaWeb(app)
       .post('/auth/ingresar', { correo: datos.correo, contrasena: datos.contrasena })
       .expect(401);
     await comoLaWeb(app)
-      .post('/auth/ingresar', { correo: datos.correo, contrasena: 'la nueva contraseña segura' })
+      .post('/auth/ingresar', { correo: datos.correo, contrasena: 'La nueva contraseña segura 9#' })
       .expect(200);
     await comoLaWeb(app)
       .post('/auth/restablecer', { token: secreto, contrasena: 'otra contraseña más' })
@@ -408,7 +430,7 @@ describe('recuperar la contraseña', () => {
 
 describe('admins: segundo factor obligatorio', () => {
   const correoAdmin = 'doctraderproiasystem@gmail.com';
-  const contrasenaAdmin = 'contraseña de admin muy segura';
+  const contrasenaAdmin = 'Contraseña de admin muy segura 1!';
   let secretoTotp = '';
   let codigosRecuperacion: string[] = [];
 
@@ -507,7 +529,7 @@ describe('admins: segundo factor obligatorio', () => {
         comoLaWeb(app)
           .post('/auth/ingresar', {
             correo: admin.usuario.email,
-            contrasena: 'contraseña de admin de pruebas',
+            contrasena: 'Contraseña de admin de pruebas 1!',
           })
           .expect(200),
       ),

@@ -75,7 +75,7 @@ export function ContrasenaNueva({
             <Requisito key={r.texto} texto={r.texto} cumple={r.cumple} vacio={!contrasena} />
           ))}
           <li className="text-sm text-ceniza">
-            Una frase corta funciona bien. Al enviar revisamos que no sea una contraseña filtrada.
+            Al enviar también revisamos que no sea una contraseña filtrada.
           </li>
         </ul>
       </div>

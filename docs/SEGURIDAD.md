@@ -20,7 +20,9 @@ control total del servidor, no podría mover el dinero de Argemiro.
 ## 2. Ingreso y contraseñas
 
 - Contraseñas guardadas con **Argon2id** (nunca en texto ni con cifrado reversible).
-- Mínimo **10 caracteres**, sin reglas raras de composición. Se rechazan las contraseñas filtradas consultando
+- De **10 a 128 caracteres**, con al menos **una mayúscula, una minúscula, un número y un carácter especial** (decisión
+  del 2026-10-18; `problemaContrasena` en `@doctrader/shared`, que exigen la web y la API al registrarse y al
+  restablecer; las contraseñas de antes siguen sirviendo para ingresar). Se rechazan las contraseñas filtradas consultando
   Have I Been Pwned por rango (k-anonimato: la contraseña nunca sale del servidor).
 - **Límite de intentos** por IP y por cuenta: después de 5 fallos, espera creciente; después de 10, se pide el
   desafío de Cloudflare Turnstile y se avisa por correo al dueño de la cuenta.
