@@ -16,3 +16,12 @@
   `public/marca/logo-doctraderpro-512.png` (logo para Google en los datos estructurados).
 - Cada texto legal tiene su propia imagen para compartir: `apps/web/public/compartir/legal-<ruta>.png` (terminos, datos,
   riesgo), con el mismo diseño y el título del documento.
+
+## Logos de otras marcas (franja "Con qué funciona")
+
+Están en `apps/web/public/logos/` y salen de **Brandfetch** (logos oficiales de cada marca): Myfxbook, MetaTrader 4,
+Social Trader Tools, JustMarkets, TradingView, USDT (símbolo de Tether), TRON y Bitcoin. Se usa la versión para fondo
+oscuro; en Bitcoin, MetaTrader 4 y TradingView el texto venía oscuro y se pasó a blanco (sin tocar los colores de marca).
+Myfxbook y MetaTrader 4 solo están en Brandfetch en tamaño pequeño (38 y 47 px de alto): si se consigue su SVG, basta
+con reemplazar el archivo y su tamaño en `apps/web/src/components/landing/logos-compatibles.ts`.
+
