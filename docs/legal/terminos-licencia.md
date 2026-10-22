@@ -182,33 +182,66 @@ La plataforma muestra enlaces a terceros, como Myfxbook, Telegram, Instagram y e
 broker (JustMarkets) es **de referido**: DocTraderPRO puede recibir una comisión si el Cliente abre su cuenta por ahí.
 El Cliente puede usar el broker que prefiera. DocTraderPRO no controla ni responde por los servicios de terceros.
 
-## 16. Soporte y comunicaciones
+## 16. Programa de referidos
 
-16.1. El soporte se da por **tickets dentro de la plataforma**, por el correo support@doctraderpro.com y por el grupo
+16.1. **Quién participa.** Pueden recomendar la plataforma los clientes con una licencia activa (o en su periodo de
+gracia) y las personas que DocTraderPRO habilite. Cada participante (el "Referidor") tiene un enlace y un código
+personales en su panel.
+
+16.2. **Comisión.** Cuando una persona se registra con el enlace o el código de un Referidor, cada licencia o renovación
+que pague le deja al Referidor el porcentaje vigente publicado en la plataforma (hoy, el 20 % de lo pagado), mientras
+siga siendo cliente. El porcentaje se fija al aprobar cada pago. Las compras aprobadas mientras la licencia del
+Referidor esté vencida no generan comisión, salvo que DocTraderPRO lo haya habilitado.
+
+16.3. **Pago.** Las comisiones se pagan en USDT por la red Tron (TRC20), a la dirección que el Referidor registre en su
+panel, por quincenas (del 1 al 15 y del 16 al último día de cada mes, hora de Colombia), cuando lo acumulado llegue al
+mínimo publicado (hoy, USD 20); si no llega, se suma a la quincena siguiente. Después de cambiar la dirección, el pago
+siguiente espera 48 horas por seguridad. El Referidor responde por que su dirección sea correcta: un envío hecho a la
+dirección que registró se considera pagado.
+
+16.4. **No es una relación laboral.** Participar no crea una relación laboral, de agencia ni de sociedad. El Referidor
+no representa a DocTraderPRO, no puede prometer rentabilidad ni presentar el Software como un servicio de inversión,
+y no puede recomendarlo con correos o mensajes no solicitados ni con publicidad engañosa.
+
+16.5. **Fraude.** No generan comisión las compras propias o de cuentas creadas para cobrarla (autorreferidos), los
+registros con datos falsos ni los pagos con fondos de origen ilícito. DocTraderPRO puede anular las comisiones que
+todavía no haya pagado y excluir del programa a quien incumpla estos términos.
+
+16.6. **Impuestos.** Cada Referidor responde por las obligaciones tributarias de lo que recibe.
+
+16.7. **Cambios.** DocTraderPRO puede cambiar el porcentaje o el mínimo, y pausar o terminar el programa. Los cambios
+aplican a las ventas aprobadas después de publicarlos; lo ya ganado se paga según estas reglas.
+
+16.8. **Quien recibe la invitación** paga el mismo precio que cualquier cliente y no recibe un beneficio por
+registrarse con un enlace.
+
+## 17. Soporte y comunicaciones
+
+17.1. El soporte se da por **tickets dentro de la plataforma**, por el correo support@doctraderpro.com y por el grupo
 de Telegram para dudas rápidas.
 
-16.2. Las comunicaciones oficiales llegan al correo registrado por el Cliente desde el dominio doctraderpro.com.
+17.2. Las comunicaciones oficiales llegan al correo registrado por el Cliente desde el dominio doctraderpro.com.
 DocTraderPRO **nunca pedirá contraseñas, códigos de verificación ni frases de recuperación** por correo, chat o
 teléfono.
 
-## 17. Datos personales
+## 18. Datos personales
 
 El tratamiento de los datos del Cliente se rige por la **Política de tratamiento de datos personales** publicada en
 la plataforma.
 
-## 18. Cambios a estos términos
+## 19. Cambios a estos términos
 
 DocTraderPRO puede actualizar estos términos. La versión nueva se publica en la plataforma con su fecha y se avisa
 por correo. Aplica a compras y renovaciones posteriores a su publicación. Si el Cliente no está de acuerdo, puede dejar
 de renovar.
 
-## 19. Ley aplicable y controversias
+## 20. Ley aplicable y controversias
 
 Estos términos se rigen por las leyes de la República de Colombia. Antes de acudir a otra instancia, las partes
 intentarán resolver cualquier diferencia directamente, a través de support@doctraderpro.com. Si no se logra, serán
 competentes los jueces de Barranquilla, sin perjuicio de los derechos del consumidor ante la Superintendencia de
 Industria y Comercio.
 
-## 20. Contacto
+## 21. Contacto
 
 DocTraderPRO — Barranquilla, Colombia — support@doctraderpro.com

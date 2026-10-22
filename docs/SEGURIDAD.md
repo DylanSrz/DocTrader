@@ -152,6 +152,17 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
   "Refused to connect to 'data:,'" vienen del **iframe de Cloudflare** y de su propia política (no de la nuestra): no
   afectan el desafío y no se agrega `data:` a nuestra `connect-src` (2026-10-18).
 
+- **Pagos de referidos** (etapa 11): se envían a mano desde Binance a la dirección que quedó copiada en el pago.
+  - Cambiar la dirección de cobro pide confirmar la identidad (contraseña o código de la app, 5 minutos), se valida la
+    suma de control de Tron, se limita a 5 cambios por día y avisa por correo. Lo que se cierre en las 48 horas
+    siguientes a un cambio queda en espera: quien robe la sesión no alcanza a desviar un pago sin que el dueño se
+    entere.
+  - Marcar un pago enviado, habilitar referidores, corregir el referidor de un cliente, anular comisiones y cambiar
+    los ajustes del programa piden el código de la app y quedan en la auditoría (`referido.*`).
+  - El código de invitación es aleatorio (`crypto.randomInt`, 31⁸ combinaciones) y la consulta pública "Te invitó"
+    tiene un límite de 60 por hora por IP. La cookie `ref` es httpOnly, `sameSite: lax` y dura 30 días.
+  - Quien refiere solo ve el nombre de pila y la inicial de sus referidos; nunca correos, documentos ni cuentas.
+
 ## 7. Entradas de datos y archivos
 
 - Toda entrada pasa por validación estricta (DTO con `class-validator` en modo lista blanca, y los mismos esquemas en

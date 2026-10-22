@@ -13,6 +13,7 @@ import { Socio1792900000000 } from './migraciones/1792900000000-socio.js';
 import { EliminarClientes1793000000000 } from './migraciones/1793000000000-eliminar-clientes.js';
 import { DocumentosYMontos1793100000000 } from './migraciones/1793100000000-documentos-y-montos.js';
 import { Referidos1793200000000 } from './migraciones/1793200000000-referidos.js';
+import { TerminosReferidos1793300000000 } from './migraciones/1793300000000-terminos-referidos.js';
 
 export const MIGRACIONES = [
   Inicial1792000000000,
@@ -28,6 +29,7 @@ export const MIGRACIONES = [
   EliminarClientes1793000000000,
   DocumentosYMontos1793100000000,
   Referidos1793200000000,
+  TerminosReferidos1793300000000,
 ];
 
 /** Opciones de la base de datos, compartidas por la API, el worker y los scripts de migración y semilla. */
