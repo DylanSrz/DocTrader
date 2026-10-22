@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { correoCanonico, normalizarTelefono, requisitosContrasena } from './contacto.js';
+import {
+  correoCanonico,
+  normalizarTelefono,
+  problemaContrasena,
+  requisitosContrasena,
+} from './contacto.js';
 
 describe('correoCanonico', () => {
   it('pasa a minúsculas y quita espacios', () => {
@@ -38,10 +43,40 @@ describe('normalizarTelefono', () => {
 });
 
 describe('requisitosContrasena', () => {
-  it('sigue la política de la API: de 10 a 128 caracteres', () => {
-    expect(requisitosContrasena('').map((r) => r.cumple)).toEqual([false, false]);
-    expect(requisitosContrasena('corta').map((r) => r.cumple)).toEqual([false, true]);
-    expect(requisitosContrasena('una frase larga').map((r) => r.cumple)).toEqual([true, true]);
-    expect(requisitosContrasena('x'.repeat(129)).map((r) => r.cumple)).toEqual([true, false]);
+  const cumple = (c: string) => requisitosContrasena(c).map((r) => r.cumple);
+
+  it('largo, mayúscula, minúscula, número y carácter especial, en ese orden', () => {
+    expect(requisitosContrasena('').map((r) => r.texto)).toEqual([
+      'Al menos 10 caracteres',
+      'Como máximo 128 caracteres',
+      'Una letra mayúscula',
+      'Una letra minúscula',
+      'Un número',
+      'Un carácter especial (por ejemplo ! # $ % & * ?)',
+    ]);
+    expect(cumple('')).toEqual([false, false, false, false, false, false]);
+    expect(cumple('corta')).toEqual([false, true, false, true, false, false]);
+    expect(cumple('Una frase larga 7!')).toEqual([true, true, true, true, true, true]);
+    expect(cumple('x'.repeat(129))).toEqual([true, false, false, true, false, false]);
+  });
+
+  it('cuenta letras con tilde y la Ñ; el espacio no es un carácter especial', () => {
+    expect(cumple('ÑANDÚ ágil 9')).toEqual([true, true, true, true, true, false]);
+    expect(cumple('ñandú-Ágil-9')).toEqual([true, true, true, true, true, true]);
+  });
+});
+
+describe('problemaContrasena', () => {
+  it('acepta una contraseña que cumple todo', () => {
+    expect(problemaContrasena('Una frase larga 7!')).toBeNull();
+  });
+
+  it('dice qué falta', () => {
+    expect(problemaContrasena('Corta1!')).toBe('Usa al menos 10 caracteres.');
+    expect(problemaContrasena('una frase larga')).toBe(
+      'A la contraseña le falta una letra mayúscula, un número y un carácter especial (por ejemplo ! # $ % & * ?).',
+    );
+    expect(problemaContrasena('Una frase larga!')).toBe('A la contraseña le falta un número.');
+    expect(problemaContrasena(`Aa1!${'x'.repeat(130)}`)).toBe('Usa como máximo 128 caracteres.');
   });
 });

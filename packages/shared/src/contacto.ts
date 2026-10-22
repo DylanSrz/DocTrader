@@ -26,13 +26,29 @@ export function normalizarTelefono(telefono: string): string | null {
   return numero?.isValid() ? numero.number : null;
 }
 
-/** Reglas de contraseña de `docs/SEGURIDAD.md` §2: largo mínimo, sin reglas raras de composición. */
+/**
+ * Reglas de contraseña de `docs/SEGURIDAD.md` §2: de 10 a 128 caracteres, con al menos una mayúscula, una minúscula,
+ * un número y un carácter especial (decisión del 2026-10-18), y que no esté filtrada (eso lo revisa la API).
+ */
 export const CONTRASENA_MINIMO = 10;
 export const CONTRASENA_MAXIMO = 128;
 
+/** Los requisitos de composición: con letras de cualquier idioma (Ñ y á cuentan como letras). */
+const COMPOSICION = [
+  { texto: 'Una letra mayúscula', falta: 'una letra mayúscula', patron: /\p{Lu}/u },
+  { texto: 'Una letra minúscula', falta: 'una letra minúscula', patron: /\p{Ll}/u },
+  { texto: 'Un número', falta: 'un número', patron: /\p{Nd}/u },
+  {
+    texto: 'Un carácter especial (por ejemplo ! # $ % & * ?)',
+    falta: 'un carácter especial (por ejemplo ! # $ % & * ?)',
+    // Cualquier cosa que no sea letra, número ni espacio.
+    patron: /[^\p{L}\p{N}\s]/u,
+  },
+];
+
 /**
  * La política de contraseñas como lista de requisitos, para mostrarla mientras se escribe. Son los mismos que exige
- * la API (largo mínimo y máximo); que no esté filtrada solo se puede revisar al enviar.
+ * la API (`problemaContrasena`); que no esté filtrada solo se puede revisar al enviar.
  */
 export function requisitosContrasena(contrasena: string): { texto: string; cumple: boolean }[] {
   const largo = contrasena.length;
@@ -42,7 +58,22 @@ export function requisitosContrasena(contrasena: string): { texto: string; cumpl
       texto: `Como máximo ${CONTRASENA_MAXIMO} caracteres`,
       cumple: largo > 0 && largo <= CONTRASENA_MAXIMO,
     },
+    ...COMPOSICION.map((r) => ({ texto: r.texto, cumple: r.patron.test(contrasena) })),
   ];
+}
+
+/** Qué le falta a una contraseña nueva, en una frase; `null` si cumple la política. */
+export function problemaContrasena(contrasena: string): string | null {
+  if (contrasena.length < CONTRASENA_MINIMO) {
+    return `Usa al menos ${CONTRASENA_MINIMO} caracteres.`;
+  }
+  if (contrasena.length > CONTRASENA_MAXIMO)
+    return `Usa como máximo ${CONTRASENA_MAXIMO} caracteres.`;
+  const faltan = COMPOSICION.filter((r) => !r.patron.test(contrasena)).map((r) => r.falta);
+  if (faltan.length === 0) return null;
+  const lista =
+    faltan.length === 1 ? faltan[0] : `${faltan.slice(0, -1).join(', ')} y ${faltan.at(-1)}`;
+  return `A la contraseña le falta ${lista}.`;
 }
 
 /** Un teléfono guardado (`+573001234567`) como se lee: "+57 300 1234567". */

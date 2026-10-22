@@ -67,7 +67,7 @@
 
 ## ❓ Por confirmar con Argemiro
 
-- [ ] **Pagos en USDT "por confirmar"** (2026-10-18): con el precio exacto, si otro cliente tenía una orden abierta
+- [x] **Pagos en USDT "por confirmar"** (2026-10-18; confirmado el 2026-10-22: se mantiene): con el precio exacto, si otro cliente tenía una orden abierta
       por el mismo monto cuando llegó el pago, el pago no se aprueba solo: hay que pedirle al cliente la captura del
       envío y usar "Aprobar de todos modos". Con pocos clientes pasará poco; si molesta, se puede volver a los
       centavos de diferencia.

@@ -35,7 +35,7 @@ async function clienteConSesion() {
   consecutivo += 1;
   const unico = `${Date.now()}${consecutivo}`;
   const correo = `cliente.cuentas.${unico}@correo.co`;
-  const contrasena = 'una contraseña bien larga';
+  const contrasena = 'Una contraseña bien larga 7!';
   await comoLaWeb(app)
     .post('/auth/registro', {
       nombre: 'Laura Gómez Restrepo',

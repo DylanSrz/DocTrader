@@ -36,7 +36,7 @@ async function olvidarCodigosUsados() {
 /** Un admin con contraseña y segundo factor, ya dentro. Devuelve el token de su sesión completa. */
 async function adminConSesion(): Promise<string> {
   const correo = `admin.contenido.${Date.now()}@doctraderpro.com`;
-  const contrasena = 'contraseña de admin de pruebas';
+  const contrasena = 'Contraseña de admin de pruebas 1!';
   await fuente.getRepository(User).insert({
     role: 'ADMIN',
     fullName: 'Admin de pruebas',
@@ -141,7 +141,7 @@ describe('textos legales desde el panel', () => {
         cedula: String(Date.now()).slice(-10),
         correo,
         telefono: `310 ${String(Date.now()).slice(-7)}`,
-        contrasena: 'una contraseña bien larga',
+        contrasena: 'Una contraseña bien larga 7!',
         aceptaTerminos: true,
         aceptaDatos: true,
         aceptaRiesgo: true,
@@ -213,7 +213,7 @@ describe('preguntas frecuentes desde el panel', () => {
         cedula: `9${String(Date.now()).slice(-9)}`,
         correo,
         telefono: `311 ${String(Date.now()).slice(-7)}`,
-        contrasena: 'una contraseña bien larga',
+        contrasena: 'Una contraseña bien larga 7!',
         aceptaTerminos: true,
         aceptaDatos: true,
         aceptaRiesgo: true,
@@ -226,7 +226,7 @@ describe('preguntas frecuentes desde el panel', () => {
     const enlace = app.get(CifradoService).descifrar(aviso.secretEnc!, CONTEXTO_SECRETO_AVISO);
     await comoLaWeb(app).post('/auth/verificar-correo', { token: enlace }).expect(200);
     const ingreso = await comoLaWeb(app)
-      .post('/auth/ingresar', { correo, contrasena: 'una contraseña bien larga' })
+      .post('/auth/ingresar', { correo, contrasena: 'Una contraseña bien larga 7!' })
       .expect(200);
     await comoLaWeb(app, { token: ingreso.body.token })
       .put('/admin/preguntas', { preguntas: [] })

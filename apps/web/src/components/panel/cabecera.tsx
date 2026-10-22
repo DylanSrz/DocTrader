@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { salir } from '@/app/acciones-cuenta';
+import { BarraFlotante } from '@/components/barra-flotante';
 import { Marca } from '@/components/marca';
 import { MenuMovil } from '@/components/menu-movil';
 import { obtenerSesion } from '@/lib/sesion';
@@ -65,32 +66,30 @@ async function PestanasConAvisos({
  */
 export function Cabecera({ pestanas }: { pestanas: Pestana[] }) {
   return (
-    <header className="pt-[calc(env(safe-area-inset-top,0px)+14px)]">
-      <div className="contenedor grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-6">
-        <Marca />
-        {/* Escritorio: pestañas en la barra. Celular y tablet (menos de 1024 px): menú de tres líneas. */}
-        <nav
-          aria-label="Panel"
-          className="max-w-full min-w-0 justify-self-center overflow-x-auto overscroll-x-contain [scrollbar-width:none] max-lg:hidden [&::-webkit-scrollbar]:hidden"
-        >
-          <Suspense fallback={<ListaPestanas pestanas={pestanas} />}>
-            <PestanasConAvisos pestanas={pestanas} />
+    <BarraFlotante className="grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-6">
+      <Marca />
+      {/* Escritorio: pestañas en la barra. Celular y tablet (menos de 1024 px): menú de tres líneas. */}
+      <nav
+        aria-label="Panel"
+        className="max-w-full min-w-0 justify-self-center overflow-x-auto overscroll-x-contain [scrollbar-width:none] max-lg:hidden [&::-webkit-scrollbar]:hidden"
+      >
+        <Suspense fallback={<ListaPestanas pestanas={pestanas} />}>
+          <PestanasConAvisos pestanas={pestanas} />
+        </Suspense>
+      </nav>
+      <Suspense fallback={<span className="min-h-11" />}>
+        <Usuario />
+      </Suspense>
+      <MenuMovil etiqueta="Menú del panel" cabecera={<Marca />} className="col-start-3 lg:hidden">
+        <nav aria-label="Panel">
+          <Suspense fallback={<ListaPestanas pestanas={pestanas} vertical />}>
+            <PestanasConAvisos pestanas={pestanas} vertical />
           </Suspense>
         </nav>
-        <Suspense fallback={<span className="min-h-11" />}>
-          <Usuario />
+        <Suspense fallback={null}>
+          <UsuarioEnMenu />
         </Suspense>
-        <MenuMovil etiqueta="Menú del panel" cabecera={<Marca />} className="col-start-3 lg:hidden">
-          <nav aria-label="Panel">
-            <Suspense fallback={<ListaPestanas pestanas={pestanas} vertical />}>
-              <PestanasConAvisos pestanas={pestanas} vertical />
-            </Suspense>
-          </nav>
-          <Suspense fallback={null}>
-            <UsuarioEnMenu />
-          </Suspense>
-        </MenuMovil>
-      </div>
-    </header>
+      </MenuMovil>
+    </BarraFlotante>
   );
 }

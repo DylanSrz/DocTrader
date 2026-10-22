@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { CopiarCorreo } from '@/components/landing/copiar-correo';
+import { BarraFlotante } from '@/components/barra-flotante';
 import { EnlacePanel } from '@/components/landing/enlace-panel';
 import { Particulas } from '@/components/landing/particulas';
 import { Marca } from '@/components/marca';
@@ -68,55 +69,56 @@ const SECCIONES = [
 
 function Barra() {
   return (
-    <header className="relative z-10 pt-[calc(env(safe-area-inset-top,0px)+22px)]">
-      <div className="contenedor flex items-center justify-between gap-6">
-        <Marca />
-        <div className="flex items-center gap-[clamp(12px,3vw,40px)]">
-          {/* Escritorio: las secciones e "Ingresar" en la barra. Celular y tablet: en el menú de tres líneas. */}
-          <nav
-            aria-label="Principal"
-            className="hidden items-center gap-[clamp(16px,3vw,40px)] min-[961px]:flex"
-          >
-            <ul className="flex gap-[clamp(20px,3vw,36px)]">
+    <BarraFlotante
+      margenSuperior="pt-[calc(env(safe-area-inset-top,0px)+22px)]"
+      className="flex min-h-[60px] items-center justify-between gap-6"
+    >
+      <Marca />
+      <div className="flex items-center gap-[clamp(12px,3vw,40px)]">
+        {/* Escritorio: las secciones e "Ingresar" en la barra. Celular y tablet: en el menú de tres líneas. */}
+        <nav
+          aria-label="Principal"
+          className="hidden items-center gap-[clamp(16px,3vw,40px)] min-[961px]:flex"
+        >
+          <ul className="flex gap-[clamp(20px,3vw,36px)]">
+            {SECCIONES.map(([href, texto]) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco"
+                >
+                  {texto}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <EnlacePanel className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco" />
+        </nav>
+        <Pildora href="#precios" className="gap-0 px-[18px] sm:px-[22px]">
+          Comprar<span className="hidden sm:inline">&nbsp;licencia</span>
+        </Pildora>
+        <MenuMovil etiqueta="Menú principal" cabecera={<Marca />} className="min-[961px]:hidden">
+          <nav aria-label="Principal">
+            <ul className="grid gap-1">
               {SECCIONES.map(([href, texto]) => (
                 <li key={href}>
                   <a
                     href={href}
-                    className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco"
+                    className="flex min-h-14 items-center text-[28px] leading-none tracking-[-0.03em] text-blanco"
                   >
                     {texto}
                   </a>
                 </li>
               ))}
             </ul>
-            <EnlacePanel className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco" />
           </nav>
-          <Pildora href="#precios" className="gap-0 px-[18px] sm:px-[22px]">
-            Comprar<span className="hidden sm:inline">&nbsp;licencia</span>
-          </Pildora>
-          <MenuMovil etiqueta="Menú principal" cabecera={<Marca />} className="min-[961px]:hidden">
-            <nav aria-label="Principal">
-              <ul className="grid gap-1">
-                {SECCIONES.map(([href, texto]) => (
-                  <li key={href}>
-                    <a
-                      href={href}
-                      className="flex min-h-14 items-center text-[28px] leading-none tracking-[-0.03em] text-blanco"
-                    >
-                      {texto}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-            <div className="grid justify-items-start gap-4 border-t border-white/10 pt-6">
-              <EnlacePanel className="inline-flex min-h-11 items-center text-[17px] text-blanco underline decoration-white/35 underline-offset-[6px]" />
-              <Pildora href="#precios">Comprar licencia</Pildora>
-            </div>
-          </MenuMovil>
-        </div>
+          <div className="grid justify-items-start gap-4 border-t border-white/10 pt-6">
+            <EnlacePanel className="inline-flex min-h-11 items-center text-[17px] text-blanco underline decoration-white/35 underline-offset-[6px]" />
+            <Pildora href="#precios">Comprar licencia</Pildora>
+          </div>
+        </MenuMovil>
       </div>
-    </header>
+    </BarraFlotante>
   );
 }
 
