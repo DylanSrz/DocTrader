@@ -30,12 +30,13 @@ export const DIAS_COOKIE_REFERIDO = 30;
 export const ALFABETO_CODIGO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const LARGO_CODIGO = 8;
 
-/** Un código nuevo a partir de bytes aleatorios (los pone quien llama: `crypto.randomBytes` o `getRandomValues`). */
-export function codigoDesdeBytes(bytes: Uint8Array): string {
-  if (bytes.length < LARGO_CODIGO) throw new Error(`Hacen falta ${LARGO_CODIGO} bytes`);
+/**
+ * Un código nuevo. `azar(n)` devuelve un entero uniforme entre 0 y n − 1 (en la API, `crypto.randomInt`): así cada
+ * letra tiene la misma probabilidad, sin el sesgo de aplicar `%` a un byte.
+ */
+export function codigoAleatorio(azar: (n: number) => number): string {
   let codigo = '';
-  for (let i = 0; i < LARGO_CODIGO; i++)
-    codigo += ALFABETO_CODIGO[bytes[i]! % ALFABETO_CODIGO.length];
+  for (let i = 0; i < LARGO_CODIGO; i++) codigo += ALFABETO_CODIGO[azar(ALFABETO_CODIGO.length)];
   return codigo;
 }
 

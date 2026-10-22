@@ -1,8 +1,7 @@
-import { randomBytes } from 'node:crypto';
+import { randomInt } from 'node:crypto';
 import {
   aplicarPorcentaje,
-  codigoDesdeBytes,
-  LARGO_CODIGO,
+  codigoAleatorio,
   normalizarCodigo,
   REFERIDOS_INICIAL,
 } from '@doctrader/shared';
@@ -138,7 +137,7 @@ export async function asegurarPerfil(m: EntityManager, usuarioId: string): Promi
   for (let intento = 0; intento < 5; intento++) {
     const [creado] = (await m.query(
       `INSERT INTO referral_profiles (user_id, code) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING code`,
-      [usuarioId, codigoDesdeBytes(randomBytes(LARGO_CODIGO))],
+      [usuarioId, codigoAleatorio((n) => randomInt(n))],
     )) as { code: string }[];
     if (creado) return creado.code;
     // Choca con el perfil que ya tenía o, muy rara vez, con el código de otro: en ese caso se prueba otro.

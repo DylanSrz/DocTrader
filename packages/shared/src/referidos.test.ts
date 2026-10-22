@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   ALFABETO_CODIGO,
-  codigoDesdeBytes,
+  codigoAleatorio,
   formaDireccionTron,
   LARGO_CODIGO,
   nombreReservado,
@@ -10,7 +10,13 @@ import {
 
 describe('código de referido', () => {
   it('genera 8 caracteres del alfabeto sin ambigüedades', () => {
-    const codigo = codigoDesdeBytes(new Uint8Array([0, 1, 2, 30, 31, 255, 128, 64]));
+    const valores = [0, 1, 2, 30, 29, 15, 7, 3];
+    let i = 0;
+    const codigo = codigoAleatorio((n) => {
+      expect(n).toBe(ALFABETO_CODIGO.length);
+      return valores[i++]!;
+    });
+    expect(codigo).toBe('ABC98SHD');
     expect(codigo).toHaveLength(LARGO_CODIGO);
     for (const letra of codigo) expect(ALFABETO_CODIGO).toContain(letra);
     expect(ALFABETO_CODIGO).not.toMatch(/[01OIL]/);
