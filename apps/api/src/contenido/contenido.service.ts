@@ -3,6 +3,7 @@ import {
   dolaresPorMes,
   type PreguntaFrecuente,
   PREGUNTAS_INICIALES,
+  REFERIDOS_INICIAL,
   TIPO_DOCUMENTO_LEGAL,
   type TipoDocumentoLegal,
 } from '@doctrader/shared';
@@ -40,7 +41,14 @@ export interface TextoLegal {
   contenido: string;
 }
 
-const CLAVES_LANDING = ['faq', 'links', 'myfxbook', 'support_email'] as const;
+const CLAVES_LANDING = [
+  'faq',
+  'links',
+  'myfxbook',
+  'support_email',
+  'referrals.enabled',
+  'referrals.percentage_bp',
+] as const;
 
 /** Lo que muestra la página pública (planes, preguntas, cifras, enlaces) y los textos legales con versiones. */
 @Injectable()
@@ -82,6 +90,13 @@ export class ContenidoService {
       enlaces: (ajustes.get('links') as Enlaces | undefined) ?? null,
       correoSoporte:
         (ajustes.get('support_email') as string | undefined) ?? 'support@doctraderpro.com',
+      // La línea "Recomienda y gana el 20 %" de la landing y la diapositiva de la presentación.
+      referidos: {
+        activo: (ajustes.get('referrals.enabled') ?? REFERIDOS_INICIAL.activo) === true,
+        porcentajeBp:
+          (ajustes.get('referrals.percentage_bp') as number | undefined) ??
+          REFERIDOS_INICIAL.porcentajeBp,
+      },
     };
   }
 

@@ -63,7 +63,7 @@ async function confirmar(token: string) {
 describe('página pública', () => {
   it('da los planes y precios de la base de datos, las preguntas, las cifras y los enlaces', async () => {
     const respuesta = await comoLaWeb(app).get('/publico/landing').expect(200);
-    const { planes, preguntas, myfxbook, enlaces, correoSoporte } = respuesta.body;
+    const { planes, preguntas, myfxbook, enlaces, correoSoporte, referidos } = respuesta.body;
     expect(planes.map((p: { codigo: string }) => p.codigo)).toEqual(['MENSUAL', 'SEMESTRAL']);
     expect(planes.find((p: { codigo: string }) => p.codigo === 'SEMESTRAL')).toMatchObject({
       precioUsdCentavos: 49_900,
@@ -76,6 +76,7 @@ describe('página pública', () => {
     expect(myfxbook.figures.gainPercent).toBe('246.68');
     expect(enlaces.broker.name).toBe('JustMarkets');
     expect(correoSoporte).toBe('support@doctraderpro.com');
+    expect(referidos).toEqual({ activo: true, porcentajeBp: 2000 });
   });
 
   it('da el texto legal vigente sin el título ni la nota interna del borrador', async () => {

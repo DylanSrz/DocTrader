@@ -15,6 +15,7 @@ export default function LayoutPanel({ children }: { children: ReactNode }) {
             texto: 'Soporte',
             aviso: { tipo: 'punto', uno: '1 respuesta nueva', varios: '# respuestas nuevas' },
           },
+          { href: '/panel/referidos', texto: 'Referidos' },
           { href: '/panel/perfil', texto: 'Perfil' },
         ]}
       />

@@ -27,6 +27,7 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
             texto: 'Ajustes',
             tambien: ['/admin/preguntas', '/admin/legal'],
           },
+          { href: '/admin/referidos', texto: 'Referidos' },
           { href: '/admin/socio', texto: 'Socio' },
         ]}
       />

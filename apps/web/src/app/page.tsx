@@ -1,3 +1,4 @@
+import { formatearPorcentaje } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -61,7 +62,7 @@ export default async function Inicio() {
         <Problema />
         <ComoFunciona broker={datos.enlaces.broker} />
         <Resultados myfxbook={datos.myfxbook} />
-        <Precios planes={datos.planes} />
+        <Precios planes={datos.planes} referidos={datos.referidos} />
         <Preguntas preguntas={datos.preguntas} telegram={datos.enlaces.telegram} />
         <Cierre />
       </main>
@@ -426,7 +427,13 @@ function ventajas(plan: PlanPublico, siguientes: PlanPublico[]): string[] {
   ];
 }
 
-function Precios({ planes }: { planes: PlanPublico[] }) {
+function Precios({
+  planes,
+  referidos,
+}: {
+  planes: PlanPublico[];
+  referidos: Landing['referidos'];
+}) {
   const { publicos, ahorroDe, recomendado } = planesEnVenta(planes);
   return (
     <Seccion id="precios">
@@ -508,6 +515,20 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
       </div>
 
       <p className="mt-7 text-sm text-ceniza">Pagas con USDT (Tron) o Bitcoin. Sin devoluciones.</p>
+
+      {referidos.activo ? (
+        <p className="mt-[clamp(40px,5vw,64px)] flex max-w-[980px] flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/8 pt-7 text-niebla">
+          <span>
+            <span className="text-blanco">
+              Recomienda y gana el {formatearPorcentaje(referidos.porcentajeBp)}
+            </span>{' '}
+            de cada licencia que paguen las personas que invites, en USDT cada quincena.
+          </span>
+          <Enlace href="/panel/referidos" nativo>
+            Ver mi enlace de invitación
+          </Enlace>
+        </p>
+      ) : null}
     </Seccion>
   );
 }

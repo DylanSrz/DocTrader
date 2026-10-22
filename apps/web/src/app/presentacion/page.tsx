@@ -1,5 +1,11 @@
 import type { Metadata } from 'next';
-import type { CSSProperties, ReactNode } from 'react';
+import {
+  aplicarPorcentaje,
+  formatearPorcentaje,
+  formatearUsd,
+  normalizarCodigo,
+} from '@doctrader/shared';
+import { type CSSProperties, type ReactNode, Suspense } from 'react';
 import Image from 'next/image';
 import { FranjaLogos } from '@/components/landing/franja-logos';
 import { Particulas } from '@/components/landing/particulas';
@@ -7,6 +13,7 @@ import { CodigoQr } from '@/components/panel/codigo-qr';
 import { type Diapositiva, Visor } from '@/components/presentacion/visor';
 import { planesEnVenta } from '@/lib/planes';
 import { obtenerLanding, type Landing } from '@/lib/publico';
+import { enlaceDeReferido, invitacion, SITIO } from '@/lib/referidos';
 import logo from '../../../public/marca/logo-icon.png';
 
 /*
@@ -19,8 +26,6 @@ export const metadata: Metadata = {
   title: 'Presentación',
   robots: { index: false, follow: false },
 };
-
-const SITIO = process.env.SITIO_URL ?? 'https://www.doctraderpro.com';
 
 const numero = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 });
 const dolares = (centavos: number) => numero.format(centavos / 100);
@@ -316,8 +321,55 @@ function Planes({ planes }: { planes: Landing['planes'] }) {
   );
 }
 
-function Cierre({ datos }: { datos: Landing }) {
-  const registro = `${SITIO}/registro`;
+function Referidos({ datos }: { datos: Landing }) {
+  const pct = formatearPorcentaje(datos.referidos.porcentajeBp);
+  const { publicos } = planesEnVenta(datos.planes);
+  const puntos: [string, ReactNode][] = [
+    [
+      'Tu propio enlace',
+      'Con tu licencia activa, en tu panel tienes un enlace y un código QR para compartir.',
+    ],
+    [
+      `El ${pct} de cada licencia`,
+      <span key="ejemplos" className="grid gap-[0.6cqmin]">
+        {publicos.map((plan) => (
+          <span key={plan.codigo}>
+            {plan.nombre}: {formatearUsd(plan.precioUsdCentavos)} →{' '}
+            <span className="text-blanco">
+              {formatearUsd(
+                aplicarPorcentaje(plan.precioUsdCentavos, datos.referidos.porcentajeBp),
+              )}
+            </span>{' '}
+            para ti
+          </span>
+        ))}
+      </span>,
+    ],
+    ['Mientras sea cliente', 'Ganas en cada compra y cada renovación de quien invitaste.'],
+    ['Pago quincenal', 'Te enviamos lo ganado en USDT, a tu billetera en la red Tron.'],
+  ];
+  return (
+    <Marco tema="Referidos">
+      <Entra>
+        <h2 className="p-titulo">Recomienda y gana el {pct}.</h2>
+      </Entra>
+      <ul className="p-rejilla">
+        {puntos.map(([titulo, texto], i) => (
+          <li key={titulo}>
+            <Entra orden={i + 1} className="grid gap-[1.2cqmin]">
+              <h3 className="p-subtitulo">{titulo}</h3>
+              <p className="p-texto text-niebla">{texto}</p>
+            </Entra>
+          </li>
+        ))}
+      </ul>
+    </Marco>
+  );
+}
+
+function Cierre({ datos, codigo }: { datos: Landing; codigo: string | null }) {
+  // Si quien presenta trae su código (`?ref=`), el QR lleva su enlace y el registro queda a su nombre.
+  const registro = codigo ? enlaceDeReferido(codigo) : `${SITIO}/registro`;
   return (
     <Marco tema="Empieza hoy">
       <div className="grid h-full items-center gap-[5cqmin] [grid-template-columns:minmax(0,1.3fr)_auto] @max-[700px]:[grid-template-columns:1fr]">
@@ -365,8 +417,26 @@ function Cierre({ datos }: { datos: Landing }) {
   );
 }
 
-export default async function Presentacion() {
-  const datos = await obtenerLanding();
+type Parametros = Promise<{ ref?: string | string[] }>;
+
+/** `?ref=CODIGO`: solo un código que sirve hoy cambia el QR del cierre; uno inválido se ignora. */
+async function codigoDe(parametros: Parametros): Promise<string | null> {
+  const { ref } = await parametros;
+  const codigo = normalizarCodigo(typeof ref === 'string' ? ref : null);
+  return codigo && (await invitacion(codigo)) ? codigo : null;
+}
+
+export default function Presentacion({ searchParams }: { searchParams: Parametros }) {
+  // El código del QR depende de la URL: la presentación se arma al pedirla (los datos siguen en caché).
+  return (
+    <Suspense fallback={null}>
+      <Contenido parametros={searchParams} />
+    </Suspense>
+  );
+}
+
+async function Contenido({ parametros }: { parametros: Parametros }) {
+  const [datos, codigo] = await Promise.all([obtenerLanding(), codigoDe(parametros)]);
   const diapositivas: Diapositiva[] = [
     {
       titulo: 'Portada',
@@ -416,11 +486,21 @@ export default async function Presentacion() {
         'Los precios salen del panel y siempre están al día. Recomienda el semestral por el ahorro; el mensual sirve para empezar. Es un pago por periodo, sin cobros automáticos, y no hay devoluciones.',
       contenido: <Planes planes={datos.planes} />,
     },
+    ...(datos.referidos.activo
+      ? [
+          {
+            titulo: 'Gana con referidos',
+            notas:
+              'Solo si la persona muestra interés o ya es cliente: con su licencia activa puede recomendar el sistema y ganar un porcentaje de cada licencia que paguen sus invitados, mientras sigan siendo clientes. Se paga en USDT cada quincena. No es un ingreso garantizado ni un trabajo.',
+            contenido: <Referidos datos={datos} />,
+          },
+        ]
+      : []),
     {
       titulo: 'Empieza hoy',
       notas:
         'Invita a escanear el QR y registrarse en el momento; acompáñalo en el primer paso si está contigo. Deja el Telegram y el correo de soporte para dudas.',
-      contenido: <Cierre datos={datos} />,
+      contenido: <Cierre datos={datos} codigo={codigo} />,
     },
   ];
   return <Visor diapositivas={diapositivas} />;

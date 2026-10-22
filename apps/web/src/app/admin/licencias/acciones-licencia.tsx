@@ -9,9 +9,11 @@ import {
   type EstadoExportacion,
   type EstadoOperacion,
   cambiarDatosCuenta,
+  corregirReferidor,
   eliminarCliente,
   exportarLicencias,
   extenderLicencia,
+  habilitarReferidor,
   reactivarLicencia,
   suspenderLicencia,
   verCedula,
@@ -22,6 +24,8 @@ const reactivarLicenciaConAviso = conAviso(reactivarLicencia);
 const extenderLicenciaConAviso = conAviso(extenderLicencia);
 const eliminarClienteConAviso = conAviso(eliminarCliente);
 const cambiarDatosCuentaConAviso = conAviso(cambiarDatosCuenta);
+const habilitarReferidorConAviso = conAviso(habilitarReferidor);
+const corregirReferidorConAviso = conAviso(corregirReferidor);
 const clasesTexto =
   'w-full resize-y rounded-[20px] bg-campo px-5 py-3.5 text-base text-blanco placeholder:text-white/35 focus-visible:bg-campo-foco focus-visible:shadow-[0_0_0_2px_var(--color-senal)] focus-visible:outline-none';
 
@@ -355,6 +359,87 @@ export function Exportar({ filtro, q }: { filtro: string; q: string }) {
           <span className="text-error">No se pudo descargar el archivo. Intenta de nuevo.</span>
         ) : null}
       </p>
+      <ErrorOperacion estado={estado} />
+    </form>
+  );
+}
+
+/** Habilitar a un cliente para referir aunque no tenga licencia activa, o quitarle la habilitación. */
+export function HabilitarReferidor({
+  cliente,
+  habilitado,
+}: {
+  cliente: string;
+  habilitado: boolean;
+}) {
+  const [estado, accion] = useActionState(habilitarReferidorConAviso, {} as EstadoOperacion);
+  return (
+    <form action={accion} noValidate className="grid justify-items-start gap-3">
+      <input type="hidden" name="cliente" value={cliente} />
+      <input type="hidden" name="habilitado" value={habilitado ? 'no' : 'si'} />
+      <CampoCodigo
+        estado={estado}
+        accion={habilitado ? 'quitar la habilitación' : 'habilitarlo como referidor'}
+      />
+      <BotonEnviar variante="enlace" enviando="Guardando…">
+        {habilitado ? 'Quitar la habilitación para referir' : 'Habilitar como referidor'}
+      </BotonEnviar>
+      <ErrorOperacion estado={estado} />
+    </form>
+  );
+}
+
+/** Corregir quién invitó al cliente (o quitarlo, con el código vacío). Solo cambia las ventas siguientes. */
+export function CorregirReferidor({ cliente }: { cliente: string }) {
+  const [estado, accion] = useActionState(corregirReferidorConAviso, {} as EstadoOperacion);
+  const [abierto, setAbierto] = useState(false);
+  useAlListo(estado, () => setAbierto(false));
+  if (!abierto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="inline-flex min-h-11 items-center justify-self-start text-sm underline decoration-white/35 underline-offset-[6px] hover:decoration-current"
+      >
+        Corregir quién lo invitó
+      </button>
+    );
+  }
+  return (
+    <form action={accion} noValidate className="grid gap-4">
+      <input type="hidden" name="cliente" value={cliente} />
+      <Campo
+        etiqueta="Código del referidor"
+        name="codigoReferidor"
+        autoComplete="off"
+        autoCapitalize="characters"
+        spellCheck={false}
+        maxLength={20}
+        defaultValue={estado.valores?.codigoReferidor}
+        ayuda="Vacío para quitarlo. Las comisiones ya fijadas no cambian: anúlalas en Referidos si hace falta."
+        error={estado.campos?.codigoReferidor}
+      />
+      <Campo
+        etiqueta="Motivo"
+        name="motivo"
+        maxLength={500}
+        required
+        defaultValue={estado.valores?.motivo}
+        error={estado.campos?.motivo}
+      />
+      <CampoCodigo estado={estado} accion="corregir el referidor" />
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <BotonEnviar variante="enlace" enviando="Guardando…">
+          Guardar
+        </BotonEnviar>
+        <button
+          type="button"
+          onClick={() => setAbierto(false)}
+          className="inline-flex min-h-11 items-center text-sm text-ceniza hover:text-blanco"
+        >
+          Cancelar
+        </button>
+      </div>
       <ErrorOperacion estado={estado} />
     </form>
   );

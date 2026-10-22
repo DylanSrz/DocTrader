@@ -515,6 +515,136 @@ export async function marcarComisionPagada(
   return listo(previo, `Quincena del ${texto(datos, 'periodo')} marcada como pagada.`);
 }
 
+// ── Referidos ─────────────────────────────────────────────────────────────────────────────────────────
+
+/** Marca enviado un pago de referidos, con el hash de la transacción (pide el código de la app). */
+export async function marcarReferidoEnviado(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const id = texto(datos, 'pago');
+  const r = await operar(datos, (t) =>
+    llamarApi(`/admin/referidos/pagos/${encodeURIComponent(id)}/enviado`, {
+      metodo: 'POST',
+      cuerpo: { hash: texto(datos, 'hash').trim() },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin/referidos');
+  return listo(
+    previo,
+    `Pago a ${texto(datos, 'referidor')} marcado como enviado. Le avisamos por correo.`,
+  );
+}
+
+/** Porcentaje, mínimo para pagar y programa activo o pausado (pide el código de la app). */
+export async function cambiarAjustesReferidos(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const porcentajeBp = puntosBasicos(texto(datos, 'porcentaje'));
+  const minimo = centavos(texto(datos, 'minimo'));
+  const campos: Record<string, string> = {};
+  if (Number.isNaN(porcentajeBp)) campos.porcentaje = 'Escribe un porcentaje, por ejemplo 20.';
+  if (minimo === null || Number.isNaN(minimo))
+    campos.minimo = 'Escribe el mínimo en dólares, por ejemplo 20.';
+  if (Object.keys(campos).length) return { campos, valores: valoresDe(datos) };
+  const r = await operar(datos, (t) =>
+    llamarApi('/admin/referidos/ajustes', {
+      metodo: 'PUT',
+      cuerpo: { porcentajeBp, minimoPagoUsdCents: minimo, activo: texto(datos, 'activo') === 'si' },
+      token: t,
+    }),
+  );
+  if (!r.ok) {
+    const c = r.estado.campos;
+    return c
+      ? {
+          ...r.estado,
+          campos: { porcentaje: c.porcentajeBp ?? '', minimo: c.minimoPagoUsdCents ?? '' },
+        }
+      : r.estado;
+  }
+  revalidatePath('/admin/referidos');
+  updateTag(ETIQUETA_LANDING);
+  return listo(
+    previo,
+    'Ajustes del programa guardados. Aplican a las ventas que se aprueben desde ahora.',
+  );
+}
+
+/** Habilita a un cliente para referir sin licencia activa, o le quita la habilitación (pide el código). */
+export async function habilitarReferidor(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const id = texto(datos, 'cliente');
+  const habilitado = texto(datos, 'habilitado') === 'si';
+  const r = await operar(datos, (t) =>
+    llamarApi(`/admin/referidos/clientes/${encodeURIComponent(id)}/habilitado`, {
+      metodo: 'PUT',
+      cuerpo: { habilitado },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin', 'layout');
+  return listo(
+    previo,
+    habilitado ? 'Cliente habilitado para referir.' : 'Se quitó la habilitación para referir.',
+  );
+}
+
+/** Corrige quién invitó a un cliente, o lo quita (código vacío). Solo cambia las ventas siguientes. */
+export async function corregirReferidor(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const id = texto(datos, 'cliente');
+  const motivo = texto(datos, 'motivo').trim();
+  if (motivo.length < 3) {
+    return { campos: { motivo: 'Escribe el motivo del cambio.' }, valores: valoresDe(datos) };
+  }
+  const codigo = texto(datos, 'codigoReferidor').trim();
+  const r = await operar(datos, (t) =>
+    llamarApi(`/admin/referidos/clientes/${encodeURIComponent(id)}/referidor`, {
+      metodo: 'PUT',
+      cuerpo: { motivo, ...(codigo ? { codigo } : {}) },
+      token: t,
+    }),
+  );
+  if (!r.ok) {
+    const c = r.estado.campos;
+    return c?.codigo ? { ...r.estado, campos: { codigoReferidor: c.codigo } } : r.estado;
+  }
+  revalidatePath('/admin', 'layout');
+  return listo(previo, codigo ? 'Referidor corregido.' : 'Se quitó el referidor.');
+}
+
+/** Quita la comisión de referido de una venta que todavía no se liquidó (pide el código). */
+export async function anularComisionReferido(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const numero = texto(datos, 'numero').trim().toUpperCase();
+  const motivo = texto(datos, 'motivo').trim();
+  const campos: Record<string, string> = {};
+  if (!numero) campos.numero = 'Escribe el número de la orden.';
+  if (motivo.length < 3) campos.motivo = 'Escribe el motivo.';
+  if (Object.keys(campos).length) return { campos, valores: valoresDe(datos) };
+  const r = await operar(datos, (t) =>
+    llamarApi(`/admin/referidos/ordenes/${encodeURIComponent(numero)}/anular`, {
+      metodo: 'POST',
+      cuerpo: { motivo },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin/referidos');
+  return listo(previo, `Comisión de la orden ${numero} anulada.`);
+}
+
 // ── Pagos ───────────────────────────────────────────────────────────────────────────────────────────
 
 /** Registrar a mano el pago de una orden pendiente o vencida y aprobarlo (pide el código de la app). */

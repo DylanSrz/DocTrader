@@ -122,6 +122,24 @@ export function FormularioRegistro() {
         </Casilla>
       </fieldset>
 
+      <details className="group" open={Boolean(v.codigoReferido || e.codigoReferido) || undefined}>
+        <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-[15px] text-niebla underline decoration-white/35 underline-offset-[6px] hover:text-blanco [&::-webkit-details-marker]:hidden">
+          ¿Tienes un código de invitación?
+        </summary>
+        <Campo
+          etiqueta="Código de invitación (opcional)"
+          name="codigoReferido"
+          autoComplete="off"
+          autoCapitalize="characters"
+          spellCheck={false}
+          maxLength={20}
+          ayuda="Son 8 letras y números. Si llegaste por el enlace de quien te invitó, no hace falta."
+          defaultValue={v.codigoReferido}
+          error={e.codigoReferido}
+          className="mt-3"
+        />
+      </details>
+
       <Turnstile key={estado.envio} />
       <BotonEnviar enviando="Creando tu cuenta…" className="justify-self-start">
         Crear cuenta
