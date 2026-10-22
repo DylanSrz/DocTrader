@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { cx } from '@/components/ui';
 import { type LogoCompatible, LOGOS_COMPATIBLES } from './logos-compatibles';
 
@@ -12,23 +13,40 @@ import { type LogoCompatible, LOGOS_COMPATIBLES } from './logos-compatibles';
 
 const REPETICIONES = 3;
 
+/**
+ * Tamaño relativo según la forma del logo, para que todos pesen parecido: los muy anchos y bajos (JustMarkets,
+ * TradingView) van más bajos que los compactos.
+ */
+function escala({ ancho, alto, etiqueta }: LogoCompatible) {
+  if (etiqueta || !ancho || !alto) return 0.85;
+  const proporcion = ancho / alto;
+  return proporcion > 5.5 ? 0.62 : proporcion > 3 ? 0.8 : 1;
+}
+
 function Logo({ logo, oculto }: { logo: LogoCompatible; oculto: boolean }) {
   return (
-    <li className="franja-logo" translate="no">
+    <li
+      className="franja-logo"
+      translate="no"
+      style={{ '--escala': escala(logo) } as CSSProperties}
+    >
       {logo.archivo ? (
-        // Logos pequeños (SVG de preferencia): no necesitan la optimización de next/image.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logo.archivo}
-          alt={oculto ? '' : logo.nombre}
-          width={logo.ancho}
-          height={logo.alto}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-        />
+        <span className="franja-marca">
+          {/* Logos pequeños (SVG de preferencia): no necesitan la optimización de next/image. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logo.archivo}
+            alt={oculto || logo.etiqueta ? '' : logo.nombre}
+            width={logo.ancho}
+            height={logo.alto}
+            // Sin carga diferida: la franja se mueve en horizontal y los logos aparecerían de golpe al entrar.
+            decoding="async"
+            draggable={false}
+          />
+          {logo.etiqueta ? <span className="franja-etiqueta">{logo.etiqueta}</span> : null}
+        </span>
       ) : (
-        <span>{logo.nombre}</span>
+        <span className="franja-texto">{logo.nombre}</span>
       )}
     </li>
   );
