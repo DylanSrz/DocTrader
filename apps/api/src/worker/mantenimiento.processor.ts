@@ -12,6 +12,7 @@ import { reportarError } from '../monitoreo/sentry.js';
 import { VerificacionPagos } from '../pagos/verificacion-pagos.service.js';
 import { BorradoDatos } from '../privacidad/borrado-datos.js';
 import { REDIS } from '../redis/redis.module.js';
+import { ReferidosService } from '../referidos/referidos.service.js';
 import { SocioService } from '../socio/socio.service.js';
 import { SoporteService } from '../soporte/soporte.service.js';
 import {
@@ -36,8 +37,8 @@ import {
  * Trabajos de mantenimiento: el latido (prueba que el worker está vivo), el envío de correos pendientes y el
  * vencimiento de las órdenes de pago, la verificación de los pagos en la blockchain, los estados de las licencias y
  * la activación de las direcciones de depósito que cumplieron sus 24 horas, el cierre de los tickets resueltos y el
- * borrado de los adjuntos que nadie usó, los recordatorios de vencimiento y la liquidación de la comisión del socio
- * el borrado diario de los datos vencidos y las alertas a los admins.
+ * borrado de los adjuntos que nadie usó, los recordatorios de vencimiento, la liquidación de la comisión del socio y
+ * de los referidos, el borrado diario de los datos vencidos y las alertas a los admins.
  */
 @Processor(COLA_MANTENIMIENTO)
 export class MantenimientoProcessor extends WorkerHost {
@@ -53,6 +54,7 @@ export class MantenimientoProcessor extends WorkerHost {
     private readonly soporte: SoporteService,
     private readonly archivos: ArchivosService,
     private readonly socio: SocioService,
+    private readonly referidos: ReferidosService,
     private readonly borrado: BorradoDatos,
     private readonly alertas: Alertas,
   ) {
@@ -90,6 +92,7 @@ export class MantenimientoProcessor extends WorkerHost {
         return;
       case TRABAJO_LIQUIDAR_COMISION:
         await this.socio.liquidar();
+        await this.referidos.liquidar();
         return;
       case TRABAJO_BORRAR_DATOS:
         await this.borrado.ejecutar();

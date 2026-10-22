@@ -76,7 +76,8 @@ export class ProgramarTrabajos implements OnApplicationBootstrap {
       { every: 60 * 60_000 },
       { name: TRABAJO_RECORDATORIOS, opts: { removeOnComplete: true, removeOnFail: 100 } },
     );
-    // Comisión del socio: cada hora se cierran las quincenas terminadas (1 al 15 y 16 al fin de mes, hora de Colombia).
+    // Comisión del socio y pagos de referidos: cada hora se cierran las quincenas terminadas (1 al 15 y 16 al fin
+    // de mes, hora de Colombia).
     await this.mantenimiento.upsertJobScheduler(
       TRABAJO_LIQUIDAR_COMISION,
       { every: 60 * 60_000 },

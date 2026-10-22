@@ -74,6 +74,12 @@ export class RegistroDto {
   @IsString()
   @MaxLength(4096)
   turnstile?: string;
+
+  /** Código de quien lo invitó (programa de referidos): de la cookie del enlace o escrito a mano. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  codigoReferido?: string;
 }
 
 export class IngresoDto {

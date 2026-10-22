@@ -11,6 +11,7 @@ import { VencimientoOrdenes } from './licencias/vencimiento-ordenes.js';
 import { PagosModule } from './pagos/pagos.module.js';
 import { BorradoDatos } from './privacidad/borrado-datos.js';
 import { Alertas } from './monitoreo/alertas.js';
+import { ReferidosModule } from './referidos/referidos.module.js';
 import { SocioModule } from './socio/socio.module.js';
 import { SoporteModule } from './soporte/soporte.module.js';
 import { COLA_MANTENIMIENTO } from './worker/latido.js';
@@ -25,6 +26,7 @@ import { ProgramarTrabajos } from './worker/programar-trabajos.js';
     PagosModule,
     SoporteModule,
     SocioModule,
+    ReferidosModule,
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService<Entorno, true>) => ({
