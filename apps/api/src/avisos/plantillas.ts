@@ -40,6 +40,10 @@ export const PLANTILLA = {
   TRABAJO_FALLIDO: 'trabajo-fallido',
   INGRESOS_FALLIDOS: 'ingresos-fallidos',
   AUDITORIA_ALTERADA: 'auditoria-alterada',
+  REFERIDO_COMISION: 'referido-comision',
+  REFERIDO_PAGO_ENVIADO: 'referido-pago-enviado',
+  REFERIDO_DIRECCION_CAMBIADA: 'referido-direccion-cambiada',
+  REFERIDOS_POR_PAGAR: 'referidos-por-pagar',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -495,6 +499,54 @@ export function renderizar(
           `La revisión diaria encontró que el registro de auditoría número ${datos.fila} no coincide con su huella. Puede ser que alguien con acceso a la base de datos lo haya cambiado o borrado.`,
           'Sigue el plan de incidentes de docs/SEGURIDAD.md §14: revisa quién tiene acceso a la base de datos, cambia las llaves y contraseñas y compara con la última copia de seguridad.',
         ],
+      });
+    case PLANTILLA.REFERIDO_COMISION:
+      return armar({
+        asunto: `Ganaste ${datos.comision} por un referido`,
+        saludo,
+        parrafos: [
+          `${datos.referido}, a quien invitaste, pagó su licencia ${datos.plan}. Tu comisión es de ${datos.comision} (${datos.porcentaje} de ${datos.monto}).`,
+          datos.direccion === 'si'
+            ? 'Te la enviamos en USDT (red Tron) con el pago de la quincena, cuando lo que tienes por cobrar llegue al mínimo.'
+            : 'Para recibirla, registra en tu panel la dirección de USDT (red Tron) donde quieres cobrar.',
+        ],
+        boton: { texto: 'Ver mis referidos', url: `${web}${datos.ruta ?? '/panel/referidos'}` },
+      });
+    case PLANTILLA.REFERIDO_PAGO_ENVIADO:
+      return armar({
+        asunto: `Te enviamos ${datos.monto} por tus referidos`,
+        saludo,
+        parrafos: [
+          `Enviamos ${datos.monto} en USDT (red Tron) a tu dirección ${datos.direccion}, por las comisiones del ${datos.periodo}.`,
+          `Comprobante de la transacción: ${datos.hash}`,
+        ],
+        boton: { texto: 'Ver mis referidos', url: `${web}${datos.ruta ?? '/panel/referidos'}` },
+      });
+    case PLANTILLA.REFERIDO_DIRECCION_CAMBIADA:
+      return armar({
+        asunto:
+          datos.horas === '0'
+            ? 'Registraste tu dirección de cobro'
+            : 'Cambiaste tu dirección de cobro',
+        saludo,
+        parrafos: [
+          `La dirección donde recibes las comisiones de referidos ahora es ${datos.direccion}.`,
+          datos.horas === '0'
+            ? 'Si no hiciste este cambio, cambia tu contraseña y escríbenos de inmediato a support@doctraderpro.com.'
+            : `Por seguridad, el próximo pago queda en espera ${datos.horas} horas. Si no hiciste este cambio, cambia tu contraseña y escríbenos de inmediato a support@doctraderpro.com.`,
+        ],
+        boton: { texto: 'Ver mis referidos', url: `${web}${datos.ruta ?? '/panel/referidos'}` },
+      });
+    case PLANTILLA.REFERIDOS_POR_PAGAR:
+      return armar({
+        asunto: `Pagos de referidos por enviar: ${datos.total}`,
+        saludo,
+        parrafos: [
+          `Se cerraron ${datos.pagos} de referidos por ${datos.total} en total.`,
+          'Envíen cada monto en USDT (red Tron) a la dirección que muestra el panel y márquenlo como enviado con el hash de la transacción.',
+        ],
+        boton: { texto: 'Ver los referidos', url: `${web}/admin/referidos` },
+        despues: ['Este aviso les llega a los dos administradores.'],
       });
     default:
       throw new Error(`Plantilla desconocida: ${plantilla}`);

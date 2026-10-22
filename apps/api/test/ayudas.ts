@@ -25,6 +25,7 @@ export async function clienteConSesion(
     correo?: string;
     telefono?: string;
     dispositivo?: string;
+    codigoReferido?: string;
   } = {},
 ) {
   const fuente = app.get<DataSource>(getDataSourceToken());
@@ -43,6 +44,7 @@ export async function clienteConSesion(
       aceptaTerminos: true,
       aceptaDatos: true,
       aceptaRiesgo: true,
+      codigoReferido: datos.codigoReferido,
     })
     .expect(202);
   // El último: quien se registra de nuevo con el mismo correo recibe otro enlace.
@@ -56,7 +58,16 @@ export async function clienteConSesion(
     .post('/auth/ingresar', { correo, contrasena, dispositivo: datos.dispositivo })
     .expect(200);
   const usuario = await fuente.getRepository(User).findOneByOrFail({ email: correo });
-  return { web: comoLaWeb(app, { token: ingreso.body.token as string }), usuario, correo };
+  const web = comoLaWeb(app, { token: ingreso.body.token as string });
+  return {
+    web,
+    usuario,
+    correo,
+    /** Confirma su identidad con la contraseña (no tiene segundo factor). */
+    confirmar: async () => {
+      await web.post('/auth/confirmar', { contrasena }).expect(200);
+    },
+  };
 }
 
 /** Un admin con contraseña y segundo factor, ya dentro, y una forma de confirmar con su código. */

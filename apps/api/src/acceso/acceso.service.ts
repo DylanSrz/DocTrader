@@ -30,6 +30,7 @@ import {
 } from '../database/entidades/index.js';
 import { claveIngresosFallidos } from '../monitoreo/alertas.js';
 import { REDIS } from '../redis/redis.module.js';
+import { referidorParaRegistro } from '../referidos/reglas.js';
 import { secretoAleatorio } from '../seguridad/cifrado.js';
 import { CifradoService } from '../seguridad/cifrado.service.js';
 import { ContrasenasService } from '../seguridad/contrasenas.service.js';
@@ -187,6 +188,7 @@ export class AccesoService {
 
     try {
       await this.fuente.transaction(async (m) => {
+        const referidor = await referidorParaRegistro(m, dto.codigoReferido);
         const usuario = await m.getRepository(User).save(
           m.getRepository(User).create({
             role: ROL.CLIENTE,
@@ -201,6 +203,8 @@ export class AccesoService {
             phoneE164: telefono,
             passwordHash: hash,
             marketingOptIn: dto.aceptaMercadeo === true,
+            referredBy: referidor?.id ?? null,
+            referredAt: referidor ? new Date() : null,
           }),
         );
 
@@ -250,7 +254,7 @@ export class AccesoService {
             action: 'usuario.registro',
             targetType: 'user',
             targetId: usuario.id,
-            metadata: { mercadeo: usuario.marketingOptIn },
+            metadata: { mercadeo: usuario.marketingOptIn, referidoPor: referidor?.id ?? null },
             ip: cliente.ip,
             userAgent: cliente.userAgent ?? null,
           },

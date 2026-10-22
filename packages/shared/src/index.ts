@@ -10,3 +10,4 @@ export * from './cuentas.js';
 export * from './licencias.js';
 export * from './soporte.js';
 export * from './comision.js';
+export * from './referidos.js';

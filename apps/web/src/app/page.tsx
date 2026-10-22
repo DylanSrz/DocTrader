@@ -1,3 +1,4 @@
+import { formatearPorcentaje } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -12,6 +13,7 @@ import { MenuMovil } from '@/components/menu-movil';
 import { NavSecciones } from '@/components/landing/nav-secciones';
 import { Enlace, Etiqueta, Pildora, cx } from '@/components/ui';
 import { markdownAHtml } from '@/lib/markdown';
+import { planesEnVenta } from '@/lib/planes';
 import { type Landing, obtenerLanding, type PlanPublico } from '@/lib/publico';
 
 export const metadata: Metadata = {
@@ -60,7 +62,7 @@ export default async function Inicio() {
         <Problema />
         <ComoFunciona broker={datos.enlaces.broker} />
         <Resultados myfxbook={datos.myfxbook} />
-        <Precios planes={datos.planes} />
+        <Precios planes={datos.planes} referidos={datos.referidos} />
         <Preguntas preguntas={datos.preguntas} telegram={datos.enlaces.telegram} />
         <Cierre />
       </main>
@@ -425,20 +427,14 @@ function ventajas(plan: PlanPublico, siguientes: PlanPublico[]): string[] {
   ];
 }
 
-function Precios({ planes }: { planes: PlanPublico[] }) {
-  const publicos = planes.filter((p) => p.publico && p.meses !== null);
-  // El ahorro de cada plan se compara con pagar mes a mes el plan de un mes.
-  const mensual = publicos.find((p) => p.meses === 1 && p.mesesObsequio === 0);
-  const ahorroDe = (plan: PlanPublico) =>
-    mensual && plan !== mensual
-      ? mensual.precioUsdCentavos * ((plan.meses ?? 0) + plan.mesesObsequio) -
-        plan.precioUsdCentavos
-      : 0;
-  // Se recomienda el plan con el que más se ahorra (hoy, el semestral).
-  const recomendado = publicos.reduce<PlanPublico | null>(
-    (mejor, plan) => (ahorroDe(plan) > (mejor ? ahorroDe(mejor) : 0) ? plan : mejor),
-    null,
-  );
+function Precios({
+  planes,
+  referidos,
+}: {
+  planes: PlanPublico[];
+  referidos: Landing['referidos'];
+}) {
+  const { publicos, ahorroDe, recomendado } = planesEnVenta(planes);
   return (
     <Seccion id="precios">
       <DosColumnas
@@ -519,6 +515,20 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
       </div>
 
       <p className="mt-7 text-sm text-ceniza">Pagas con USDT (Tron) o Bitcoin. Sin devoluciones.</p>
+
+      {referidos.activo ? (
+        <p className="mt-[clamp(40px,5vw,64px)] flex max-w-[980px] flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/8 pt-7 text-niebla">
+          <span>
+            <span className="text-blanco">
+              Recomienda y gana el {formatearPorcentaje(referidos.porcentajeBp)}
+            </span>{' '}
+            de cada licencia que paguen las personas que invites, en USDT cada quincena.
+          </span>
+          <Enlace href="/panel/referidos" nativo>
+            Ver mi enlace de invitación
+          </Enlace>
+        </p>
+      ) : null}
     </Seccion>
   );
 }

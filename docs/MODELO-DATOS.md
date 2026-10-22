@@ -41,6 +41,10 @@ erDiagram
   ticket_messages ||--o{ files : "adjuntos"
   partner_profiles ||--o{ commission_payouts : "liquida"
   payment_orders }o--o| commission_payouts : "entra en"
+  users ||--o| referral_profiles : "refiere"
+  users ||--o{ users : "invitó a"
+  users ||--o{ referral_payouts : "cobra"
+  payment_orders }o--o| referral_payouts : "comisión en"
 ```
 
 ## 3. Tablas
@@ -265,6 +269,28 @@ Las órdenes quedan ligadas por `payment_orders.commission_payout_id`.
 `deposit_address.create`, …), `target_type`, `target_id`, `metadata` (jsonb), `ip`, `user_agent`, `created_at`,
 `prev_hash`, `hash`. La app solo puede insertar (ver `SEGURIDAD.md` §12).
 
+### 3.8. Referidos (etapa 11, 2026-10-22)
+
+**`referral_profiles`**: `user_id` (clave), `code` (único, 8 caracteres de `ABCDEFGHJKMNPQRSTUVWXYZ23456789`),
+`usdt_address` (Tron, con su suma de control), `address_changed_at` (nulo en la primera dirección),
+`enabled_by_admin`, `enabled_by`, `enabled_at`, `created_at`, `updated_at`. Se crea al abrir "Referidos" quien puede
+referir, o al habilitarlo un admin. Refieren: un cliente con licencia `ACTIVA` o `EN_GRACIA`, quien un admin habilite y
+el socio (por estar en `partner_profiles`), siempre con la cuenta `ACTIVE`.
+
+**`users`**: `referred_by` (quien lo invitó; nunca él mismo) y `referred_at`. Se fijan al registrarse con un código
+que sirve ese día; solo un admin los corrige (`referido.corregido`).
+
+**`payment_orders`**: `referrer_id`, `referral_bp`, `referral_usd_cents` (todo o nada), fijados al aprobar si el
+programa está activo y el referidor puede referir en ese momento; `referral_payout_id` liga la venta al pago que la
+liquidó.
+
+**`referral_payouts`**: `referrer_id`, `period_start`, `period_end` (de la quincena de la venta más vieja a la de la
+más nueva), `sales_count`, `gross_usd_cents`, `commission_usd_cents`, `usdt_address` (copiada al cerrar), `status`
+(`CERRADA`, `PAGADA`), `paid_at`, `paid_by`, `tx_hash`. Único por (`referrer_id`, `period_start`).
+
+**`settings`**: `referrals.percentage_bp` (2000), `referrals.min_payout_usd_cents` (2000) y `referrals.enabled`
+(true).
+
 **Fase 2** (no se crean ahora): `exchange_rates` (TRM del día) para cobrar en pesos.
 
 ## 4. Estados
@@ -381,6 +407,7 @@ stateDiagram-v2
 | Cerrar tickets | Cada hora | RESUELTO → CERRADO a los 7 días |
 | Borrar adjuntos sin usar | Cada hora | Archivos subidos que ningún mensaje adjuntó en 24 horas |
 | Liquidar comisión | Cada hora | Cierra las quincenas terminadas (1–15 y 16–fin de mes) con sus órdenes aprobadas |
+| Pagos de referidos | Cada hora (con la del socio) | Por referidor: si lo acumulado de quincenas terminadas llega al mínimo, tiene dirección y no la cambió en 48 h, crea el pago y avisa a los admins |
 | Enviar avisos | Continuo | Envía `notifications` pendientes con reintentos |
 | Borrar datos vencidos | Diario, 3 a. m. | Contraseñas de trading, tickets y registros según la política de datos |
 | Copia de seguridad extra | Semanal | Copia cifrada de la base de datos en R2 |
@@ -508,3 +535,22 @@ stateDiagram-v2
   `delete_after` y los borra el trabajo de adjuntos); `user_devices` sin verse en 12 meses; `auth_tokens` vencidos
   hace 12 meses; `notifications` ENVIADA o FALLIDA de más de 12 meses. La auditoría (5 años) no se borra todavía: la
   tabla no acepta borrados y su primer registro es de 2026.
+
+## 13. Cómo quedó construido (etapa 11, referidos, 2026-10-22)
+
+- **Reglas (`apps/api/src/referidos/reglas.ts`):** `viaParaReferir` (`HABILITADO`, `SOCIO` o `LICENCIA`),
+  `referidorParaRegistro`, `comisionDeReferido` (en `aprobarEn`, la misma transacción que la del socio) y
+  `asegurarPerfil` (código con `crypto.randomInt`). Un código que no sirve nunca impide registrarse.
+- **Liquidación (`ReferidosService.liquidar`):** toma las ventas sin liquidar de quincenas terminadas; si no llegan al
+  mínimo, no hay dirección o la dirección cambió hace menos de 48 h, esperan a la siguiente hora.
+- **Correos:** `referido-comision`, `referido-pago-enviado`, `referido-direccion-cambiada` y, a los admins,
+  `referidos-por-pagar`. Claves: `referido-comision:{orden}`, `referido-pago:{pago}`, `referidos-por-pagar:{pago}`.
+- **Auditoría:** `referido.direccion_cambiada`, `referido.pago_enviado`, `referido.habilitado`,
+  `referido.deshabilitado`, `referido.corregido`, `referido.comision_anulada` y `referido.ajustes_cambiados`; el
+  registro guarda `referidoPor` en `usuario.registro`, y la aprobación, la comisión en `pago.aprobado`.
+- **Privacidad:** el referidor ve el nombre de pila y la inicial de sus referidos (`nombreReservado`), su estado y las
+  comisiones. "Mis datos" incluye la sección de referidos; eliminar un cliente borra su `referral_profiles`.
+- **Web:** `/r/CODIGO` (cookie `ref` de 30 días), "Te invitó" en el registro, `/panel/referidos`, `/admin/referidos`,
+  la sección de la ficha y la del socio. `/publico/landing` da `referidos: { activo, porcentajeBp }`.
+- **Textos legales:** la migración `1793300000000-terminos-referidos` publica la sección 16 de los términos y los
+  cambios de la política de datos como versiones nuevas.

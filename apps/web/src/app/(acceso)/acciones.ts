@@ -1,10 +1,11 @@
 'use server';
 
-import { problemaContrasena, validarDocumento } from '@doctrader/shared';
+import { normalizarCodigo, problemaContrasena, validarDocumento } from '@doctrader/shared';
 import { redirect } from 'next/navigation';
 import { type ErrorApi, llamarApi } from '@/lib/api';
 import { borrarSesion, guardarSesion, identificadorDelNavegador } from '@/lib/cookies';
 import { type EstadoFormulario, texto } from '@/lib/formulario';
+import { codigoGuardado, invitacion, olvidarCodigo } from '@/lib/referidos';
 import { inicioDe, tokenDeSesion } from '@/lib/sesion';
 import { tomarDestino } from '@/lib/tras-ingresar';
 
@@ -65,6 +66,7 @@ export async function registrar(previo: EstadoRegistro, datos: FormData): Promis
     aceptaDatos: datos.get('aceptaDatos') === 'on' ? 'on' : '',
     aceptaRiesgo: datos.get('aceptaRiesgo') === 'on' ? 'on' : '',
     aceptaMercadeo: datos.get('aceptaMercadeo') === 'on' ? 'on' : '',
+    codigoReferido: texto(datos, 'codigoReferido').trim(),
   };
   const contrasena = texto(datos, 'contrasena');
 
@@ -84,6 +86,13 @@ export async function registrar(previo: EstadoRegistro, datos: FormData): Promis
   if (!valores.aceptaTerminos) campos.aceptaTerminos = 'Debes aceptar los términos de la licencia.';
   if (!valores.aceptaDatos) campos.aceptaDatos = 'Debes autorizar el tratamiento de tus datos.';
   if (!valores.aceptaRiesgo) campos.aceptaRiesgo = 'Debes leer y aceptar el aviso de riesgo.';
+  // El código escrito a mano gana sobre el del enlace; si se escribió, se revisa que sirva antes de crear la cuenta.
+  const escrito = valores.codigoReferido;
+  const codigoReferido = escrito ? normalizarCodigo(escrito) : await codigoGuardado();
+  if (escrito && !(await invitacion(codigoReferido))) {
+    campos.codigoReferido =
+      'Ese código de invitación no existe o ya no está activo. Revísalo o déjalo vacío.';
+  }
   if (Object.keys(campos).length > 0) {
     return { envio: (previo.envio ?? 0) + 1, campos, valores, desafio: previo.desafio };
   }
@@ -103,9 +112,11 @@ export async function registrar(previo: EstadoRegistro, datos: FormData): Promis
       aceptaRiesgo: true,
       aceptaMercadeo: valores.aceptaMercadeo === 'on',
       turnstile: texto(datos, 'turnstile') || undefined,
+      codigoReferido: codigoReferido ?? undefined,
     },
   });
   if (!respuesta.ok) return desdeError(respuesta.error, previo, valores);
+  await olvidarCodigo();
   return { correoEnviadoA: valores.correo };
 }
 

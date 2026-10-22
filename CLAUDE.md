@@ -8,7 +8,8 @@ Plataforma web para vender licencias del software de copy trading **Doc Trader P
 
 Estado: **construcción** (desde el 2026-10-14). Etapas 0 a 8 hechas (base, cuentas y acceso, página pública, cuentas de trading con licencias y órdenes,
 verificación y aprobación de pagos, operación del admin, licencia de prueba —retirada el 2026-10-15—, soporte por tickets, automatizaciones y socio);
-sigue la etapa 9 de `docs/PLAN-TRABAJO.md`. Cómo correr el proyecto y convenciones de código: `README.md`.
+la etapa 9 (lanzamiento) sigue en curso y las etapas 10 (presentación de ventas, `/presentacion`) y 11 (referidos)
+están hechas; ver `docs/PLAN-TRABAJO.md`. Cómo correr el proyecto y convenciones de código: `README.md`.
 
 Reglas clave:
 - Se vende una **licencia de uso de software**, nunca "servicio de trading" ni rentabilidad garantizada.
@@ -35,6 +36,10 @@ Reglas clave:
   "DocTrader Pro" o se habla en plural ("conectamos tu cuenta"). Su usuario admin se llama "DocTrader Pro".
 - Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
+- **Referidos** (etapa 11): quien refiere gana el 20 % (editable) de cada compra de su referido mientras sea cliente;
+  se paga en USDT (Tron) cada quincena desde USD 20, a mano desde Binance, con el hash. Refieren los clientes con
+  licencia activa o en gracia, quienes un admin habilite y el socio. El invitado no recibe beneficio. Sección 16 de
+  los términos.
 - Titular: **DocTraderPRO, Barranquilla, Colombia**. Textos legales (borradores) en `docs/legal/`; plan de seguridad en
   `docs/SEGURIDAD.md`; decisiones técnicas (blockchain, archivos, cuentas) en `docs/DECISIONES-TECNICAS.md`;
   modelo de datos y estados en `docs/MODELO-DATOS.md`; etapas, entornos, pruebas y lista de lanzamiento en

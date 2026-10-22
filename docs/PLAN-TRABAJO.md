@@ -300,6 +300,28 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
     estados de procesando, listo y error.
   - **Falta:** la lista del §5 y el lanzamiento suave.
 
+### Etapa 10 — Presentación de ventas ✅ (2026-10-22)
+- **`/presentacion`**: diapositivas a pantalla completa para las reuniones con clientes (portada, problema, qué es,
+  cómo funciona, resultados, seguridad, con qué funciona, planes y cierre con QR al registro). Precios, planes y
+  cifras de Myfxbook en vivo, los mismos de la landing (`obtenerLanding`, `lib/planes.ts`).
+- Flechas, espacio, Inicio y Fin; deslizar en tablet; **N** muestra las notas para quien presenta; **F**, pantalla
+  completa; `#3` abre la diapositiva 3. "Guardar PDF" imprime todas en 16:9, una por página.
+- No se indexa ni está en el sitemap. Mismas reglas que la web: licencia de software, sin promesas de ganancia.
+- La diapositiva 9, "Gana con referidos", llegó con la etapa 11; con `?ref=CODIGO`, el QR del cierre lleva a
+  `/r/CODIGO`.
+
+### Etapa 11 — Programa de referidos ✅ (2026-10-22)
+- Argemiro aprobó las siete decisiones el 2026-10-22: 20 % de cada compra del referido mientras sea cliente, pago en
+  USDT (Tron) cada quincena desde USD 20, sin comisión mientras la licencia del referidor esté vencida, cookie de 30
+  días (gana el último enlace), sin beneficio para el invitado y el socio sigue al 10 % sobre el bruto.
+- Refieren los clientes con licencia activa o en gracia, quienes un admin habilite y el socio con su cuenta de admin.
+- **PR #43 (API):** tablas, atribución en el registro, comisión al aprobar, liquidación cada hora con espera de 48 h
+  tras cambiar la dirección, correos, auditoría, "mis datos" y eliminación.
+- **PR #44 (web):** `/r/CODIGO`, "Te invitó" en el registro, `/panel/referidos`, `/admin/referidos`, ficha del
+  cliente, sección del socio, línea en la landing y diapositiva 9.
+- **Parte 3:** sección 16 "Programa de referidos" en los términos y los datos del programa en la política de datos,
+  publicados como versiones nuevas por migración; documentación.
+
 ## 5. Lista para el día del lanzamiento
 
 **Legal y contenido**

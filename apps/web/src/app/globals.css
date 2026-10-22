@@ -901,3 +901,380 @@ html {
     }
   }
 }
+
+/*
+  Presentación de ventas (app/presentacion, components/presentacion/visor.tsx).
+  - La lámina es el mayor 16:9 que cabe en la pantalla (en un celular vertical, toda la pantalla). Cada diapositiva es
+    un contenedor de tamaño: el tipo y los espacios usan `cqmin`, así se ven igual en una laptop, un televisor o el PDF.
+  - Al imprimir ("Guardar PDF") salen todas las diapositivas, una por página de 16:9, sin animaciones.
+*/
+@layer components {
+  .presentacion {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: var(--color-vacio);
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .presentacion-lamina {
+    position: relative;
+    width: min(100vw, calc(100dvh * 16 / 9));
+    height: min(100dvh, calc(100vw * 9 / 16));
+  }
+  @media (max-aspect-ratio: 4/5) {
+    .presentacion-lamina {
+      width: 100vw;
+      height: 100dvh;
+    }
+  }
+  .diapositiva {
+    position: absolute;
+    inset: 0;
+    container-type: size;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 420ms var(--ease-salida),
+      visibility 0s linear 420ms;
+  }
+  .diapositiva[data-activa] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 420ms var(--ease-salida);
+  }
+  .diapositiva-marco {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100%;
+    padding: 6cqmin 7cqmin 9cqmin;
+    gap: 4cqmin;
+  }
+  .diapositiva-marco:not(:has(.diapositiva-cabeza)) {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .diapositiva-cabeza {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2cqmin;
+    font-size: max(13px, 2.3cqmin);
+  }
+  .diapositiva-cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: 5cqmin;
+    min-height: 0;
+  }
+  /* Entrada: cada bloque sube un poco y aparece, escalonado con --i. */
+  .diapositiva[data-activa] .entra {
+    animation: entrar-diapositiva 640ms var(--ease-salida) both;
+    animation-delay: calc(var(--i, 0) * 90ms + 80ms);
+  }
+  @keyframes entrar-diapositiva {
+    from {
+      opacity: 0;
+      transform: translateY(2.4cqmin);
+    }
+  }
+
+  /* Tipo de las diapositivas (en cqmin: la altura de una lámina 16:9). */
+  .p-etiqueta {
+    color: var(--color-senal);
+    font-size: max(12px, 2.1cqmin);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .p-titulo-xl {
+    font-size: max(34px, 9.6cqmin);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .p-titulo {
+    max-width: 22em;
+    font-size: max(28px, 6.4cqmin);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+  .p-subtitulo {
+    font-size: max(18px, 3.3cqmin);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .p-texto {
+    font-size: max(15px, 2.7cqmin);
+    line-height: 1.5;
+  }
+  .p-pequeno {
+    font-size: max(12px, 2cqmin);
+    line-height: 1.5;
+  }
+  .p-columnas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5cqmin;
+  }
+  .p-rejilla {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4cqmin 6cqmin;
+  }
+  .p-pasos {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4cqmin;
+  }
+  .p-columnas > li,
+  .p-rejilla > li,
+  .p-pasos > li {
+    padding-top: 2.4cqmin;
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+  .p-cifra-paso {
+    font-size: max(48px, 14cqmin);
+    font-weight: 300;
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(
+      0deg,
+      var(--color-brasa) 0%,
+      var(--color-llama) 55%,
+      var(--color-senal) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .p-cifra-grande {
+    font-size: max(56px, 17cqmin);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+  .p-planes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 40cqmin), 1fr));
+    gap: 4cqmin;
+  }
+  .p-plan {
+    display: grid;
+    align-content: start;
+    gap: 2cqmin;
+    padding: 4cqmin;
+    border-radius: 3.6cqmin;
+    background: rgb(255 255 255 / 0.03);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .p-precio {
+    font-size: max(44px, 11cqmin);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+  .p-insignia,
+  .p-insignia-llena {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8cqmin 1.8cqmin;
+    border-radius: 999px;
+    font-size: max(12px, 1.9cqmin);
+    font-weight: 600;
+  }
+  .p-insignia {
+    background: rgb(251 152 25 / 0.14);
+    color: var(--color-llama-viva);
+  }
+  .p-insignia-llena {
+    background: var(--color-llama);
+    color: var(--color-vacio);
+  }
+  .p-franja {
+    --alto-logo: max(28px, 6cqmin);
+    --separacion: 10cqmin;
+  }
+  @container (orientation: portrait) {
+    .p-columnas,
+    .p-rejilla {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 3cqmin;
+    }
+    .p-pasos {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* Progreso, controles y notas. */
+  .presentacion-progreso {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 2;
+    height: 3px;
+    background: rgb(255 255 255 / 0.06);
+  }
+  .presentacion-progreso span {
+    display: block;
+    height: 100%;
+    background: var(--color-llama);
+    transform-origin: left;
+    transition: transform 420ms var(--ease-salida);
+  }
+  .presentacion-controles {
+    position: fixed;
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgb(12 12 12 / 0.7);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+    color: var(--color-niebla);
+    font-size: 13px;
+    opacity: 0.45;
+    transition: opacity 240ms ease;
+  }
+  .presentacion-controles:hover,
+  .presentacion-controles:focus-within {
+    opacity: 1;
+  }
+  .presentacion-controles button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    padding-inline: 12px;
+    border-radius: 999px;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  .presentacion-controles button:hover:not(:disabled) {
+    background: rgb(255 255 255 / 0.08);
+    color: var(--color-blanco);
+  }
+  .presentacion-controles button[aria-pressed='true'] {
+    color: var(--color-blanco);
+    background: rgb(255 255 255 / 0.1);
+  }
+  .presentacion-controles button:disabled {
+    opacity: 0.35;
+  }
+  .presentacion-controles svg {
+    width: 16px;
+    height: 16px;
+  }
+  .presentacion-controles > span.cifra {
+    min-width: 52px;
+    text-align: center;
+  }
+  .presentacion-separador {
+    width: 1px;
+    height: 20px;
+    margin-inline: 4px;
+    background: rgb(255 255 255 / 0.14);
+  }
+  @media (max-width: 640px) {
+    .presentacion-controles button:not([aria-label]) {
+      display: none;
+    }
+    .presentacion-separador {
+      display: none;
+    }
+  }
+  .presentacion-notas {
+    position: fixed;
+    left: calc(16px + env(safe-area-inset-left, 0px));
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    z-index: 2;
+    display: grid;
+    gap: 8px;
+    max-width: min(560px, calc(100vw - 32px));
+    padding: 18px 20px;
+    border-radius: 20px;
+    background: rgb(12 12 12 / 0.88);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.1),
+      0 16px 40px rgb(0 0 0 / 0.5);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .solo-impresion {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .diapositiva,
+    .diapositiva[data-activa],
+    .presentacion-progreso span {
+      transition: none;
+    }
+    .diapositiva[data-activa] .entra {
+      animation: none;
+    }
+  }
+}
+
+/* PDF: todas las diapositivas, una por página de 16:9, sin controles ni animaciones. */
+/* El tamaño de página 16:9 lo pone el visor solo en la presentación; el resto del sitio imprime en hoja normal. */
+@media print {
+  .presentacion {
+    position: static;
+    display: block;
+    overflow: visible;
+  }
+  .presentacion-lamina {
+    width: 1600px;
+    height: auto;
+  }
+  .diapositiva {
+    position: relative;
+    width: 1600px;
+    height: 900px;
+    opacity: 1;
+    visibility: visible;
+    break-after: page;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: var(--color-vacio);
+  }
+  .diapositiva:last-child {
+    break-after: auto;
+  }
+  .diapositiva .entra {
+    animation: none !important;
+  }
+  .presentacion-progreso,
+  .presentacion-controles,
+  .presentacion-notas,
+  .solo-pantalla {
+    display: none !important;
+  }
+  .solo-impresion {
+    display: block;
+  }
+  .p-franja .franja-pista {
+    animation: none;
+  }
+  /* Algunos lectores de PDF no pintan bien el degradado recortado al texto: naranja sólido. */
+  .p-cifra-paso {
+    background: none;
+    color: var(--color-llama);
+  }
+}
