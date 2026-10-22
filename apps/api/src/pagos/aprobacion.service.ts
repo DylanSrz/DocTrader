@@ -31,7 +31,7 @@ import {
 } from '../database/entidades/index.js';
 import { leerAjustes } from '../licencias/ajustes.js';
 import { conexionAlActivar } from '../licencias/conexion.js';
-import { comisionDeReferido, rutaReferidos } from '../referidos/reglas.js';
+import { comisionesDeReferidos, rutaReferidos } from '../referidos/reglas.js';
 import { errorApi, errorDeCampos } from '../seguridad/errores.js';
 
 /** Quién decide: un admin (con su IP y navegador, para la auditoría) o el sistema, con la aprobación automática. */
@@ -235,8 +235,8 @@ export class AprobacionPagos {
       `SELECT commission_bp FROM partner_profiles ORDER BY created_at LIMIT 1`,
     )) as { commission_bp: number }[];
     const porcentaje = socio?.commission_bp ?? 0;
-    // La del referidor se fija igual: un cambio del % del programa solo aplica a las ventas siguientes.
-    const referido = await comisionDeReferido(m, orden.userId, orden.amountUsdCents);
+    // Las de los referidores (primera y segunda línea) se fijan igual: un cambio del % solo aplica a las ventas siguientes.
+    const referidos = await comisionesDeReferidos(m, orden.userId, orden.amountUsdCents);
     await m.getRepository(PaymentOrder).update(
       { id: orden.id },
       {
@@ -246,9 +246,6 @@ export class AprobacionPagos {
         approvalMode: decisor.tipo === 'ADMIN' ? 'MANUAL' : 'AUTO',
         commissionBp: porcentaje,
         commissionUsdCents: aplicarPorcentaje(orden.amountUsdCents, porcentaje),
-        referrerId: referido?.referidorId ?? null,
-        referralBp: referido?.bp ?? null,
-        referralUsdCents: referido?.usdCents ?? null,
       },
     );
 
@@ -273,22 +270,29 @@ export class AprobacionPagos {
       },
       clave: `pago-aprobado:${orden.id}`,
     });
-    if (referido && referido.usdCents > 0) {
+    for (const r of referidos) {
+      await m.query(
+        `INSERT INTO referral_commissions (payment_order_id, referrer_id, level, bp, usd_cents, earned_at)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [orden.id, r.referidorId, r.nivel, r.bp, r.usdCents, ahora],
+      );
+      if (r.usdCents === 0) continue;
       await this.avisos.encolar(m, {
-        usuarioId: referido.referidorId,
-        correo: referido.referidor.correo,
+        usuarioId: r.referidorId,
+        correo: r.referidor.correo,
         plantilla: PLANTILLA.REFERIDO_COMISION,
         datos: {
-          nombre: primerNombre(referido.referidor.nombre),
+          nombre: primerNombre(r.referidor.nombre),
           referido: nombreReservado(cliente.fullName),
+          via: r.via ? nombreReservado(r.via) : '',
           plan: plan.name.toLowerCase(),
-          comision: formatearUsd(referido.usdCents),
-          porcentaje: formatearPorcentaje(referido.bp),
+          comision: formatearUsd(r.usdCents),
+          porcentaje: formatearPorcentaje(r.bp),
           monto: formatearUsd(orden.amountUsdCents),
-          direccion: referido.referidor.direccion ? 'si' : 'no',
-          ruta: rutaReferidos(referido.referidor.rol),
+          direccion: r.referidor.direccion ? 'si' : 'no',
+          ruta: rutaReferidos(r.referidor.rol),
         },
-        clave: `referido-comision:${orden.id}`,
+        clave: `referido-comision:${orden.id}:${r.nivel}`,
       });
     }
     const quien =
@@ -313,9 +317,12 @@ export class AprobacionPagos {
       verificacion: orden.verificationStatus,
       periodo: { inicio: inicio.toISOString(), fin: fin.toISOString() },
       comisionBp: porcentaje,
-      referido: referido
-        ? { referidorId: referido.referidorId, bp: referido.bp, usdCentavos: referido.usdCents }
-        : null,
+      referidos: referidos.map((r) => ({
+        nivel: r.nivel,
+        referidorId: r.referidorId,
+        bp: r.bp,
+        usdCentavos: r.usdCents,
+      })),
     });
   }
 

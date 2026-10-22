@@ -62,8 +62,9 @@ const AJUSTES: Record<string, ValorJson> = {
   links: ENLACES_INICIALES,
   myfxbook: MYFXBOOK_INICIAL,
   support_email: CORREO_SOPORTE,
-  // Programa de referidos (etapa 11): 20 %, mínimo USD 20 por pago, activo.
+  // Programa de referidos (etapa 11): 15 % la primera línea, 5 % la segunda, mínimo USD 20 por pago, activo.
   'referrals.percentage_bp': REFERIDOS_INICIAL.porcentajeBp,
+  'referrals.level2_bp': REFERIDOS_INICIAL.segundaLineaBp,
   'referrals.min_payout_usd_cents': REFERIDOS_INICIAL.minimoPagoUsdCents,
   'referrals.enabled': REFERIDOS_INICIAL.activo,
   // Preguntas frecuentes de la landing: los admins las editan desde el panel.

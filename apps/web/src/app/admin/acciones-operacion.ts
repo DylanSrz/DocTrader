@@ -544,16 +544,23 @@ export async function cambiarAjustesReferidos(
   datos: FormData,
 ): Promise<EstadoOperacion> {
   const porcentajeBp = puntosBasicos(texto(datos, 'porcentaje'));
+  const segundaLineaBp = puntosBasicos(texto(datos, 'segundaLinea'));
   const minimo = centavos(texto(datos, 'minimo'));
   const campos: Record<string, string> = {};
-  if (Number.isNaN(porcentajeBp)) campos.porcentaje = 'Escribe un porcentaje, por ejemplo 20.';
+  if (Number.isNaN(porcentajeBp)) campos.porcentaje = 'Escribe un porcentaje, por ejemplo 15.';
+  if (Number.isNaN(segundaLineaBp)) campos.segundaLinea = 'Escribe un porcentaje, por ejemplo 5.';
   if (minimo === null || Number.isNaN(minimo))
     campos.minimo = 'Escribe el mínimo en dólares, por ejemplo 20.';
   if (Object.keys(campos).length) return { campos, valores: valoresDe(datos) };
   const r = await operar(datos, (t) =>
     llamarApi('/admin/referidos/ajustes', {
       metodo: 'PUT',
-      cuerpo: { porcentajeBp, minimoPagoUsdCents: minimo, activo: texto(datos, 'activo') === 'si' },
+      cuerpo: {
+        porcentajeBp,
+        segundaLineaBp,
+        minimoPagoUsdCents: minimo,
+        activo: texto(datos, 'activo') === 'si',
+      },
       token: t,
     }),
   );
@@ -562,7 +569,11 @@ export async function cambiarAjustesReferidos(
     return c
       ? {
           ...r.estado,
-          campos: { porcentaje: c.porcentajeBp ?? '', minimo: c.minimoPagoUsdCents ?? '' },
+          campos: {
+            porcentaje: c.porcentajeBp ?? '',
+            segundaLinea: c.segundaLineaBp ?? '',
+            minimo: c.minimoPagoUsdCents ?? '',
+          },
         }
       : r.estado;
   }
@@ -629,6 +640,7 @@ export async function anularComisionReferido(
 ): Promise<EstadoOperacion> {
   const numero = texto(datos, 'numero').trim().toUpperCase();
   const motivo = texto(datos, 'motivo').trim();
+  const nivel = Number(texto(datos, 'nivel')) || null;
   const campos: Record<string, string> = {};
   if (!numero) campos.numero = 'Escribe el número de la orden.';
   if (motivo.length < 3) campos.motivo = 'Escribe el motivo.';
@@ -636,13 +648,18 @@ export async function anularComisionReferido(
   const r = await operar(datos, (t) =>
     llamarApi(`/admin/referidos/ordenes/${encodeURIComponent(numero)}/anular`, {
       metodo: 'POST',
-      cuerpo: { motivo },
+      cuerpo: { motivo, ...(nivel ? { nivel } : {}) },
       token: t,
     }),
   );
   if (!r.ok) return r.estado;
   revalidatePath('/admin/referidos');
-  return listo(previo, `Comisión de la orden ${numero} anulada.`);
+  return listo(
+    previo,
+    nivel
+      ? `Comisión de ${nivel === 1 ? 'primera' : 'segunda'} línea de la orden ${numero} anulada.`
+      : `Comisiones de la orden ${numero} anuladas.`,
+  );
 }
 
 // ── Pagos ───────────────────────────────────────────────────────────────────────────────────────────

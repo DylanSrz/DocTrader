@@ -161,7 +161,10 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
     los ajustes del programa piden el código de la app y quedan en la auditoría (`referido.*`).
   - El código de invitación es aleatorio (`crypto.randomInt`, 31⁸ combinaciones) y la consulta pública "Te invitó"
     tiene un límite de 60 por hora por IP. La cookie `ref` es httpOnly, `sameSite: lax` y dura 30 días.
-  - Quien refiere solo ve el nombre de pila y la inicial de sus referidos; nunca correos, documentos ni cuentas.
+  - Quien refiere solo ve el nombre de pila y la inicial de sus referidos (de las dos líneas); nunca correos,
+    documentos ni cuentas.
+  - Nadie cobra por sus propias compras: la comisión salta a quien sea el comprador, y corregir el referidor de un
+    cliente se rechaza si formaría un ciclo en la red.
 
 ## 7. Entradas de datos y archivos
 

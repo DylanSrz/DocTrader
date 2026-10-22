@@ -280,16 +280,20 @@ el socio (por estar en `partner_profiles`), siempre con la cuenta `ACTIVE`.
 **`users`**: `referred_by` (quien lo invitó; nunca él mismo) y `referred_at`. Se fijan al registrarse con un código
 que sirve ese día; solo un admin los corrige (`referido.corregido`).
 
-**`payment_orders`**: `referrer_id`, `referral_bp`, `referral_usd_cents` (todo o nada), fijados al aprobar si el
-programa está activo y el referidor puede referir en ese momento; `referral_payout_id` liga la venta al pago que la
-liquidó.
+**`referral_commissions`** (desde el 2026-10-22, dos niveles): una fila por orden y nivel: `payment_order_id`,
+`referrer_id`, `level` (1: invitó al comprador; 2: invitó a quien invitó al comprador), `bp`, `usd_cents`,
+`earned_at` (la aprobación), `payout_id` (el pago que la liquidó; nulo mientras no) y `created_at`. Único por
+(`payment_order_id`, `level`); índice parcial de las que están sin liquidar. Se crean al aprobar si el programa está
+activo y quien cobra puede referir en ese momento (el intermedio no importa). Reemplaza las columnas `referrer_id`,
+`referral_bp`, `referral_usd_cents` y `referral_payout_id` de `payment_orders`, que la migración
+`1793400000000-referidos-dos-niveles` copió como nivel 1 y quitó.
 
 **`referral_payouts`**: `referrer_id`, `period_start`, `period_end` (de la quincena de la venta más vieja a la de la
 más nueva), `sales_count`, `gross_usd_cents`, `commission_usd_cents`, `usdt_address` (copiada al cerrar), `status`
 (`CERRADA`, `PAGADA`), `paid_at`, `paid_by`, `tx_hash`. Único por (`referrer_id`, `period_start`).
 
-**`settings`**: `referrals.percentage_bp` (2000), `referrals.min_payout_usd_cents` (2000) y `referrals.enabled`
-(true).
+**`settings`**: `referrals.percentage_bp` (1500; era 2000 hasta el 2026-10-22), `referrals.level2_bp` (500),
+`referrals.min_payout_usd_cents` (2000) y `referrals.enabled` (true).
 
 **Fase 2** (no se crean ahora): `exchange_rates` (TRM del día) para cobrar en pesos.
 
@@ -539,18 +543,22 @@ stateDiagram-v2
 ## 13. Cómo quedó construido (etapa 11, referidos, 2026-10-22)
 
 - **Reglas (`apps/api/src/referidos/reglas.ts`):** `viaParaReferir` (`HABILITADO`, `SOCIO` o `LICENCIA`),
-  `referidorParaRegistro`, `comisionDeReferido` (en `aprobarEn`, la misma transacción que la del socio) y
+  `referidorParaRegistro`, `comisionesDeReferidos` (hasta dos, en `aprobarEn`, la misma transacción que la del
+  socio; nunca para el propio comprador) y
   `asegurarPerfil` (código con `crypto.randomInt`). Un código que no sirve nunca impide registrarse.
-- **Liquidación (`ReferidosService.liquidar`):** toma las ventas sin liquidar de quincenas terminadas; si no llegan al
+- **Dos niveles (2026-10-22):** el referidor ve su red hasta la segunda línea (con "vía Ana M."), y sus comisiones
+  con la línea. Corregir el referidor de un cliente rechaza el cambio si formaría un ciclo; anular una comisión puede
+  ser de una línea o de las dos (`referido.comision_anulada` guarda las anuladas).
+- **Liquidación (`ReferidosService.liquidar`):** toma las comisiones (de las dos líneas) sin liquidar de quincenas terminadas; si no llegan al
   mínimo, no hay dirección o la dirección cambió hace menos de 48 h, esperan a la siguiente hora.
 - **Correos:** `referido-comision`, `referido-pago-enviado`, `referido-direccion-cambiada` y, a los admins,
-  `referidos-por-pagar`. Claves: `referido-comision:{orden}`, `referido-pago:{pago}`, `referidos-por-pagar:{pago}`.
+  `referidos-por-pagar`. Claves: `referido-comision:{orden}:{nivel}`, `referido-pago:{pago}`, `referidos-por-pagar:{pago}`.
 - **Auditoría:** `referido.direccion_cambiada`, `referido.pago_enviado`, `referido.habilitado`,
   `referido.deshabilitado`, `referido.corregido`, `referido.comision_anulada` y `referido.ajustes_cambiados`; el
   registro guarda `referidoPor` en `usuario.registro`, y la aprobación, la comisión en `pago.aprobado`.
 - **Privacidad:** el referidor ve el nombre de pila y la inicial de sus referidos (`nombreReservado`), su estado y las
   comisiones. "Mis datos" incluye la sección de referidos; eliminar un cliente borra su `referral_profiles`.
 - **Web:** `/r/CODIGO` (cookie `ref` de 30 días), "Te invitó" en el registro, `/panel/referidos`, `/admin/referidos`,
-  la sección de la ficha y la del socio. `/publico/landing` da `referidos: { activo, porcentajeBp }`.
+  la sección de la ficha y la del socio. `/publico/landing` da `referidos: { activo, porcentajeBp, segundaLineaBp }`.
 - **Textos legales:** la migración `1793300000000-terminos-referidos` publica la sección 16 de los términos y los
   cambios de la política de datos como versiones nuevas.

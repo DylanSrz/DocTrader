@@ -44,6 +44,7 @@ export interface VistaReferidos {
   programa: {
     activo: boolean;
     porcentajeBp: number;
+    segundaLineaBp: number;
     minimoPagoUsdCents: number;
     esperaHoras: number;
   };
@@ -58,15 +59,26 @@ export interface VistaReferidos {
   cifras?: {
     registrados: number;
     compradores: number;
+    registradosSegunda: number;
+    compradoresSegunda: number;
     periodo: { inicio: string; fin: string; comisionUsdCents: number };
     acumuladoUsdCents: number;
     porPagarUsdCents: number;
     pagadoUsdCents: number;
   };
-  referidos?: { nombre: string; registradoEn: string | null; estado: EstadoReferido }[];
+  referidos?: {
+    nombre: string;
+    /** 1: lo invité yo; 2: lo invitó uno de mis referidos (`via`). */
+    nivel: 1 | 2;
+    via: string | null;
+    registradoEn: string | null;
+    estado: EstadoReferido;
+  }[];
   comisiones?: {
     fecha: string;
+    nivel: 1 | 2;
     referido: string;
+    via: string | null;
     plan: string;
     montoUsdCents: number;
     porcentajeBp: number;
@@ -92,7 +104,12 @@ export interface PagoReferido {
 
 /** Lo que devuelve `GET /admin/referidos`. */
 export interface VistaAdminReferidos {
-  ajustes: { porcentajeBp: number; minimoPagoUsdCents: number; activo: boolean };
+  ajustes: {
+    porcentajeBp: number;
+    segundaLineaBp: number;
+    minimoPagoUsdCents: number;
+    activo: boolean;
+  };
   acumuladoUsdCents: number;
   porEnviar: {
     id: string;
@@ -126,6 +143,8 @@ export interface VistaAdminReferidos {
     conDireccion: boolean;
     registrados: number;
     compradores: number;
+    registradosSegunda: number;
+    compradoresSegunda: number;
     ganadoUsdCents: number;
     acumuladoUsdCents: number;
   }[];

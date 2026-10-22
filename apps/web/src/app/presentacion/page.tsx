@@ -322,7 +322,9 @@ function Planes({ planes }: { planes: Landing['planes'] }) {
 }
 
 function Referidos({ datos }: { datos: Landing }) {
-  const pct = formatearPorcentaje(datos.referidos.porcentajeBp);
+  const { porcentajeBp, segundaLineaBp } = datos.referidos;
+  const pct = formatearPorcentaje(porcentajeBp);
+  const pct2 = segundaLineaBp > 0 ? formatearPorcentaje(segundaLineaBp) : null;
   const { publicos } = planesEnVenta(datos.planes);
   const puntos: [string, ReactNode][] = [
     [
@@ -336,22 +338,38 @@ function Referidos({ datos }: { datos: Landing }) {
           <span key={plan.codigo}>
             {plan.nombre}: {formatearUsd(plan.precioUsdCentavos)} →{' '}
             <span className="text-blanco">
-              {formatearUsd(
-                aplicarPorcentaje(plan.precioUsdCentavos, datos.referidos.porcentajeBp),
-              )}
+              {formatearUsd(aplicarPorcentaje(plan.precioUsdCentavos, porcentajeBp))}
             </span>{' '}
             para ti
+            {pct2 ? (
+              <>
+                {' '}
+                ·{' '}
+                <span className="text-blanco">
+                  {formatearUsd(aplicarPorcentaje(plan.precioUsdCentavos, segundaLineaBp))}
+                </span>{' '}
+                de segunda línea
+              </>
+            ) : null}
           </span>
         ))}
       </span>,
     ],
-    ['Mientras sea cliente', 'Ganas en cada compra y cada renovación de quien invitaste.'],
+    pct2
+      ? [
+          `Y el ${pct2} de su red`,
+          'Cuando compran las personas que invitaron tus referidos (tu segunda línea), también ganas. En cada compra y renovación, mientras sigan siendo clientes.',
+        ]
+      : ['Mientras sea cliente', 'Ganas en cada compra y cada renovación de quien invitaste.'],
     ['Pago quincenal', 'Te enviamos lo ganado en USDT, a tu billetera en la red Tron.'],
   ];
   return (
     <Marco tema="Referidos">
       <Entra>
-        <h2 className="p-titulo">Recomienda y gana el {pct}.</h2>
+        <h2 className="p-titulo">
+          Recomienda y gana el {pct}
+          {pct2 ? `, y el ${pct2} de tu segunda línea` : ''}.
+        </h2>
       </Entra>
       <ul className="p-rejilla">
         {puntos.map(([titulo, texto], i) => (
@@ -491,7 +509,7 @@ async function Contenido({ parametros }: { parametros: Parametros }) {
           {
             titulo: 'Gana con referidos',
             notas:
-              'Solo si la persona muestra interés o ya es cliente: con su licencia activa puede recomendar el sistema y ganar un porcentaje de cada licencia que paguen sus invitados, mientras sigan siendo clientes. Se paga en USDT cada quincena. No es un ingreso garantizado ni un trabajo.',
+              'Solo si la persona muestra interés o ya es cliente: con su licencia activa puede recomendar el sistema y ganar un porcentaje de cada licencia que paguen sus invitados y, uno menor, de las que paguen los invitados de ellos (dos niveles, no más), mientras sigan siendo clientes. Se paga en USDT cada quincena. No es un ingreso garantizado ni un trabajo.',
             contenido: <Referidos datos={datos} />,
           },
         ]

@@ -321,6 +321,11 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
   cliente, sección del socio, línea en la landing y diapositiva 9.
 - **Parte 3:** sección 16 "Programa de referidos" en los términos y los datos del programa en la política de datos,
   publicados como versiones nuevas por migración; documentación.
+- **Ajuste del 2026-10-22 (pedido de Argemiro, con los términos ya revisados por su abogado):** 15 % por la primera
+  línea y 5 % por la segunda (los referidos de los referidos), con las mismas reglas para cobrar; si el intermedio
+  vence o se va, el de arriba sigue cobrando. Cada quien ve su red hasta la segunda línea. Tabla
+  `referral_commissions`, nueva versión del 16.2 de los términos y de la política de datos (sin correo masivo: los
+  clientes actuales son de prueba), ajustes con los dos porcentajes, landing y diapositiva 9.
 
 ## 5. Lista para el día del lanzamiento
 

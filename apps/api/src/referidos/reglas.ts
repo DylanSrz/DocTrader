@@ -13,7 +13,10 @@ import type { EntityManager } from 'typeorm';
  */
 
 export interface AjustesReferidos {
+  /** Primera línea: quienes se registraron con el código del referidor. */
   porcentajeBp: number;
+  /** Segunda línea: quienes invitaron sus referidos. */
+  segundaLineaBp: number;
   minimoPagoUsdCents: number;
   activo: boolean;
 }
@@ -21,13 +24,15 @@ export interface AjustesReferidos {
 export async function leerAjustesReferidos(m: EntityManager): Promise<AjustesReferidos> {
   const filas = (await m.query(
     `SELECT key, value FROM settings
-      WHERE key IN ('referrals.percentage_bp', 'referrals.min_payout_usd_cents', 'referrals.enabled')`,
+      WHERE key IN ('referrals.percentage_bp', 'referrals.level2_bp', 'referrals.min_payout_usd_cents',
+                    'referrals.enabled')`,
   )) as { key: string; value: unknown }[];
   const valor = new Map(filas.map((f) => [f.key, f.value]));
   const entero = (v: unknown, porDefecto: number) =>
     typeof v === 'number' && Number.isSafeInteger(v) && v >= 0 ? v : porDefecto;
   return {
     porcentajeBp: entero(valor.get('referrals.percentage_bp'), REFERIDOS_INICIAL.porcentajeBp),
+    segundaLineaBp: entero(valor.get('referrals.level2_bp'), REFERIDOS_INICIAL.segundaLineaBp),
     minimoPagoUsdCents: entero(
       valor.get('referrals.min_payout_usd_cents'),
       REFERIDOS_INICIAL.minimoPagoUsdCents,
@@ -97,39 +102,68 @@ export async function referidorParaRegistro(
   return (await viaParaReferir(m, dueno.id)) ? dueno : null;
 }
 
-/** La comisión de una venta que se aprueba: la del referidor del comprador, si hoy puede referir. */
-export async function comisionDeReferido(
-  m: EntityManager,
-  compradorId: string,
-  montoUsdCents: number,
-): Promise<{
+export interface ComisionReferido {
+  nivel: 1 | 2;
   referidorId: string;
   bp: number;
   usdCents: number;
   referidor: { nombre: string; correo: string; rol: string; direccion: boolean };
-} | null> {
-  const [comprador] = (await m.query(`SELECT referred_by FROM users WHERE id = $1`, [
-    compradorId,
-  ])) as { referred_by: string | null }[];
-  if (!comprador?.referred_by) return null;
+  /** En la segunda línea, el referido intermedio (por quien llegó el comprador). */
+  via: string | null;
+}
+
+/**
+ * Las comisiones de una venta que se aprueba: nivel 1 para quien invitó al comprador y nivel 2 para quien invitó a ese
+ * referidor. Cada una se paga solo si quien la recibe puede referir hoy; que el intermedio esté activo no importa (la
+ * red se fija al registrarse). Con el programa pausado, ninguna.
+ */
+export async function comisionesDeReferidos(
+  m: EntityManager,
+  compradorId: string,
+  montoUsdCents: number,
+): Promise<ComisionReferido[]> {
   const ajustes = await leerAjustesReferidos(m);
-  if (!ajustes.activo || !(await viaParaReferir(m, comprador.referred_by))) return null;
-  const [referidor] = (await m.query(
-    `SELECT u.full_name, u.email, u.role, r.usdt_address IS NOT NULL AS direccion
-       FROM users u LEFT JOIN referral_profiles r ON r.user_id = u.id WHERE u.id = $1`,
-    [comprador.referred_by],
-  )) as { full_name: string; email: string; role: string; direccion: boolean }[];
-  return {
-    referidorId: comprador.referred_by,
-    bp: ajustes.porcentajeBp,
-    usdCents: aplicarPorcentaje(montoUsdCents, ajustes.porcentajeBp),
-    referidor: {
-      nombre: referidor!.full_name,
-      correo: referidor!.email,
-      rol: referidor!.role,
-      direccion: referidor!.direccion,
+  if (!ajustes.activo) return [];
+  const [cadena] = (await m.query(
+    `SELECT c.referred_by AS primero, p.full_name AS primero_nombre, p.referred_by AS segundo
+       FROM users c LEFT JOIN users p ON p.id = c.referred_by
+      WHERE c.id = $1`,
+    [compradorId],
+  )) as { primero: string | null; primero_nombre: string | null; segundo: string | null }[];
+  const candidatos = [
+    { nivel: 1 as const, id: cadena?.primero ?? null, bp: ajustes.porcentajeBp, via: null },
+    {
+      nivel: 2 as const,
+      id: cadena?.segundo ?? null,
+      bp: ajustes.segundaLineaBp,
+      via: cadena?.primero_nombre ?? null,
     },
-  };
+  ];
+  const comisiones: ComisionReferido[] = [];
+  for (const c of candidatos) {
+    // Nunca se cobra por las compras propias, ni aunque una corrección dejara un ciclo.
+    if (!c.id || c.id === compradorId || c.bp === 0) continue;
+    if (!(await viaParaReferir(m, c.id))) continue;
+    const [referidor] = (await m.query(
+      `SELECT u.full_name, u.email, u.role, r.usdt_address IS NOT NULL AS direccion
+         FROM users u LEFT JOIN referral_profiles r ON r.user_id = u.id WHERE u.id = $1`,
+      [c.id],
+    )) as { full_name: string; email: string; role: string; direccion: boolean }[];
+    comisiones.push({
+      nivel: c.nivel,
+      referidorId: c.id,
+      bp: c.bp,
+      usdCents: aplicarPorcentaje(montoUsdCents, c.bp),
+      referidor: {
+        nombre: referidor!.full_name,
+        correo: referidor!.email,
+        rol: referidor!.role,
+        direccion: referidor!.direccion,
+      },
+      via: c.via,
+    });
+  }
+  return comisiones;
 }
 
 /** El perfil de referidor de alguien; lo crea con un código nuevo si no tiene. Devuelve el código. */

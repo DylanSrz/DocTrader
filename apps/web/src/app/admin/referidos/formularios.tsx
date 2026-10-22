@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { CampoCodigo, conAviso, ErrorOperacion } from '@/components/admin/operacion';
 import { BotonEnviar, Campo, Casilla } from '@/components/ui';
+import { Selector } from '@/components/ui/selector';
 import {
   anularComisionReferido,
   cambiarAjustesReferidos,
@@ -46,10 +47,12 @@ export function MarcarEnviado({ id, referidor }: { id: string; referidor: string
 
 export function AjustesReferidos({
   porcentaje,
+  segundaLinea,
   minimo,
   activo,
 }: {
   porcentaje: string;
+  segundaLinea: string;
   minimo: string;
   activo: boolean;
 }) {
@@ -58,12 +61,20 @@ export function AjustesReferidos({
   return (
     <form action={accion} noValidate className="grid w-full max-w-[420px] gap-5">
       <Campo
-        etiqueta="Comisión del referidor (%)"
+        etiqueta="Comisión por la primera línea (%)"
         name="porcentaje"
         inputMode="decimal"
         defaultValue={v?.porcentaje ?? porcentaje}
-        ayuda="Sobre lo que paga el referido. Aplica a las ventas que se aprueben después del cambio."
+        ayuda="Sobre lo que paga quien se registró con el enlace. Aplica a las ventas que se aprueben después del cambio."
         error={estado.campos?.porcentaje || undefined}
+      />
+      <Campo
+        etiqueta="Comisión por la segunda línea (%)"
+        name="segundaLinea"
+        inputMode="decimal"
+        defaultValue={v?.segundaLinea ?? segundaLinea}
+        ayuda="Sobre lo que pagan los referidos de los referidos. Con 0 no hay comisión de segunda línea."
+        error={estado.campos?.segundaLinea || undefined}
       />
       <Campo
         etiqueta="Mínimo para enviar un pago (USD)"
@@ -100,6 +111,11 @@ export function AnularComision() {
         defaultValue={estado.valores?.numero}
         error={estado.campos?.numero}
       />
+      <Selector etiqueta="Qué comisión" name="nivel" defaultValue={estado.valores?.nivel ?? ''}>
+        <option value="">Las dos líneas</option>
+        <option value="1">Solo la de primera línea</option>
+        <option value="2">Solo la de segunda línea</option>
+      </Selector>
       <Campo
         etiqueta="Motivo"
         name="motivo"

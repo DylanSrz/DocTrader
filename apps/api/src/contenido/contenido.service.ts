@@ -48,6 +48,7 @@ const CLAVES_LANDING = [
   'support_email',
   'referrals.enabled',
   'referrals.percentage_bp',
+  'referrals.level2_bp',
 ] as const;
 
 /** Lo que muestra la página pública (planes, preguntas, cifras, enlaces) y los textos legales con versiones. */
@@ -96,6 +97,9 @@ export class ContenidoService {
         porcentajeBp:
           (ajustes.get('referrals.percentage_bp') as number | undefined) ??
           REFERIDOS_INICIAL.porcentajeBp,
+        segundaLineaBp:
+          (ajustes.get('referrals.level2_bp') as number | undefined) ??
+          REFERIDOS_INICIAL.segundaLineaBp,
       },
     };
   }
