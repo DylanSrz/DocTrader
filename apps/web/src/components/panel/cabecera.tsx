@@ -9,13 +9,13 @@ import { ListaPestanas, type Pestana, Pestanas } from './pestanas';
 async function Usuario() {
   const sesion = await obtenerSesion();
   return (
-    <div className="flex items-center gap-5 max-lg:hidden">
-      <span className="hidden text-sm text-niebla sm:inline">{sesion?.usuario.nombre}</span>
+    <div className="flex items-center gap-3 max-lg:hidden">
+      {/* Entre 1024 y 1279 px no cabe con las siete pestañas del admin: queda solo "Salir". */}
+      <span className="max-w-[16ch] truncate text-sm text-niebla max-xl:hidden">
+        {sesion?.usuario.nombre}
+      </span>
       <form action={salir}>
-        <button
-          type="submit"
-          className="inline-flex min-h-11 items-center text-sm text-ceniza underline decoration-white/35 underline-offset-[6px] hover:text-blanco hover:decoration-current"
-        >
+        <button type="submit" className="boton-barra">
           Salir
         </button>
       </form>
@@ -61,17 +61,20 @@ async function PestanasConAvisos({
 }
 
 /**
- * Barra de los paneles: logo, pestañas en mayúsculas (la activa en blanco con un triángulo naranja debajo) y el
- * nombre con "Salir". Igual a la del prototipo del panel del cliente.
+ * Barra de los paneles: la píldora de cristal más baja y a todo el ancho, con el logo, las pestañas (la activa sobre
+ * la cápsula) y el nombre con "Salir". Celular y tablet: logo y menú de tres líneas.
  */
 export function Cabecera({ pestanas }: { pestanas: Pestana[] }) {
   return (
-    <BarraFlotante className="grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-6">
+    <BarraFlotante
+      variante="panel"
+      className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-4 pr-2 pl-5"
+    >
       <Marca />
       {/* Escritorio: pestañas en la barra. Celular y tablet (menos de 1024 px): menú de tres líneas. */}
       <nav
         aria-label="Panel"
-        className="max-w-full min-w-0 justify-self-center overflow-x-auto overscroll-x-contain [scrollbar-width:none] max-lg:hidden [&::-webkit-scrollbar]:hidden"
+        className="max-w-full min-w-0 justify-self-center overflow-x-auto overscroll-x-contain py-1 [scrollbar-width:none] max-lg:hidden [&::-webkit-scrollbar]:hidden"
       >
         <Suspense fallback={<ListaPestanas pestanas={pestanas} />}>
           <PestanasConAvisos pestanas={pestanas} />

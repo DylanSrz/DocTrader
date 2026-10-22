@@ -9,6 +9,8 @@
   --color-*: initial;
   --color-vacio: #000000;
   --color-blanco: #ffffff;
+  /* `white` también (sin esto no existían border-white/10, decoration-white/35, bg-white/5…: salían en blanco sólido). */
+  --color-white: #ffffff;
   --color-niebla: #bdbdbd;
   --color-ceniza: #9a9a9a;
   --color-llama: #fb9819;
@@ -672,6 +674,230 @@ html {
     }
     .franja-grupo[aria-hidden] {
       display: none;
+    }
+  }
+}
+
+/*
+  Navegación: píldora de cristal flotante (components/barra-flotante.tsx), común a la landing y los paneles.
+  - La caja (`.barra-caja`) mide siempre lo mismo: al volverse compacta, la píldora baja de alto dentro de la caja y
+    el contenido de la página no se mueve. Esconderla o subirla usa `transform`, nunca el alto ni el margen.
+  - Cristal: fondo negro translúcido, desenfoque y un borde fino hecho con sombra interior (no ocupa espacio).
+  - La cabecera no recibe clics (`pointer-events: none`) para no tapar la página en los márgenes; la píldora y el menú
+    de celular sí.
+*/
+@layer components {
+  .barra {
+    --barra-alto: 62px;
+    --barra-alto-compacta: 54px;
+    --barra-margen: 18px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding-top: calc(env(safe-area-inset-top, 0px) + var(--barra-margen));
+    pointer-events: none;
+    transition: transform 320ms var(--ease-salida);
+  }
+  .barra[data-variante='panel'] {
+    --barra-alto: 56px;
+    --barra-alto-compacta: 50px;
+    --barra-margen: 14px;
+  }
+  .barra[data-compacta] {
+    transform: translateY(-6px);
+  }
+  .barra[data-oculta] {
+    transform: translateY(calc(-100% - 8px));
+  }
+  .barra-caja {
+    display: flex;
+    align-items: center;
+    height: var(--barra-alto);
+  }
+  .barra-pildora {
+    width: 100%;
+    height: var(--barra-alto);
+    margin-inline: auto;
+    border-radius: 999px;
+    pointer-events: auto;
+    background: rgb(16 16 16 / 0.5);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.08),
+      0 6px 20px rgb(0 0 0 / 0.22);
+    transition:
+      height 300ms var(--ease-salida),
+      background-color 300ms ease,
+      box-shadow 300ms ease,
+      backdrop-filter 300ms ease,
+      -webkit-backdrop-filter 300ms ease;
+  }
+  .barra[data-variante='publica'] .barra-pildora {
+    max-width: 1120px;
+  }
+  .barra[data-compacta] .barra-pildora {
+    height: var(--barra-alto-compacta);
+    background: rgb(12 12 12 / 0.78);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.1),
+      0 14px 36px rgb(0 0 0 / 0.5);
+  }
+  /* Sin desenfoque (navegadores viejos): la píldora es casi opaca para que el texto siga legible. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .barra-pildora,
+    .barra[data-compacta] .barra-pildora {
+      background: rgb(12 12 12 / 0.94);
+    }
+  }
+
+  /* Enlace de la barra: texto de menú, en gris; blanco al pasar el cursor o si es la sección activa. */
+  .enlace-barra {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding-inline: 14px;
+    border-radius: 999px;
+    color: var(--color-ceniza);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    transition:
+      color 200ms ease,
+      background-color 200ms ease;
+  }
+  .enlace-barra[aria-current] {
+    color: var(--color-blanco);
+  }
+  /* Paneles entre 1024 y 1279 px: pestañas más juntas para que las siete del admin quepan sin desplazarse. */
+  @media (max-width: 1279px) {
+    .barra[data-variante='panel'] .enlace-barra {
+      padding-inline: 10px;
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .enlace-barra:hover {
+      color: var(--color-blanco);
+    }
+    .enlace-barra:not([aria-current]):hover {
+      background-color: rgb(255 255 255 / 0.04);
+    }
+  }
+  .enlace-barra:focus-visible {
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  /* Cápsula de la sección activa (components/capsula.tsx): se desliza con transform y ancho, sin medir en scroll. */
+  .capsula {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 40px;
+    margin-top: -20px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.09);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  .capsula[data-visible] {
+    opacity: 1;
+  }
+  .capsula[data-animar] {
+    transition:
+      transform 320ms var(--ease-salida),
+      width 320ms var(--ease-salida),
+      opacity 200ms ease;
+  }
+
+  /* Botón secundario de la barra ("Salir"): píldora fantasma con el mismo borde fino del cristal. */
+  .boton-barra {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding-inline: 16px;
+    border-radius: 999px;
+    color: var(--color-niebla);
+    font-size: 14px;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+    transition:
+      color 200ms ease,
+      background-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .boton-barra:hover {
+      color: var(--color-blanco);
+      background-color: rgb(255 255 255 / 0.06);
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22);
+    }
+  }
+
+  /* Enlace del menú de celular: grande; el activo, en blanco sobre una franja suave con un punto naranja. */
+  .enlace-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    margin-inline: -14px;
+    padding-inline: 14px;
+    border-radius: 18px;
+    color: var(--color-niebla);
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    transition:
+      color 200ms ease,
+      background-color 200ms ease;
+  }
+  .enlace-menu[aria-current] {
+    color: var(--color-blanco);
+    background-color: rgb(255 255 255 / 0.06);
+  }
+  .enlace-menu[aria-current]::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: var(--color-llama);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .enlace-menu:hover {
+      color: var(--color-blanco);
+    }
+  }
+
+  /* El menú de celular es del mismo cristal oscuro; dentro de la cabecera, vuelve a recibir clics. */
+  .menu-movil {
+    pointer-events: auto;
+    background: rgb(10 10 10 / 0.8);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(150%);
+    box-shadow: inset 1px 0 0 rgb(255 255 255 / 0.08);
+  }
+  .menu-movil::backdrop {
+    background: rgb(0 0 0 / 0.55);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .barra,
+    .barra-pildora,
+    .capsula,
+    .capsula[data-animar],
+    .enlace-barra,
+    .enlace-menu,
+    .boton-barra {
+      transition: none;
     }
   }
 }

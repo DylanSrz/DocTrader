@@ -9,6 +9,7 @@ import { FranjaLogos } from '@/components/landing/franja-logos';
 import { Particulas } from '@/components/landing/particulas';
 import { Marca } from '@/components/marca';
 import { MenuMovil } from '@/components/menu-movil';
+import { NavSecciones } from '@/components/landing/nav-secciones';
 import { Enlace, Etiqueta, Pildora, cx } from '@/components/ui';
 import { markdownAHtml } from '@/lib/markdown';
 import { type Landing, obtenerLanding, type PlanPublico } from '@/lib/publico';
@@ -77,43 +78,26 @@ const SECCIONES = [
 
 function Barra() {
   return (
-    <BarraFlotante
-      margenSuperior="pt-[calc(env(safe-area-inset-top,0px)+22px)]"
-      className="flex min-h-[60px] items-center justify-between gap-6"
-    >
+    <BarraFlotante className="flex items-center justify-between gap-4 pr-2 pl-5 sm:pl-6">
       <Marca />
-      <div className="flex items-center gap-[clamp(12px,3vw,40px)]">
-        {/* Escritorio: las secciones e "Ingresar" en la barra. Celular y tablet: en el menú de tres líneas. */}
-        <nav
-          aria-label="Principal"
-          className="hidden items-center gap-[clamp(16px,3vw,40px)] min-[961px]:flex"
-        >
-          <ul className="flex gap-[clamp(20px,3vw,36px)]">
-            {SECCIONES.map(([href, texto]) => (
-              <li key={href}>
-                <a
-                  href={href}
-                  className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco"
-                >
-                  {texto}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <EnlacePanel className="inline-flex min-h-11 items-center texto-menu text-ceniza transition-colors hover:text-blanco" />
+      <div className="flex items-center gap-[clamp(8px,1.6vw,20px)]">
+        {/* Escritorio: las secciones e "Ingresar" en la píldora. Celular y tablet: en el menú de tres líneas. */}
+        <nav aria-label="Principal" className="hidden items-center gap-1 min-[961px]:flex">
+          <NavSecciones secciones={SECCIONES} />
+          <EnlacePanel className="enlace-barra" />
         </nav>
-        <Pildora href="#precios" className="gap-0 px-[18px] sm:px-[22px]">
-          Comprar<span className="hidden sm:inline">&nbsp;licencia</span>
+        <Pildora href="#precios" className="min-h-10 px-[18px] py-2.5 sm:px-[22px]">
+          {/* Un solo bloque de texto: el espacio entre las palabras no depende del `gap` de la píldora. */}
+          <span>
+            Comprar<span className="hidden sm:inline"> licencia</span>
+          </span>
         </Pildora>
         <MenuMovil etiqueta="Menú principal" cabecera={<Marca />} className="min-[961px]:hidden">
           <nav aria-label="Principal">
             <ul className="grid gap-1">
               {SECCIONES.map(([href, texto]) => (
                 <li key={href}>
-                  <a
-                    href={href}
-                    className="flex min-h-14 items-center text-[28px] leading-none tracking-[-0.03em] text-blanco"
-                  >
+                  <a href={href} className="enlace-menu">
                     {texto}
                   </a>
                 </li>
