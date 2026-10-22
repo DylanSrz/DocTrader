@@ -261,8 +261,8 @@ verificación, confirmaciones, monto recibido, billetera de origen, aprobado por
 - **Fase 1 (lanzamiento):** landing + FAQ + Myfxbook + broker sugerido, registro/login, licencias
   mensual/semestral, **tickets de soporte**, pagos cripto por depósito directo con aprobación (Binance Pay Merchant en cuanto Binance lo apruebe),
   panel del cliente, panel de admin, perfil de socio, recordatorios y gracia.
-- **Referidos** (adelantado de la fase 2, etapa 11, 2026-10-22): 20 % de cada compra del referido mientras sea
-  cliente, en USDT (Tron) cada quincena desde USD 20. Refieren los clientes con licencia activa, quienes un admin
+- **Referidos** (adelantado de la fase 2, etapa 11, 2026-10-22): 15 % de cada compra del referido directo y 5 % de
+  las de su segunda línea mientras sean clientes, en USDT (Tron) cada quincena desde USD 20. Refieren los clientes con licencia activa, quienes un admin
   habilite y el socio. Ver `PLAN-TRABAJO.md`, etapa 11.
 - **Fase 2:** pasarela en pesos (COP), cupones adicionales, avisos por Telegram/WhatsApp,
   versión en inglés.

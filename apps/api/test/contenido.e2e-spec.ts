@@ -76,7 +76,7 @@ describe('página pública', () => {
     expect(myfxbook.figures.gainPercent).toBe('246.68');
     expect(enlaces.broker.name).toBe('JustMarkets');
     expect(correoSoporte).toBe('support@doctraderpro.com');
-    expect(referidos).toEqual({ activo: true, porcentajeBp: 2000 });
+    expect(referidos).toEqual({ activo: true, porcentajeBp: 1500, segundaLineaBp: 500 });
   });
 
   it('da el texto legal vigente sin el título ni la nota interna del borrador', async () => {
@@ -139,7 +139,7 @@ describe('textos legales desde el panel', () => {
     await comoLaWeb(app)
       .post('/auth/registro', {
         nombre: 'Cliente de la versión dos',
-        cedula: String(Date.now()).slice(-10),
+        cedula: `1${String(Date.now()).slice(-9)}`,
         correo,
         telefono: `310 ${String(Date.now()).slice(-7)}`,
         contrasena: 'Una contraseña bien larga 7!',

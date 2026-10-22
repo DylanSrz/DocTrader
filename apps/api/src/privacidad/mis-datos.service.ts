@@ -163,7 +163,7 @@ export class MisDatosService {
         codigo: string | null;
         direccion: string | null;
         referidos: { nombre: string; desde: Date }[] | null;
-        comisiones: { fecha: Date; usd_cents: number }[] | null;
+        comisiones: { fecha: Date; nivel: number; usd_cents: number }[] | null;
         pagos:
           | {
               desde: string;
@@ -179,9 +179,9 @@ export class MisDatosService {
                 (SELECT json_agg(json_build_object('nombre', x.full_name, 'desde', x.referred_at)
                                  ORDER BY x.referred_at)
                    FROM users x WHERE x.referred_by = u.id AND x.status <> 'DELETED') AS referidos,
-                (SELECT json_agg(json_build_object('fecha', o.decided_at, 'usd_cents', o.referral_usd_cents)
-                                 ORDER BY o.decided_at)
-                   FROM payment_orders o WHERE o.referrer_id = u.id AND o.status = 'APROBADA') AS comisiones,
+                (SELECT json_agg(json_build_object('fecha', c.earned_at, 'nivel', c.level, 'usd_cents', c.usd_cents)
+                                 ORDER BY c.earned_at)
+                   FROM referral_commissions c WHERE c.referrer_id = u.id) AS comisiones,
                 (SELECT json_agg(json_build_object('desde', p.period_start, 'hasta', p.period_end,
                                    'usd_cents', p.commission_usd_cents, 'estado', p.status, 'hash', p.tx_hash)
                                  ORDER BY p.period_start)
@@ -299,6 +299,7 @@ export class MisDatosService {
         })),
         comisiones: (referidos?.comisiones ?? []).map((c) => ({
           fecha: c.fecha,
+          linea: c.nivel === 2 ? 'segunda' : 'primera',
           usd: usd(c.usd_cents),
         })),
         pagos: (referidos?.pagos ?? []).map((p) => ({

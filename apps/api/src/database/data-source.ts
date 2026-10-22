@@ -14,6 +14,7 @@ import { EliminarClientes1793000000000 } from './migraciones/1793000000000-elimi
 import { DocumentosYMontos1793100000000 } from './migraciones/1793100000000-documentos-y-montos.js';
 import { Referidos1793200000000 } from './migraciones/1793200000000-referidos.js';
 import { TerminosReferidos1793300000000 } from './migraciones/1793300000000-terminos-referidos.js';
+import { ReferidosDosNiveles1793400000000 } from './migraciones/1793400000000-referidos-dos-niveles.js';
 
 export const MIGRACIONES = [
   Inicial1792000000000,
@@ -30,6 +31,7 @@ export const MIGRACIONES = [
   DocumentosYMontos1793100000000,
   Referidos1793200000000,
   TerminosReferidos1793300000000,
+  ReferidosDosNiveles1793400000000,
 ];
 
 /** Opciones de la base de datos, compartidas por la API, el worker y los scripts de migración y semilla. */

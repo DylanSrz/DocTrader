@@ -188,10 +188,12 @@ El Cliente puede usar el broker que prefiera. DocTraderPRO no controla ni respon
 gracia) y las personas que DocTraderPRO habilite. Cada participante (el "Referidor") tiene un enlace y un código
 personales en su panel.
 
-16.2. **Comisión.** Cuando una persona se registra con el enlace o el código de un Referidor, cada licencia o renovación
-que pague le deja al Referidor el porcentaje vigente publicado en la plataforma (hoy, el 20 % de lo pagado), mientras
-siga siendo cliente. El porcentaje se fija al aprobar cada pago. Las compras aprobadas mientras la licencia del
-Referidor esté vencida no generan comisión, salvo que DocTraderPRO lo haya habilitado.
+16.2. **Comisión.** Quien se registra con el enlace o el código de un Referidor queda en su **primera línea**; quienes
+esa persona invite quedan en su **segunda línea**. Cada licencia o renovación que pague alguien de la primera línea le
+deja al Referidor el porcentaje vigente publicado en la plataforma para ella (hoy, el 15 % de lo pagado), y cada una que
+pague alguien de la segunda línea, el porcentaje de la segunda línea (hoy, el 5 %), mientras sigan siendo clientes. No
+hay comisiones por líneas más abajo. Los porcentajes se fijan al aprobar cada pago. Las compras aprobadas mientras la
+licencia del Referidor esté vencida no le generan comisión, salvo que DocTraderPRO lo haya habilitado.
 
 16.3. **Pago.** Las comisiones se pagan en USDT por la red Tron (TRC20), a la dirección que el Referidor registre en su
 panel, por quincenas (del 1 al 15 y del 16 al último día de cada mes, hora de Colombia), cuando lo acumulado llegue al

@@ -85,6 +85,7 @@ export class ReferidosService {
     const programa = {
       activo: ajustes.activo,
       porcentajeBp: ajustes.porcentajeBp,
+      segundaLineaBp: ajustes.segundaLineaBp,
       minimoPagoUsdCents: ajustes.minimoPagoUsdCents,
       esperaHoras: ESPERA_CAMBIO_DIRECCION_HORAS,
     };
@@ -93,42 +94,56 @@ export class ReferidosService {
     const actual = periodoDeComision(ahora);
     const [referidos, comisiones, pagos, [sumas]] = await Promise.all([
       m.query(
-        `SELECT u.full_name, u.status, u.referred_at,
-                EXISTS (SELECT 1 FROM licenses l WHERE l.user_id = u.id AND l.status IN ('ACTIVA', 'EN_GRACIA'))
+        `WITH red AS (
+           SELECT u.id, u.full_name, u.status, u.referred_at, 1 AS nivel, NULL::text AS via
+             FROM users u WHERE u.referred_by = $1
+           UNION ALL
+           SELECT n.id, n.full_name, n.status, n.referred_at, 2, i.full_name
+             FROM users n JOIN users i ON i.id = n.referred_by
+            WHERE i.referred_by = $1 AND n.id <> $1
+         )
+         SELECT r.full_name, r.status, r.referred_at, r.nivel, r.via,
+                EXISTS (SELECT 1 FROM licenses l WHERE l.user_id = r.id AND l.status IN ('ACTIVA', 'EN_GRACIA'))
                   AS con_licencia,
-                EXISTS (SELECT 1 FROM payment_orders o WHERE o.user_id = u.id AND o.status = 'APROBADA')
+                EXISTS (SELECT 1 FROM payment_orders o WHERE o.user_id = r.id AND o.status = 'APROBADA')
                   AS compro
-           FROM users u WHERE u.referred_by = $1
-          ORDER BY u.referred_at DESC NULLS LAST LIMIT 200`,
+           FROM red r
+          ORDER BY r.nivel, r.referred_at DESC NULLS LAST LIMIT 400`,
         [id],
       ) as Promise<
         {
           full_name: string;
           status: string;
           referred_at: Date | null;
+          nivel: number;
+          via: string | null;
           con_licencia: boolean;
           compro: boolean;
         }[]
       >,
       m.query(
-        `SELECT o.decided_at, u.full_name, u.status AS estado_usuario, p.name AS plan, o.amount_usd_cents,
-                o.referral_bp, o.referral_usd_cents, rp.status AS pago
-           FROM payment_orders o
+        `SELECT c.earned_at, c.level, c.bp, c.usd_cents, u.full_name, u.status AS estado_usuario,
+                i.full_name AS via, p.name AS plan, o.amount_usd_cents, rp.status AS pago
+           FROM referral_commissions c
+           JOIN payment_orders o ON o.id = c.payment_order_id
            JOIN users u ON u.id = o.user_id
+           LEFT JOIN users i ON i.id = u.referred_by AND c.level = 2
            JOIN plans p ON p.id = o.plan_id
-           LEFT JOIN referral_payouts rp ON rp.id = o.referral_payout_id
-          WHERE o.referrer_id = $1 AND o.status = 'APROBADA'
-          ORDER BY o.decided_at DESC LIMIT 100`,
+           LEFT JOIN referral_payouts rp ON rp.id = c.payout_id
+          WHERE c.referrer_id = $1
+          ORDER BY c.earned_at DESC LIMIT 100`,
         [id],
       ) as Promise<
         {
-          decided_at: Date;
+          earned_at: Date;
+          level: number;
+          bp: number;
+          usd_cents: number;
           full_name: string;
           estado_usuario: string;
+          via: string | null;
           plan: string;
           amount_usd_cents: number;
-          referral_bp: number;
-          referral_usd_cents: number;
           pago: 'CERRADA' | 'PAGADA' | null;
         }[]
       >,
@@ -152,13 +167,17 @@ export class ReferidosService {
       >,
       m.query(
         `SELECT
-           coalesce(sum(referral_usd_cents) FILTER (WHERE referral_payout_id IS NULL AND decided_at >= $2), 0)::bigint
+           coalesce(sum(c.usd_cents) FILTER (WHERE c.payout_id IS NULL AND c.earned_at >= $2), 0)::bigint
              AS periodo,
-           coalesce(sum(referral_usd_cents) FILTER (WHERE referral_payout_id IS NULL), 0)::bigint AS acumulado,
-           count(DISTINCT user_id)::int AS compradores
-           FROM payment_orders WHERE referrer_id = $1 AND status = 'APROBADA'`,
+           coalesce(sum(c.usd_cents) FILTER (WHERE c.payout_id IS NULL), 0)::bigint AS acumulado,
+           count(DISTINCT o.user_id) FILTER (WHERE c.level = 1)::int AS compradores,
+           count(DISTINCT o.user_id) FILTER (WHERE c.level = 2)::int AS compradores_segunda
+           FROM referral_commissions c JOIN payment_orders o ON o.id = c.payment_order_id
+          WHERE c.referrer_id = $1`,
         [id, actual.desde],
-      ) as Promise<{ periodo: string; acumulado: string; compradores: number }[]>,
+      ) as Promise<
+        { periodo: string; acumulado: string; compradores: number; compradores_segunda: number }[]
+      >,
     ]);
 
     const enEsperaHasta =
@@ -167,6 +186,8 @@ export class ReferidosService {
         ahora.getTime()
         ? new Date(perfil.address_changed_at.getTime() + ESPERA_CAMBIO_DIRECCION_HORAS * HORA_MS)
         : null;
+    // Quien eliminó su cuenta sale de la red visible (sus compras pasadas siguen en las comisiones).
+    const vivos = referidos.filter((r) => r.status !== 'DELETED');
     const sumaPagos = (estado: 'CERRADA' | 'PAGADA') =>
       pagos
         .filter((p) => p.status === estado)
@@ -182,8 +203,10 @@ export class ReferidosService {
         enEsperaHasta,
       },
       cifras: {
-        registrados: referidos.filter((r) => r.status !== 'DELETED').length,
+        registrados: vivos.filter((r) => r.nivel === 1).length,
         compradores: sumas?.compradores ?? 0,
+        registradosSegunda: vivos.filter((r) => r.nivel === 2).length,
+        compradoresSegunda: sumas?.compradores_segunda ?? 0,
         periodo: {
           inicio: actual.inicio,
           fin: actual.fin,
@@ -194,20 +217,22 @@ export class ReferidosService {
         porPagarUsdCents: sumaPagos('CERRADA'),
         pagadoUsdCents: sumaPagos('PAGADA'),
       },
-      referidos: referidos
-        .filter((r) => r.status !== 'DELETED')
-        .map((r) => ({
-          nombre: nombreReservado(r.full_name),
-          registradoEn: r.referred_at,
-          estado: r.con_licencia ? 'CON_LICENCIA' : r.compro ? 'VENCIDA' : 'REGISTRADO',
-        })),
+      referidos: vivos.map((r) => ({
+        nombre: nombreReservado(r.full_name),
+        nivel: r.nivel,
+        via: r.via ? nombreReservado(r.via) : null,
+        registradoEn: r.referred_at,
+        estado: r.con_licencia ? 'CON_LICENCIA' : r.compro ? 'VENCIDA' : 'REGISTRADO',
+      })),
       comisiones: comisiones.map((c) => ({
-        fecha: c.decided_at,
+        fecha: c.earned_at,
+        nivel: c.level,
         referido: nombreParaReferidor(c.full_name, c.estado_usuario),
+        via: c.via ? nombreReservado(c.via) : null,
         plan: c.plan,
         montoUsdCents: c.amount_usd_cents,
-        porcentajeBp: c.referral_bp,
-        comisionUsdCents: c.referral_usd_cents,
+        porcentajeBp: c.bp,
+        comisionUsdCents: c.usd_cents,
         estado: c.pago ?? 'ACUMULADA',
       })),
       pagos: pagos.map((p) => ({
@@ -337,12 +362,18 @@ export class ReferidosService {
         `SELECT u.id, u.full_name, u.email, u.role, r.code, r.enabled_by_admin, r.enabled_at,
                 r.usdt_address IS NOT NULL AS con_direccion,
                 (SELECT count(*)::int FROM users x WHERE x.referred_by = u.id AND x.status <> 'DELETED') AS registrados,
-                (SELECT count(DISTINCT o.user_id)::int FROM payment_orders o
-                  WHERE o.referrer_id = u.id AND o.status = 'APROBADA') AS compradores,
-                (SELECT coalesce(sum(o.referral_usd_cents), 0)::bigint FROM payment_orders o
-                  WHERE o.referrer_id = u.id AND o.status = 'APROBADA') AS ganado,
-                (SELECT coalesce(sum(o.referral_usd_cents), 0)::bigint FROM payment_orders o
-                  WHERE o.referrer_id = u.id AND o.status = 'APROBADA' AND o.referral_payout_id IS NULL) AS acumulado
+                (SELECT count(*)::int FROM users x JOIN users i ON i.id = x.referred_by
+                  WHERE i.referred_by = u.id AND x.id <> u.id AND x.status <> 'DELETED') AS registrados_segunda,
+                (SELECT count(DISTINCT o.user_id)::int FROM referral_commissions c
+                   JOIN payment_orders o ON o.id = c.payment_order_id
+                  WHERE c.referrer_id = u.id AND c.level = 1) AS compradores,
+                (SELECT count(DISTINCT o.user_id)::int FROM referral_commissions c
+                   JOIN payment_orders o ON o.id = c.payment_order_id
+                  WHERE c.referrer_id = u.id AND c.level = 2) AS compradores_segunda,
+                (SELECT coalesce(sum(c.usd_cents), 0)::bigint FROM referral_commissions c
+                  WHERE c.referrer_id = u.id) AS ganado,
+                (SELECT coalesce(sum(c.usd_cents), 0)::bigint FROM referral_commissions c
+                  WHERE c.referrer_id = u.id AND c.payout_id IS NULL) AS acumulado
            FROM referral_profiles r JOIN users u ON u.id = r.user_id
           WHERE r.enabled_by_admin OR EXISTS (SELECT 1 FROM users x WHERE x.referred_by = u.id)
           ORDER BY ganado DESC, registrados DESC, u.full_name LIMIT 200`,
@@ -357,14 +388,15 @@ export class ReferidosService {
           enabled_at: Date | null;
           con_direccion: boolean;
           registrados: number;
+          registrados_segunda: number;
           compradores: number;
+          compradores_segunda: number;
           ganado: string;
           acumulado: string;
         }[]
       >,
       m.query(
-        `SELECT coalesce(sum(referral_usd_cents), 0)::bigint AS total FROM payment_orders
-          WHERE status = 'APROBADA' AND referrer_id IS NOT NULL AND referral_payout_id IS NULL`,
+        `SELECT coalesce(sum(usd_cents), 0)::bigint AS total FROM referral_commissions WHERE payout_id IS NULL`,
       ) as Promise<{ total: string }[]>,
     ]);
     return {
@@ -402,6 +434,8 @@ export class ReferidosService {
         conDireccion: r.con_direccion,
         registrados: r.registrados,
         compradores: r.compradores,
+        registradosSegunda: r.registrados_segunda,
+        compradoresSegunda: r.compradores_segunda,
         ganadoUsdCents: Number(r.ganado),
         acumuladoUsdCents: Number(r.acumulado),
       })),
@@ -409,7 +443,12 @@ export class ReferidosService {
   }
 
   async cambiarAjustes(
-    ajustes: { porcentajeBp: number; minimoPagoUsdCents: number; activo: boolean },
+    ajustes: {
+      porcentajeBp: number;
+      segundaLineaBp: number;
+      minimoPagoUsdCents: number;
+      activo: boolean;
+    },
     sesion: SesionActiva,
     cliente: ContextoCliente,
   ) {
@@ -417,6 +456,7 @@ export class ReferidosService {
       const anteriores = await leerAjustesReferidos(m);
       for (const [clave, valor] of [
         ['referrals.percentage_bp', ajustes.porcentajeBp],
+        ['referrals.level2_bp', ajustes.segundaLineaBp],
         ['referrals.min_payout_usd_cents', ajustes.minimoPagoUsdCents],
         ['referrals.enabled', ajustes.activo],
       ] as const) {
@@ -620,6 +660,24 @@ export class ReferidosService {
       if (nuevo?.id === id)
         throw errorDeCampos({ codigo: 'Un cliente no puede referirse a sí mismo.' });
       if ((nuevo?.id ?? null) === usuario.referred_by) return;
+      if (nuevo) {
+        // La red no puede tener ciclos: el nuevo referidor no puede estar debajo de este cliente.
+        const [ciclo] = (await m.query(
+          `WITH RECURSIVE arriba AS (
+             SELECT id, referred_by, 1 AS paso FROM users WHERE id = $1
+             UNION ALL
+             SELECT u.id, u.referred_by, a.paso + 1 FROM users u JOIN arriba a ON u.id = a.referred_by
+              WHERE a.paso < 100
+           )
+           SELECT 1 FROM arriba WHERE id = $2 LIMIT 1`,
+          [nuevo.id, id],
+        )) as unknown[];
+        if (ciclo) {
+          throw errorDeCampos({
+            codigo: 'Ese referidor está en la red de este cliente: se formaría un ciclo.',
+          });
+        }
+      }
       await m.query(
         `UPDATE users SET referred_by = $2, referred_at = CASE WHEN $2::uuid IS NULL THEN NULL ELSE now() END,
                 updated_at = now()
@@ -645,41 +703,48 @@ export class ReferidosService {
   /** Quita la comisión de una venta que todavía no se liquidó (autorreferido, fraude, error). */
   async anularComision(
     numero: string,
+    nivel: 1 | 2 | null,
     motivo: string,
     sesion: SesionActiva,
     cliente: ContextoCliente,
   ) {
     await this.fuente.transaction(async (m) => {
-      const [orden] = (await m.query(
-        `SELECT id, referrer_id, referral_usd_cents, referral_payout_id FROM payment_orders
-          WHERE number = $1 FOR UPDATE`,
-        [numero],
-      )) as {
-        id: string;
-        referrer_id: string | null;
-        referral_usd_cents: number | null;
-        referral_payout_id: string | null;
-      }[];
-      if (!orden?.referrer_id) {
+      const [orden] = (await m.query(`SELECT id FROM payment_orders WHERE number = $1 FOR UPDATE`, [
+        numero,
+      ])) as { id: string }[];
+      const comisiones = orden
+        ? ((await m.query(
+            `SELECT id, referrer_id, level, usd_cents, payout_id FROM referral_commissions
+              WHERE payment_order_id = $1 AND ($2::int IS NULL OR level = $2)`,
+            [orden.id, nivel],
+          )) as {
+            id: string;
+            referrer_id: string;
+            level: number;
+            usd_cents: number;
+            payout_id: string | null;
+          }[])
+        : [];
+      if (!orden || comisiones.length === 0) {
         throw errorApi(
           HttpStatus.NOT_FOUND,
           'SIN_COMISION',
-          'Esa orden no tiene comisión de referido.',
+          nivel
+            ? `Esa orden no tiene comisión de referido de ${nivel === 1 ? 'primera' : 'segunda'} línea.`
+            : 'Esa orden no tiene comisión de referido.',
         );
       }
-      if (orden.referral_payout_id) {
+      const anulables = comisiones.filter((c) => !c.payout_id);
+      if (anulables.length === 0) {
         throw errorApi(
           HttpStatus.CONFLICT,
           'YA_LIQUIDADA',
           'Esa comisión ya se liquidó en un pago de quincena: no se puede anular.',
         );
       }
-      await m.query(
-        `UPDATE payment_orders SET referrer_id = NULL, referral_bp = NULL, referral_usd_cents = NULL,
-                updated_at = now()
-          WHERE id = $1`,
-        [orden.id],
-      );
+      await m.query(`DELETE FROM referral_commissions WHERE id = ANY($1::uuid[])`, [
+        anulables.map((c) => c.id),
+      ]);
       await this.auditoria.registrar(
         {
           actorId: sesion.usuarioId,
@@ -689,9 +754,12 @@ export class ReferidosService {
           targetId: orden.id,
           metadata: {
             numero,
-            referidorId: orden.referrer_id,
-            usdCentavos: orden.referral_usd_cents,
             motivo,
+            anuladas: anulables.map((c) => ({
+              nivel: c.level,
+              referidorId: c.referrer_id,
+              usdCentavos: c.usd_cents,
+            })),
           },
           ip: cliente.ip,
           userAgent: cliente.userAgent ?? null,
@@ -732,8 +800,7 @@ export class ReferidosService {
   async liquidar(ahora: Date = new Date()): Promise<number> {
     const corte = periodoDeComision(ahora).desde;
     const referidores = (await this.fuente.query(
-      `SELECT DISTINCT referrer_id FROM payment_orders
-        WHERE status = 'APROBADA' AND referrer_id IS NOT NULL AND referral_payout_id IS NULL AND decided_at < $1`,
+      `SELECT DISTINCT referrer_id FROM referral_commissions WHERE payout_id IS NULL AND earned_at < $1`,
       [corte],
     )) as { referrer_id: string }[];
     const creados: { id: string; usdCents: number }[] = [];
@@ -776,10 +843,9 @@ export class ReferidosService {
       }
       const ajustes = await leerAjustesReferidos(m);
       const [pendiente] = (await m.query(
-        `SELECT min(decided_at) AS desde, max(decided_at) AS hasta,
-                coalesce(sum(referral_usd_cents), 0)::bigint AS total
-           FROM payment_orders
-          WHERE status = 'APROBADA' AND referrer_id = $1 AND referral_payout_id IS NULL AND decided_at < $2`,
+        `SELECT min(earned_at) AS desde, max(earned_at) AS hasta, coalesce(sum(usd_cents), 0)::bigint AS total
+           FROM referral_commissions
+          WHERE referrer_id = $1 AND payout_id IS NULL AND earned_at < $2`,
         [referidorId, corte],
       )) as { desde: Date | null; hasta: Date | null; total: string }[];
       const total = Number(pendiente?.total ?? 0);
@@ -800,14 +866,15 @@ export class ReferidosService {
         return null;
       }
       await m.query(
-        `UPDATE payment_orders SET referral_payout_id = $1
-          WHERE status = 'APROBADA' AND referrer_id = $2 AND referral_payout_id IS NULL AND decided_at < $3`,
+        `UPDATE referral_commissions SET payout_id = $1
+          WHERE referrer_id = $2 AND payout_id IS NULL AND earned_at < $3`,
         [pago.id, referidorId, corte],
       );
       const [suma] = (await m.query(
-        `SELECT count(*)::int AS ventas, coalesce(sum(amount_usd_cents), 0)::bigint AS bruto,
-                coalesce(sum(referral_usd_cents), 0)::bigint AS comision
-           FROM payment_orders WHERE referral_payout_id = $1`,
+        `SELECT count(*)::int AS ventas, coalesce(sum(o.amount_usd_cents), 0)::bigint AS bruto,
+                coalesce(sum(c.usd_cents), 0)::bigint AS comision
+           FROM referral_commissions c JOIN payment_orders o ON o.id = c.payment_order_id
+          WHERE c.payout_id = $1`,
         [pago.id],
       )) as { ventas: number; bruto: string; comision: string }[];
       await m.query(

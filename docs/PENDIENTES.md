@@ -93,7 +93,9 @@
       DocTraderPRO, dirección física y teléfono (quedaron entre corchetes en los textos). Si DocTraderPRO no está
       registrada como empresa, el responsable legal es la persona natural que la representa.
 - [x] Borradores escritos (2026-10-14) en `docs/legal/`: términos de la licencia, política de datos y aviso de riesgo.
-- [ ] Revisión de un abogado antes de publicar (recomendada).
+- [x] Revisión de un abogado: Argemiro la hizo y está de acuerdo con los términos en su totalidad (2026-10-22).
+- [x] **Riesgo aceptado (2026-10-22):** los referidos de dos niveles (15 % + 5 %) pueden encuadrar en la Ley 1700 de
+      2013 (comercialización en red). Argemiro decidió publicarlos así.
 
 ## 🔧 Accesos técnicos (cuando empecemos)
 
@@ -149,6 +151,8 @@
 
 ## ✅ Resuelto (resumen)
 
+- **2026-10-22:** referidos de dos niveles: 15 % directo y 5 % de segunda línea. Nueva versión de los términos sin
+  correo masivo (los clientes actuales son de prueba).
 - **2026-10-15:** se retira la licencia trimestral, la semestral pasa a 6 meses sin obsequio y el nombre del dueño
   no aparece en la plataforma (va "DocTrader Pro").
 - **2026-10-15:** se quita por completo la licencia de prueba (y con ella la verificación del teléfono por SMS): ya
