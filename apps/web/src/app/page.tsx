@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   title: { absolute: 'DocTraderPRO · Licencia de software de copy trading' },
   description:
     'Doc Trader Pro AI replica en tu cuenta cada operación del sistema DocTrader Pro, en el broker que tú elijas. Tu dinero nunca sale de tu cuenta y el historial lo audita Myfxbook.',
+  // Dirección oficial para los buscadores (con www, de metadataBase): sin www o con parámetros cuenta como esta.
+  alternates: { canonical: '/' },
 };
 
 /*
