@@ -308,7 +308,7 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 - [ ] Cifras de Myfxbook al día; caída máxima y tiempo auditado solo si el historial ya está completo.
 
 **Dinero**
-- [ ] Direcciones de USDT (Tron) y BTC comprobadas con un pago real pequeño a cada una, verificado por la plataforma.
+- [x] Direcciones de USDT (Tron) y BTC comprobadas con un pago real pequeño a cada una, verificado por la plataforma (2026-10-22).
 - [ ] Cuenta de Binance con segundo factor fuerte, código antiphishing y lista blanca de retiros.
 - [ ] Precios, días de gracia y confirmaciones revisados en el panel.
 
@@ -321,8 +321,8 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 **Funcionamiento**
 - [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
       correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
-- [ ] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo.
-- [ ] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook.
+- [x] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo (2026-10-22).
+- [x] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook (2026-10-22).
 - [x] Monitor de disponibilidad y alertas activos (2026-10-16; falta cambiar sus direcciones al dominio propio).
 - [ ] Revisión en celular (iPhone y Android) y en escritorio.
 

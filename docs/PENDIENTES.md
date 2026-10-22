@@ -1,6 +1,6 @@
 # Pendientes — información por recibir
 
-> Actualizado: 2026-10-16. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
+> Actualizado: 2026-10-22. Lo resuelto está en `CONTEXTO.md`; aquí queda solo lo abierto.
 
 ## ⏳ En espera
 
@@ -42,12 +42,12 @@
 
 ## 🧪 Por probar en producción
 
-- [ ] **Un pago real de punta a punta** (etapa 4): con una cuenta de cliente de prueba, crear una orden mensual,
+- [x] **Un pago real de punta a punta** (etapa 4; probado el 2026-10-22 en USDT y BTC, todo bien): con una cuenta de cliente de prueba, crear una orden mensual,
       enviar el monto exacto en USDT (Tron) a la dirección de la orden, reportar el hash y ver que en "Pagos" del
       admin queda **verificado** a los pocos minutos (20 confirmaciones). Aprobarlo y revisar que la licencia quede
       activa por un mes. El dinero llega a la cuenta de Binance de cobro.
 
-- [ ] **Un día de operación desde el panel** (etapa 5): con el pago anterior aprobado, ir a "Cuentas", ver las
+- [x] **Un día de operación desde el panel** (etapa 5; probado el 2026-10-22 con el recorrido completo): con el pago anterior aprobado, ir a "Cuentas", ver las
       contraseñas (pide el código de la app), conectar la cuenta en Social Trader Tools, fijar capital y riesgo y
       "Marcar como conectada". El cliente debe recibir el correo y ver el capital y el riesgo en su panel.
 - [ ] **Direcciones de depósito** (etapa 5): agregar desde "Ajustes" una dirección de USDT (Tron) que sea de
@@ -58,7 +58,7 @@
       admin, dejar una nota interna, responder con una respuesta guardada y asignarlo. Al cliente le debe llegar el
       correo con la respuesta; después, marcarlo resuelto y escribir otra vez para reabrirlo (llega el correo a los
       admins). Con R2 listo, descargar la captura desde los dos lados.
-- [ ] **Los correos del ciclo de la licencia** (etapa 8): con el pago real de arriba, revisar que llegue la
+- [x] **Los correos del ciclo de la licencia** (etapa 8; los del pago real llegaron el 2026-10-22; los recordatorios llegan con las fechas reales): con el pago real de arriba, revisar que llegue la
       bienvenida al confirmar el correo y, a los admins, "pago verificado por aprobar" y "venta". Los recordatorios
       (7, 3 y 1 día), "tu licencia venció" y "desconectaremos la cuenta" llegan solos con las fechas reales; se
       probaron con fechas aceleradas.
