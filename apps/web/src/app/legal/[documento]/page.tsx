@@ -46,6 +46,7 @@ export async function generateMetadata({
   return {
     title: titulo,
     description: RESUMEN[tipo],
+    alternates: { canonical: `/legal/${ruta}` },
     openGraph: {
       type: 'article',
       siteName: 'DocTraderPRO',

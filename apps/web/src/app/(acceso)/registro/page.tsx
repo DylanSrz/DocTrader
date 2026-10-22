@@ -2,7 +2,11 @@ import type { Metadata } from 'next';
 import { PlantillaAcceso } from '@/components/plantilla-acceso';
 import { FormularioRegistro } from './formulario';
 
-export const metadata: Metadata = { title: 'Crear cuenta' };
+export const metadata: Metadata = {
+  title: 'Crear cuenta',
+  // Dirección oficial para los buscadores: "/registro?plan=…" cuenta como esta misma página.
+  alternates: { canonical: '/registro' },
+};
 
 export default function Registro() {
   return (
