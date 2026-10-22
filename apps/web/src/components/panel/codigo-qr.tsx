@@ -6,7 +6,15 @@ import QRCode from 'qrcode';
  * dirección, sin `bitcoin:` ni monto: así lo leen todas las billeteras y el cliente escribe el monto exacto. Fondo
  * blanco con margen: los lectores no leen bien un QR claro sobre fondo oscuro.
  */
-export function CodigoQr({ texto, etiqueta }: { texto: string; etiqueta: string }) {
+export function CodigoQr({
+  texto,
+  etiqueta,
+  className = 'size-40',
+}: {
+  texto: string;
+  etiqueta: string;
+  className?: string;
+}) {
   const { modules } = QRCode.create(texto, { errorCorrectionLevel: 'M' });
   const margen = 4;
   const lado = modules.size + margen * 2;
@@ -22,7 +30,7 @@ export function CodigoQr({ texto, etiqueta }: { texto: string; etiqueta: string 
       aria-label={etiqueta}
       viewBox={`0 0 ${lado} ${lado}`}
       shapeRendering="crispEdges"
-      className="size-40 shrink-0 rounded-xl bg-blanco"
+      className={`shrink-0 rounded-xl bg-blanco ${className}`}
     >
       <path d={trazo} fill="#000" />
     </svg>

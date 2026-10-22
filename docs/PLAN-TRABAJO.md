@@ -300,6 +300,15 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
     estados de procesando, listo y error.
   - **Falta:** la lista del §5 y el lanzamiento suave.
 
+### Etapa 10 — Presentación de ventas ✅ (2026-10-22)
+- **`/presentacion`**: diapositivas a pantalla completa para las reuniones con clientes (portada, problema, qué es,
+  cómo funciona, resultados, seguridad, con qué funciona, planes y cierre con QR al registro). Precios, planes y
+  cifras de Myfxbook en vivo, los mismos de la landing (`obtenerLanding`, `lib/planes.ts`).
+- Flechas, espacio, Inicio y Fin; deslizar en tablet; **N** muestra las notas para quien presenta; **F**, pantalla
+  completa; `#3` abre la diapositiva 3. "Guardar PDF" imprime todas en 16:9, una por página.
+- No se indexa ni está en el sitemap. Mismas reglas que la web: licencia de software, sin promesas de ganancia.
+- La diapositiva de referidos se agrega con la etapa 11 (referidos), cuando Argemiro apruebe el plan.
+
 ## 5. Lista para el día del lanzamiento
 
 **Legal y contenido**
