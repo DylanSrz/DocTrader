@@ -4,6 +4,7 @@ import { opcionesBaseDeDatos } from '../src/database/data-source.js';
 import { DepositAddress, PartnerProfile, Plan, User } from '../src/database/entidades/index.js';
 import { quitarPruebaDeTextosLegales } from '../src/database/migraciones/1792800000000-quitar-prueba.js';
 import { PlanesYMarca1792400000000 } from '../src/database/migraciones/1792400000000-planes-y-marca.js';
+import { ReferidosDosNiveles1793400000000 } from '../src/database/migraciones/1793400000000-referidos-dos-niveles.js';
 import { TerminosReferidos1793300000000 } from '../src/database/migraciones/1793300000000-terminos-referidos.js';
 import { aplicarSemilla } from '../src/database/semilla-datos.js';
 import { registrarEnCadena, verificarCadena } from '../src/auditoria/cadena.js';
@@ -245,6 +246,63 @@ describe('semilla', () => {
     expect(d.content_md).toContain('| Programa de referidos |');
     expect(d.content_md).toContain('11. Administrar el programa de referidos');
     expect(d.content_md).toMatch(/\*\*Quien invitó al Titular\*\*[\s\S]*\*\*Autoridades\*\*/);
+  });
+
+  it('pasa los referidos a dos niveles: 15 % y 5 %, y publica el nuevo 16.2 de los términos', async () => {
+    const ultimo = async (tipo: string) =>
+      (
+        (await fuente.query(
+          `SELECT version, content_md FROM legal_documents WHERE type = $1 ORDER BY version DESC LIMIT 1`,
+          [tipo],
+        )) as { version: number; content_md: string }[]
+      )[0]!;
+    const correr = async (paso: 'up' | 'down') => {
+      const corredor = fuente.createQueryRunner();
+      try {
+        await new ReferidosDosNiveles1793400000000()[paso](corredor);
+      } finally {
+        await corredor.release();
+      }
+    };
+    // Como estaba producción antes del cambio: un solo nivel, 20 % y el 16.2 de entonces.
+    await correr('down');
+    const antes = (await ultimo('TERMS')).version;
+    await fuente.query(
+      `INSERT INTO legal_documents (type, version, content_md) VALUES ('TERMS', $1, $2)`,
+      [
+        antes + 1,
+        [
+          '## 16. Programa de referidos',
+          '',
+          '16.2. **Comisión.** Cuando una persona se registra con el enlace o el código de un Referidor, cada licencia o renovación',
+          'que pague le deja al Referidor el porcentaje vigente publicado en la plataforma (hoy, el 20 % de lo pagado), mientras',
+          'siga siendo cliente. El porcentaje se fija al aprobar cada pago. Las compras aprobadas mientras la licencia del',
+          'Referidor esté vencida no generan comisión, salvo que DocTraderPRO lo haya habilitado.',
+          '',
+        ].join('\n'),
+      ],
+    );
+    await fuente.query(
+      `UPDATE settings SET value = '2000'::jsonb WHERE key = 'referrals.percentage_bp'`,
+    );
+
+    await correr('up');
+    const t = await ultimo('TERMS');
+    expect(t.version).toBe(antes + 2);
+    expect(t.content_md).toContain('(hoy, el 15 % de lo pagado)');
+    expect(t.content_md).toContain('**segunda línea**');
+    const ajustes = (await fuente.query(
+      `SELECT key, value FROM settings WHERE key IN ('referrals.percentage_bp', 'referrals.level2_bp') ORDER BY key`,
+    )) as { key: string; value: number }[];
+    expect(ajustes).toEqual([
+      { key: 'referrals.level2_bp', value: 500 },
+      { key: 'referrals.percentage_bp', value: 1500 },
+    ]);
+    const columnas = (await fuente.query(
+      `SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'payment_orders' AND column_name LIKE 'referr%'`,
+    )) as unknown[];
+    expect(columnas).toHaveLength(0);
   });
 
   it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 10 %', async () => {

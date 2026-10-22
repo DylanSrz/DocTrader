@@ -41,7 +41,7 @@ async function Contenido() {
         </h1>
         <p className="max-w-[38em] text-niebla">
           {ajustes.activo
-            ? `El programa está activo: ${formatearPorcentaje(ajustes.porcentajeBp)} de cada licencia que paga un referido, enviado en USDT (red Tron) cada quincena desde ${usd(ajustes.minimoPagoUsdCents)}.`
+            ? `El programa está activo: ${formatearPorcentaje(ajustes.porcentajeBp)} de cada licencia que paga un referido${ajustes.segundaLineaBp > 0 ? ` y ${formatearPorcentaje(ajustes.segundaLineaBp)} de las de su segunda línea` : ''}, enviado en USDT (red Tron) cada quincena desde ${usd(ajustes.minimoPagoUsdCents)}.`
             : 'El programa está pausado: los enlaces no suman referidos nuevos y las compras no dejan comisión.'}{' '}
           {acumuladoUsdCents > 0
             ? `Hay ${usd(acumuladoUsdCents)} en comisiones ganadas que todavía no se liquidan.`
@@ -116,9 +116,11 @@ async function Contenido() {
                     </th>
                     <th scope="col" className="pr-4 pb-3.5 text-right font-normal">
                       Registrados
+                      <small className="block text-[12px]">1.ª + 2.ª línea</small>
                     </th>
                     <th scope="col" className="pr-4 pb-3.5 text-right font-normal">
                       Compraron
+                      <small className="block text-[12px]">1.ª + 2.ª línea</small>
                     </th>
                     <th scope="col" className="pr-4 pb-3.5 text-right font-normal">
                       Ganado
@@ -153,8 +155,18 @@ async function Contenido() {
                             <span className="cifra">{x.codigo}</span> · {x.correo}
                           </small>
                         </td>
-                        <td className="cifra py-4 pr-4 text-right">{x.registrados}</td>
-                        <td className="cifra py-4 pr-4 text-right">{x.compradores}</td>
+                        <td className="cifra py-4 pr-4 text-right">
+                          {x.registrados}
+                          {x.registradosSegunda > 0 ? (
+                            <span className="text-ceniza"> + {x.registradosSegunda}</span>
+                          ) : null}
+                        </td>
+                        <td className="cifra py-4 pr-4 text-right">
+                          {x.compradores}
+                          {x.compradoresSegunda > 0 ? (
+                            <span className="text-ceniza"> + {x.compradoresSegunda}</span>
+                          ) : null}
+                        </td>
                         <td className="cifra py-4 pr-4 text-right">
                           {usd(x.ganadoUsdCents)}
                           {x.acumuladoUsdCents > 0 ? (
@@ -224,6 +236,7 @@ async function Contenido() {
             </h2>
             <AjustesReferidos
               porcentaje={formatearPorcentaje(ajustes.porcentajeBp).replace(/\s?%$/, '')}
+              segundaLinea={formatearPorcentaje(ajustes.segundaLineaBp).replace(/\s?%$/, '')}
               minimo={String(ajustes.minimoPagoUsdCents / 100)}
               activo={ajustes.activo}
             />

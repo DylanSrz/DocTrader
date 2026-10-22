@@ -37,7 +37,7 @@ export interface Landing {
   myfxbook: typeof MYFXBOOK_INICIAL;
   enlaces: typeof ENLACES_INICIALES;
   correoSoporte: string;
-  referidos: { activo: boolean; porcentajeBp: number };
+  referidos: { activo: boolean; porcentajeBp: number; segundaLineaBp: number };
 }
 
 export interface TextoLegal {
@@ -84,7 +84,11 @@ const LANDING_DE_RESPALDO: Landing = {
   myfxbook: MYFXBOOK_INICIAL,
   enlaces: ENLACES_INICIALES,
   correoSoporte: CORREO_SOPORTE,
-  referidos: { activo: REFERIDOS_INICIAL.activo, porcentajeBp: REFERIDOS_INICIAL.porcentajeBp },
+  referidos: {
+    activo: REFERIDOS_INICIAL.activo,
+    porcentajeBp: REFERIDOS_INICIAL.porcentajeBp,
+    segundaLineaBp: REFERIDOS_INICIAL.segundaLineaBp,
+  },
 };
 
 /**
@@ -111,7 +115,7 @@ export async function obtenerLanding(): Promise<Landing> {
     myfxbook: datos.myfxbook ?? LANDING_DE_RESPALDO.myfxbook,
     enlaces: datos.enlaces ?? LANDING_DE_RESPALDO.enlaces,
     correoSoporte: datos.correoSoporte ?? CORREO_SOPORTE,
-    referidos: datos.referidos ?? LANDING_DE_RESPALDO.referidos,
+    referidos: { ...LANDING_DE_RESPALDO.referidos, ...datos.referidos },
   };
 }
 

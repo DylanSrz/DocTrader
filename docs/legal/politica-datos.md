@@ -85,9 +85,9 @@ DocTraderPRO **no vende ni alquila** datos personales. Los comparte solo con:
   datos a países con un nivel adecuado de protección según la Superintendencia de Industria y Comercio.
 - **El servicio de copia de operaciones** (hoy, Social Trader Tools), que recibe los datos de la cuenta de trading
   necesarios para conectarla al Software.
-- **Quien invitó al Titular**, si se registró con un enlace o código de invitación: esa persona ve solo su nombre de
-  pila, la inicial de su apellido, si tiene una licencia activa y el valor de la comisión que le dejó cada compra.
-  Nunca ve su correo, su documento, su teléfono ni sus cuentas de trading.
+- **Quien invitó al Titular y quien invitó a esa persona**, si se registró con un enlace o código de invitación: ven
+  solo su nombre de pila, la inicial de su apellido, por quién llegó, si tiene una licencia activa y el valor de la
+  comisión que les dejó cada compra. Nunca ven su correo, su documento, su teléfono ni sus cuentas de trading.
 - **Autoridades** que lo pidan en ejercicio de sus funciones legales.
 
 Las consultas a la blockchain se hacen con datos que ya son públicos en la red (hash, direcciones y montos).

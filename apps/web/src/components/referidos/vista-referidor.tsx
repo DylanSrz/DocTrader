@@ -77,6 +77,7 @@ export function VistaReferidor({
 }) {
   const { programa, perfil, cifras } = vista;
   const pct = formatearPorcentaje(programa.porcentajeBp);
+  const pct2 = programa.segundaLineaBp > 0 ? formatearPorcentaje(programa.segundaLineaBp) : null;
   const minimo = usd(programa.minimoPagoUsdCents);
 
   if (!perfil || !cifras) {
@@ -85,15 +86,18 @@ export function VistaReferidor({
         {titular ? <Etiqueta>Referidos</Etiqueta> : null}
         <h1 className={titular ? 'text-grande' : 'text-medio'}>
           {programa.activo
-            ? `Recomienda DocTrader Pro y gana el ${pct} de cada licencia.`
+            ? `Recomienda DocTrader Pro y gana el ${pct} de cada licencia${pct2 ? `, y el ${pct2} de tu segunda línea` : ''}.`
             : 'El programa de referidos está pausado.'}
         </h1>
         {programa.activo ? (
           <>
             <p className="max-w-[36em] text-blanco">
               Con una licencia activa tienes tu propio enlace. Cada vez que alguien que invitaste
-              paga una licencia, ganas el {pct} de lo que pagó, mientras siga siendo cliente. Te
-              enviamos lo ganado en USDT (red Tron) cada quincena, desde {minimo}.
+              paga una licencia, ganas el {pct} de lo que pagó, mientras siga siendo cliente.
+              {pct2
+                ? ` Y cuando pagan las personas que ellos invitan (tu segunda línea), ganas el ${pct2}.`
+                : ''}{' '}
+              Te enviamos lo ganado en USDT (red Tron) cada quincena, desde {minimo}.
             </p>
             <Pildora href="/comprar/mensual">Comprar una licencia</Pildora>
           </>
@@ -108,8 +112,17 @@ export function VistaReferidor({
 
   const enlace = enlaceDeReferido(perfil.codigo);
   const numeros = [
-    { texto: 'Registrados', valor: String(cifras.registrados) },
-    { texto: 'Compraron', valor: String(cifras.compradores) },
+    {
+      texto: 'Tu primera línea',
+      valor: String(cifras.registrados),
+      detalle: cifras.compradores === 1 ? '1 compró' : `${cifras.compradores} compraron`,
+    },
+    {
+      texto: 'Tu segunda línea',
+      valor: String(cifras.registradosSegunda),
+      detalle:
+        cifras.compradoresSegunda === 1 ? '1 compró' : `${cifras.compradoresSegunda} compraron`,
+    },
     {
       texto: `Esta quincena, hasta el ${diaYMes(cifras.periodo.fin)}`,
       valor: usd(cifras.periodo.comisionUsdCents),
@@ -119,6 +132,10 @@ export function VistaReferidor({
     { texto: 'Enviado', valor: usd(cifras.pagadoUsdCents) },
   ];
   const referidos = vista.referidos ?? [];
+  const lineas = [
+    { nivel: 1, titulo: 'Primera línea', filas: referidos.filter((r) => r.nivel === 1) },
+    { nivel: 2, titulo: 'Segunda línea', filas: referidos.filter((r) => r.nivel === 2) },
+  ].filter((l) => l.filas.length > 0);
   const comisiones = vista.comisiones ?? [];
   const pagos = vista.pagos ?? [];
   const Titulo = titular ? 'h1' : 'h2';
@@ -128,12 +145,18 @@ export function VistaReferidor({
       <div className="grid max-w-[980px] justify-items-start gap-[26px]">
         {titular ? <Etiqueta>Referidos</Etiqueta> : null}
         <Titulo className={titular ? 'text-grande' : 'text-medio'}>
-          Gana el {pct} de cada licencia que paguen tus referidos.
+          {pct2
+            ? `Gana el ${pct} de tus referidos y el ${pct2} de los referidos de ellos.`
+            : `Gana el ${pct} de cada licencia que paguen tus referidos.`}
         </Titulo>
         <p className="max-w-[38em] text-niebla">
-          Comparte tu enlace. Quien se registre con él queda como tu referido, y cada licencia que
-          pague te deja el {pct} mientras tengas tu licencia activa. Cada quincena te enviamos lo
-          ganado en USDT (red Tron) si llega a {minimo}; si no, se suma a la siguiente.
+          Comparte tu enlace. Quien se registre con él queda en tu primera línea, y cada licencia
+          que pague te deja el {pct}.
+          {pct2
+            ? ` Quienes ellos inviten quedan en tu segunda línea, y cada licencia que paguen te deja el ${pct2}.`
+            : ''}{' '}
+          Ganas mientras tengas tu licencia activa. Cada quincena te enviamos lo ganado en USDT (red
+          Tron) si llega a {minimo}; si no, se suma a la siguiente.
         </p>
         {!programa.activo ? (
           <p role="status" className="rounded-[20px] bg-llama/14 px-5 py-4 text-[15px] text-llama">
@@ -181,6 +204,7 @@ export function VistaReferidor({
               <dd className="cifra text-[clamp(28px,3.4vw,44px)] leading-none tracking-[-0.03em]">
                 {n.valor}
               </dd>
+              {n.detalle ? <dd className="text-sm text-ceniza">{n.detalle}</dd> : null}
             </div>
           ))}
         </dl>
@@ -208,30 +232,46 @@ export function VistaReferidor({
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-[clamp(56px,7vw,80px)]">
           <Tabla
             id="t-referidos"
-            titulo="Tus referidos"
+            titulo="Tu red"
             minimo={340}
             columnas={[{ texto: 'Nombre' }, { texto: 'Desde' }, { texto: 'Estado' }]}
           >
-            {referidos.length === 0 ? (
+            {lineas.length === 0 ? (
               <tr>
                 <td colSpan={3} className="py-4 text-ceniza">
                   Todavía nadie se ha registrado con tu enlace.
                 </td>
               </tr>
             ) : (
-              referidos.map((r, i) => (
-                <tr key={`${r.nombre}-${i}`} className="align-top">
-                  <td className="py-4 pr-4">{r.nombre}</td>
-                  <td className="cifra py-4 pr-4 whitespace-nowrap text-ceniza">
-                    {r.registradoEn ? fechaCorta(r.registradoEn) : '—'}
-                  </td>
-                  <td className="py-4">
-                    <Estado tono={ESTADO_REFERIDO[r.estado].tono}>
-                      {ESTADO_REFERIDO[r.estado].texto}
-                    </Estado>
-                  </td>
-                </tr>
-              ))
+              lineas.flatMap((l, j) => [
+                <tr key={`linea-${l.nivel}`}>
+                  <th
+                    scope="colgroup"
+                    colSpan={3}
+                    className={`${j === 0 ? 'pt-1' : 'pt-6'} pb-1 text-left text-[13px] font-normal text-ceniza`}
+                  >
+                    {l.titulo} · {l.filas.length}
+                  </th>
+                </tr>,
+                ...l.filas.map((r, i) => (
+                  <tr key={`${l.nivel}-${r.nombre}-${i}`} className="align-top">
+                    <td className="py-4 pr-4">
+                      {r.nombre}
+                      {r.via ? (
+                        <small className="block text-[13px] text-ceniza">vía {r.via}</small>
+                      ) : null}
+                    </td>
+                    <td className="cifra py-4 pr-4 whitespace-nowrap text-ceniza">
+                      {r.registradoEn ? fechaCorta(r.registradoEn) : '—'}
+                    </td>
+                    <td className="py-4">
+                      <Estado tono={ESTADO_REFERIDO[r.estado].tono}>
+                        {ESTADO_REFERIDO[r.estado].texto}
+                      </Estado>
+                    </td>
+                  </tr>
+                )),
+              ])
             )}
           </Tabla>
 
@@ -260,7 +300,10 @@ export function VistaReferidor({
                   </td>
                   <td className="py-4 pr-4">
                     {c.referido}
-                    <small className="block text-[13px] text-ceniza">{c.plan}</small>
+                    <small className="block text-[13px] text-ceniza">
+                      {c.plan}
+                      {c.nivel === 2 ? ` · segunda línea${c.via ? `, vía ${c.via}` : ''}` : ''}
+                    </small>
                   </td>
                   <td className="cifra py-4 pr-4 text-right">{usd(c.montoUsdCents)}</td>
                   <td className="cifra py-4 pr-4 text-right">{usd(c.comisionUsdCents)}</td>

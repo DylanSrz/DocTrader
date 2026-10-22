@@ -1,6 +1,7 @@
 import { LIMITES_REFERIDOS } from '@doctrader/shared';
 import {
   IsBoolean,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -25,6 +26,12 @@ export class AjustesReferidosDto {
   @Min(LIMITES_REFERIDOS.minimoBp, { message: rango })
   @Max(LIMITES_REFERIDOS.maximoBp, { message: rango })
   porcentajeBp: number;
+
+  /** Segunda línea (quienes invitan mis referidos), en puntos básicos: 500 = 5 %. */
+  @IsInt({ message: rango })
+  @Min(LIMITES_REFERIDOS.minimoBp, { message: rango })
+  @Max(LIMITES_REFERIDOS.maximoBp, { message: rango })
+  segundaLineaBp: number;
 
   @IsInt({ message: minimo })
   @Min(0, { message: minimo })
@@ -59,6 +66,11 @@ export class CorregirReferidorDto {
 }
 
 export class AnularComisionDto {
+  /** 1 o 2 para anular solo esa línea; sin él, todas las comisiones sin liquidar de la orden. */
+  @IsOptional()
+  @IsIn([1, 2], { message: 'La línea es 1 o 2.' })
+  nivel?: 1 | 2;
+
   @IsString()
   @Length(3, 500, { message: 'Escribe el motivo (entre 3 y 500 caracteres).' })
   motivo: string;

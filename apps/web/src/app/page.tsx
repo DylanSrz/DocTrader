@@ -521,8 +521,12 @@ function Precios({
           <span>
             <span className="text-blanco">
               Recomienda y gana el {formatearPorcentaje(referidos.porcentajeBp)}
+              {referidos.segundaLineaBp > 0
+                ? `, y el ${formatearPorcentaje(referidos.segundaLineaBp)} de la segunda línea`
+                : ''}
             </span>{' '}
-            de cada licencia que paguen las personas que invites, en USDT cada quincena.
+            de cada licencia que paguen las personas que invites
+            {referidos.segundaLineaBp > 0 ? ' y las que ellas inviten' : ''}, en USDT cada quincena.
           </span>
           <Enlace href="/panel/referidos" nativo>
             Ver mi enlace de invitación

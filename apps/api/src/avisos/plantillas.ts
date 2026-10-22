@@ -505,7 +505,9 @@ export function renderizar(
         asunto: `Ganaste ${datos.comision} por un referido`,
         saludo,
         parrafos: [
-          `${datos.referido}, a quien invitaste, pagó su licencia ${datos.plan}. Tu comisión es de ${datos.comision} (${datos.porcentaje} de ${datos.monto}).`,
+          datos.via
+            ? `${datos.referido}, de la red de ${datos.via} (tu segunda línea), pagó su licencia ${datos.plan}. Tu comisión es de ${datos.comision} (${datos.porcentaje} de ${datos.monto}).`
+            : `${datos.referido}, a quien invitaste, pagó su licencia ${datos.plan}. Tu comisión es de ${datos.comision} (${datos.porcentaje} de ${datos.monto}).`,
           datos.direccion === 'si'
             ? 'Te la enviamos en USDT (red Tron) con el pago de la quincena, cuando lo que tienes por cobrar llegue al mínimo.'
             : 'Para recibirla, registra en tu panel la dirección de USDT (red Tron) donde quieres cobrar.',

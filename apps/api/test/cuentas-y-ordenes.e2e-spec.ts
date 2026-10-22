@@ -39,7 +39,7 @@ async function clienteConSesion() {
   await comoLaWeb(app)
     .post('/auth/registro', {
       nombre: 'Laura Gómez Restrepo',
-      cedula: unico.slice(-10),
+      cedula: `1${unico.slice(-9)}`, // La cédula no empieza en 0.
       correo,
       telefono: `31${unico.slice(-8)}`,
       contrasena,

@@ -143,7 +143,13 @@ export class AdminReferidosController {
     @SesionActual() sesion: SesionActiva,
     @Cliente() cliente: ContextoCliente,
   ) {
-    await this.referidos.anularComision(numero, dto.motivo.trim(), sesion, cliente);
+    await this.referidos.anularComision(
+      numero,
+      dto.nivel ?? null,
+      dto.motivo.trim(),
+      sesion,
+      cliente,
+    );
     return { ok: true };
   }
 }

@@ -1,13 +1,16 @@
 /**
  * Programa de referidos (`docs/PLAN-TRABAJO.md`, etapa 11): quien refiere gana un porcentaje de cada licencia que paga
- * su referido, liquidado por quincenas (las mismas del socio, `comision.ts`) y pagado en USDT (Tron).
+ * su referido, y uno menor de las que pagan los referidos de sus referidos (segunda línea). Se liquida por quincenas
+ * (las mismas del socio, `comision.ts`) y se paga en USDT (Tron).
  * Refieren los clientes con licencia activa (o en gracia), las personas que un admin habilite y el socio.
  */
 
 /** Valores iniciales de los ajustes del programa (tabla `settings`); se cambian desde el panel. */
 export const REFERIDOS_INICIAL = {
-  /** 20 %, en puntos básicos. */
-  porcentajeBp: 2_000,
+  /** Primera línea (quienes yo invito): 15 %, en puntos básicos. */
+  porcentajeBp: 1_500,
+  /** Segunda línea (quienes invitan mis referidos): 5 %. No hay más niveles. */
+  segundaLineaBp: 500,
   /** Mínimo para enviar un pago: USD 20. Lo que no llega se suma a la quincena siguiente. */
   minimoPagoUsdCents: 2_000,
   activo: true,

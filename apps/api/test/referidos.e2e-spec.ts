@@ -36,6 +36,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await fuente.query(
+    `UPDATE settings SET value = '2000'::jsonb WHERE key = 'referrals.min_payout_usd_cents'`,
+  );
   // Las ventas que estas pruebas corrieron al pasado no deben quedar para la liquidación del socio de otra prueba.
   await app.get(SocioService).liquidar();
   await app.close();
@@ -74,17 +77,20 @@ async function referidoPor(usuarioId: string): Promise<string | null> {
   return fila!.referred_by;
 }
 
-async function comision(numero: string) {
-  const [fila] = (await fuente.query(
-    `SELECT referrer_id, referral_bp, referral_usd_cents, referral_payout_id FROM payment_orders WHERE number = $1`,
+/** Las comisiones de referidos de una orden, de la primera línea a la segunda. */
+async function comisiones(numero: string) {
+  return (await fuente.query(
+    `SELECT c.referrer_id, c.level, c.bp, c.usd_cents, c.payout_id
+       FROM referral_commissions c JOIN payment_orders o ON o.id = c.payment_order_id
+      WHERE o.number = $1 ORDER BY c.level`,
     [numero],
   )) as {
-    referrer_id: string | null;
-    referral_bp: number | null;
-    referral_usd_cents: number | null;
-    referral_payout_id: string | null;
+    referrer_id: string;
+    level: number;
+    bp: number;
+    usd_cents: number;
+    payout_id: string | null;
   }[];
-  return fila!;
 }
 
 /** Corre la venta a una quincena ya terminada, para que la liquidación la tome. */
@@ -93,6 +99,11 @@ async function alPasado(numero: string, fecha = '2025-03-05T10:00:00-05:00') {
     numero,
     fecha,
   ]);
+  await fuente.query(
+    `UPDATE referral_commissions SET earned_at = $2
+      WHERE payment_order_id = (SELECT id FROM payment_orders WHERE number = $1)`,
+    [numero, fecha],
+  );
 }
 
 async function pagosDe(referidorId: string) {
@@ -133,7 +144,11 @@ describe('referidos', () => {
   it('sin licencia no se refiere; con licencia hay código y el registro queda atribuido', async () => {
     const antes = await ana.web.get('/referidos/mio').expect(200);
     expect(antes.body).toMatchObject({ puedeReferir: false, via: null, perfil: null });
-    expect(antes.body.programa).toMatchObject({ activo: true, porcentajeBp: 2000 });
+    expect(antes.body.programa).toMatchObject({
+      activo: true,
+      porcentajeBp: 1500,
+      segundaLineaBp: 500,
+    });
 
     await comprar(ana, admin);
     const vista = await ana.web.get('/referidos/mio').expect(200);
@@ -209,19 +224,17 @@ describe('referidos', () => {
     ]);
   });
 
-  it('cada compra del referido deja el 20 % al referidor, salvo mientras su licencia está vencida', async () => {
+  it('cada compra del referido deja el 15 % al referidor, salvo mientras su licencia está vencida', async () => {
     const hugo = await clienteConSesion(app, { nombre: 'Hugo Ramírez', codigoReferido: codigoAna });
     const primera = await comprar(hugo, admin);
-    expect(await comision(primera)).toMatchObject({
-      referrer_id: ana.usuario.id,
-      referral_bp: 2000,
-      referral_usd_cents: 2400,
-      referral_payout_id: null,
-    });
+    expect(await comisiones(primera)).toEqual([
+      { referrer_id: ana.usuario.id, level: 1, bp: 1500, usd_cents: 1800, payout_id: null },
+    ]);
     expect(await correo(ana.usuario.id, 'referido-comision')).toMatchObject({
       referido: 'Hugo R.',
-      comision: 'USD 24',
-      porcentaje: '20\u00a0%',
+      comision: 'USD 18',
+      porcentaje: '15\u00a0%',
+      via: '',
       monto: 'USD 120',
       direccion: 'no',
       ruta: '/panel/referidos',
@@ -231,15 +244,20 @@ describe('referidos', () => {
       ana.usuario.id,
     ]);
     const segunda = await comprar(hugo, admin);
-    expect(await comision(segunda)).toMatchObject({ referrer_id: null, referral_usd_cents: null });
+    expect(await comisiones(segunda)).toEqual([]);
     await fuente.query(`UPDATE licenses SET status = 'ACTIVA' WHERE user_id = $1`, [
       ana.usuario.id,
     ]);
 
     const vista = await ana.web.get('/referidos/mio').expect(200);
-    expect(vista.body.cifras).toMatchObject({ compradores: 1, acumuladoUsdCents: 2400 });
+    expect(vista.body.cifras).toMatchObject({ compradores: 1, acumuladoUsdCents: 1800 });
     expect(vista.body.comisiones).toEqual([
-      expect.objectContaining({ referido: 'Hugo R.', comisionUsdCents: 2400, estado: 'ACUMULADA' }),
+      expect.objectContaining({
+        referido: 'Hugo R.',
+        nivel: 1,
+        comisionUsdCents: 1800,
+        estado: 'ACUMULADA',
+      }),
     ]);
   });
 
@@ -248,8 +266,8 @@ describe('referidos', () => {
     const ivan = await clienteConSesion(app, { nombre: 'Iván Castro', codigoReferido: codigoAna });
     const venta = await comprar(ivan, admin);
     await fuente.query(
-      `UPDATE payment_orders SET decided_at = '2025-03-05T10:00:00-05:00'
-        WHERE referrer_id = $1 AND referral_payout_id IS NULL`,
+      `UPDATE referral_commissions SET earned_at = '2025-03-05T10:00:00-05:00'
+        WHERE referrer_id = $1 AND payout_id IS NULL`,
       [ana.usuario.id],
     );
 
@@ -279,11 +297,11 @@ describe('referidos', () => {
     expect(pago).toMatchObject({
       inicio: '2025-03-01',
       sales_count: 2,
-      comision: 4800,
+      comision: 3600,
       usdt_address: DIRECCION_1,
       status: 'CERRADA',
     });
-    expect((await comision(venta)).referral_payout_id).toBe(pago!.id);
+    expect((await comisiones(venta))[0]!.payout_id).toBe(pago!.id);
     expect(await correo(admin.usuario.id, 'referidos-por-pagar')).toBeTruthy();
     await referidos.liquidar();
     expect(await pagosDe(ana.usuario.id)).toHaveLength(1);
@@ -305,11 +323,12 @@ describe('referidos', () => {
       [ana.usuario.id],
     );
 
-    // Con un mínimo de USD 30, los USD 24 se acumulan; con USD 20, se pagan.
+    // Con un mínimo de USD 30, los USD 18 se acumulan; con USD 15, se pagan.
     await admin.confirmar();
     await admin.web
       .put('/admin/referidos/ajustes', {
-        porcentajeBp: 2000,
+        porcentajeBp: 1500,
+        segundaLineaBp: 500,
         minimoPagoUsdCents: 3000,
         activo: true,
       })
@@ -318,8 +337,9 @@ describe('referidos', () => {
     expect(await pagosDe(ana.usuario.id)).toHaveLength(1);
     await admin.web
       .put('/admin/referidos/ajustes', {
-        porcentajeBp: 2000,
-        minimoPagoUsdCents: 2000,
+        porcentajeBp: 1500,
+        segundaLineaBp: 500,
+        minimoPagoUsdCents: 1500,
         activo: true,
       })
       .expect(200);
@@ -327,7 +347,7 @@ describe('referidos', () => {
     const pagos = await pagosDe(ana.usuario.id);
     expect(pagos[1]).toMatchObject({
       inicio: '2025-04-01',
-      comision: 2400,
+      comision: 1800,
       usdt_address: DIRECCION_2,
     });
 
@@ -335,7 +355,7 @@ describe('referidos', () => {
     const vistaAdmin = await admin.web.get('/admin/referidos').expect(200);
     expect(vistaAdmin.body.porEnviar).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: pago!.id, comisionUsdCents: 4800, direccion: DIRECCION_1 }),
+        expect.objectContaining({ id: pago!.id, comisionUsdCents: 3600, direccion: DIRECCION_1 }),
       ]),
     );
     await admin.web
@@ -346,24 +366,24 @@ describe('referidos', () => {
     await admin.web.post(`/admin/referidos/pagos/${pago!.id}/enviado`, { hash }).expect(409);
     expect((await pagosDe(ana.usuario.id))[0]).toMatchObject({ status: 'PAGADA', tx_hash: hash });
     expect(await correo(ana.usuario.id, 'referido-pago-enviado')).toMatchObject({
-      monto: 'USD 48',
+      monto: 'USD 36',
       direccion: DIRECCION_1,
       hash,
       periodo: '1 de marzo al 15 de marzo de 2025',
     });
     const mia = await ana.web.get('/referidos/mio').expect(200);
-    expect(mia.body.cifras).toMatchObject({ pagadoUsdCents: 4800, porPagarUsdCents: 2400 });
+    expect(mia.body.cifras).toMatchObject({ pagadoUsdCents: 3600, porPagarUsdCents: 1800 });
   });
 
   it('el admin anula una comisión sin liquidar y corrige el referidor', async () => {
     const julia = await clienteConSesion(app, { codigoReferido: codigoAna });
     const venta = await comprar(julia, admin);
-    expect((await comision(venta)).referral_usd_cents).toBe(2400);
+    expect((await comisiones(venta)).map((c) => c.usd_cents)).toEqual([1800]);
     await admin.confirmar();
     await admin.web
       .post(`/admin/referidos/ordenes/${venta}/anular`, { motivo: 'Autorreferido' })
       .expect(200);
-    expect(await comision(venta)).toMatchObject({ referrer_id: null, referral_usd_cents: null });
+    expect(await comisiones(venta)).toEqual([]);
     await admin.web
       .post(`/admin/referidos/ordenes/${venta}/anular`, { motivo: 'Otra vez' })
       .expect(404);
@@ -387,6 +407,95 @@ describe('referidos', () => {
       })
       .expect(200);
     expect(await referidoPor(julia.usuario.id)).toBe(ana.usuario.id);
+  });
+
+  it('la segunda línea deja el 5 % a quien invitó al referidor, aunque el intermedio esté vencido', async () => {
+    // Ana → Luis → Marta. Luis tiene licencia; Marta compra.
+    const luis = await clienteConSesion(app, { nombre: 'Luis Prado', codigoReferido: codigoAna });
+    await comprar(luis, admin);
+    const codigoLuis = (await luis.web.get('/referidos/mio').expect(200)).body.perfil
+      .codigo as string;
+    const marta = await clienteConSesion(app, { nombre: 'Marta Gil', codigoReferido: codigoLuis });
+
+    const primera = await comprar(marta, admin);
+    expect(await comisiones(primera)).toEqual([
+      { referrer_id: luis.usuario.id, level: 1, bp: 1500, usd_cents: 1800, payout_id: null },
+      { referrer_id: ana.usuario.id, level: 2, bp: 500, usd_cents: 600, payout_id: null },
+    ]);
+    expect(await correo(ana.usuario.id, 'referido-comision')).toMatchObject({
+      referido: 'Marta G.',
+      via: 'Luis P.',
+      comision: 'USD 6',
+      porcentaje: '5\u00a0%',
+    });
+
+    // Luis vencido: él no cobra, pero Ana sí cobra su 5 %.
+    await fuente.query(`UPDATE licenses SET status = 'VENCIDA' WHERE user_id = $1`, [
+      luis.usuario.id,
+    ]);
+    const segunda = await comprar(marta, admin);
+    expect((await comisiones(segunda)).map((c) => [c.level, c.referrer_id])).toEqual([
+      [2, ana.usuario.id],
+    ]);
+    await fuente.query(`UPDATE licenses SET status = 'ACTIVA' WHERE user_id = $1`, [
+      luis.usuario.id,
+    ]);
+
+    // Ana vencida: no hay 5 %.
+    await fuente.query(`UPDATE licenses SET status = 'VENCIDA' WHERE user_id = $1`, [
+      ana.usuario.id,
+    ]);
+    const tercera = await comprar(marta, admin);
+    expect((await comisiones(tercera)).map((c) => c.level)).toEqual([1]);
+    await fuente.query(`UPDATE licenses SET status = 'ACTIVA' WHERE user_id = $1`, [
+      ana.usuario.id,
+    ]);
+
+    // Ana ve su red en dos líneas; Marta aparece "vía Luis P.".
+    const vista = await ana.web.get('/referidos/mio').expect(200);
+    expect(vista.body.referidos).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ nombre: 'Luis P.', nivel: 1, via: null }),
+        expect.objectContaining({ nombre: 'Marta G.', nivel: 2, via: 'Luis P.' }),
+      ]),
+    );
+    expect(vista.body.cifras).toMatchObject({ registradosSegunda: 1, compradoresSegunda: 1 });
+    expect(vista.body.comisiones).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          referido: 'Marta G.',
+          nivel: 2,
+          via: 'Luis P.',
+          comisionUsdCents: 600,
+        }),
+      ]),
+    );
+    // Luis no ve la línea de arriba: solo a Marta, en su primera línea.
+    const deLuis = await luis.web.get('/referidos/mio').expect(200);
+    expect(deLuis.body.referidos.map((r: { nombre: string }) => r.nombre)).toEqual(['Marta G.']);
+
+    // Anular solo la segunda línea de la primera compra.
+    await admin.confirmar();
+    await admin.web
+      .post(`/admin/referidos/ordenes/${primera}/anular`, {
+        nivel: 2,
+        motivo: 'Prueba de anulación',
+      })
+      .expect(200);
+    expect((await comisiones(primera)).map((c) => c.level)).toEqual([1]);
+
+    // Corregir el referidor de Ana a Marta formaría un ciclo (Ana → Luis → Marta → Ana).
+    const codigoMarta = (await marta.web.get('/referidos/mio').expect(200)).body.perfil?.codigo as
+      string | undefined;
+    const codigoParaCiclo =
+      codigoMarta ?? (await luis.web.get('/referidos/mio').expect(200)).body.perfil.codigo;
+    const ciclo = await admin.web
+      .put(`/admin/referidos/clientes/${ana.usuario.id}/referidor`, {
+        codigo: codigoParaCiclo,
+        motivo: 'Prueba de ciclo',
+      })
+      .expect(400);
+    expect(ciclo.body.campos.codigo).toMatch(/ciclo/);
   });
 
   it('el socio refiere con su cuenta de admin; otro admin no', async () => {
