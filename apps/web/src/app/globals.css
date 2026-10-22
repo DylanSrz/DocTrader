@@ -1102,6 +1102,108 @@ html {
     --alto-logo: max(28px, 6cqmin);
     --separacion: 10cqmin;
   }
+  .p-subtitulo-xl {
+    font-size: max(24px, 5cqmin);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .p-cifra-media {
+    font-size: max(32px, 8cqmin);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .p-tarjeta {
+    display: grid;
+    align-content: start;
+    gap: 1.2cqmin;
+    padding: 2.8cqmin 3cqmin;
+    border-radius: 2.8cqmin;
+    background: rgb(255 255 255 / 0.03);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .p-lista {
+    display: grid;
+    gap: 1cqmin;
+  }
+  .p-lista > li {
+    position: relative;
+    padding-left: 2.4cqmin;
+  }
+  .p-lista > li::before {
+    content: '';
+    position: absolute;
+    top: 0.7em;
+    left: 0;
+    width: 0.9cqmin;
+    height: 0.9cqmin;
+    border-radius: 999px;
+    background: var(--color-llama);
+  }
+  /* Gráfico en vivo: el iframe de TradingView ocupa la caja; el borde redondeado lo recorta. */
+  .p-grafico {
+    height: 100%;
+    overflow: hidden;
+    border-radius: 2.4cqmin;
+    background: rgb(255 255 255 / 0.03);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .p-grafico iframe {
+    border: 0;
+  }
+  .p-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: max(13px, 2.4cqmin);
+    font-variant-numeric: tabular-nums;
+  }
+  .p-tabla th,
+  .p-tabla td {
+    padding: 1.4cqmin 2cqmin 1.4cqmin 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    text-align: left;
+    white-space: nowrap;
+  }
+  .p-tabla thead th {
+    color: var(--color-ceniza);
+    font-size: max(12px, 1.9cqmin);
+    font-weight: 400;
+  }
+  .p-tabla tbody th {
+    font-weight: 600;
+  }
+  .p-campo {
+    width: 100%;
+    min-height: max(44px, 6.4cqmin);
+    padding: 0 2.4cqmin;
+    border-radius: 999px;
+    background: var(--color-campo);
+    color: var(--color-blanco);
+    font-size: max(16px, 2.7cqmin);
+    font-variant-numeric: tabular-nums;
+    transition:
+      background-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+  .p-campo::placeholder {
+    color: var(--color-ceniza);
+  }
+  .p-campo:focus-visible {
+    background: var(--color-campo-foco);
+    box-shadow: 0 0 0 2px var(--color-senal);
+    outline: none;
+  }
+  .p-campo[aria-invalid] {
+    box-shadow: 0 0 0 1.5px var(--color-error);
+  }
+  .p-casilla {
+    width: max(18px, 2.8cqmin);
+    height: max(18px, 2.8cqmin);
+    accent-color: var(--color-llama);
+  }
   @container (orientation: portrait) {
     .p-columnas,
     .p-rejilla {

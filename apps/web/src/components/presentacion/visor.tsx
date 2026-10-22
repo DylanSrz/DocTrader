@@ -15,6 +15,11 @@ const ANTERIOR = new Set(['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace']);
 /** Lo que hay que deslizar el dedo (px) para cambiar de diapositiva. */
 const DESLIZAR = 50;
 
+/** Si el foco o el toque está en un campo de texto o una lista (la calculadora). */
+function enUnCampo(objetivo: EventTarget | null): boolean {
+  return objetivo instanceof HTMLElement && Boolean(objetivo.closest('input, select, textarea'));
+}
+
 /** El número de diapositiva de la URL (`#3` → índice 2), si existe. */
 function desdeLaUrl(total: number): number | null {
   const n = Number.parseInt(window.location.hash.slice(1), 10);
@@ -24,7 +29,8 @@ function desdeLaUrl(total: number): number | null {
 /**
  * Visor de la presentación de ventas (`/presentacion`): una diapositiva a la vez, a pantalla completa.
  * - Teclado: flechas, espacio, Enter y Re Pág/Av Pág para avanzar o volver; Inicio y Fin; N muestra las notas; F,
- *   pantalla completa. En tablet y celular, deslizar el dedo.
+ *   pantalla completa. En tablet y celular, deslizar el dedo. Dentro de un campo (la calculadora) las teclas y el
+ *   dedo son del campo.
  * - La URL lleva el número (`#3`): se puede abrir o recargar en una diapositiva concreta.
  * - Las diapositivas inactivas quedan `inert` (fuera del tabulador y de los lectores de pantalla).
  * - Al imprimir (o "Guardar PDF") salen todas, una por página de 16:9 (estilos `.presentacion` en globals.css).
@@ -70,6 +76,8 @@ export function Visor({ diapositivas }: { diapositivas: Diapositiva[] }) {
   useEffect(() => {
     const alTeclear = (evento: KeyboardEvent) => {
       if (evento.altKey || evento.ctrlKey || evento.metaKey) return;
+      // Al escribir en la calculadora, las teclas son del campo, no de la presentación.
+      if (enUnCampo(evento.target)) return;
       // Enter y espacio sobre un botón o enlace hacen lo de ese botón o enlace.
       const sobreControl = (evento.target as HTMLElement | null)?.closest('button, a');
       if (sobreControl && (evento.key === 'Enter' || evento.key === ' ')) return;
@@ -90,7 +98,8 @@ export function Visor({ diapositivas }: { diapositivas: Diapositiva[] }) {
     <div
       className="presentacion"
       onPointerDown={(e) => {
-        if (e.pointerType === 'touch') inicioToque.current = { x: e.clientX, y: e.clientY };
+        if (e.pointerType === 'touch' && !enUnCampo(e.target))
+          inicioToque.current = { x: e.clientX, y: e.clientY };
       }}
       onPointerUp={(e) => {
         const inicio = inicioToque.current;
