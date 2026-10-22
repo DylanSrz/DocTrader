@@ -14,6 +14,9 @@
 - [x] **Página de referencia:** https://denmu.com/
 - [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
 - [x] **Correo oficial:** support@doctraderpro.com (2026-10-13).
+- [ ] **Cuenta auditada del otro broker** (2026-10-22): Argemiro quiere mostrarla en "Nuestros rendimientos" de la
+      presentación. Falta el enlace de Myfxbook; cuando llegue, se cambia en el admin (Ajustes → Myfxbook) o, si debe
+      salir solo en la presentación, se agrega un ajuste aparte.
 - [x] **Myfxbook de Argemiro** (2026-10-14): https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459
       (cuenta 12253459, JustMarkets, real en centavos USC, MT4). Pública, con historial público y transacciones abiertas,
       órdenes y SL/TP privados. Ya está en la landing.
