@@ -20,14 +20,17 @@ import {
 } from '@/lib/admin';
 import { llamarApi } from '@/lib/api';
 import { conceptoOrden, ESTADO_ORDEN_VISIBLE, fechaCorta, fechaLarga, usd } from '@/lib/formato';
+import type { FichaReferidos } from '@/lib/referidos';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
 import { Asignacion } from '../cuentas/acciones-cuenta';
 import {
   Cedula,
   CambiarDatosCuenta,
+  CorregirReferidor,
   EliminarCliente,
   Exportar,
   Extender,
+  HabilitarReferidor,
   Reactivar,
   Suspender,
 } from './acciones-licencia';
@@ -78,7 +81,15 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
   );
 }
 
-function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) => string }) {
+function ContenidoFicha({
+  ficha,
+  referidos,
+  volver,
+}: {
+  ficha: Ficha;
+  referidos: FichaReferidos | null;
+  volver: (id: string) => string;
+}) {
   const estado = ESTADO_LICENCIA_ADMIN[ficha.estado];
   const vigente = ['ACTIVA', 'EN_GRACIA'].includes(ficha.estado);
   const eliminado = ficha.cliente.estado === 'DELETED';
@@ -254,6 +265,50 @@ function ContenidoFicha({ ficha, volver }: { ficha: Ficha; volver: (id: string) 
         </Seccion>
       ) : null}
 
+      {referidos && !eliminado ? (
+        <Seccion titulo="Referidos">
+          <p className="text-[15px] text-niebla">
+            {referidos.referidoPor ? (
+              <>
+                Lo invitó <span className="text-blanco">{referidos.referidoPor.nombre}</span> (
+                {referidos.referidoPor.correo}
+                {referidos.referidoPor.codigo ? (
+                  <>
+                    , código <span className="cifra">{referidos.referidoPor.codigo}</span>
+                  </>
+                ) : null}
+                )
+                {referidos.referidoPor.desde
+                  ? ` el ${fechaCorta(referidos.referidoPor.desde)}`
+                  : ''}
+                .
+              </>
+            ) : (
+              'Llegó sin invitación de un referidor.'
+            )}
+          </p>
+          <CorregirReferidor cliente={ficha.cliente.id} />
+          <p className="text-[15px] text-niebla">
+            {referidos.perfil?.habilitado
+              ? `Habilitado para referir aunque no tenga licencia activa${referidos.perfil.habilitadoEn ? `, desde el ${fechaCorta(referidos.perfil.habilitadoEn)}` : ''}.`
+              : referidos.puedeReferir
+                ? 'Puede referir porque tiene una licencia activa.'
+                : 'No puede referir: no tiene una licencia activa.'}
+            {referidos.perfil ? (
+              <>
+                {' '}
+                Su código es <span className="cifra">{referidos.perfil.codigo}</span>
+                {referidos.perfil.direccion ? '' : ' y todavía no registra dirección de cobro'}.
+              </>
+            ) : null}
+          </p>
+          <HabilitarReferidor
+            cliente={ficha.cliente.id}
+            habilitado={referidos.perfil?.habilitado === true}
+          />
+        </Seccion>
+      ) : null}
+
       {vigente || ficha.estado === 'SUSPENDIDA' ? (
         <Seccion titulo={ficha.estado === 'SUSPENDIDA' ? 'Suspensión' : 'Suspender'}>
           {ficha.estado === 'SUSPENDIDA' ? (
@@ -316,6 +371,11 @@ async function Contenido({ parametros }: { parametros: Parametros }) {
   if (!lista.ok) {
     return <p className="text-error">No pudimos cargar las licencias: {lista.error.mensaje}</p>;
   }
+  const referidos = ficha?.ok
+    ? await llamarApi<FichaReferidos>(`/admin/referidos/clientes/${ficha.datos.cliente.id}`, {
+        token,
+      })
+    : null;
   const { licencias, conteos, recortada } = lista.datos;
   const activas = conteos.activas;
   const vencen = conteos.vence;
@@ -477,7 +537,11 @@ async function Contenido({ parametros }: { parametros: Parametros }) {
           cerrarEn={enlaceLista(filtro, q)}
           idOrigen={`ficha-${ficha.datos.id}`}
         >
-          <ContenidoFicha ficha={ficha.datos} volver={(id) => enlaceLista(filtro, q, id)} />
+          <ContenidoFicha
+            ficha={ficha.datos}
+            referidos={referidos?.ok ? referidos.datos : null}
+            volver={(id) => enlaceLista(filtro, q, id)}
+          />
         </LateralAbierto>
       ) : null}
     </>
