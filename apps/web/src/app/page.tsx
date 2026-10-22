@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { CifraAnimada } from '@/components/landing/cifra-animada';
 import { CopiarCorreo } from '@/components/landing/copiar-correo';
 import { BarraFlotante } from '@/components/barra-flotante';
 import { EnlacePanel } from '@/components/landing/enlace-panel';
+import { FranjaLogos } from '@/components/landing/franja-logos';
 import { Particulas } from '@/components/landing/particulas';
 import { Marca } from '@/components/marca';
 import { MenuMovil } from '@/components/menu-movil';
@@ -32,6 +34,9 @@ const fechaLarga = new Intl.DateTimeFormat('es-CO', {
 });
 
 const dolares = (centavos: number) => numero.format(centavos / 100);
+/** Decimales con que se muestra una cifra de Myfxbook ("246.680" → 2, "12.5" → 1), como `numero`. */
+const decimalesDe = (cifra: string) =>
+  Math.min(cifra.split('.')[1]?.replace(/0+$/, '').length ?? 0, 2);
 const NoTraducir = ({ children }: { children: ReactNode }) => (
   <span translate="no">{children}</span>
 );
@@ -57,6 +62,7 @@ export default async function Inicio() {
         <Cierre />
       </main>
       <Pie datos={datos} />
+      <DatosEstructurados datos={datos} />
     </>
   );
 }
@@ -272,6 +278,12 @@ function ComoFunciona({ broker }: { broker: Landing['enlaces']['broker'] }) {
       titulo: 'Conectamos tu cuenta',
       texto:
         'Te avisamos por correo cuando quede conectada. Desde ahí, cada operación del sistema se replica en tu cuenta.',
+      extra: (
+        <span className="inline-flex items-center gap-2.5 rounded-pildora bg-senal/12 px-3.5 py-2 text-sm font-medium text-senal">
+          <span aria-hidden="true" className="punto-vivo" />
+          Cuenta conectada
+        </span>
+      ),
     },
   ];
   return (
@@ -279,20 +291,26 @@ function ComoFunciona({ broker }: { broker: Landing['enlaces']['broker'] }) {
       <h2 id="t-como-funciona" className="max-w-[760px] text-grande">
         Cuatro pasos y tu cuenta queda conectada.
       </h2>
+      {/* Al bajar, cada cifra se llena con el degradado del logo de abajo hacia arriba, como sus barras (ver `.paso`). */}
       <ol className="mt-[clamp(56px,8vw,112px)] grid gap-[clamp(72px,10vw,136px)]">
         {pasos.map((paso, i) => (
           <li
             key={paso.titulo}
-            className="group grid items-center gap-4 min-[961px]:grid-cols-2 min-[961px]:gap-[clamp(24px,6vw,96px)]"
+            className="paso group grid items-center gap-4 min-[961px]:grid-cols-2 min-[961px]:gap-[clamp(24px,6vw,96px)]"
           >
             <span
               aria-hidden="true"
-              className="cifra text-[clamp(96px,16vw,220px)] leading-[0.81] font-light tracking-[-0.06em] text-ceniza min-[961px]:group-even:order-2 min-[961px]:group-even:justify-self-end"
+              data-cifra={i + 1}
+              className="paso-cifra cifra text-[clamp(96px,16vw,220px)] leading-[0.81] font-light tracking-[-0.06em] min-[961px]:group-even:order-2 min-[961px]:group-even:justify-self-end"
             >
               {i + 1}
             </span>
             <div className="grid justify-items-start gap-4">
+              <p className="texto-menu text-llama">
+                Paso {i + 1} de {pasos.length}
+              </p>
               <h3 className="text-medio">{paso.titulo}</h3>
+              <span aria-hidden="true" className="paso-linea" />
               <p className="max-w-[34em] text-niebla">{paso.texto}</p>
               {paso.extra}
             </div>
@@ -317,17 +335,33 @@ function Resultados({ myfxbook }: { myfxbook: Landing['myfxbook'] }) {
     {
       etiqueta: 'Ganancia total',
       nombre: 'la ganancia total',
-      valor: gainPercent ? `+${numero.format(Number(gainPercent))} %` : null,
+      valor: gainPercent ? (
+        <CifraAnimada
+          valor={Number(gainPercent)}
+          decimales={decimalesDe(gainPercent)}
+          prefijo="+"
+          sufijo=" %"
+        />
+      ) : null,
     },
     {
       etiqueta: 'Caída máxima',
       nombre: 'la caída máxima',
-      valor: maxDrawdownPercent ? `${numero.format(Number(maxDrawdownPercent))} %` : null,
+      valor: maxDrawdownPercent ? (
+        <CifraAnimada
+          valor={Number(maxDrawdownPercent)}
+          decimales={decimalesDe(maxDrawdownPercent)}
+          sufijo=" %"
+        />
+      ) : null,
     },
     {
       etiqueta: 'Tiempo auditado',
       nombre: 'el tiempo auditado',
-      valor: anios !== null ? `${anios} ${anios === 1 ? 'año' : 'años'}` : null,
+      valor:
+        anios !== null ? (
+          <CifraAnimada valor={anios} sufijo={anios === 1 ? ' año' : ' años'} />
+        ) : null,
     },
   ];
   // "La caída máxima y el tiempo auditado vuelven cuando el historial esté completo."
@@ -377,16 +411,7 @@ function Resultados({ myfxbook }: { myfxbook: Landing['myfxbook'] }) {
 
       <div className="mt-[clamp(72px,9vw,128px)] grid gap-[22px]">
         <h3 className="text-sm text-ceniza">Con qué funciona</h3>
-        <ul translate="no" className="flex flex-wrap gap-x-[clamp(28px,4vw,56px)] gap-y-3.5">
-          {['Myfxbook', 'Social Trader Tools', 'JustMarkets', 'Tron', 'Bitcoin'].map((nombre) => (
-            <li
-              key={nombre}
-              className="text-[clamp(22px,2.4vw,32px)] font-medium tracking-[-0.03em] text-ceniza"
-            >
-              {nombre}
-            </li>
-          ))}
-        </ul>
+        <FranjaLogos />
       </div>
     </Seccion>
   );
@@ -416,7 +441,18 @@ function ventajas(plan: PlanPublico, siguientes: PlanPublico[]): string[] {
 
 function Precios({ planes }: { planes: PlanPublico[] }) {
   const publicos = planes.filter((p) => p.publico && p.meses !== null);
-  const destacado = publicos.at(-1);
+  // El ahorro de cada plan se compara con pagar mes a mes el plan de un mes.
+  const mensual = publicos.find((p) => p.meses === 1 && p.mesesObsequio === 0);
+  const ahorroDe = (plan: PlanPublico) =>
+    mensual && plan !== mensual
+      ? mensual.precioUsdCentavos * ((plan.meses ?? 0) + plan.mesesObsequio) -
+        plan.precioUsdCentavos
+      : 0;
+  // Se recomienda el plan con el que más se ahorra (hoy, el semestral).
+  const recomendado = publicos.reduce<PlanPublico | null>(
+    (mejor, plan) => (ahorroDe(plan) > (mejor ? ahorroDe(mejor) : 0) ? plan : mejor),
+    null,
+  );
   return (
     <Seccion id="precios">
       <DosColumnas
@@ -443,13 +479,15 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
       >
         {publicos.map((plan, i) => {
           const meses = (plan.meses ?? 0) + plan.mesesObsequio;
+          const ahorro = ahorroDe(plan);
           // La ruta decide según la sesión: panel con la compra abierta, ingresar o registro.
           const ruta = `/comprar/${plan.codigo.toLowerCase()}`;
           return (
             <article
               key={plan.codigo}
               aria-labelledby={`t-plan-${plan.codigo}`}
-              className="grid content-start justify-items-start gap-[22px]"
+              // Columna flexible: el botón queda abajo, alineado entre planes con distinto número de ventajas.
+              className="flex flex-col items-start gap-[22px]"
             >
               <div className="flex min-h-8 flex-wrap items-center gap-3.5">
                 <h3 id={`t-plan-${plan.codigo}`} className="text-2xl tracking-[-0.02em]">
@@ -458,6 +496,16 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
                 {plan.mesesObsequio > 0 ? (
                   <span className="inline-flex items-center rounded-full bg-senal/12 px-3 py-1.5 text-[13px] font-medium text-senal">
                     {plan.mesesObsequio === 1 ? '1 mes' : `${plan.mesesObsequio} meses`} de obsequio
+                  </span>
+                ) : null}
+                {plan === recomendado ? (
+                  <span className="inline-flex items-center rounded-full bg-llama px-3 py-1.5 text-[13px] font-semibold text-vacio">
+                    Recomendado
+                  </span>
+                ) : null}
+                {ahorro > 0 ? (
+                  <span className="inline-flex items-center rounded-full bg-llama/14 px-3 py-1.5 text-[13px] font-medium text-llama-viva">
+                    Ahorras USD {dolares(ahorro)}
                   </span>
                 ) : null}
               </div>
@@ -476,15 +524,9 @@ function Precios({ planes }: { planes: PlanPublico[] }) {
                   </li>
                 ))}
               </ul>
-              {plan === destacado ? (
-                <Pildora href={ruta} nativo>
-                  Comprar {plan.nombre.toLowerCase()}
-                </Pildora>
-              ) : (
-                <Enlace href={ruta} nativo>
-                  Comprar {plan.nombre.toLowerCase()}
-                </Enlace>
-              )}
+              <Pildora href={ruta} nativo className="mt-auto">
+                Comprar {plan.nombre.toLowerCase()}
+              </Pildora>
             </article>
           );
         })}
@@ -614,5 +656,47 @@ function Pie({ datos }: { datos: Landing }) {
         </p>
       </div>
     </footer>
+  );
+}
+
+/**
+ * Datos estructurados (schema.org) para los buscadores: quién es la marca, su logo, sus redes y el sitio. Google
+ * los usa para mostrar el logo y el nombre del sitio en los resultados.
+ */
+function DatosEstructurados({ datos }: { datos: Landing }) {
+  const sitio = process.env.SITIO_URL ?? 'https://www.doctraderpro.com';
+  const grafo = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${sitio}/#organizacion`,
+        name: 'DocTraderPRO',
+        url: sitio,
+        logo: `${sitio}/marca/logo-doctraderpro-512.png`,
+        email: datos.correoSoporte,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Barranquilla',
+          addressCountry: 'CO',
+        },
+        sameAs: [datos.enlaces.instagram],
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${sitio}/#sitio`,
+        name: 'DocTraderPRO',
+        url: sitio,
+        inLanguage: 'es',
+        publisher: { '@id': `${sitio}/#organizacion` },
+      },
+    ],
+  };
+  return (
+    <script
+      type="application/ld+json"
+      // JSON sin "<" para que ningún texto pueda cerrar la etiqueta.
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(grafo).replace(/</g, '\\u003c') }}
+    />
   );
 }

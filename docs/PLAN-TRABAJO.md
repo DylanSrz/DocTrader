@@ -8,7 +8,9 @@
 
 - **Repositorio:** monorepo pnpm con `apps/api` (NestJS: API y worker), `apps/web` (Next.js) y `packages/shared`
   (tipos, esquemas de validación y reglas de negocio puras, como el cálculo de fechas y precios).
-- **Ramas:** `main` protegida. Cada etapa se hace en ramas cortas que entran por pull request con las pruebas en verde.
+- **Ramas:** `main` es producción (Vercel y Railway despliegan desde ahí). Desde el 2026-10-22 se desarrolla sobre
+  **`dev`**: los cambios entran a `dev` por pull request con las pruebas en verde, se prueban en la vista previa de
+  Vercel de `dev` y, si todo está bien, se abre un pull request de `dev` a `main` para publicarlos.
 - **Hecho** significa: funciona en el entorno de pruebas, tiene sus pruebas automáticas, cumple el diseño de la
   propuesta 2 en celular y escritorio, y deja registro en la auditoría cuando corresponde.
 - Al cerrar cada etapa se le muestra a Argemiro en el entorno de pruebas.
