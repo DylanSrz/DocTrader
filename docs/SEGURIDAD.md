@@ -226,7 +226,9 @@ Es el punto más sensible: quien cambie una dirección se queda con los pagos.
 ## 11. Encabezados y configuración web
 
 - `Strict-Transport-Security` (HSTS) con un año de duración.
-- `Content-Security-Policy` estricta; el único script de terceros es Turnstile. El widget de Myfxbook es una imagen:
+- `Content-Security-Policy` estricta; el único script de terceros es Turnstile. Solo `/presentacion` permite además
+  el iframe del gráfico de TradingView (`frame-src` con `s.tradingview.com` y `www.tradingview-widget.com`, en un
+  iframe con `sandbox`). El widget de Myfxbook es una imagen:
   se permiten sus dominios de imágenes (`widgets.myfxbook.com` y `widget.mfbcdn.net`).
   - **Decisión (2026-10-14):** sin nonces por ahora. Con nonces todas las páginas pasan a ser dinámicas y se pierde
     el prerenderizado de la landing; React escapa todo lo que muestra y la web no inserta HTML de usuarios. Se

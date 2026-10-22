@@ -1,15 +1,23 @@
 import type { Metadata } from 'next';
-import {
-  aplicarPorcentaje,
-  formatearPorcentaje,
-  formatearUsd,
-  normalizarCodigo,
-} from '@doctrader/shared';
-import { type CSSProperties, type ReactNode, Suspense } from 'react';
+import { normalizarCodigo } from '@doctrader/shared';
+import { Suspense } from 'react';
 import Image from 'next/image';
 import { FranjaLogos } from '@/components/landing/franja-logos';
 import { Particulas } from '@/components/landing/particulas';
 import { CodigoQr } from '@/components/panel/codigo-qr';
+import { Calculadora } from '@/components/presentacion/calculadora';
+import {
+  AntesDeEmpezar,
+  ComoSeOpera,
+  GraficoDeTrading,
+  Objetivo,
+  OperarAMano,
+  PorQueAutomatico,
+  QueNecesitas,
+  TecnologiaGana,
+} from '@/components/presentacion/educacion';
+import { Entra, Marco, Puntos } from '@/components/presentacion/marco';
+import { Referidos } from '@/components/presentacion/referidos';
 import { type Diapositiva, Visor } from '@/components/presentacion/visor';
 import { planesEnVenta } from '@/lib/planes';
 import { obtenerLanding, type Landing } from '@/lib/publico';
@@ -18,8 +26,10 @@ import logo from '../../../public/marca/logo-icon.png';
 
 /*
   Presentación de ventas (`docs/PLAN-TRABAJO.md`, etapa 10): diapositivas a pantalla completa para las reuniones con
-  clientes, con los precios y las cifras de Myfxbook en vivo (las mismas de la landing). No se indexa ni está en el
-  sitemap: la abre quien tenga el enlace. Mismas reglas que la web: licencia de software, sin promesas de ganancia.
+  clientes, en el orden en que DocTrader Pro presenta (primero el trading y la tecnología, después el sistema), con
+  los precios, las cifras de Myfxbook y los porcentajes de referidos en vivo (los mismos de la landing). No se indexa
+  ni está en el sitemap: la abre quien tenga el enlace. Mismas reglas que la web: licencia de software, sin promesas
+  de ganancia; la calculadora solo usa la rentabilidad que escribe quien presenta.
 */
 
 export const metadata: Metadata = {
@@ -35,41 +45,6 @@ const fechaLarga = new Intl.DateTimeFormat('es-CO', {
   year: 'numeric',
   timeZone: 'UTC',
 });
-
-/** Un elemento que entra con la diapositiva; `orden` escalona la entrada. */
-function Entra({
-  orden = 0,
-  className,
-  children,
-}: {
-  orden?: number;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className={`entra ${className ?? ''}`} style={{ '--i': orden } as CSSProperties}>
-      {children}
-    </div>
-  );
-}
-
-/** Marco de cada diapositiva: la marca arriba, el tema de la diapositiva y el contenido. */
-function Marco({ tema, children }: { tema?: string; children: ReactNode }) {
-  return (
-    <div className="diapositiva-marco">
-      <div className="diapositiva-cabeza">
-        <span className="inline-flex items-center gap-[1.4cqmin]">
-          <Image src={logo} alt="" className="h-[4.2cqmin] w-auto" />
-          <span className="font-semibold tracking-[-0.02em]" translate="no">
-            DocTraderPRO
-          </span>
-        </span>
-        {tema ? <span className="text-ceniza">{tema}</span> : null}
-      </div>
-      <div className="diapositiva-cuerpo">{children}</div>
-    </div>
-  );
-}
 
 function Portada() {
   return (
@@ -102,40 +77,6 @@ function Portada() {
   );
 }
 
-function Problema() {
-  const puntos = [
-    [
-      'No puedes estar frente a la pantalla todo el día.',
-      'El mercado se mueve de domingo a viernes, a cualquier hora.',
-    ],
-    [
-      'Las emociones deciden por ti.',
-      'El miedo cierra antes de tiempo; un sistema sigue sus reglas siempre.',
-    ],
-    [
-      'Las señales no se pueden comprobar.',
-      'Una captura no muestra el historial completo. El de este sistema lo audita Myfxbook.',
-    ],
-  ];
-  return (
-    <Marco tema="El problema">
-      <Entra>
-        <h2 className="p-titulo">Operar a mano cuesta más que tiempo.</h2>
-      </Entra>
-      <ul className="p-columnas">
-        {puntos.map(([titulo, texto], i) => (
-          <li key={titulo}>
-            <Entra orden={i + 1} className="grid gap-[1.6cqmin]">
-              <h3 className="p-subtitulo">{titulo}</h3>
-              <p className="p-texto text-niebla">{texto}</p>
-            </Entra>
-          </li>
-        ))}
-      </ul>
-    </Marco>
-  );
-}
-
 function QueEs() {
   const puntos = [
     ['Tu dinero no sale de tu cuenta.', 'Sigue en tu broker, a tu nombre.'],
@@ -144,24 +85,15 @@ function QueEs() {
       'Cada operación se replica.',
       'Lo que abre y cierra el sistema se abre y se cierra en tu cuenta.',
     ],
-  ];
+  ] as const;
   return (
-    <Marco tema="Qué es">
+    <Marco tema="DocTrader Pro IA">
       <Entra>
         <h2 className="p-titulo max-w-[18em]">
           Una licencia de uso del software <span translate="no">Doc Trader Pro AI</span>.
         </h2>
       </Entra>
-      <ul className="p-columnas">
-        {puntos.map(([titulo, texto], i) => (
-          <li key={titulo}>
-            <Entra orden={i + 1} className="grid gap-[1.6cqmin]">
-              <h3 className="p-subtitulo">{titulo}</h3>
-              <p className="p-texto text-niebla">{texto}</p>
-            </Entra>
-          </li>
-        ))}
-      </ul>
+      <Puntos puntos={puntos} />
       <Entra orden={4}>
         <p className="p-pequeno text-ceniza">
           No es asesoría de inversión ni administramos dinero de terceros.
@@ -171,7 +103,7 @@ function QueEs() {
   );
 }
 
-function ComoFunciona() {
+function NuestroSistema() {
   const pasos = [
     ['Crea tu cuenta', 'Nombre, documento, correo y teléfono.'],
     ['Agrega tu cuenta de trading', 'Broker, servidor y contraseñas, guardadas cifradas.'],
@@ -179,7 +111,7 @@ function ComoFunciona() {
     ['Conectamos tu cuenta', 'Te avisamos por correo. Desde ahí, cada operación se replica.'],
   ];
   return (
-    <Marco tema="Cómo funciona">
+    <Marco tema="Nuestro sistema">
       <Entra>
         <h2 className="p-titulo">Cuatro pasos y tu cuenta queda conectada.</h2>
       </Entra>
@@ -196,6 +128,9 @@ function ComoFunciona() {
           </li>
         ))}
       </ol>
+      <Entra orden={5} className="min-w-0">
+        <FranjaLogos className="p-franja" />
+      </Entra>
     </Marco>
   );
 }
@@ -203,10 +138,10 @@ function ComoFunciona() {
 function Resultados({ myfxbook }: { myfxbook: Landing['myfxbook'] }) {
   const { gainPercent, asOf } = myfxbook.figures;
   return (
-    <Marco tema="Resultados">
+    <Marco tema="Nuestros rendimientos">
       <div className="grid h-full content-center gap-[3cqmin]">
         <Entra>
-          <h2 className="p-titulo">Resultados que puedes revisar tú mismo.</h2>
+          <h2 className="p-titulo">Nuestros rendimientos, auditados por un tercero.</h2>
         </Entra>
         {gainPercent ? (
           <Entra orden={1} className="grid gap-[1cqmin]">
@@ -239,37 +174,13 @@ function Seguridad() {
     ['Contraseñas cifradas', 'Las de tu cuenta de trading se guardan cifradas.'],
     ['Pagos comprobados', 'Cada pago se verifica en la blockchain antes de aprobarlo.'],
     ['Soporte cercano', 'Tickets en tu panel y grupo de Telegram.'],
-  ];
+  ] as const;
   return (
     <Marco tema="Seguridad">
       <Entra>
         <h2 className="p-titulo">Hecho para que confíes en cada paso.</h2>
       </Entra>
-      <ul className="p-rejilla">
-        {puntos.map(([titulo, texto], i) => (
-          <li key={titulo}>
-            <Entra orden={i + 1} className="grid gap-[1.2cqmin]">
-              <h3 className="p-subtitulo">{titulo}</h3>
-              <p className="p-texto text-niebla">{texto}</p>
-            </Entra>
-          </li>
-        ))}
-      </ul>
-    </Marco>
-  );
-}
-
-function ConQueFunciona() {
-  return (
-    <Marco tema="Con qué funciona">
-      <div className="grid h-full content-center gap-[6cqmin] [grid-template-columns:minmax(0,1fr)]">
-        <Entra>
-          <h2 className="p-titulo">Herramientas que el mundo del trading ya conoce.</h2>
-        </Entra>
-        <Entra orden={1} className="min-w-0">
-          <FranjaLogos className="p-franja" />
-        </Entra>
-      </div>
+      <Puntos forma="p-rejilla" puntos={puntos} />
     </Marco>
   );
 }
@@ -317,70 +228,6 @@ function Planes({ planes }: { planes: Landing['planes'] }) {
           devoluciones.
         </p>
       </Entra>
-    </Marco>
-  );
-}
-
-function Referidos({ datos }: { datos: Landing }) {
-  const { porcentajeBp, segundaLineaBp } = datos.referidos;
-  const pct = formatearPorcentaje(porcentajeBp);
-  const pct2 = segundaLineaBp > 0 ? formatearPorcentaje(segundaLineaBp) : null;
-  const { publicos } = planesEnVenta(datos.planes);
-  const puntos: [string, ReactNode][] = [
-    [
-      'Tu propio enlace',
-      'Con tu licencia activa, en tu panel tienes un enlace y un código QR para compartir.',
-    ],
-    [
-      `El ${pct} de cada licencia`,
-      <span key="ejemplos" className="grid gap-[0.6cqmin]">
-        {publicos.map((plan) => (
-          <span key={plan.codigo}>
-            {plan.nombre}: {formatearUsd(plan.precioUsdCentavos)} →{' '}
-            <span className="text-blanco">
-              {formatearUsd(aplicarPorcentaje(plan.precioUsdCentavos, porcentajeBp))}
-            </span>{' '}
-            para ti
-            {pct2 ? (
-              <>
-                {' '}
-                ·{' '}
-                <span className="text-blanco">
-                  {formatearUsd(aplicarPorcentaje(plan.precioUsdCentavos, segundaLineaBp))}
-                </span>{' '}
-                de segunda línea
-              </>
-            ) : null}
-          </span>
-        ))}
-      </span>,
-    ],
-    pct2
-      ? [
-          `Y el ${pct2} de su red`,
-          'Cuando compran las personas que invitaron tus referidos (tu segunda línea), también ganas. En cada compra y renovación, mientras sigan siendo clientes.',
-        ]
-      : ['Mientras sea cliente', 'Ganas en cada compra y cada renovación de quien invitaste.'],
-    ['Pago quincenal', 'Te enviamos lo ganado en USDT, a tu billetera en la red Tron.'],
-  ];
-  return (
-    <Marco tema="Referidos">
-      <Entra>
-        <h2 className="p-titulo">
-          Recomienda y gana el {pct}
-          {pct2 ? `, y el ${pct2} de tu segunda línea` : ''}.
-        </h2>
-      </Entra>
-      <ul className="p-rejilla">
-        {puntos.map(([titulo, texto], i) => (
-          <li key={titulo}>
-            <Entra orden={i + 1} className="grid gap-[1.2cqmin]">
-              <h3 className="p-subtitulo">{titulo}</h3>
-              <p className="p-texto text-niebla">{texto}</p>
-            </Entra>
-          </li>
-        ))}
-      </ul>
     </Marco>
   );
 }
@@ -459,29 +306,65 @@ async function Contenido({ parametros }: { parametros: Parametros }) {
     {
       titulo: 'Portada',
       notas:
-        'Preséntate y pregunta cómo opera hoy la persona: ¿a mano, con señales, o no opera? La idea en una frase: su cuenta, conectada a un sistema que opera por ella, en su propio broker.',
+        'Preséntate y pregunta cómo opera hoy la persona: ¿a mano, con señales, o no opera? Cuéntale que primero le vas a mostrar cómo funciona el trading y después el sistema.',
       contenido: <Portada />,
     },
     {
-      titulo: 'El problema',
+      titulo: 'Antes de empezar',
       notas:
-        'Conecta con su experiencia: falta de tiempo, decisiones por miedo o esperanza, señales que nadie puede verificar. Pregunta cuál de las tres le pasa más.',
-      contenido: <Problema />,
+        'Deja esto claro desde el inicio: vendemos una licencia de software, operar tiene riesgo y el pasado no garantiza el futuro. Genera confianza decirlo antes de mostrar cifras.',
+      contenido: <AntesDeEmpezar />,
     },
     {
-      titulo: 'Qué es',
+      titulo: 'Un gráfico de trading',
       notas:
-        'Deja claro que vende una licencia de software, no un servicio de inversión. El dinero se queda en su cuenta y en su broker. Nunca prometas ganancias.',
+        'El gráfico está en vivo: muévelo, acércalo y señala una vela. Explica que cada vela es un periodo, que el color dice si subió o bajó, y dónde están el precio y la hora.',
+      contenido: <GraficoDeTrading />,
+    },
+    {
+      titulo: 'Cómo se opera',
+      notas:
+        'Comprar si crees que sube, vender si crees que baja. Muestra en el dibujo la entrada, el take profit y el stop loss. Menciona que el apalancamiento multiplica también las pérdidas.',
+      contenido: <ComoSeOpera />,
+    },
+    {
+      titulo: 'Qué necesitas',
+      notas:
+        'Explica qué es un broker y por qué debe estar regulado: el dinero queda en una cuenta a su nombre. El mercado de divisas es el más grande del mundo; la cifra es del BIS.',
+      contenido: <QueNecesitas />,
+    },
+    {
+      titulo: 'Operar a mano',
+      notas:
+        'Ante quién opera una persona sola: bancos, fondos y algoritmos. Las emociones y el cansancio hacen el resto. La cifra es la advertencia que la ESMA exige a los brokers europeos.',
+      contenido: <OperarAMano />,
+    },
+    {
+      titulo: 'La tecnología gana',
+      notas:
+        'Pide un ejemplo de su vida: ¿usa mapa o GPS? Hoy casi todo lo que se repite con reglas lo hace mejor una máquina, y el trading no es la excepción.',
+      contenido: <TecnologiaGana />,
+    },
+    {
+      titulo: 'Qué es DocTrader Pro IA',
+      notas:
+        'Ahora sí, el sistema. Deja claro que vende una licencia de software, no un servicio de inversión. El dinero se queda en su cuenta y en su broker. Nunca prometas ganancias.',
       contenido: <QueEs />,
     },
     {
-      titulo: 'Cómo funciona',
+      titulo: 'Nuestro sistema',
       notas:
-        'Recorre los cuatro pasos. Resalta que el registro toma un minuto, que las contraseñas se guardan cifradas y que le avisamos por correo cuando su cuenta queda conectada.',
-      contenido: <ComoFunciona />,
+        'Recorre los cuatro pasos. Resalta que las contraseñas se guardan cifradas y que le avisamos por correo cuando su cuenta queda conectada. Funciona con herramientas que ya conoce.',
+      contenido: <NuestroSistema />,
     },
     {
-      titulo: 'Resultados',
+      titulo: 'Automático con IA',
+      notas:
+        'Conecta con la diapositiva de operar a mano: lo que hace perder a una persona (emociones, cansancio, falta de método) es justo lo que el sistema no tiene. Él sigue supervisando y retira cuando quiera.',
+      contenido: <PorQueAutomatico />,
+    },
+    {
+      titulo: 'Rendimientos',
       notas:
         'Muestra que el historial lo audita Myfxbook y que puede revisarlo por su cuenta (el enlace está en la diapositiva). Repite siempre que los resultados pasados no garantizan resultados futuros.',
       contenido: <Resultados myfxbook={datos.myfxbook} />,
@@ -493,16 +376,31 @@ async function Contenido({ parametros }: { parametros: Parametros }) {
       contenido: <Seguridad />,
     },
     {
-      titulo: 'Con qué funciona',
+      titulo: 'Nuestro objetivo',
       notas:
-        'Herramientas conocidas: MetaTrader 4, Myfxbook, JustMarkets, TradingView. Pagos en USDT por la red Tron o en Bitcoin.',
-      contenido: <ConQueFunciona />,
+        'El objetivo no es solo ganar este mes: es construir un retiro, una pensión, un patrimonio. Explica el interés compuesto con la curva: lo que ganas también gana, y el tiempo es lo que más pesa.',
+      contenido: <Objetivo />,
     },
     {
       titulo: 'Planes',
       notas:
         'Los precios salen del panel y siempre están al día. Recomienda el semestral por el ahorro; el mensual sirve para empezar. Es un pago por periodo, sin cobros automáticos, y no hay devoluciones.',
       contenido: <Planes planes={datos.planes} />,
+    },
+    {
+      titulo: 'Calculadora',
+      notas:
+        'Escribe con la persona su capital, su aporte y el plazo. La rentabilidad mensual la escribes tú: usa un valor prudente y repite que es un ejemplo, no una promesa. Prueba con y sin reinvertir para mostrar la diferencia.',
+      contenido: (
+        <Marco tema="Interés compuesto">
+          <Entra>
+            <h2 className="p-titulo">Calcula tu propio ejemplo.</h2>
+          </Entra>
+          <Entra orden={1} className="min-h-0">
+            <Calculadora />
+          </Entra>
+        </Marco>
+      ),
     },
     ...(datos.referidos.activo
       ? [

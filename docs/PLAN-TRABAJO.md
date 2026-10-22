@@ -309,6 +309,17 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 - No se indexa ni está en el sitemap. Mismas reglas que la web: licencia de software, sin promesas de ganancia.
 - La diapositiva 9, "Gana con referidos", llegó con la etapa 11; con `?ref=CODIGO`, el QR del cierre lleva a
   `/r/CODIGO`.
+- **Rehecha el 2026-10-22 con la secuencia de Argemiro (17 diapositivas):**
+  - **Primero el trading:** antes de empezar (aviso de riesgo), un gráfico de TradingView en vivo (XAU/USD), cómo se
+    opera, qué necesitas (broker regulado; mercado de divisas según el BIS), por qué operar a mano hace perder (cifra
+    de la ESMA) y por qué la tecnología gana.
+  - **Después el sistema:** qué es DocTrader Pro IA, nuestro sistema, por qué automático con IA, rendimientos
+    (Myfxbook), seguridad, el objetivo (retiro y patrimonio con interés compuesto), planes, la calculadora, referidos
+    (tabla por plan y línea con el esquema "TÚ") y cierre.
+  - **Calculadora de interés compuesto** (aprobada el 2026-10-22): la rentabilidad mensual la escribe quien presenta
+    (nunca hay una por defecto) y lleva el aviso de que es un ejemplo ilustrativo; no aparece en la landing. El
+    cálculo está en `packages/shared/src/interes.ts`, con pruebas.
+  - En el PDF, el gráfico en vivo se cambia por velas dibujadas y la calculadora indica que funciona en vivo.
 
 ### Etapa 11 — Programa de referidos ✅ (2026-10-22)
 - Argemiro aprobó las siete decisiones el 2026-10-22: 20 % de cada compra del referido mientras sea cliente, pago en
