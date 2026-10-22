@@ -18,6 +18,24 @@ export const metadata: Metadata = {
   },
   description:
     'Licencia de uso del software Doc Trader Pro AI: conecta tu cuenta de trading y el sistema replica cada operación en tu broker.',
+  applicationName: 'DocTraderPRO',
+  // Vista previa al compartir el enlace (WhatsApp, Telegram, Facebook, LinkedIn, X…). La imagen sale de
+  // `app/opengraph-image.png` y `app/twitter-image.png`; cada página puede cambiar el título y la descripción.
+  openGraph: {
+    type: 'website',
+    siteName: 'DocTraderPRO',
+    locale: 'es_CO',
+    url: '/',
+    title: 'DocTraderPRO · Licencia de software de copy trading',
+    description:
+      'Conecta tu cuenta de trading al sistema DocTrader Pro: cada operación se replica en tu broker. Tu dinero nunca sale de tu cuenta.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'DocTraderPRO · Licencia de software de copy trading',
+    description:
+      'Conecta tu cuenta de trading al sistema DocTrader Pro: cada operación se replica en tu broker. Tu dinero nunca sale de tu cuenta.',
+  },
 };
 
 export const viewport: Viewport = {

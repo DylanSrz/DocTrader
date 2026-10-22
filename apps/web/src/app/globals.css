@@ -393,3 +393,269 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/*
+  Landing: movimiento de las secciones. Lo que depende del scroll usa `animation-timeline: view()` (solo CSS, sin
+  JavaScript). Donde el navegador no lo admite, o con "reducir movimiento", todo se ve en su estado final.
+*/
+@layer components {
+  /* Cómo funciona: la cifra gris se llena con el degradado del logo de abajo hacia arriba, como las barras. */
+  .paso-cifra {
+    position: relative;
+    color: rgb(255 255 255 / 0.14);
+  }
+  .paso-cifra::after {
+    content: attr(data-cifra);
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      0deg,
+      var(--color-brasa) 0%,
+      var(--color-llama) 55%,
+      var(--color-senal) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .paso-linea {
+    display: block;
+    width: 56px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--color-brasa), var(--color-llama));
+    transform-origin: left;
+  }
+  /* Punto que late: "Cuenta conectada". */
+  .punto-vivo {
+    position: relative;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .punto-vivo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: currentColor;
+    animation: latido 2.2s var(--ease-salida) infinite;
+  }
+  @keyframes latido {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    70%,
+    100% {
+      transform: scale(3.2);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .paso-cifra::after {
+        animation: llenar linear both;
+        animation-timeline: view();
+        animation-range: entry 30% cover 50%;
+      }
+      .paso-linea {
+        animation: trazar linear both;
+        animation-timeline: view();
+        animation-range: entry 40% cover 45%;
+      }
+      .pregunta {
+        animation: aparecer linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 80%;
+      }
+    }
+  }
+  @keyframes llenar {
+    from {
+      clip-path: inset(100% 0 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes trazar {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .punto-vivo::after {
+      animation: none;
+    }
+  }
+
+  /* Preguntas frecuentes: línea fina entre preguntas que se pinta de naranja al abrir; la respuesta sube un poco. */
+  .pregunta {
+    position: relative;
+    background: linear-gradient(rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.1)) bottom / 100% 1px
+      no-repeat;
+  }
+  .pregunta::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-llama), var(--color-brasa) 60%, transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 520ms var(--ease-salida);
+  }
+  .pregunta[open]::after {
+    transform: scaleX(1);
+  }
+  .pregunta summary {
+    transition: color 200ms ease;
+  }
+  .pregunta[open] summary {
+    color: var(--color-blanco);
+  }
+  .pregunta .respuesta {
+    transform: translateY(-8px);
+    transition: transform 320ms var(--ease-salida);
+  }
+  .pregunta[open] .respuesta {
+    transform: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .pregunta:not([open]) summary:hover {
+      color: var(--color-llama-viva);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pregunta::after,
+    .pregunta .respuesta {
+      transition: none;
+    }
+    .pregunta .respuesta {
+      transform: none;
+    }
+  }
+
+  /* Franja de logos ("Con qué funciona"): ver components/landing/franja-logos.tsx. */
+  .franja-logos {
+    --alto-logo: 28px;
+    --separacion: 40px;
+    --duracion: 40s;
+    overflow: hidden;
+    padding-block: 14px;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  @media (min-width: 640px) {
+    .franja-logos {
+      --alto-logo: 34px;
+      --separacion: 56px;
+    }
+  }
+  @media (min-width: 961px) {
+    .franja-logos {
+      --alto-logo: 40px;
+      --separacion: 72px;
+      --duracion: 48s;
+    }
+  }
+  .franja-pista {
+    display: flex;
+    width: max-content;
+    animation: desplazar var(--duracion) linear infinite;
+  }
+  .franja-grupo {
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+  .franja-logo {
+    display: flex;
+    align-items: center;
+    flex: none;
+    height: calc(var(--alto-logo) + 12px);
+    /* Margen a ambos lados (no gap): así las dos mitades miden lo mismo y el empalme es exacto. */
+    padding-inline: calc(var(--separacion) / 2);
+  }
+  .franja-logo img,
+  .franja-logo span {
+    transition:
+      transform 260ms var(--ease-salida),
+      filter 260ms ease,
+      opacity 260ms ease,
+      color 260ms ease;
+  }
+  .franja-logo img {
+    display: block;
+    height: var(--alto-logo);
+    width: auto;
+    max-width: none;
+    object-fit: contain;
+    filter: grayscale(1) brightness(1.6);
+    opacity: 0.7;
+    user-select: none;
+  }
+  .franja-logo span {
+    color: var(--color-ceniza);
+    font-size: calc(var(--alto-logo) * 0.8);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .franja-logos:hover .franja-pista {
+      animation-play-state: paused;
+    }
+    .franja-logo:hover img {
+      filter: none;
+      opacity: 1;
+      transform: scale(1.06);
+    }
+    .franja-logo:hover span {
+      color: var(--color-blanco);
+      transform: scale(1.06);
+    }
+  }
+  @keyframes desplazar {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .franja-logos {
+      mask-image: none;
+    }
+    .franja-pista {
+      animation: none;
+      width: auto;
+      justify-content: center;
+    }
+    .franja-grupo {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 8px;
+      flex: 1;
+    }
+    .franja-grupo[aria-hidden] {
+      display: none;
+    }
+  }
+}
