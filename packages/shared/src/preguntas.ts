@@ -63,14 +63,15 @@ export const ENLACES_INICIALES = {
 /**
  * Cuenta de DocTrader Pro en Myfxbook y las cifras que muestran la landing y la presentación (ajuste `myfxbook`).
  * Desde el 2026-10-23 es la cuenta del otro broker (11792099), con el historial completo; la de JustMarkets
- * (12253459) quedó atrás por el historial archivado (ver docs/PENDIENTES.md). Cifras de la captura del 2026-10-23.
+ * (12253459) quedó atrás por el historial archivado (ver docs/PENDIENTES.md). Cifras de la captura del 2026-10-23; la caída máxima (30,31 %) no se muestra, por
+ * decisión de Argemiro.
  */
 export const MYFXBOOK_INICIAL = {
   url: 'https://www.myfxbook.com/members/Dr_arge/doctrader-pro-academy/11792099',
   accountId: '11792099',
   figures: {
     gainPercent: '79.98' as string | null,
-    maxDrawdownPercent: '30.31' as string | null,
+    maxDrawdownPercent: null as string | null,
     auditedSince: '2025-08-18' as string | null,
     asOf: '2026-10-23' as string | null,
   },
