@@ -154,15 +154,23 @@ build, búsqueda de secretos (gitleaks) y CodeQL en cada pull request. Dependabo
 
 ### Limpieza antes del lanzamiento
 
-Los clientes de hoy son de prueba. Antes de abrir, en el servicio de la API de Railway (pestaña de la consola o
-`railway ssh`):
+Los clientes de hoy son de prueba. Antes de abrir se corre `apps/api/dist/database/limpiar.js` dentro de Railway: la
+base de datos de producción no es alcanzable desde fuera de su red privada (salvo el proxy TCP). Sin `railway ssh`, se
+hace con el paso previo al despliegue de la API (Settings → Deploy → Pre-deploy Command):
 
-1. `node apps/api/dist/database/limpiar.js` muestra lo que se borraría, sin cambiar nada.
-2. `CONFIRMAR_LIMPIEZA=borrar-todos-los-clientes node apps/api/dist/database/limpiar.js` borra todos los clientes con
-   sus cuentas, licencias, órdenes, tickets, adjuntos y correos, y reinicia los números de orden (DTP-000001) y de
-   ticket (1000). Quedan los admins, el socio, los ajustes, los planes, las direcciones de depósito, los textos
-   legales, las preguntas y las respuestas guardadas. La auditoría no se toca (no admite borrados).
-3. Vaciar el depósito de adjuntos (`doctrader-adjuntos`) en Cloudflare R2: todos sus archivos eran de prueba.
+1. Sacar una copia: correr a mano el flujo "Copia de seguridad" en GitHub Actions y esperar que termine en verde.
+2. **Simulacro:** el paso previo pasa a `node apps/api/dist/database/preparar-despliegue.js && node
+   apps/api/dist/database/limpiar.js` y se redespliega la API. Los registros del despliegue muestran lo que se
+   borraría, sin cambiar nada.
+3. **Limpieza:** la variable `CONFIRMAR_LIMPIEZA=borrar-todos-los-clientes` en la API (redespliega sola). Borra todos
+   los clientes con sus cuentas, licencias, órdenes, tickets, adjuntos, correos y referidos (comisiones, pagos y
+   perfiles), y reinicia los números de orden (DTP-000001) y de ticket (1000). Quedan los admins, el socio con su
+   perfil de referidos, los ajustes, los planes, las direcciones de depósito, los textos legales, las preguntas y las
+   respuestas guardadas. La auditoría no se toca (no admite borrados). Los registros dicen cuántos admins quedan.
+4. **Dejarlo como estaba:** `CONFIRMAR_LIMPIEZA` vacía y el paso previo de nuevo en
+   `node apps/api/dist/database/preparar-despliegue.js`. Aunque la variable quedara puesta, no se vuelve a borrar: la
+   limpieza deja la marca `launch_cleanup_at` en `settings` y, con ella, se niega.
+5. Si se borraron adjuntos (`files`), vaciar el depósito `doctrader-adjuntos` en Cloudflare R2: eran de prueba.
 
 ### Dónde está corriendo (2026-10-14)
 
