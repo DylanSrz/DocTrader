@@ -305,7 +305,7 @@ describe('semilla', () => {
     expect(columnas).toHaveLength(0);
   });
 
-  it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 10 %', async () => {
+  it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 20 %', async () => {
     // Las de la semilla no tienen autor; las que agregan otras pruebas desde el panel, sí.
     const direcciones = await fuente
       .getRepository(DepositAddress)
@@ -326,7 +326,7 @@ describe('semilla', () => {
 
     const socio = await fuente.getRepository(PartnerProfile).find();
     expect(socio).toHaveLength(1);
-    expect(socio[0]!.commissionBp).toBe(1_000);
+    expect(socio[0]!.commissionBp).toBe(2_000);
   });
 
   it('se puede volver a correr sin crear nada nuevo', async () => {

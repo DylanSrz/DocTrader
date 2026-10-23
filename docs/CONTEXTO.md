@@ -87,7 +87,7 @@ deben reflejar esto (nunca prometer rentabilidad).
 - **Pasarela en pesos (COP): fuera del lanzamiento**, queda como funcionalidad futura.
 
 ### Comisión del socio desarrollador
-- **10 % del valor bruto de las ventas**, editable por el desarrollador **desde su perfil de socio**.
+- **20 % del valor bruto de las ventas** (desde el 2026-10-23; antes era 10 %), editable por el desarrollador **desde su perfil de socio**.
 - Se liquida **los días 15 y 30 de cada mes** (en febrero, el último día del mes).
 - Salvaguardas propuestas: cada cambio aplica solo a ventas posteriores, queda en el registro de
   auditoría y Argemiro recibe un aviso.
