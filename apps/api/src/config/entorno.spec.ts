@@ -42,4 +42,28 @@ describe('validarEntorno', () => {
       /DATABASE_URL/,
     );
   });
+
+  it('acepta una rotación de la llave de cifrado solo con la versión siguiente y una llave distinta', () => {
+    const anterior = Buffer.alloc(32, 9).toString('base64');
+    expect(() => validarEntorno({ ...valido, DATA_ENCRYPTION_KEY_ANTERIOR: anterior })).toThrow(
+      /DATA_ENCRYPTION_KEY_VERSION/,
+    );
+    expect(
+      validarEntorno({
+        ...valido,
+        DATA_ENCRYPTION_KEY_ANTERIOR: anterior,
+        DATA_ENCRYPTION_KEY_VERSION: '2',
+      }).DATA_ENCRYPTION_KEY_VERSION,
+    ).toBe(2);
+    expect(() =>
+      validarEntorno({
+        ...valido,
+        DATA_ENCRYPTION_KEY_ANTERIOR: valido.DATA_ENCRYPTION_KEY,
+        DATA_ENCRYPTION_KEY_VERSION: '2',
+      }),
+    ).toThrow(/DATA_ENCRYPTION_KEY_ANTERIOR/);
+    expect(() =>
+      validarEntorno({ ...valido, AUDIT_HMAC_KEY_ANTERIOR: valido.AUDIT_HMAC_KEY }),
+    ).toThrow(/AUDIT_HMAC_KEY_ANTERIOR/);
+  });
 });

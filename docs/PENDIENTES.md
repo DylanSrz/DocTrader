@@ -105,6 +105,14 @@
 - [x] **Renovar a un plan más corto** (etapa 3; decidido el 2026-10-23): se permite. Un cliente con semestral puede
       renovar con mensual: se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación.
 
+## 🔐 Incidente de seguridad de Railway (2026-10-21)
+
+- [ ] Railway informó una filtración el 21 de octubre y pidió a todos rotar las credenciales guardadas en sus
+      variables de entorno (https://blog.railway.com/p/preliminary-report-october-security-incident). Mientras tanto,
+      algunos despliegues fallaron hasta reconectar GitHub en Railway (2026-10-23).
+- [ ] Revisar si Railway envió un correo de "mayor riesgo" para el espacio de trabajo de Dylan.
+- [ ] Rotar todo según `docs/ROTACION-CREDENCIALES.md` (el código para rotar sin perder datos ya está listo).
+
 ## ⚖️ Legal
 
 - [x] **Titular:** DocTraderPRO, Barranquilla, Colombia.

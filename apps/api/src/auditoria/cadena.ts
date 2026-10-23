@@ -82,19 +82,28 @@ export async function registrarEnCadena(
   return manager.getRepository(AuditLog).save(fila);
 }
 
-/** Recorre toda la cadena y dice si alguna fila fue alterada. */
+/**
+ * Recorre toda la cadena y dice si alguna fila fue alterada. `llaves` va de la más vieja a la actual: después de una
+ * rotación (`docs/ROTACION-CREDENCIALES.md`), las filas viejas se revisan con la llave anterior y, desde la primera
+ * firmada con la nueva, solo vale la nueva (una fila no puede volver a una llave retirada).
+ */
 export async function verificarCadena(
   manager: EntityManager,
-  llave: Buffer,
+  llaves: Buffer | readonly Buffer[],
 ): Promise<{ valida: boolean; filaRota?: string }> {
+  const lista = Buffer.isBuffer(llaves) ? [llaves] : llaves;
   const filas = await manager.getRepository(AuditLog).find({ order: { id: 'ASC' } });
   let anterior: Buffer | null = null;
+  let desde = 0;
   for (const fila of filas) {
-    const esperado = calcularHash(llave, anterior, fila, fila.createdAt);
     const previo = fila.prevHash ?? null;
     const enlazada =
       previo === null ? anterior === null : anterior !== null && previo.equals(anterior);
-    if (!enlazada || !esperado.equals(fila.hash)) return { valida: false, filaRota: fila.id };
+    const llave = lista.findIndex(
+      (l, i) => i >= desde && calcularHash(l, anterior, fila, fila.createdAt).equals(fila.hash),
+    );
+    if (!enlazada || llave === -1) return { valida: false, filaRota: fila.id };
+    desde = llave;
     anterior = fila.hash;
   }
   return { valida: true };
