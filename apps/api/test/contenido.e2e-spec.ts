@@ -73,7 +73,7 @@ describe('página pública', () => {
       publico: true,
     });
     expect(preguntas).toHaveLength(8);
-    expect(myfxbook.figures.gainPercent).toBe('246.68');
+    expect(myfxbook.figures.gainPercent).toBe('79.98');
     expect(enlaces.broker.name).toBe('JustMarkets');
     expect(correoSoporte).toBe('support@doctraderpro.com');
     expect(referidos).toEqual({ activo: true, porcentajeBp: 1500, segundaLineaBp: 500 });

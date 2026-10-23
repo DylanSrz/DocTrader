@@ -531,16 +531,21 @@ describe('operación del admin', () => {
         accountId: '12253459',
         figures: { gainPercent: '250.10', asOf: '2026-10-15' },
       });
-      // Deja las cifras de la semilla para las demás pruebas.
+      // Deja la cuenta y las cifras de la semilla para las demás pruebas.
       await admin.web
         .put('/admin/ajustes/myfxbook', {
-          url: 'https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459',
-          ganancia: '246.68',
-          caidaMaxima: null,
-          auditadaDesde: null,
-          alDia: '2026-10-14',
+          url: 'https://www.myfxbook.com/members/Dr_arge/doctrader-pro-academy/11792099',
+          ganancia: '79.98',
+          caidaMaxima: '30.31',
+          auditadaDesde: '2025-08-18',
+          alDia: '2026-10-23',
         })
         .expect(200);
+      const devuelta = await admin.web.get('/publico/landing').expect(200);
+      expect(devuelta.body.myfxbook).toMatchObject({
+        accountId: '11792099',
+        figures: { gainPercent: '79.98', maxDrawdownPercent: '30.31', auditedSince: '2025-08-18' },
+      });
     });
   });
 
