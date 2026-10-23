@@ -1,7 +1,7 @@
 'use client';
 
 import { PAISES, tiposDocumento, validarDocumento } from '@doctrader/shared';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Campo } from './campo';
 import { Selector } from './selector';
 
@@ -12,9 +12,12 @@ import { Selector } from './selector';
 export function CampoDocumento({
   valores = {},
   errores = {},
+  ayuda,
 }: {
   valores?: { documentoPais?: string; documentoTipo?: string; documento?: string };
   errores?: { documentoPais?: string; documentoTipo?: string; documento?: string };
+  /** Debajo del país y el tipo: qué hacer si no aparecen. */
+  ayuda?: ReactNode;
 }) {
   const paisInicial = valores.documentoPais || 'CO';
   const [pais, setPais] = useState(paisInicial);
@@ -76,6 +79,7 @@ export function CampoDocumento({
           ))}
         </Selector>
       </div>
+      {ayuda ? <p className="-mt-2 text-sm text-ceniza">{ayuda}</p> : null}
       <Campo
         etiqueta="Número del documento"
         name="documento"

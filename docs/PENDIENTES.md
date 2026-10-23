@@ -45,8 +45,8 @@
         salen +304 % y 36 % de caída, que no son representativas;
       - sin la flotante (el Excel no la trae), la caída real con la equity fue mayor;
       - hubo movimientos de capital muy grandes (por ejemplo, +USD 9.100 en enero y −USD 19.630 en febrero de 2026).
-      Qué sigue (Argemiro): pedir al soporte de Myfxbook que fije la fecha de inicio en septiembre de 2025 o recalcule
-      la cuenta (borrador del mensaje entregado a Dylan el 2026-10-23).
+      Mensaje enviado al soporte de Myfxbook el 2026-10-23: que fije la fecha de inicio en septiembre de 2025 o
+      recalcule la cuenta. Falta su respuesta.
       Desde el 2026-10-23, la landing y la presentación muestran la cuenta del otro broker (ver arriba), con la
       ganancia y el tiempo auditado; esta queda como cuenta anterior.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
@@ -90,8 +90,9 @@
       por el mismo monto cuando llegó el pago, el pago no se aprueba solo: hay que pedirle al cliente la captura del
       envío y usar "Aprobar de todos modos". Con pocos clientes pasará poco; si molesta, se puede volver a los
       centavos de diferencia.
-- [ ] **Documentos de otros países** (2026-10-18): se admiten Colombia, Argentina, México, Estados Unidos, Reino Unido
-      y 22 países más con pasaporte o documento nacional. ¿Falta algún país o documento?
+- [x] **Documentos de otros países** (2026-10-18; decidido el 2026-10-23): se admiten Colombia, Argentina, México,
+      Estados Unidos, Reino Unido y 22 países más con pasaporte o documento nacional. Si a alguien le falta su país o su
+      documento, escribe a support@doctraderpro.com (el registro lo dice debajo del documento) y se agrega.
 
 - [x] **Aceptar de nuevo los textos legales** (2026-10-15): no hace falta. Los clientes de hoy son de prueba y, antes
       de salir a producción, se limpia la base de datos (todo menos los admins): todos los clientes se registran de
@@ -101,9 +102,8 @@
 - [x] **Cambiar el número de una cuenta con licencia vigente** (2026-10-15): se pide por ticket. Construido: el
       cliente ya no puede cambiar broker, servidor ni número con la licencia vigente (le sale el enlace al ticket) y
       el admin lo cambia en la ficha de Licencias → "Cambiar broker, servidor o número", con su código.
-- [ ] **Renovar a un plan más corto** (etapa 3): hoy un cliente con semestral puede renovar con mensual
-      (se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación). Si Argemiro
-      prefiere que solo se pueda renovar al mismo plan o a uno más largo, es un cambio pequeño.
+- [x] **Renovar a un plan más corto** (etapa 3; decidido el 2026-10-23): se permite. Un cliente con semestral puede
+      renovar con mensual: se cobra el plan elegido y los días se suman al vencimiento, igual que una renovación.
 
 ## ⚖️ Legal
 

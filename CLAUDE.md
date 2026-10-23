@@ -16,7 +16,8 @@ Reglas clave:
 - **Una licencia por cada cuenta de trading.** Pagos **manuales y no recurrentes** (periodos prepagados + recordatorios).
 - Precios en USD, editables desde el admin. Sin devoluciones.
   Mensual: 1 mes, USD 120. Semestral: **6 meses**, USD 499 (desde el 2026-10-15 no hay trimestral ni mes de obsequio).
-  Mensual → semestral antes de vencer (se paga el plan nuevo; los días se suman).
+  Mensual → semestral antes de vencer (se paga el plan nuevo; los días se suman). También se puede renovar a un plan
+  más corto (semestral → mensual; los días se suman igual).
   **No hay licencia de prueba** (se quitó el 2026-10-15): para conocer el software se empieza con el mensual.
   Tampoco se verifica el teléfono por SMS (no se usa Twilio).
   Si algún día se cobra en pesos: TRM oficial del día (Superintendencia Financiera) redondeada a 1.000 pesos.

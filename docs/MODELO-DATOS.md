@@ -439,7 +439,7 @@ stateDiagram-v2
 - **Huellas:** `account_key_hmac` y `account_number_hmac` usan `LOOKUP_HMAC_KEY` (la de buscar sin descifrar).
 - **Tipo de orden:** lo decide la API con el estado de la licencia (`tipoDeOrden` en `packages/shared`): sin pagar o
   vencida es NUEVA; activa o en gracia, a un plan de `rank` mayor es CAMBIO_DE_PLAN y al mismo o a uno menor,
-  RENOVACION (renovar a un plan más corto queda por confirmar con Argemiro, ver `PENDIENTES.md`).
+  RENOVACION (renovar a un plan más corto está permitido, decidido el 2026-10-23).
 - **Orden abierta:** crear otra orden para la misma licencia cancela la PENDIENTE (el cliente cambió de plan o de
   moneda); si hay una REPORTADA, no se puede crear otra hasta que se revise.
 - **Montos:** USDT = centavos × 10.000. BTC = centavos × 10⁸ ÷ precio en centavos, redondeado hacia arriba (el

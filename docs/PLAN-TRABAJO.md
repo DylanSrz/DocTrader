@@ -350,11 +350,11 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 
 **Dinero**
 - [x] Direcciones de USDT (Tron) y BTC comprobadas con un pago real pequeño a cada una, verificado por la plataforma (2026-10-22).
-- [ ] Cuenta de Binance con segundo factor fuerte, código antiphishing y lista blanca de retiros. **Quién:** Argemiro.
-- [ ] Precios, días de gracia y confirmaciones revisados en el panel. **Quién:** Argemiro y Dylan.
+- [x] Cuenta de Binance con segundo factor fuerte, código antiphishing y lista blanca de retiros (2026-10-23).
+- [x] Precios, días de gracia y confirmaciones revisados en el panel (2026-10-23).
 
 **Cuentas y seguridad**
-- [ ] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación. **Quién:** cada admin.
+- [x] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación (2026-10-23).
 - [x] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger (2026-10-16).
 - [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido. **Quién:** Dylan.
 - [x] Copia de seguridad restaurada con éxito al menos una vez (2026-10-16; el flujo diario la restaura y la revisa solo).
@@ -365,15 +365,16 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
       **Quién:** el desarrollo, con la confirmación de Dylan y una copia de seguridad antes; justo antes de anunciar.
 - [x] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo (2026-10-22).
 - [x] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook (2026-10-22).
-- [x] Monitor de disponibilidad y alertas activos (2026-10-16). Falta cambiar sus direcciones a
-      `https://api.doctraderpro.com/salud` y `https://www.doctraderpro.com` (**Quién:** Dylan).
-- [ ] Revisión en celular (iPhone y Android) y en escritorio. **Quién:** Argemiro y Dylan.
+- [x] Monitor de disponibilidad y alertas activos (2026-10-16), con las direcciones del dominio propio
+      (`https://api.doctraderpro.com/salud` y `https://www.doctraderpro.com`, 2026-10-23).
+- [x] Revisión en celular (iPhone y Android) y en escritorio (2026-10-23).
 
 **Recomendado antes de anunciar (no bloquea)**
-- [ ] Pruebas a mano: agregar y cancelar una dirección de depósito, un ticket de ida y vuelta y registrar a mano el
-      pago DTP-000001 (antes de limpiar la base).
-- [ ] Decisiones de Argemiro: ¿falta algún país o tipo de documento? ¿Se permite renovar a un plan más corto?
-- [ ] Mensaje a Myfxbook sobre el historial de la cuenta de JustMarkets (ya no bloquea: se muestra la otra cuenta).
+- [x] Pruebas a mano: agregar y cancelar una dirección de depósito, un ticket de ida y vuelta y registrar a mano el
+      pago DTP-000001 (2026-10-23).
+- [x] Decisiones de Argemiro (2026-10-23): si falta un país o un documento, se escribe a soporte; sí se puede renovar
+      a un plan más corto.
+- [x] Mensaje a Myfxbook sobre el historial de la cuenta de JustMarkets (2026-10-23).
 
 ## 6. Después del lanzamiento
 
