@@ -7,7 +7,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * autorizaciones apuntan al texto que cada persona aceptó.
  */
 export const DATOS_RESPONSABLE: Record<string, string> = {
-  '[NIT o cédula del titular]': 'NIT 901001001',
+  '[NIT o cédula del titular]': 'NIT 901001001-0',
   '[dirección física]': 'Calle 10 No 10 - 10, Barranquilla',
   '[teléfono de contacto]': '310 100 1000',
 };

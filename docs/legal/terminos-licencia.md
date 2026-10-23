@@ -10,7 +10,7 @@
 Estos términos regulan el uso de la plataforma **doctraderpro.com** y de las licencias del software
 **Doc Trader Pro AI** (en adelante, "el Software").
 
-- **Titular:** DocTraderPRO (NIT 901001001), con domicilio en Barranquilla, Colombia.
+- **Titular:** DocTraderPRO (NIT 901001001-0), con domicilio en Barranquilla, Colombia.
 - **Dirección:** Calle 10 No 10 - 10, Barranquilla.
 - **Correo oficial:** support@doctraderpro.com.
 

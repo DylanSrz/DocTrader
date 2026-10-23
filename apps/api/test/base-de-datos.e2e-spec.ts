@@ -337,7 +337,7 @@ describe('semilla', () => {
     const t = await ultimo('TERMS');
     expect(t.version).toBe(t0 + 2);
     expect(t.content_md).toBe(
-      '- **Titular:** DocTraderPRO (NIT 901001001).\n- **Dirección:** Calle 10 No 10 - 10, Barranquilla.',
+      '- **Titular:** DocTraderPRO (NIT 901001001-0).\n- **Dirección:** Calle 10 No 10 - 10, Barranquilla.',
     );
     const d = await ultimo('PRIVACY');
     expect(d.version).toBe(d0 + 2);

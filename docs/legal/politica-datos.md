@@ -11,7 +11,7 @@
 | Dato | Valor |
 |---|---|
 | Nombre | DocTraderPRO |
-| Identificación | NIT 901001001 |
+| Identificación | NIT 901001001-0 |
 | Domicilio | Barranquilla, Colombia |
 | Dirección | Calle 10 No 10 - 10, Barranquilla |
 | Correo | support@doctraderpro.com |
