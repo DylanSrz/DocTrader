@@ -35,7 +35,7 @@ import type { ValorJson } from './entidades/setting.entity.js';
  */
 
 const ADMINS = [
-  { fullName: 'Dylan', email: 'dylansrz96@gmail.com', socioConComisionBp: 1_000 },
+  { fullName: 'Dylan', email: 'dylansrz96@gmail.com', socioConComisionBp: 2_000 },
   // El dueño no quiere su nombre en la plataforma (2026-10-15): su cuenta se llama como la marca.
   { fullName: 'DocTrader Pro', email: 'doctraderproiasystem@gmail.com', socioConComisionBp: null },
 ] as const;

@@ -35,7 +35,7 @@ Reglas clave:
   licencias, datos de cuenta (contraseñas cifradas) y listas "por conectar" / "por desconectar".
 - **El nombre del dueño (Argemiro) no aparece en ninguna parte de la plataforma** (textos, correos, panel): se dice
   "DocTrader Pro" o se habla en plural ("conectamos tu cuenta"). Su usuario admin se llama "DocTrader Pro".
-- Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 10 % del bruto editable desde su perfil,
+- Dos administradores con todos los permisos: Argemiro y el desarrollador (socio, comisión 20 % del bruto —desde el 2026-10-23; antes 10 %— editable desde su perfil,
   liquidada los 15 y 30 de cada mes).
 - **Referidos** (etapa 11): quien refiere gana el **15 %** (editable) de cada compra de su referido directo (primera
   línea) y el **5 %** (editable) de las de los referidos de ellos (segunda línea; no hay más niveles), mientras sean

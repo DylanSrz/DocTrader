@@ -178,7 +178,7 @@
   no hacen falta Twilio ni `TRIAL_HMAC_KEY`. Si llegaron a ponerse en Railway, se pueden borrar `TRIAL_HMAC_KEY` y
   las `TWILIO_*`.
 
-Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 10 % del valor bruto, editable desde el perfil del
+Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 20 % del valor bruto (desde el 2026-10-23), editable desde el perfil del
 socio, liquidada los 15 y 30 de cada mes ·
 licencias mensual USD 120 y semestral USD 499 (6 meses; la trimestral y el mes de obsequio se quitaron el 2026-10-15) · mensual → semestral antes de vencer (se
 paga el plan nuevo; los días se suman) · sin licencia de prueba (se quitó el 2026-10-15) ·

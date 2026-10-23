@@ -360,9 +360,10 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 - [x] Copia de seguridad restaurada con éxito al menos una vez (2026-10-16; el flujo diario la restaura y la revisa solo).
 
 **Funcionamiento**
-- [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
-      correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
-      **Quién:** el desarrollo, con la confirmación de Dylan y una copia de seguridad antes; justo antes de anunciar.
+- [x] Base de datos limpia (2026-10-23, `limpiar.js` con copia de seguridad antes): se borraron 10 clientes de prueba
+      con 9 cuentas, 9 licencias, 20 órdenes, 7 tickets, 4 adjuntos y 100 correos; quedan 3 admins, los ajustes y los
+      textos legales. Falta vaciar el depósito de adjuntos en Cloudflare R2 (**Quién:** Dylan) y revisar quién es el
+      tercer admin.
 - [x] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo (2026-10-22).
 - [x] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook (2026-10-22).
 - [x] Monitor de disponibilidad y alertas activos (2026-10-16), con las direcciones del dominio propio
