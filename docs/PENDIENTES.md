@@ -17,7 +17,8 @@
 - [x] **Cuenta auditada del otro broker** (2026-10-23): https://www.myfxbook.com/members/Dr_arge/doctrader-pro-academy/11792099.
       Reemplaza a la de JustMarkets en la landing y en la presentación. Cifras de la captura del 2026-10-23: ganancia
       +79,98 % (absoluta +5,82 %), 4,17 % mensual, caída máxima 30,31 %, desde el 18 de agosto de 2025. En producción
-      se cargan desde el admin (Ajustes → Myfxbook); el valor inicial está en `MYFXBOOK_INICIAL` (shared).
+      se cargan desde el admin (Ajustes → Myfxbook); el valor inicial está en `MYFXBOOK_INICIAL` (shared). La caída
+      máxima **no se muestra** (decisión del 2026-10-23): la landing enseña la ganancia y el tiempo auditado.
       Al tomar la captura, la equity venía cayendo por operaciones abiertas en pérdida: revisar las cifras cada tanto.
 - [x] **Myfxbook de JustMarkets** (2026-10-14, ya no se muestra desde el 2026-10-23):
       https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459 (cuenta 12253459, real en centavos
@@ -47,7 +48,7 @@
       Qué sigue (Argemiro): pedir al soporte de Myfxbook que fije la fecha de inicio en septiembre de 2025 o recalcule
       la cuenta (borrador del mensaje entregado a Dylan el 2026-10-23).
       Desde el 2026-10-23, la landing y la presentación muestran la cuenta del otro broker (ver arriba), con la
-      ganancia, la caída máxima y el tiempo auditado; esta queda como cuenta anterior.
+      ganancia y el tiempo auditado; esta queda como cuenta anterior.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).

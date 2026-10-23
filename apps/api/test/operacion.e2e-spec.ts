@@ -536,7 +536,7 @@ describe('operación del admin', () => {
         .put('/admin/ajustes/myfxbook', {
           url: 'https://www.myfxbook.com/members/Dr_arge/doctrader-pro-academy/11792099',
           ganancia: '79.98',
-          caidaMaxima: '30.31',
+          caidaMaxima: null,
           auditadaDesde: '2025-08-18',
           alDia: '2026-10-23',
         })
@@ -544,7 +544,7 @@ describe('operación del admin', () => {
       const devuelta = await admin.web.get('/publico/landing').expect(200);
       expect(devuelta.body.myfxbook).toMatchObject({
         accountId: '11792099',
-        figures: { gainPercent: '79.98', maxDrawdownPercent: '30.31', auditedSince: '2025-08-18' },
+        figures: { gainPercent: '79.98', maxDrawdownPercent: null, auditedSince: '2025-08-18' },
       });
     });
   });
