@@ -108,9 +108,8 @@
 ## ⚖️ Legal
 
 - [x] **Titular:** DocTraderPRO, Barranquilla, Colombia.
-- [ ] **Datos que la ley pide del responsable** para la política de datos: NIT o cédula de quien responde por
-      DocTraderPRO, dirección física y teléfono (quedaron entre corchetes en los textos). Si DocTraderPRO no está
-      registrada como empresa, el responsable legal es la persona natural que la representa.
+- [x] **Datos que la ley pide del responsable** (2026-10-23): NIT 901001001-0, Calle 10 No 10 - 10 (Barranquilla) y
+      teléfono 310 100 1000. Publicados en la política de datos y en los términos con una migración.
 - [x] Borradores escritos (2026-10-14) en `docs/legal/`: términos de la licencia, política de datos y aviso de riesgo.
 - [x] Revisión de un abogado: Argemiro la hizo y está de acuerdo con los términos en su totalidad (2026-10-22).
 - [x] **Riesgo aceptado (2026-10-22):** los referidos de dos niveles (15 % + 5 %) pueden encuadrar en la Ley 1700 de
@@ -178,7 +177,7 @@
   no hacen falta Twilio ni `TRIAL_HMAC_KEY`. Si llegaron a ponerse en Railway, se pueden borrar `TRIAL_HMAC_KEY` y
   las `TWILIO_*`.
 
-Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 10 % del valor bruto, editable desde el perfil del
+Stack NestJS + Next.js + PostgreSQL/TypeORM · Docker solo en desarrollo · comisión 20 % del valor bruto (desde el 2026-10-23), editable desde el perfil del
 socio, liquidada los 15 y 30 de cada mes ·
 licencias mensual USD 120 y semestral USD 499 (6 meses; la trimestral y el mes de obsequio se quitaron el 2026-10-15) · mensual → semestral antes de vencer (se
 paga el plan nuevo; los días se suman) · sin licencia de prueba (se quitó el 2026-10-15) ·

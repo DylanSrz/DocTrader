@@ -1,8 +1,8 @@
 # Política de tratamiento de datos personales
 
 > Borrador del 2026-10-14, escrito según la Ley 1581 de 2012 y el Decreto 1377 de 2013 (compilado en el Decreto 1074
-> de 2015). Antes de publicarlo conviene que lo revise un abogado colombiano. Los campos entre corchetes se completan
-> con los datos del titular; la ley pide nombre, domicilio, dirección, correo y teléfono del responsable.
+> de 2015). Antes de publicarlo conviene que lo revise un abogado colombiano. Los datos del responsable se completaron
+> el 2026-10-23; la ley pide nombre, domicilio, dirección, correo y teléfono del responsable.
 
 **Versión 1.0 — vigente desde [fecha de publicación]**
 
@@ -11,11 +11,11 @@
 | Dato | Valor |
 |---|---|
 | Nombre | DocTraderPRO |
-| Identificación | [NIT o cédula del titular] |
+| Identificación | NIT 901001001-0 |
 | Domicilio | Barranquilla, Colombia |
-| Dirección | [dirección física] |
+| Dirección | Calle 10 No 10 - 10, Barranquilla |
 | Correo | support@doctraderpro.com |
-| Teléfono | [teléfono de contacto] |
+| Teléfono | 310 100 1000 |
 | Sitio web | doctraderpro.com |
 
 ## 2. Alcance

@@ -341,9 +341,8 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 ## 5. Lista para el día del lanzamiento
 
 **Legal y contenido**
-- [ ] Datos del responsable completos en la política de datos (NIT o cédula, dirección y teléfono). La política
-      publicada todavía los muestra entre corchetes (revisado el 2026-10-23). **Quién:** Argemiro los pasa; el
-      desarrollo publica la versión nueva con una migración.
+- [x] Datos del responsable completos en la política de datos y en los términos (NIT, dirección y teléfono): se
+      publican con la migración `1793500000000-datos-responsable` (2026-10-23).
 - [x] Términos, política y aviso de riesgo publicados y revisados por el abogado (2026-10-22).
 - [x] Cifras de Myfxbook al día (2026-10-23): cuenta 11792099 del otro broker, con ganancia y tiempo auditado; sin
       caída máxima, por decisión.
@@ -360,9 +359,10 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 - [x] Copia de seguridad restaurada con éxito al menos una vez (2026-10-16; el flujo diario la restaura y la revisa solo).
 
 **Funcionamiento**
-- [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
-      correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
-      **Quién:** el desarrollo, con la confirmación de Dylan y una copia de seguridad antes; justo antes de anunciar.
+- [x] Base de datos limpia (2026-10-23, `limpiar.js` con copia de seguridad antes): se borraron 10 clientes de prueba
+      con 9 cuentas, 9 licencias, 20 órdenes, 7 tickets, 4 adjuntos y 100 correos; quedan 3 admins, los ajustes y los
+      textos legales. Falta vaciar el depósito de adjuntos en Cloudflare R2 (**Quién:** Dylan) y revisar quién es el
+      tercer admin.
 - [x] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo (2026-10-22).
 - [x] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook (2026-10-22).
 - [x] Monitor de disponibilidad y alertas activos (2026-10-16), con las direcciones del dominio propio

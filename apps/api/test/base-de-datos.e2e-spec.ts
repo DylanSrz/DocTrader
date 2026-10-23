@@ -6,6 +6,7 @@ import { quitarPruebaDeTextosLegales } from '../src/database/migraciones/1792800
 import { PlanesYMarca1792400000000 } from '../src/database/migraciones/1792400000000-planes-y-marca.js';
 import { ReferidosDosNiveles1793400000000 } from '../src/database/migraciones/1793400000000-referidos-dos-niveles.js';
 import { TerminosReferidos1793300000000 } from '../src/database/migraciones/1793300000000-terminos-referidos.js';
+import { DatosResponsable1793500000000 } from '../src/database/migraciones/1793500000000-datos-responsable.js';
 import { aplicarSemilla } from '../src/database/semilla-datos.js';
 import { registrarEnCadena, verificarCadena } from '../src/auditoria/cadena.js';
 
@@ -305,7 +306,46 @@ describe('semilla', () => {
     expect(columnas).toHaveLength(0);
   });
 
-  it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 10 %', async () => {
+  it('publica los datos del responsable en los términos y la política, una sola vez', async () => {
+    const ultimo = async (tipo: string) =>
+      (
+        (await fuente.query(
+          `SELECT version, content_md FROM legal_documents WHERE type = $1 ORDER BY version DESC LIMIT 1`,
+          [tipo],
+        )) as { version: number; content_md: string }[]
+      )[0]!;
+    const [t0, d0] = [(await ultimo('TERMS')).version, (await ultimo('PRIVACY')).version];
+    await fuente.query(
+      `INSERT INTO legal_documents (type, version, content_md) VALUES ('TERMS', $1, $2), ('PRIVACY', $3, $4)`,
+      [
+        t0 + 1,
+        '- **Titular:** DocTraderPRO ([NIT o cédula del titular]).\n- **Dirección:** [dirección física].',
+        d0 + 1,
+        '| Identificación | [NIT o cédula del titular] |\n| Dirección | [dirección física] |\n| Teléfono | [teléfono de contacto] |',
+      ],
+    );
+
+    for (let i = 0; i < 2; i++) {
+      const corredor = fuente.createQueryRunner();
+      try {
+        await new DatosResponsable1793500000000().up(corredor);
+      } finally {
+        await corredor.release();
+      }
+    }
+
+    const t = await ultimo('TERMS');
+    expect(t.version).toBe(t0 + 2);
+    expect(t.content_md).toBe(
+      '- **Titular:** DocTraderPRO (NIT 901001001-0).\n- **Dirección:** Calle 10 No 10 - 10, Barranquilla.',
+    );
+    const d = await ultimo('PRIVACY');
+    expect(d.version).toBe(d0 + 2);
+    expect(d.content_md).not.toMatch(/\[[^\]]+\]/);
+    expect(d.content_md).toContain('| Teléfono | 310 100 1000 |');
+  });
+
+  it('carga las dos direcciones de Binance activas y los dos admins, con Dylan como socio al 20 %', async () => {
     // Las de la semilla no tienen autor; las que agregan otras pruebas desde el panel, sí.
     const direcciones = await fuente
       .getRepository(DepositAddress)
@@ -326,7 +366,7 @@ describe('semilla', () => {
 
     const socio = await fuente.getRepository(PartnerProfile).find();
     expect(socio).toHaveLength(1);
-    expect(socio[0]!.commissionBp).toBe(1_000);
+    expect(socio[0]!.commissionBp).toBe(2_000);
   });
 
   it('se puede volver a correr sin crear nada nuevo', async () => {

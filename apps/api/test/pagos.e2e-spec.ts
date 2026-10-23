@@ -145,8 +145,8 @@ describe('verificación y aprobación de pagos', () => {
     expect(orden).toMatchObject({
       status: 'APROBADA',
       approval_mode: 'MANUAL',
-      commission_bp: 1_000,
-      commission_usd_cents: 1_200,
+      commission_bp: 2_000,
+      commission_usd_cents: 2_400,
       decided_by: admin.usuario.id,
     });
     const correo = await fuente
