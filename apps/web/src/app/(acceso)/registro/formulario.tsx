@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useActionState } from 'react';
+import { CorreoSoporte } from '@/components/correo-soporte';
 import { Turnstile } from '@/components/turnstile';
 import {
   Aviso,
@@ -61,7 +62,16 @@ export function FormularioRegistro() {
         React reinicia el formulario después de cada envío: con la `key` estos campos (que llevan su estado) se vuelven
         a armar con lo que devolvió el servidor, y la lista de tipos nunca queda de otro país.
       */}
-      <CampoDocumento key={`documento-${estado.envio ?? 0}`} valores={v} errores={e} />
+      <CampoDocumento
+        key={`documento-${estado.envio ?? 0}`}
+        valores={v}
+        errores={e}
+        ayuda={
+          <>
+            ¿No encuentras tu país o tu documento? Escríbenos a <CorreoSoporte /> y lo revisamos.
+          </>
+        }
+      />
       <Campo
         etiqueta="Correo"
         name="correo"
