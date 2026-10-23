@@ -341,30 +341,46 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 ## 5. Lista para el día del lanzamiento
 
 **Legal y contenido**
-- [ ] Datos del responsable completos en la política de datos (NIT o cédula, dirección y teléfono).
-- [ ] Términos, política y aviso de riesgo publicados (idealmente revisados por un abogado).
-- [ ] Cifras de Myfxbook al día; caída máxima y tiempo auditado solo si el historial ya está completo.
+- [ ] Datos del responsable completos en la política de datos (NIT o cédula, dirección y teléfono). La política
+      publicada todavía los muestra entre corchetes (revisado el 2026-10-23). **Quién:** Argemiro los pasa; el
+      desarrollo publica la versión nueva con una migración.
+- [x] Términos, política y aviso de riesgo publicados y revisados por el abogado (2026-10-22).
+- [x] Cifras de Myfxbook al día (2026-10-23): cuenta 11792099 del otro broker, con ganancia y tiempo auditado; sin
+      caída máxima, por decisión.
 
 **Dinero**
 - [x] Direcciones de USDT (Tron) y BTC comprobadas con un pago real pequeño a cada una, verificado por la plataforma (2026-10-22).
-- [ ] Cuenta de Binance con segundo factor fuerte, código antiphishing y lista blanca de retiros.
-- [ ] Precios, días de gracia y confirmaciones revisados en el panel.
+- [ ] Cuenta de Binance con segundo factor fuerte, código antiphishing y lista blanca de retiros. **Quién:** Argemiro.
+- [ ] Precios, días de gracia y confirmaciones revisados en el panel. **Quién:** Argemiro y Dylan.
 
 **Cuentas y seguridad**
-- [ ] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación.
+- [ ] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación. **Quién:** cada admin.
 - [x] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger (2026-10-16).
-- [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido.
+- [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido. **Quién:** Dylan.
 - [x] Copia de seguridad restaurada con éxito al menos una vez (2026-10-16; el flujo diario la restaura y la revisa solo).
 
 **Funcionamiento**
 - [ ] Base de datos limpia: se borran todos los clientes de prueba con sus cuentas, licencias, órdenes, tickets y
       correos; quedan solo los dos admins, los ajustes y los textos legales vigentes (script `limpiar.js`, ver README).
+      **Quién:** el desarrollo, con la confirmación de Dylan y una copia de seguridad antes; justo antes de anunciar.
 - [x] Recorrido completo con una cuenta real: registro → compra → pago → aprobación → conexión → correo (2026-10-22).
 - [x] Correos llegando a la bandeja de entrada (no a spam) en Gmail y Outlook (2026-10-22).
-- [x] Monitor de disponibilidad y alertas activos (2026-10-16; falta cambiar sus direcciones al dominio propio).
-- [ ] Revisión en celular (iPhone y Android) y en escritorio.
+- [x] Monitor de disponibilidad y alertas activos (2026-10-16). Falta cambiar sus direcciones a
+      `https://api.doctraderpro.com/salud` y `https://www.doctraderpro.com` (**Quién:** Dylan).
+- [ ] Revisión en celular (iPhone y Android) y en escritorio. **Quién:** Argemiro y Dylan.
+
+**Recomendado antes de anunciar (no bloquea)**
+- [ ] Pruebas a mano: agregar y cancelar una dirección de depósito, un ticket de ida y vuelta y registrar a mano el
+      pago DTP-000001 (antes de limpiar la base).
+- [ ] Decisiones de Argemiro: ¿falta algún país o tipo de documento? ¿Se permite renovar a un plan más corto?
+- [ ] Mensaje a Myfxbook sobre el historial de la cuenta de JustMarkets (ya no bloquea: se muestra la otra cuenta).
 
 ## 6. Después del lanzamiento
 
 - Binance Pay Merchant cuando Binance lo apruebe.
-- Fase 2 (`CONTEXTO.md` §7): pagos en pesos, referidos, cupones, avisos por Telegram o WhatsApp y versión en inglés.
+- DMARC a `quarantine` después de dos semanas de correos sin problemas.
+- Base de datos con un usuario de permisos separados para la aplicación.
+- Llave de CoinGecko para la cotización de BTC (opcional).
+- Fotos y videos para la landing.
+- Fase 2 (`CONTEXTO.md` §7): pagos en pesos, cupones, avisos por Telegram o WhatsApp y versión en inglés (los
+  referidos ya se hicieron en la etapa 11).
