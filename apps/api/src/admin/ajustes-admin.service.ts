@@ -196,8 +196,10 @@ export class AjustesAdminService {
       const [fila] = (await m.query(`SELECT value FROM settings WHERE key = 'myfxbook'`)) as {
         value: Record<string, unknown>;
       }[];
-      // Se conserva lo que el panel no edita (el número de cuenta, por ejemplo).
-      const valor = { ...fila?.value, ...cifras };
+      // Se conserva lo que el panel no edita; el número de cuenta sale del enlace (el último número), así no queda
+      // el de una cuenta anterior al cambiar el enlace.
+      const accountId = /\/(\d+)\/?$/.exec(cifras.url)?.[1];
+      const valor = { ...fila?.value, ...cifras, ...(accountId ? { accountId } : {}) };
       await this.guardarAjuste(m, 'myfxbook', valor, quien);
       await this.registrar(m, quien, 'ajustes.myfxbook', 'settings', { despues: cifras });
     });

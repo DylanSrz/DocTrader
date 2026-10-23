@@ -14,12 +14,14 @@
 - [x] **Página de referencia:** https://denmu.com/
 - [x] **Elección de propuesta de diseño:** Argemiro eligió la propuesta 2 (2026-10-12).
 - [x] **Correo oficial:** support@doctraderpro.com (2026-10-13).
-- [ ] **Cuenta auditada del otro broker** (2026-10-22): Argemiro quiere mostrarla en "Nuestros rendimientos" de la
-      presentación. Falta el enlace de Myfxbook; cuando llegue, se cambia en el admin (Ajustes → Myfxbook) o, si debe
-      salir solo en la presentación, se agrega un ajuste aparte.
-- [x] **Myfxbook de Argemiro** (2026-10-14): https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459
-      (cuenta 12253459, JustMarkets, real en centavos USC, MT4). Pública, con historial público y transacciones abiertas,
-      órdenes y SL/TP privados. Ya está en la landing.
+- [x] **Cuenta auditada del otro broker** (2026-10-23): https://www.myfxbook.com/members/Dr_arge/doctrader-pro-academy/11792099.
+      Reemplaza a la de JustMarkets en la landing y en la presentación. Cifras de la captura del 2026-10-23: ganancia
+      +79,98 % (absoluta +5,82 %), 4,17 % mensual, caída máxima 30,31 %, desde el 18 de agosto de 2025. En producción
+      se cargan desde el admin (Ajustes → Myfxbook); el valor inicial está en `MYFXBOOK_INICIAL` (shared).
+      Al tomar la captura, la equity venía cayendo por operaciones abiertas en pérdida: revisar las cifras cada tanto.
+- [x] **Myfxbook de JustMarkets** (2026-10-14, ya no se muestra desde el 2026-10-23):
+      https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459 (cuenta 12253459, real en centavos
+      USC, MT4). Pública, con historial público y transacciones abiertas, órdenes y SL/TP privados.
 - [ ] **Historial archivado en Myfxbook** (2026-10-14). La cuenta (login MT4 **450197102**) empezó el **1 de septiembre
       de 2025** (corregido el 2026-10-23 con el historial de JustMarkets; antes se creía febrero de 2025), pero JustMarkets archivó
       el historial viejo ("PnL.Arch") para ahorrar espacio. Por eso Myfxbook muestra:
@@ -43,9 +45,9 @@
       - sin la flotante (el Excel no la trae), la caída real con la equity fue mayor;
       - hubo movimientos de capital muy grandes (por ejemplo, +USD 9.100 en enero y −USD 19.630 en febrero de 2026).
       Qué sigue (Argemiro): pedir al soporte de Myfxbook que fije la fecha de inicio en septiembre de 2025 o recalcule
-      la cuenta, o mostrar la cuenta del otro broker en los rendimientos (ver arriba).
-      Mientras tanto, la landing y la presentación solo muestran la ganancia de Myfxbook: la caída máxima se quitó
-      (2026-10-14) y el tiempo auditado y el widget de la gráfica esperan a que el historial esté completo.
+      la cuenta (borrador del mensaje entregado a Dylan el 2026-10-23).
+      Desde el 2026-10-23, la landing y la presentación muestran la cuenta del otro broker (ver arriba), con la
+      ganancia, la caída máxima y el tiempo auditado; esta queda como cuenta anterior.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
