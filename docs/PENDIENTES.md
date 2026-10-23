@@ -20,7 +20,8 @@
 - [x] **Myfxbook de Argemiro** (2026-10-14): https://www.myfxbook.com/members/Dr_arge/doctrader-pro-ia-system/12253459
       (cuenta 12253459, JustMarkets, real en centavos USC, MT4). Pública, con historial público y transacciones abiertas,
       órdenes y SL/TP privados. Ya está en la landing.
-- [ ] **Historial archivado en Myfxbook** (2026-10-14). La cuenta empezó en **febrero de 2025**, pero JustMarkets archivó
+- [ ] **Historial archivado en Myfxbook** (2026-10-14). La cuenta (login MT4 **450197102**) empezó el **1 de septiembre
+      de 2025** (corregido el 2026-10-23 con el historial de JustMarkets; antes se creía febrero de 2025), pero JustMarkets archivó
       el historial viejo ("PnL.Arch") para ahorrar espacio. Por eso Myfxbook muestra:
       - un depósito con fecha 01/02/2000, que hace que la gráfica arranque en el año 2000 y que los promedios salgan
         diminutos (0,38 % mensual, 0,01 % diario);
@@ -29,10 +30,22 @@
       Consecuencias: el tiempo auditado no se puede publicar y la **caída máxima (11,59 %) probablemente se queda corta**,
       porque los resúmenes esconden las caídas dentro de cada periodo. La ganancia (+246,68 %) también sale de esos
       resúmenes.
-      Qué hacer (Argemiro): pedir a JustMarkets el estado de cuenta completo desde febrero de 2025 y si pueden
-      restaurar el historial; preguntar al soporte de Myfxbook si pueden recalcular la cuenta o fijar su fecha de inicio.
-      Mientras tanto, la landing solo muestra la ganancia: la caída máxima se quitó (2026-10-14) y el tiempo auditado y
-      el widget de la gráfica esperan a que el historial esté completo.
+      **Respuesta de JustMarkets (2026-10-23):** mandaron el historial completo en Excel (desde la creación de la
+      cuenta hasta el 21 de octubre de 2026: 15.593 operaciones con sus precios reales, 15 depósitos y 8 retiros). No
+      dicen nada de restaurarlo en el servidor, así que Myfxbook seguirá igual: lee el historial del broker, no el
+      Excel.
+      **Cálculo propio con ese Excel** (solo operaciones cerradas; **no es auditado y no se publica**):
+      - desde octubre de 2025 (13 meses): +65,7 % compuesto (unos 3,96 % al mes), todos los meses positivos (el
+        peor, mayo de 2026, +0,94 %) y caída máxima del balance cerrado de 10,7 % (enero de 2026);
+      - 70,4 % de operaciones ganadoras, todas en pares de divisas mayores;
+      - septiembre de 2025 distorsiona las cifras (depósitos y retiros grandes con un balance de USD 61): contándolo
+        salen +304 % y 36 % de caída, que no son representativas;
+      - sin la flotante (el Excel no la trae), la caída real con la equity fue mayor;
+      - hubo movimientos de capital muy grandes (por ejemplo, +USD 9.100 en enero y −USD 19.630 en febrero de 2026).
+      Qué sigue (Argemiro): pedir al soporte de Myfxbook que fije la fecha de inicio en septiembre de 2025 o recalcule
+      la cuenta, o mostrar la cuenta del otro broker en los rendimientos (ver arriba).
+      Mientras tanto, la landing y la presentación solo muestran la ganancia de Myfxbook: la caída máxima se quitó
+      (2026-10-14) y el tiempo auditado y el widget de la gráfica esperan a que el historial esté completo.
 - [ ] Fotos y videos (¿video explicativo para el inicio?).
 - [x] **Dominio:** doctraderpro.com, comprado en Hostinger, donde se maneja el DNS (2026-10-13).
 - [x] **Buzón del dominio:** support@doctraderpro.com, que es también el correo oficial (2026-10-13).
