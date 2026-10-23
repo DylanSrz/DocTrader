@@ -1,28 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Entorno } from '../config/entorno.js';
-import { cifrar, descifrar, huella } from './cifrado.js';
+import { cifrar, descifrar, huella, llavesDeCifrado } from './cifrado.js';
 
 /**
- * Versión de la llave actual. Para rotarla: se agrega la llave nueva como versión 2, se cifra todo lo nuevo con
- * ella, se vuelven a cifrar los datos viejos con un trabajo del worker y solo entonces se retira la versión 1.
+ * Cifrado por campo con la llave actual. Para rotarla (`docs/ROTACION-CREDENCIALES.md`): la llave nueva entra con la
+ * versión siguiente y la vieja como `DATA_ENCRYPTION_KEY_ANTERIOR`; lo nuevo se cifra con la nueva, lo viejo se sigue
+ * leyendo y el paso previo al despliegue lo vuelve a cifrar. Después se quita la anterior.
  */
-const VERSION_ACTUAL = 1;
-
 @Injectable()
 export class CifradoService {
+  private readonly version: number;
   private readonly llaves: Map<number, Buffer>;
   private readonly llaveBusqueda: Buffer;
 
   constructor(config: ConfigService<Entorno, true>) {
-    this.llaves = new Map([
-      [VERSION_ACTUAL, Buffer.from(config.get('DATA_ENCRYPTION_KEY', { infer: true }), 'base64')],
-    ]);
+    ({ version: this.version, llaves: this.llaves } = llavesDeCifrado({
+      DATA_ENCRYPTION_KEY: config.get('DATA_ENCRYPTION_KEY', { infer: true }),
+      DATA_ENCRYPTION_KEY_VERSION: config.get('DATA_ENCRYPTION_KEY_VERSION', { infer: true }),
+      DATA_ENCRYPTION_KEY_ANTERIOR: config.get('DATA_ENCRYPTION_KEY_ANTERIOR', { infer: true }),
+    }));
     this.llaveBusqueda = Buffer.from(config.get('LOOKUP_HMAC_KEY', { infer: true }), 'base64');
   }
 
   cifrar(texto: string, contexto: string): Buffer {
-    return cifrar(this.llaves.get(VERSION_ACTUAL)!, VERSION_ACTUAL, texto, contexto);
+    return cifrar(this.llaves.get(this.version)!, this.version, texto, contexto);
   }
 
   descifrar(dato: Buffer, contexto: string): string {

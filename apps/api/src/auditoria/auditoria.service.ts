@@ -10,12 +10,16 @@ import { type EntradaAuditoria, registrarEnCadena, verificarCadena } from './cad
 @Injectable()
 export class AuditoriaService {
   private readonly llave: Buffer;
+  /** Para revisar la cadena: la llave anterior (si hubo una rotación) y la actual. */
+  private readonly llavesRevision: Buffer[];
 
   constructor(
     @InjectDataSource() private readonly fuente: DataSource,
     config: ConfigService<Entorno, true>,
   ) {
     this.llave = Buffer.from(config.get('AUDIT_HMAC_KEY', { infer: true }), 'base64');
+    const anterior = config.get('AUDIT_HMAC_KEY_ANTERIOR', { infer: true });
+    this.llavesRevision = anterior ? [Buffer.from(anterior, 'base64'), this.llave] : [this.llave];
   }
 
   /**
@@ -28,6 +32,6 @@ export class AuditoriaService {
   }
 
   verificar(): Promise<{ valida: boolean; filaRota?: string }> {
-    return verificarCadena(this.fuente.manager, this.llave);
+    return verificarCadena(this.fuente.manager, this.llavesRevision);
   }
 }

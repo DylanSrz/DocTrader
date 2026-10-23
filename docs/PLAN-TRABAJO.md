@@ -355,7 +355,11 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 **Cuentas y seguridad**
 - [x] Los dos admins entran con segundo factor y guardaron sus códigos de recuperación (2026-10-23).
 - [x] Segundo factor en Vercel, Railway, Resend, Cloudflare, Sentry, GitHub y Hostinger (2026-10-16).
-- [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido. **Quién:** Dylan.
+- [ ] **Rotar todas las credenciales** por el incidente de seguridad de Railway del 2026-10-21, antes de anunciar
+      (`docs/ROTACION-CREDENCIALES.md`): servicios externos, Postgres, Redis y las llaves de la aplicación.
+      **Quién:** Dylan en los paneles; el desarrollo despliega y comprueba.
+- [ ] Llaves de cifrado de producción guardadas en el gestor de contraseñas compartido (las nuevas, después de rotar).
+      **Quién:** Dylan.
 - [x] Copia de seguridad restaurada con éxito al menos una vez (2026-10-16; el flujo diario la restaura y la revisa solo).
 
 **Funcionamiento**

@@ -106,6 +106,7 @@ No hay Docker en producción. Las cuentas de Vercel y Railway están a nombre de
    | `AUDIT_HMAC_KEY` | Una llave nueva: `openssl rand -base64 32`. Guárdala en el gestor de contraseñas: si se pierde, la auditoría vieja ya no se puede verificar |
    | `DATA_ENCRYPTION_KEY` | Otra llave nueva (`openssl rand -base64 32`). Cifra cédulas y segundos factores: **si se pierde, esos datos no se recuperan** |
    | `LOOKUP_HMAC_KEY` | Otra llave nueva (`openssl rand -base64 32`). Para buscar cédulas repetidas sin descifrarlas |
+   | `DATA_ENCRYPTION_KEY_VERSION`, `DATA_ENCRYPTION_KEY_ANTERIOR`, `AUDIT_HMAC_KEY_ANTERIOR` | Solo al rotar llaves: ver `docs/ROTACION-CREDENCIALES.md` |
    | `RESEND_API_KEY` | La llave de Resend (cuando el dominio esté verificado). Sin ella, los correos esperan en cola |
    | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | Cloudflare R2 privado para los adjuntos de soporte (token de R2 con lectura y escritura solo en ese depósito). Sin ellas, los tickets funcionan sin adjuntos |
    | `SENTRY_DSN` | Opcional: el DSN del proyecto de Sentry (el mismo de la web). Sin ella, los errores solo quedan en los registros de Railway |

@@ -81,7 +81,10 @@ Con **AES-256-GCM** en la API (cifrado autenticado: si alguien altera el dato, n
 
 ### 4.2. Llaves
 - La llave de cifrado vive en una **variable de entorno del servidor** (`DATA_ENCRYPTION_KEY`), nunca en el código ni
-  en la base de datos. Cada dato cifrado guarda la versión de la llave, para poder **rotarla** sin perder nada.
+  en la base de datos. Cada dato cifrado guarda la versión de la llave, para poder **rotarla** sin perder nada:
+  `DATA_ENCRYPTION_KEY_ANTERIOR` permite leer lo viejo mientras el paso previo al despliegue lo vuelve a cifrar con la
+  nueva. Las llaves de búsqueda y de auditoría también se rotan (la de auditoría conserva la anterior para revisar las
+  filas viejas). Procedimiento completo en `docs/ROTACION-CREDENCIALES.md`.
 - Llaves distintas para desarrollo y producción. Copia de las llaves de producción en el gestor de contraseñas
   compartido de Argemiro y Dylan (**operación**): si se pierden, los datos cifrados no se recuperan.
 
