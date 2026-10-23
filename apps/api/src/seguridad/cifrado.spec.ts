@@ -1,4 +1,4 @@
-import { cifrar, descifrar, huella, secretoAleatorio } from './cifrado.js';
+import { cifrar, descifrar, huella, llavesDeCifrado, secretoAleatorio } from './cifrado.js';
 
 const llave = Buffer.alloc(32, 7);
 const llaves = new Map([[1, llave]]);
@@ -29,6 +29,29 @@ describe('cifrado por campo', () => {
     const dato = cifrar(llave, 1, 'x', 'c');
     expect(() => descifrar(new Map([[1, Buffer.alloc(32, 8)]]), dato, 'c')).toThrow();
     expect(() => descifrar(new Map([[2, llave]]), dato, 'c')).toThrow(/versión 1/);
+  });
+});
+
+describe('llavesDeCifrado', () => {
+  it('durante una rotación lee con la anterior y cifra con la nueva', () => {
+    const vieja = Buffer.alloc(32, 1);
+    const nueva = Buffer.alloc(32, 2);
+    const antes = cifrar(vieja, 1, 'secreto', 'users.totp');
+    const { version, llaves } = llavesDeCifrado({
+      DATA_ENCRYPTION_KEY: nueva.toString('base64'),
+      DATA_ENCRYPTION_KEY_VERSION: 2,
+      DATA_ENCRYPTION_KEY_ANTERIOR: vieja.toString('base64'),
+    });
+    expect(version).toBe(2);
+    expect(descifrar(llaves, antes, 'users.totp').toString()).toBe('secreto');
+    const despues = cifrar(llaves.get(version)!, version, 'secreto', 'users.totp');
+    expect(despues[0]).toBe(2);
+    // Sin la anterior, lo viejo ya no se lee.
+    const soloNueva = llavesDeCifrado({
+      DATA_ENCRYPTION_KEY: nueva.toString('base64'),
+      DATA_ENCRYPTION_KEY_VERSION: 2,
+    });
+    expect(() => descifrar(soloNueva.llaves, antes, 'users.totp')).toThrow(/versión 1/);
   });
 });
 

@@ -34,6 +34,23 @@ export function descifrar(llaves: ReadonlyMap<number, Buffer>, dato: Buffer, con
   ]);
 }
 
+/**
+ * Las llaves de cifrado del entorno: la actual con su versión y, durante una rotación, la anterior (versión - 1),
+ * que solo sirve para leer. `docs/ROTACION-CREDENCIALES.md`.
+ */
+export function llavesDeCifrado(entorno: {
+  DATA_ENCRYPTION_KEY: string;
+  DATA_ENCRYPTION_KEY_VERSION: number;
+  DATA_ENCRYPTION_KEY_ANTERIOR?: string | undefined;
+}): { version: number; llaves: Map<number, Buffer> } {
+  const version = entorno.DATA_ENCRYPTION_KEY_VERSION;
+  const llaves = new Map([[version, Buffer.from(entorno.DATA_ENCRYPTION_KEY, 'base64')]]);
+  if (entorno.DATA_ENCRYPTION_KEY_ANTERIOR) {
+    llaves.set(version - 1, Buffer.from(entorno.DATA_ENCRYPTION_KEY_ANTERIOR, 'base64'));
+  }
+  return { version, llaves };
+}
+
 /** HMAC-SHA256 separado por propósito, para buscar un dato sin guardarlo en claro. */
 export function huella(llave: Buffer, proposito: string, valor: string): Buffer {
   return createHmac('sha256', llave).update(proposito).update('\0').update(valor).digest();
