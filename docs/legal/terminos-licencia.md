@@ -1,7 +1,7 @@
 # Términos y condiciones de la licencia de uso de Doc Trader Pro AI
 
 > Borrador del 2026-10-14, escrito para la plataforma doctraderpro.com. Antes de publicarlo conviene que lo revise un
-> abogado colombiano. Los campos entre corchetes se completan con los datos del titular.
+> abogado colombiano. Los datos del titular se completaron el 2026-10-23.
 
 **Versión 1.0 — vigente desde [fecha de publicación]**
 
@@ -10,8 +10,8 @@
 Estos términos regulan el uso de la plataforma **doctraderpro.com** y de las licencias del software
 **Doc Trader Pro AI** (en adelante, "el Software").
 
-- **Titular:** DocTraderPRO ([NIT o cédula del titular]), con domicilio en Barranquilla, Colombia.
-- **Dirección:** [dirección física].
+- **Titular:** DocTraderPRO (NIT 901001001), con domicilio en Barranquilla, Colombia.
+- **Dirección:** Calle 10 No 10 - 10, Barranquilla.
 - **Correo oficial:** support@doctraderpro.com.
 
 En este documento, "DocTraderPRO", "nosotros" o "la plataforma" se refieren al titular, y "el Cliente" a la persona

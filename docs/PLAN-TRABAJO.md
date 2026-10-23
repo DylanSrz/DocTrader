@@ -341,9 +341,8 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
 ## 5. Lista para el día del lanzamiento
 
 **Legal y contenido**
-- [ ] Datos del responsable completos en la política de datos (NIT o cédula, dirección y teléfono). La política
-      publicada todavía los muestra entre corchetes (revisado el 2026-10-23). **Quién:** Argemiro los pasa; el
-      desarrollo publica la versión nueva con una migración.
+- [x] Datos del responsable completos en la política de datos y en los términos (NIT, dirección y teléfono): se
+      publican con la migración `1793500000000-datos-responsable` (2026-10-23).
 - [x] Términos, política y aviso de riesgo publicados y revisados por el abogado (2026-10-22).
 - [x] Cifras de Myfxbook al día (2026-10-23): cuenta 11792099 del otro broker, con ganancia y tiempo auditado; sin
       caída máxima, por decisión.
