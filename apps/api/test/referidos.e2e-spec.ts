@@ -224,6 +224,38 @@ describe('referidos', () => {
     ]);
   });
 
+  it('un admin habilita por correo a quien se registró sin cuenta de trading', async () => {
+    const correo = `Irene.${Date.now()}@Correo.co`;
+    const irene = await clienteConSesion(app, {
+      nombre: 'Irene Castro',
+      correo: correo.toLowerCase(),
+    });
+    // Un admin propio: el compartido ya gastó sus confirmaciones de los 15 minutos.
+    const otroAdmin = await adminConSesion(app);
+    await otroAdmin.confirmar();
+    const noExiste = await otroAdmin.web
+      .put('/admin/referidos/habilitado', { correo: 'nadie@correo.co', habilitado: true })
+      .expect(400);
+    expect(noExiste.body.campos.correo).toMatch(/No hay ningún cliente/);
+    // Tampoco sirve para un admin.
+    await otroAdmin.web
+      .put('/admin/referidos/habilitado', { correo: otroAdmin.usuario.email, habilitado: true })
+      .expect(400);
+
+    const r = await otroAdmin.web
+      .put('/admin/referidos/habilitado', { correo: ` ${correo} `.trim(), habilitado: true })
+      .expect(200);
+    expect(r.body.nombre).toBe('Irene Castro');
+    expect((await irene.web.get('/referidos/mio').expect(200)).body).toMatchObject({
+      puedeReferir: true,
+      via: 'HABILITADO',
+    });
+    await otroAdmin.web
+      .put('/admin/referidos/habilitado', { correo, habilitado: false })
+      .expect(200);
+    expect((await irene.web.get('/referidos/mio').expect(200)).body.puedeReferir).toBe(false);
+  });
+
   it('cada compra del referido deja el 15 % al referidor, salvo mientras su licencia está vencida', async () => {
     const hugo = await clienteConSesion(app, { nombre: 'Hugo Ramírez', codigoReferido: codigoAna });
     const primera = await comprar(hugo, admin);

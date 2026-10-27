@@ -8,12 +8,14 @@ import {
   anularComisionReferido,
   cambiarAjustesReferidos,
   type EstadoOperacion,
+  habilitarReferidorPorCorreo,
   marcarReferidoEnviado,
 } from '../acciones-operacion';
 
 const enviadoConAviso = conAviso(marcarReferidoEnviado);
 const ajustesConAviso = conAviso(cambiarAjustesReferidos);
 const anularConAviso = conAviso(anularComisionReferido);
+const habilitarConAviso = conAviso(habilitarReferidorPorCorreo);
 
 /** Marcar enviado un pago de referidos: el hash de la transacción en Tron (o el número de la transferencia). */
 export function MarcarEnviado({ id, referidor }: { id: string; referidor: string }) {
@@ -128,6 +130,41 @@ export function AnularComision() {
       <div>
         <BotonEnviar variante="enlace" enviando="Anulando…">
           Anular comisión
+        </BotonEnviar>
+      </div>
+      {estado.error ? <ErrorOperacion estado={estado} /> : null}
+    </form>
+  );
+}
+
+/** Habilitar para referir a alguien registrado que no ha comprado (sin cuenta de trading no tiene ficha en Licencias). */
+export function HabilitarPorCorreo() {
+  const [estado, accion] = useActionState(habilitarConAviso, {} as EstadoOperacion);
+  return (
+    <form action={accion} noValidate className="grid w-full max-w-[420px] gap-4">
+      <Campo
+        etiqueta="Correo con el que se registró"
+        name="correo"
+        type="email"
+        autoComplete="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        maxLength={254}
+        defaultValue={estado.valores?.correo}
+        error={estado.campos?.correo}
+      />
+      <Selector
+        etiqueta="Qué hacer"
+        name="habilitado"
+        defaultValue={estado.valores?.habilitado ?? 'si'}
+      >
+        <option value="si">Habilitar para referir</option>
+        <option value="no">Quitar la habilitación</option>
+      </Selector>
+      <CampoCodigo estado={estado} accion="cambiar la habilitación" />
+      <div>
+        <BotonEnviar variante="enlace" enviando="Guardando…">
+          Guardar
         </BotonEnviar>
       </div>
       {estado.error ? <ErrorOperacion estado={estado} /> : null}

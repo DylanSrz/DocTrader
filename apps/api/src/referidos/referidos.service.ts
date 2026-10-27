@@ -1,4 +1,5 @@
 import {
+  correoCanonico,
   ESPERA_CAMBIO_DIRECCION_HORAS,
   formatearUsd,
   interpretarReferencia,
@@ -642,6 +643,27 @@ export class ReferidosService {
         m,
       );
     });
+  }
+
+  /**
+   * Lo mismo, buscando al cliente por su correo: quien se registró pero aún no agregó una cuenta de trading no tiene
+   * licencia ni ficha en el admin.
+   */
+  async habilitarPorCorreo(
+    correo: string,
+    habilitado: boolean,
+    sesion: SesionActiva,
+    cliente: ContextoCliente,
+  ) {
+    const [usuario] = (await this.fuente.query(
+      `SELECT id, full_name FROM users WHERE email_canonical = $1 AND role = $2 AND status <> 'DELETED'`,
+      [correoCanonico(correo), ROL.CLIENTE],
+    )) as { id: string; full_name: string }[];
+    if (!usuario) {
+      throw errorDeCampos({ correo: 'No hay ningún cliente registrado con ese correo.' });
+    }
+    await this.habilitar(usuario.id, habilitado, sesion, cliente);
+    return { nombre: usuario.full_name };
   }
 
   /**

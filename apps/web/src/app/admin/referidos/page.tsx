@@ -9,7 +9,7 @@ import { fechaCorta, usd } from '@/lib/formato';
 import type { VistaAdminReferidos, VistaReferidos } from '@/lib/referidos';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
 import { nombrePeriodo } from '@/lib/socio';
-import { AjustesReferidos, AnularComision, MarcarEnviado } from './formularios';
+import { AjustesReferidos, AnularComision, HabilitarPorCorreo, MarcarEnviado } from './formularios';
 
 export const metadata: Metadata = { title: 'Referidos' };
 
@@ -242,6 +242,17 @@ async function Contenido() {
               minimo={String(ajustes.minimoPagoUsdCents / 100)}
               activo={ajustes.activo}
             />
+          </section>
+          <section aria-labelledby="t-habilitar" className="grid justify-items-start gap-4">
+            <h2 id="t-habilitar" className="text-medio">
+              Habilitar a un referidor
+            </h2>
+            <p className="max-w-[30em] text-sm text-ceniza">
+              Para que alguien refiera sin haber comprado una licencia. Primero debe registrarse en
+              la plataforma; luego ve su enlace en Panel → Referidos. Si ya tiene una cuenta de
+              trading, también se hace desde su ficha en Licencias.
+            </p>
+            <HabilitarPorCorreo />
           </section>
           <section aria-labelledby="t-anular" className="grid justify-items-start gap-4">
             <h2 id="t-anular" className="text-medio">

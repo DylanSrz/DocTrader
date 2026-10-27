@@ -607,6 +607,36 @@ export async function habilitarReferidor(
   );
 }
 
+/** Habilita (o deja de habilitar) para referir a un registrado sin cuenta de trading, buscándolo por su correo. */
+export async function habilitarReferidorPorCorreo(
+  previo: EstadoOperacion,
+  datos: FormData,
+): Promise<EstadoOperacion> {
+  const correo = texto(datos, 'correo').trim();
+  const habilitado = texto(datos, 'habilitado') !== 'no';
+  if (!correo.includes('@')) {
+    return {
+      campos: { correo: 'Escribe el correo con el que se registró.' },
+      valores: valoresDe(datos),
+    };
+  }
+  const r = await operar(datos, (t) =>
+    llamarApi<{ nombre: string }>('/admin/referidos/habilitado', {
+      metodo: 'PUT',
+      cuerpo: { correo, habilitado },
+      token: t,
+    }),
+  );
+  if (!r.ok) return r.estado;
+  revalidatePath('/admin', 'layout');
+  return listo(
+    previo,
+    habilitado
+      ? `${r.datos.nombre} quedó habilitado para referir. Ve su enlace en Panel → Referidos.`
+      : `Se quitó la habilitación para referir de ${r.datos.nombre}.`,
+  );
+}
+
 /** Corrige quién invitó a un cliente, o lo quita (código vacío). Solo cambia las ventas siguientes. */
 export async function corregirReferidor(
   previo: EstadoOperacion,
