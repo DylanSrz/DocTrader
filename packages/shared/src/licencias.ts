@@ -165,6 +165,26 @@ export const NOMBRE_FILTRO_LICENCIAS: Record<FiltroLicencias, string> = {
   suspendidas: 'Suspendidas',
 };
 
+/** Filtros de la lista de clientes del admin (todos los registrados, tengan o no cuenta de trading). */
+export const FILTROS_CLIENTES = [
+  'todos',
+  'sin_cuenta',
+  'con_licencia',
+  'vencidos',
+  'referidores',
+  'suspendidos',
+] as const;
+export type FiltroClientes = (typeof FILTROS_CLIENTES)[number];
+
+export const NOMBRE_FILTRO_CLIENTES: Record<FiltroClientes, string> = {
+  todos: 'Todos',
+  sin_cuenta: 'Sin cuenta',
+  con_licencia: 'Con licencia',
+  vencidos: 'Vencidos',
+  referidores: 'Referidores',
+  suspendidos: 'Suspendidos',
+};
+
 /** Límites de lo que un admin puede ajustar a mano en una licencia. */
 export const LIMITES_ADMIN = {
   diasExtension: { minimo: 1, maximo: 90 },

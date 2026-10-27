@@ -21,6 +21,7 @@ export default function LayoutAdmin({ children }: { children: ReactNode }) {
               varios: '# tickets sin responder',
             },
           },
+          { href: '/admin/clientes', texto: 'Clientes' },
           { href: '/admin/licencias', texto: 'Licencias' },
           {
             href: '/admin/ajustes',
