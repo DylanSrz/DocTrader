@@ -2,10 +2,11 @@ import { enlaceExplorador, formatearPorcentaje } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Copiar } from '@/components/panel/copiar';
+import { VistaReferidor } from '@/components/referidos/vista-referidor';
 import { Enlace, Estado, Etiqueta } from '@/components/ui';
 import { llamarApi } from '@/lib/api';
 import { fechaCorta, usd } from '@/lib/formato';
-import type { VistaAdminReferidos } from '@/lib/referidos';
+import type { VistaAdminReferidos, VistaReferidos } from '@/lib/referidos';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
 import { nombrePeriodo } from '@/lib/socio';
 import { AjustesReferidos, AnularComision, MarcarEnviado } from './formularios';
@@ -16,9 +17,8 @@ const pagos = (n: number) => (n === 1 ? '1 pago' : `${n} pagos`);
 
 async function Contenido() {
   await requerirSesion('ADMIN');
-  const r = await llamarApi<VistaAdminReferidos>('/admin/referidos', {
-    token: await tokenDeSesion(),
-  });
+  const token = await tokenDeSesion();
+  const r = await llamarApi<VistaAdminReferidos>('/admin/referidos', { token });
   if (!r.ok) {
     return <p className="text-error">No pudimos cargar los referidos: {r.error.mensaje}</p>;
   }
@@ -176,7 +176,9 @@ async function Contenido() {
                           ) : null}
                         </td>
                         <td className="grid justify-items-start gap-1.5 py-4">
-                          {x.esAdmin ? <Estado tono="neutro">Socio</Estado> : null}
+                          {x.esAdmin ? (
+                            <Estado tono="neutro">{x.esSocio ? 'Socio' : 'Admin'}</Estado>
+                          ) : null}
                           {x.habilitado ? <Estado tono="senal">Habilitado</Estado> : null}
                           {!x.conDireccion ? <Estado tono="apagado">Sin dirección</Estado> : null}
                         </td>
@@ -253,7 +255,23 @@ async function Contenido() {
           </section>
         </div>
       </div>
+
+      <MisReferidos token={token} />
     </>
+  );
+}
+
+/** Cada admin también refiere con su cuenta: su enlace, su red hasta la segunda línea y su dirección de cobro. */
+async function MisReferidos({ token }: { token: string | undefined }) {
+  const r = await llamarApi<VistaReferidos>('/referidos/mio', { token });
+  if (!r.ok) return null;
+  return (
+    <section
+      aria-label="Mis referidos"
+      className="mt-[clamp(80px,10vw,140px)] border-t border-white/8 pt-[clamp(48px,6vw,80px)]"
+    >
+      <VistaReferidor vista={r.datos} titular={false} />
+    </section>
   );
 }
 

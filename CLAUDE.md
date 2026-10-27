@@ -40,7 +40,7 @@ Reglas clave:
 - **Referidos** (etapa 11): quien refiere gana el **15 %** (editable) de cada compra de su referido directo (primera
   línea) y el **5 %** (editable) de las de los referidos de ellos (segunda línea; no hay más niveles), mientras sean
   clientes (desde el 2026-10-22; antes era 20 % de un solo nivel). Cada uno ve su red hasta la segunda línea. Se paga en USDT (Tron) cada quincena desde USD 20, a mano desde Binance, con el hash. Refieren los clientes con
-  licencia activa o en gracia, quienes un admin habilite y el socio. El invitado no recibe beneficio. Sección 16 de
+  licencia activa o en gracia, quienes un admin habilite y los dos admins (el socio y DocTrader Pro, cada uno con su enlace y su red, desde 2026-10-27). El invitado no recibe beneficio. Sección 16 de
   los términos.
 - Titular: **DocTraderPRO, Barranquilla, Colombia**. Textos legales (borradores) en `docs/legal/`; plan de seguridad en
   `docs/SEGURIDAD.md`; decisiones técnicas (blockchain, archivos, cuentas) en `docs/DECISIONES-TECNICAS.md`;
