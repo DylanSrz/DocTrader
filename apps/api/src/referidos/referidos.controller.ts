@@ -24,6 +24,7 @@ import {
   CorregirReferidorDto,
   DireccionCobroDto,
   HabilitarDto,
+  HabilitarPorCorreoDto,
   PagoEnviadoDto,
 } from './dto.js';
 import { ReferidosService } from './referidos.service.js';
@@ -113,6 +114,17 @@ export class AdminReferidosController {
   ) {
     await this.referidos.habilitar(id, dto.habilitado, sesion, cliente);
     return { ok: true };
+  }
+
+  @Put('habilitado')
+  @HttpCode(HttpStatus.OK)
+  @ConfirmacionReciente()
+  async habilitarPorCorreo(
+    @Body() dto: HabilitarPorCorreoDto,
+    @SesionActual() sesion: SesionActiva,
+    @Cliente() cliente: ContextoCliente,
+  ) {
+    return this.referidos.habilitarPorCorreo(dto.correo, dto.habilitado, sesion, cliente);
   }
 
   @Put('clientes/:id/referidor')

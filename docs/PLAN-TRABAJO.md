@@ -341,6 +341,9 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
   enlace, su red hasta la segunda línea y su dirección de cobro, y cobra con las mismas reglas (15 % y 5 %, quincenal
   en USDT). La sección "Mis referidos" pasó a `/admin/referidos` (antes estaba en `/admin/socio`) y los correos de
   comisión llevan ahí. A quienes invitan se les muestra como "DocTrader P.".
+- **Habilitar por correo (2026-10-27):** quien se registró pero no agregó una cuenta de trading no tiene ficha en
+  Licencias. En `/admin/referidos`, "Habilitar a un referidor" lo habilita (o le quita la habilitación) con su correo y
+  el código de la app (`PUT /admin/referidos/habilitado`); cualquiera de los dos admins puede hacerlo.
 
 ## 5. Lista para el día del lanzamiento
 

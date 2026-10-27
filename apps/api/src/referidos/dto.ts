@@ -1,6 +1,7 @@
 import { LIMITES_REFERIDOS } from '@doctrader/shared';
 import {
   IsBoolean,
+  IsEmail,
   IsIn,
   IsInt,
   IsOptional,
@@ -51,6 +52,13 @@ export class PagoEnviadoDto {
 export class HabilitarDto {
   @IsBoolean()
   habilitado: boolean;
+}
+
+/** Habilitar por correo a alguien registrado que todavía no tiene una cuenta de trading (no tiene ficha). */
+export class HabilitarPorCorreoDto extends HabilitarDto {
+  @IsEmail({}, { message: 'Escribe un correo válido.' })
+  @MaxLength(254)
+  correo: string;
 }
 
 export class CorregirReferidorDto {
