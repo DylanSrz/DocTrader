@@ -361,6 +361,7 @@ export class ReferidosService {
       m.query(
         `SELECT u.id, u.full_name, u.email, u.role, r.code, r.enabled_by_admin, r.enabled_at,
                 r.usdt_address IS NOT NULL AS con_direccion,
+                EXISTS (SELECT 1 FROM partner_profiles p WHERE p.user_id = u.id) AS es_socio,
                 (SELECT count(*)::int FROM users x WHERE x.referred_by = u.id AND x.status <> 'DELETED') AS registrados,
                 (SELECT count(*)::int FROM users x JOIN users i ON i.id = x.referred_by
                   WHERE i.referred_by = u.id AND x.id <> u.id AND x.status <> 'DELETED') AS registrados_segunda,
@@ -384,6 +385,7 @@ export class ReferidosService {
           email: string;
           role: string;
           code: string;
+          es_socio: boolean;
           enabled_by_admin: boolean;
           enabled_at: Date | null;
           con_direccion: boolean;
@@ -428,6 +430,7 @@ export class ReferidosService {
         nombre: r.full_name,
         correo: r.email,
         esAdmin: r.role === ROL.ADMIN,
+        esSocio: r.es_socio,
         codigo: r.code,
         habilitado: r.enabled_by_admin,
         habilitadoEn: r.enabled_at,

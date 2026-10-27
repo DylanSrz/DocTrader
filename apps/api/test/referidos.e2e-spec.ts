@@ -498,7 +498,7 @@ describe('referidos', () => {
     expect(ciclo.body.campos.codigo).toMatch(/ciclo/);
   });
 
-  it('el socio refiere con su cuenta de admin; otro admin no', async () => {
+  it('el socio y cualquier otro admin refieren con su cuenta de admin', async () => {
     const socio = await adminConSesion(app);
     const [antes] = (await fuente.query(
       `SELECT user_id FROM partner_profiles ORDER BY created_at LIMIT 1`,
@@ -514,9 +514,30 @@ describe('referidos', () => {
       expect(await referidoPor(karen.usuario.id)).toBe(socio.usuario.id);
       await comprar(karen, admin);
       expect(await correo(socio.usuario.id, 'referido-comision')).toMatchObject({
-        ruta: '/admin/socio',
+        ruta: '/admin/referidos',
       });
-      expect((await admin.web.get('/referidos/mio').expect(200)).body.puedeReferir).toBe(false);
+
+      // El otro admin no es el socio, pero también refiere: su enlace, su red y su cobro.
+      const otro = await admin.web.get('/referidos/mio').expect(200);
+      expect(otro.body).toMatchObject({ puedeReferir: true, via: 'ADMIN' });
+      expect(otro.body.perfil.codigo).not.toBe(vista.body.perfil.codigo);
+      const lucia = await clienteConSesion(app, { codigoReferido: otro.body.perfil.codigo });
+      expect(await referidoPor(lucia.usuario.id)).toBe(admin.usuario.id);
+      const ordenLucia = await comprar(lucia, admin);
+      expect((await comisiones(ordenLucia)).map((c) => [c.referrer_id, c.level])).toEqual([
+        [admin.usuario.id, 1],
+      ]);
+
+      // Su segunda línea: quien llega con el código de Lucía le deja el 5 % al admin.
+      const codigoLucia = (await lucia.web.get('/referidos/mio').expect(200)).body.perfil.codigo;
+      const pedro = await clienteConSesion(app, { codigoReferido: codigoLucia });
+      const ordenPedro = await comprar(pedro, admin);
+      expect((await comisiones(ordenPedro)).map((c) => [c.referrer_id, c.level])).toEqual([
+        [lucia.usuario.id, 1],
+        [admin.usuario.id, 2],
+      ]);
+      const red = await admin.web.get('/referidos/mio').expect(200);
+      expect(red.body.referidos.map((r: { nivel: number }) => r.nivel).sort()).toEqual([1, 2]);
     } finally {
       await fuente.query(
         `UPDATE partner_profiles SET user_id = $1 WHERE id = (SELECT id FROM partner_profiles ORDER BY created_at LIMIT 1)`,

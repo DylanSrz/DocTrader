@@ -1,12 +1,10 @@
 import { formatearPorcentaje } from '@doctrader/shared';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { VistaReferidor } from '@/components/referidos/vista-referidor';
 import { Estado, Etiqueta } from '@/components/ui';
 import { llamarApi } from '@/lib/api';
 import { fechaCorta, usd } from '@/lib/formato';
 import { requerirSesion, tokenDeSesion } from '@/lib/sesion';
-import type { VistaReferidos } from '@/lib/referidos';
 import { diaYMes, nombrePeriodo, type VistaSocio } from '@/lib/socio';
 import { EditarPorcentaje, MarcarPagada } from './formularios';
 
@@ -201,23 +199,7 @@ async function Contenido() {
           </section>
         </div>
       </div>
-
-      {socio.esElSocio ? <MisReferidos token={token} /> : null}
     </>
-  );
-}
-
-/** El socio también refiere con su cuenta de admin: su enlace, sus cifras y su dirección de cobro. */
-async function MisReferidos({ token }: { token: string | undefined }) {
-  const r = await llamarApi<VistaReferidos>('/referidos/mio', { token });
-  if (!r.ok) return null;
-  return (
-    <section
-      aria-label="Mis referidos"
-      className="mt-[clamp(80px,10vw,140px)] border-t border-white/8 pt-[clamp(48px,6vw,80px)]"
-    >
-      <VistaReferidor vista={r.datos} titular={false} />
-    </section>
   );
 }
 

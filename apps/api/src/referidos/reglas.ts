@@ -47,10 +47,11 @@ export async function leerAjustesReferidos(m: EntityManager): Promise<AjustesRef
  * Por qué alguien puede referir hoy, o `null` si no puede:
  * - `HABILITADO`: un admin lo habilitó (aunque no tenga licencia);
  * - `SOCIO`: el socio desarrollador refiere con su cuenta de admin (2026-10-22);
+ * - `ADMIN`: cualquier otro admin activo refiere con su cuenta (2026-10-27), con su enlace, su red y su cobro;
  * - `LICENCIA`: tiene una licencia activa o en gracia.
  * Una cuenta suspendida o eliminada no refiere.
  */
-export type ViaReferidor = 'HABILITADO' | 'SOCIO' | 'LICENCIA';
+export type ViaReferidor = 'HABILITADO' | 'SOCIO' | 'ADMIN' | 'LICENCIA';
 
 export async function viaParaReferir(
   m: EntityManager,
@@ -60,15 +61,23 @@ export async function viaParaReferir(
     `SELECT u.status,
             coalesce(r.enabled_by_admin, false) AS habilitado,
             EXISTS (SELECT 1 FROM partner_profiles p WHERE p.user_id = u.id) AS socio,
+            u.role = 'ADMIN' AS admin,
             EXISTS (SELECT 1 FROM licenses l WHERE l.user_id = u.id AND l.status IN ('ACTIVA', 'EN_GRACIA'))
               AS licencia
        FROM users u LEFT JOIN referral_profiles r ON r.user_id = u.id
       WHERE u.id = $1`,
     [usuarioId],
-  )) as { status: string; habilitado: boolean; socio: boolean; licencia: boolean }[];
+  )) as {
+    status: string;
+    habilitado: boolean;
+    socio: boolean;
+    admin: boolean;
+    licencia: boolean;
+  }[];
   if (!fila || fila.status !== 'ACTIVE') return null;
   if (fila.habilitado) return 'HABILITADO';
   if (fila.socio) return 'SOCIO';
+  if (fila.admin) return 'ADMIN';
   if (fila.licencia) return 'LICENCIA';
   return null;
 }
@@ -183,7 +192,7 @@ export async function asegurarPerfil(m: EntityManager, usuarioId: string): Promi
   throw new Error('No se pudo generar un código de referido único');
 }
 
-/** A dónde lleva el botón de los correos del referidor: el socio ve sus referidos en su perfil del admin. */
+/** A dónde lleva el botón de los correos del referidor: los admins ven sus referidos en la página Referidos del panel. */
 export function rutaReferidos(rol: string): string {
-  return rol === 'ADMIN' ? '/admin/socio' : '/panel/referidos';
+  return rol === 'ADMIN' ? '/admin/referidos' : '/panel/referidos';
 }
