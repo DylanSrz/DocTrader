@@ -49,7 +49,7 @@ export interface VistaReferidos {
     esperaHoras: number;
   };
   puedeReferir: boolean;
-  via: 'HABILITADO' | 'SOCIO' | 'LICENCIA' | null;
+  via: 'HABILITADO' | 'SOCIO' | 'ADMIN' | 'LICENCIA' | null;
   perfil: {
     codigo: string;
     direccion: string | null;
@@ -137,6 +137,7 @@ export interface VistaAdminReferidos {
     nombre: string;
     correo: string;
     esAdmin: boolean;
+    esSocio: boolean;
     codigo: string;
     habilitado: boolean;
     habilitadoEn: string | null;

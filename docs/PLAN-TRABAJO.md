@@ -337,6 +337,10 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
   vence o se va, el de arriba sigue cobrando. Cada quien ve su red hasta la segunda línea. Tabla
   `referral_commissions`, nueva versión del 16.2 de los términos y de la política de datos (sin correo masivo: los
   clientes actuales son de prueba), ajustes con los dos porcentajes, landing y diapositiva 9.
+- **Ajuste del 2026-10-27 (pedido de Dylan):** los dos admins refieren con su cuenta, no solo el socio: cada uno tiene su
+  enlace, su red hasta la segunda línea y su dirección de cobro, y cobra con las mismas reglas (15 % y 5 %, quincenal
+  en USDT). La sección "Mis referidos" pasó a `/admin/referidos` (antes estaba en `/admin/socio`) y los correos de
+  comisión llevan ahí. A quienes invitan se les muestra como "DocTrader P.".
 
 ## 5. Lista para el día del lanzamiento
 

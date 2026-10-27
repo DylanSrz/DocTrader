@@ -559,6 +559,7 @@ stateDiagram-v2
 - **Privacidad:** el referidor ve el nombre de pila y la inicial de sus referidos (`nombreReservado`), su estado y las
   comisiones. "Mis datos" incluye la sección de referidos; eliminar un cliente borra su `referral_profiles`.
 - **Web:** `/r/CODIGO` (cookie `ref` de 30 días), "Te invitó" en el registro, `/panel/referidos`, `/admin/referidos`,
-  la sección de la ficha y la del socio. `/publico/landing` da `referidos: { activo, porcentajeBp, segundaLineaBp }`.
+  la sección de la ficha y "Mis referidos" al final de `/admin/referidos` (cada admin refiere con su cuenta: vía `SOCIO`
+  para el socio y `ADMIN` para el otro). `/publico/landing` da `referidos: { activo, porcentajeBp, segundaLineaBp }`.
 - **Textos legales:** la migración `1793300000000-terminos-referidos` publica la sección 16 de los términos y los
   cambios de la política de datos como versiones nuevas.
