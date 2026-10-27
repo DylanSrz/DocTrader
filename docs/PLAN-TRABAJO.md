@@ -168,6 +168,11 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
     ni cédulas; queda en la auditoría). La ficha (panel lateral) trae contacto con la cédula enmascarada ("Ver
     completa" queda en la auditoría), la cuenta, capital, riesgo y notas internas, extender días con motivo (correo
     al cliente), periodos, pagos, otras cuentas del cliente y suspender (segundo clic) o quitar la suspensión.
+  - **Clientes** (2026-10-27): todos los registrados, hayan comprado o no, con filtros y conteos (todos, sin cuenta,
+    con licencia, vencidos, referidores y suspendidos) y búsqueda por nombre, correo, teléfono o número de cuenta.
+    La ficha (panel lateral) trae contacto con el documento enmascarado, sus cuentas con el estado de cada licencia
+    (enlace a la ficha de Licencias), pagos, tickets (enlace a Soporte), referidos (quién lo invitó, su red, habilitar
+    y corregir referidor) y eliminar cliente. `GET /admin/clientes` y `GET /admin/clientes/:id`.
   - **Ajustes:** precios; días de gracia, vigencia de la orden y confirmaciones (ambos con el código de la app); la
     aprobación automática; direcciones de depósito; enlaces de la página y correo de soporte; cifras de Myfxbook.
     Los cambios de la página pública se ven al instante.
