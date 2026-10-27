@@ -5,11 +5,14 @@ import type {
   EstadoLicencia,
   EstadoOrden,
   EstadoUsuario,
+  EstadoTicket,
   EstadoVerificacion,
+  FiltroClientes,
   FiltroLicencias,
   Moneda,
   NivelRiesgo,
   Red,
+  TemaTicket,
   TipoOrden,
   TipoPeriodo,
 } from '@doctrader/shared';
@@ -99,6 +102,77 @@ export interface ListaLicencias {
     cuenta: { id: string; numero: string; broker: string; conexion: EstadoConexion };
     cliente: { id: string; nombre: string };
   }[];
+}
+
+export interface ListaClientes {
+  filtro: FiltroClientes;
+  busqueda: string;
+  conteos: Record<FiltroClientes, number>;
+  recortada: boolean;
+  clientes: {
+    id: string;
+    nombre: string;
+    correo: string;
+    correoVerificado: boolean;
+    telefono: string | null;
+    estado: EstadoUsuario;
+    desde: string;
+    invitadoPor: string | null;
+    cuentas: number;
+    licenciasVigentes: number;
+    algunaVencida: boolean;
+    referidor: boolean;
+    habilitado: boolean;
+  }[];
+}
+
+/** Lo que devuelve `GET /admin/clientes/:id`. */
+export interface FichaCliente {
+  cliente: {
+    id: string;
+    nombre: string;
+    correo: string;
+    correoVerificado: boolean;
+    telefono: string | null;
+    cedulaFinal: string | null;
+    documentoPais: string | null;
+    documentoTipo: string | null;
+    estado: EstadoUsuario;
+    desde: string;
+    aceptaPublicidad: boolean;
+  };
+  cuentas: {
+    id: string;
+    numero: string;
+    broker: string;
+    conexion: EstadoConexion;
+    creadaEn: string;
+    licencia: {
+      id: string;
+      estado: EstadoLicencia;
+      plan: string | null;
+      vence: string | null;
+    } | null;
+  }[];
+  pagos: {
+    numero: string;
+    tipo: TipoOrden;
+    estado: EstadoOrden;
+    moneda: Moneda;
+    montoUsdCentavos: number;
+    plan: string;
+    cuenta: string | null;
+    creadaEn: string;
+  }[];
+  tickets: {
+    numero: number;
+    tema: TemaTicket;
+    asunto: string;
+    estado: EstadoTicket;
+    creadoEn: string;
+    ultimoMensaje: string;
+  }[];
+  red: { primeraLinea: number; segundaLinea: number };
 }
 
 export interface Ficha {

@@ -24,6 +24,7 @@ import {
   DireccionDto,
   EnlacesDto,
   ExtenderDto,
+  ListaClientesDto,
   ListaLicenciasDto,
   MotivoDto,
   MyfxbookDto,
@@ -171,6 +172,16 @@ export class AdminLicenciasController {
   ) {
     await this.licencias.reactivar(id, sesion, cliente);
     return { ok: true };
+  }
+
+  @Get('clientes')
+  clientesLista(@Query() dto: ListaClientesDto) {
+    return this.clientes.listar(dto.filtro ?? 'todos', dto.q ?? '');
+  }
+
+  @Get('clientes/:id')
+  clienteFicha(@Param('id', uuid) id: string) {
+    return this.clientes.ficha(id);
   }
 
   @Post('clientes/:id/cedula')

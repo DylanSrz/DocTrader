@@ -1,5 +1,7 @@
 import {
+  FILTROS_CLIENTES,
   FILTROS_LICENCIAS,
+  type FiltroClientes,
   type FiltroLicencias,
   LIMITES_ADMIN,
   LIMITES_CUENTA,
@@ -27,6 +29,17 @@ import {
 const { diasExtension, motivo, capitalUsd, notas } = LIMITES_ADMIN;
 
 const URL_SEGURA = { protocols: ['https'], require_protocol: true };
+
+export class ListaClientesDto {
+  @IsOptional()
+  @IsIn(FILTROS_CLIENTES)
+  filtro?: FiltroClientes;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  q?: string;
+}
 
 export class ListaLicenciasDto {
   @IsOptional()
