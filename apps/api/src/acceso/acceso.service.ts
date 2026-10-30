@@ -2,6 +2,7 @@ import {
   correoCanonico,
   ESTADO_SESION,
   ESTADO_USUARIO,
+  formatearTelefono,
   claveDocumento,
   problemaContrasena,
   validarDocumento,
@@ -316,11 +317,18 @@ export class AccesoService {
       );
       const usado = usados[0];
       if (!usado) throw enlaceInvalido();
-      const verificado = filas<{ email: string; full_name: string; role: string }>(
+      const verificado = filas<{
+        email: string;
+        full_name: string;
+        role: string;
+        phone_e164: string | null;
+        invitado_por: string | null;
+      }>(
         await m.query(
-          `UPDATE users SET email_verified_at = now(), updated_at = now()
-           WHERE id = $1 AND email_verified_at IS NULL
-           RETURNING email, full_name, role`,
+          `UPDATE users u SET email_verified_at = now(), updated_at = now()
+           WHERE u.id = $1 AND u.email_verified_at IS NULL
+           RETURNING u.email, u.full_name, u.role, u.phone_e164,
+                     (SELECT r.full_name FROM users r WHERE r.id = u.referred_by) AS invitado_por`,
           [usado.user_id],
         ),
       )[0];
@@ -332,6 +340,18 @@ export class AccesoService {
           plantilla: PLANTILLA.BIENVENIDA,
           datos: { nombre: primerNombre(verificado.full_name) },
           clave: `bienvenida:${usado.user_id}`,
+        });
+        // Los admins se enteran del registro cuando la persona confirma su correo: así no llegan avisos de
+        // registros que nunca se completan.
+        await this.avisos.avisarAdmins(m, PLANTILLA.REGISTRO_NUEVO, {
+          clave: `registro:${usado.user_id}`,
+          datos: {
+            id: usado.user_id,
+            cliente: verificado.full_name,
+            correo: verificado.email,
+            telefono: verificado.phone_e164 ? formatearTelefono(verificado.phone_e164) : '—',
+            invitadoPor: verificado.invitado_por ?? '',
+          },
         });
       }
     });

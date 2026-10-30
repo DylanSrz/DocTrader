@@ -174,6 +174,26 @@ describe('registro', () => {
     expect(aviso!.status).toBe('PENDIENTE');
     expect(secreto).toMatch(/^[A-Za-z0-9_-]{43}$/);
     expect(JSON.stringify(aviso!.payload)).not.toContain(secreto!);
+
+    // Los admins se enteran recién cuando la persona confirma su correo, una sola vez.
+    const avisosDe = async () =>
+      (await fuente.query(
+        `SELECT n.payload FROM notifications n
+          WHERE n.template = 'registro-nuevo' AND n.payload->>'id' = $1`,
+        [usuario.id],
+      )) as { payload: Record<string, string> }[];
+    expect(await avisosDe()).toHaveLength(0);
+    await comoLaWeb(app).post('/auth/verificar-correo', { token: secreto }).expect(200);
+    const [admins] = (await fuente.query(
+      `SELECT count(*)::int AS n FROM users WHERE role = 'ADMIN' AND status = 'ACTIVE'`,
+    )) as { n: number }[];
+    const avisos = await avisosDe();
+    expect(avisos).toHaveLength(admins!.n);
+    expect(avisos[0]!.payload).toMatchObject({
+      cliente: datos.nombre,
+      correo: datos.correo,
+      invitadoPor: '',
+    });
   });
 
   it('con un correo ya registrado responde igual, no crea otra cuenta y avisa al dueño', async () => {
