@@ -2,6 +2,7 @@ import {
   correoCanonico,
   ESTADO_SESION,
   ESTADO_USUARIO,
+  formatearTelefono,
   claveDocumento,
   problemaContrasena,
   validarDocumento,
@@ -246,6 +247,17 @@ export class AccesoService {
           plantilla: PLANTILLA.VERIFICAR_CORREO,
           datos: { nombre: primerNombre(usuario.fullName) },
           secreto: token,
+        });
+        // Los dos admins se enteran de cada registro, con enlace a su ficha en Clientes.
+        await this.avisos.avisarAdmins(m, PLANTILLA.REGISTRO_NUEVO, {
+          clave: `registro:${usuario.id}`,
+          datos: {
+            id: usuario.id,
+            cliente: usuario.fullName,
+            correo: usuario.email,
+            telefono: formatearTelefono(telefono!),
+            invitadoPor: referidor?.nombre ?? '',
+          },
         });
         await this.auditoria.registrar(
           {

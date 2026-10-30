@@ -163,6 +163,8 @@ describe('automatizaciones', () => {
     expect(recordatorios.map((r) => r.dias)).toEqual(['7', '3', '1', '7']);
 
     expect(await correos({ usuarioId: admin.usuario.id })).toEqual({
+      // El registro del cliente (los admins se enteran de cada uno).
+      'registro-nuevo': 1,
       'pago-por-revisar': 2,
       'venta-aprobada': 2,
       'cuenta-por-desconectar': 1,

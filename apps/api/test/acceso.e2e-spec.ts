@@ -174,6 +174,22 @@ describe('registro', () => {
     expect(aviso!.status).toBe('PENDIENTE');
     expect(secreto).toMatch(/^[A-Za-z0-9_-]{43}$/);
     expect(JSON.stringify(aviso!.payload)).not.toContain(secreto!);
+
+    // Cada admin activo recibe el aviso del registro, con enlace a la ficha del cliente.
+    const avisos = (await fuente.query(
+      `SELECT n.user_id, n.payload FROM notifications n JOIN users u ON u.id = n.user_id
+        WHERE n.template = 'registro-nuevo' AND n.payload->>'id' = $1`,
+      [usuario.id],
+    )) as { user_id: string; payload: Record<string, string> }[];
+    const admins = (await fuente.query(
+      `SELECT count(*)::int AS n FROM users WHERE role = 'ADMIN' AND status = 'ACTIVE'`,
+    )) as { n: number }[];
+    expect(avisos).toHaveLength(admins[0]!.n);
+    expect(avisos[0]!.payload).toMatchObject({
+      cliente: datos.nombre,
+      correo: datos.correo,
+      invitadoPor: '',
+    });
   });
 
   it('con un correo ya registrado responde igual, no crea otra cuenta y avisa al dueño', async () => {
