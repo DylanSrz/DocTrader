@@ -33,6 +33,11 @@ describe('plantillas de correo', () => {
     expect(correo.html).toContain('&lt;script&gt;');
   });
 
+  it('el encabezado lleva el logo de la marca, con dirección absoluta', () => {
+    const correo = renderizar(PLANTILLA.BIENVENIDA, { nombre: 'Ana' }, null, web);
+    expect(correo.html).toContain('src="https://www.doctraderpro.com/marca/icono-192.png"');
+  });
+
   it('una plantilla desconocida es un error', () => {
     expect(() => renderizar('no-existe', {}, null, web)).toThrow(/desconocida/);
   });
