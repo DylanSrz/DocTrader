@@ -83,6 +83,13 @@ function conEnlaceDeSoporte(texto: string): string {
   );
 }
 
+/**
+ * El icono de la marca (cerebro sobre fondo negro, se ve igual en modo claro y oscuro). Va con la dirección pública
+ * de producción: un correo de desarrollo tampoco podría cargarlo desde localhost. Si se mueve el archivo de
+ * `apps/web/public/marca`, hay que cambiarlo aquí.
+ */
+const LOGO = 'https://www.doctraderpro.com/marca/icono-192.png';
+
 function armar({ asunto, saludo, parrafos, boton, despues = [] }: Contenido): CorreoListo {
   const texto = [
     saludo,
@@ -103,7 +110,10 @@ function armar({ asunto, saludo, parrafos, boton, despues = [] }: Contenido): Co
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f2"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px">
 <tr><td style="padding:32px 32px 8px;font-family:Inter,Helvetica,Arial,sans-serif">
-<p style="margin:0 0 24px;font-size:15px;font-weight:600;letter-spacing:-0.01em;color:#000">DocTrader<span style="color:#fb9819">PRO</span></p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px"><tr>
+<td style="padding:0 12px 0 0;vertical-align:middle"><img src="${LOGO}" width="44" height="44" alt="" style="display:block;width:44px;height:44px;border:0;border-radius:10px"></td>
+<td style="vertical-align:middle;font-size:17px;font-weight:600;letter-spacing:-0.01em;color:#000">DocTrader<span style="color:#fb9819">PRO</span></td>
+</tr></table>
 ${p(saludo)}
 ${parrafos.map(p).join('\n')}
 ${
