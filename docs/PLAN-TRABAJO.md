@@ -173,7 +173,8 @@ Cada etapa deja algo que se puede usar y probar. El orden respeta las dependenci
     La ficha (panel lateral) trae contacto con el documento enmascarado, sus cuentas con el estado de cada licencia
     (enlace a la ficha de Licencias), pagos, tickets (enlace a Soporte), referidos (quién lo invitó, su red, habilitar
     y corregir referidor) y eliminar cliente. `GET /admin/clientes` y `GET /admin/clientes/:id`.
-  - **Aviso de registro** (2026-10-30): cada registro nuevo manda a los dos admins el correo "Nuevo registro: nombre",
+  - **Aviso de registro** (2026-10-30): cuando una persona registrada confirma su correo, los dos admins reciben
+    "Nuevo registro: nombre" (los registros que nunca confirman no avisan),
     con correo, teléfono, quién lo invitó y el botón a su ficha en Clientes (plantilla `registro-nuevo`).
   - **Ajustes:** precios; días de gracia, vigencia de la orden y confirmaciones (ambos con el código de la app); la
     aprobación automática; direcciones de depósito; enlaces de la página y correo de soporte; cifras de Myfxbook.
