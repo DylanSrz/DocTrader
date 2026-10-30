@@ -44,6 +44,7 @@ export const PLANTILLA = {
   REFERIDO_PAGO_ENVIADO: 'referido-pago-enviado',
   REFERIDO_DIRECCION_CAMBIADA: 'referido-direccion-cambiada',
   REFERIDOS_POR_PAGAR: 'referidos-por-pagar',
+  REGISTRO_NUEVO: 'registro-nuevo',
 } as const;
 export type Plantilla = (typeof PLANTILLA)[keyof typeof PLANTILLA];
 
@@ -409,6 +410,17 @@ export function renderizar(
           datos.conectar === 'si'
             ? { texto: 'Ver las cuentas por conectar', url: `${web}/admin/cuentas` }
             : { texto: 'Ver los pagos', url: `${web}/admin/pagos` },
+      });
+    case PLANTILLA.REGISTRO_NUEVO:
+      return armar({
+        asunto: `Nuevo registro: ${datos.cliente}`,
+        saludo,
+        parrafos: [
+          `${datos.cliente} se registró en DocTraderPRO${datos.invitadoPor ? `, invitado por ${datos.invitadoPor}` : ''}.`,
+          `Correo: ${datos.correo}. Teléfono: ${datos.telefono}.`,
+          'Todavía no confirma su correo ni agrega una cuenta de trading. Su ficha muestra cómo avanza.',
+        ],
+        boton: { texto: 'Ver su ficha', url: `${web}/admin/clientes?ficha=${datos.id}` },
       });
     case PLANTILLA.CUENTA_POR_CONECTAR:
       return armar({
