@@ -416,9 +416,9 @@ export function renderizar(
         asunto: `Nuevo registro: ${datos.cliente}`,
         saludo,
         parrafos: [
-          `${datos.cliente} se registró en DocTraderPRO${datos.invitadoPor ? `, invitado por ${datos.invitadoPor}` : ''}.`,
+          `${datos.cliente} se registró en DocTraderPRO y confirmó su correo${datos.invitadoPor ? `. Lo invitó ${datos.invitadoPor}` : ''}.`,
           `Correo: ${datos.correo}. Teléfono: ${datos.telefono}.`,
-          'Todavía no confirma su correo ni agrega una cuenta de trading. Su ficha muestra cómo avanza.',
+          'Todavía no agrega una cuenta de trading. Su ficha muestra cómo avanza.',
         ],
         boton: { texto: 'Ver su ficha', url: `${web}/admin/clientes?ficha=${datos.id}` },
       });
